@@ -1,0 +1,53 @@
+# Cloudflare Pages — redirect rules
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+# Format: source  destination  status_code
+
+# Redirect www -> apex (canonical)
+# (Cloudflare Pages also does this automatically when both are added,
+#  but explicit rule guarantees consistent behaviour.)
+https://www.monkeytactics.com/*  https://monkeytactics.com/:splat  301!
+
+# Directory URLs: serve the index.html cleanly without trailing-slash
+# duplication. Pages handles this by default, but these rules make it
+# explicit so /age-calculator and /age-calculator/ don't both resolve.
+# (No action needed — Pages auto-resolves directory indexes.)
+
+# Legacy clean paths -> exact .html canonical (single hop)
+/about/  /about.html  301
+/privacy/  /privacy.html  301
+/contact/  /contact.html  301
+/tools/age-calculator/  /tools/age-calculator.html  301
+/tools/percentage-calculator/  /tools/percentage-calculator.html  301
+/tools/bmi-calculator/  /tools/bmi-calculator.html  301
+/tools/loan-calculator/  /tools/loan-mortgage-calculator.html  301
+/tools/loan-mortgage-calculator/  /tools/loan-mortgage-calculator.html  301
+/tools/date-difference/  /tools/date-difference-calculator.html  301
+/tools/date-difference-calculator/  /tools/date-difference-calculator.html  301
+/tools/unit-converter/  /tools/unit-converter.html  301
+/tools/tip-calculator/  /tools/tip-calculator.html  301
+/tools/password-generator/  /tools/password-generator.html  301
+/tools/compound-interest-calculator/  /tools/compound-interest-calculator.html  301
+/tools/qr-code-generator/  /tools/qr-code-generator.html  301
+/tools/word-character-counter/  /tools/word-character-counter.html  301
+/tools/time-zone-converter/  /tools/time-zone-converter.html  301
+/tools/finance/  /tools/finance.html  301
+/tools/health/  /tools/health.html  301
+/tools/utilities/  /tools/utilities.html  301
+/tools/productivity/  /tools/productivity.html  301
+/tools/age-calculator  /tools/age-calculator.html  301
+/tools/bmi-calculator  /tools/bmi-calculator.html  301
+/tools/compound-interest-calculator  /tools/compound-interest-calculator.html  301
+/tools/date-difference-calculator  /tools/date-difference-calculator.html  301
+/tools/loan-mortgage-calculator  /tools/loan-mortgage-calculator.html  301
+/tools/password-generator  /tools/password-generator.html  301
+/tools/percentage-calculator  /tools/percentage-calculator.html  301
+/tools/qr-code-generator  /tools/qr-code-generator.html  301
+/tools/time-zone-converter  /tools/time-zone-converter.html  301
+/tools/tip-calculator  /tools/tip-calculator.html  301
+/tools/unit-converter  /tools/unit-converter.html  301
+/tools/word-character-counter  /tools/word-character-counter.html  301
+/tools/index  /tools/index.html  301
+/tools/finance  /tools/finance.html  301
+/tools/health  /tools/health.html  301
+/tools/utilities  /tools/utilities.html  301
+/tools/productivity  /tools/productivity.html  301

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>About — MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Learn about MonkeyTactics — who we are, what we build, and why we believe free, private, accurate tools should be available to everyone." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="About — MonkeyTactics" />
+  <meta property="og:description" content="Free, fast, and privacy-friendly online calculators and tools for finance, health, utilities, and productivity." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/about.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/about.html" />
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <!-- About-page overrides -->
+  <style>
+    /* Hero variant for inner pages */
+    .hero--inner {
+      padding: 1.75rem 2rem;
+    }
+
+    .hero--inner h1 {
+      font-size: 1.9rem;
+    }
+
+    /* Pillar grid — 4-up on wide, 2-up on tablet, 1-up on mobile */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .pillar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.25rem 1.4rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .pillar-icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .pillar-card strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 0.35rem;
+      color: var(--accent);
+    }
+
+    .pillar-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.875rem;
+      line-height: 1.55;
+    }
+
+    /* Prose sections */
+    .about-section {
+      max-width: 740px;
+      margin-top: 2rem;
+    }
+
+    .about-section h2 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .about-section p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0 0 0.75rem;
+    }
+
+    .about-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Category list inline */
+    .category-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0;
+      list-style: none;
+    }
+
+    .category-list li a {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .category-list li a:hover {
+      background: var(--accent);
+      color: #022c22;
+    }
+
+    /* CTA strip */
+    .about-cta {
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 600px) {
+      .hero--inner {
+        padding: 1.25rem;
+      }
+
+      .hero--inner h1 {
+        font-size: 1.5rem;
+      }
+
+      .about-cta {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- PAGE HERO -->
+    <section class="hero hero--inner" aria-labelledby="about-heading">
+      <h1 id="about-heading">About MonkeyTactics</h1>
+      <p>Free, fast, and privacy‑friendly tools for everyday calculations. No accounts. No tracking. No nonsense.</p>
+
+      <div class="hero-actions">
+        <a href="/tools/index.html" class="btn-primary">⚡ Browse all tools</a>
+        <a href="/contact.html" class="btn-ghost">Get in touch</a>
+      </div>
+    </section>
+
+    <!-- AD -->
+    <div class="ad-container" aria-label="Advertisement">
+      <!-- AdSense: Top Display Ad -->
+    </div>
+
+    <!-- PILLARS -->
+    <section aria-labelledby="pillars-heading">
+      <h2 id="pillars-heading">What MonkeyTactics stands for</h2>
+      <p class="text-muted">Four principles that guide every tool we build.</p>
+
+      <div class="pillars-grid">
+
+        <div class="pillar-card">
+          <span class="pillar-icon" aria-hidden="true">🆓</span>
+          <strong>Always Free</strong>
+          <p>Every tool on this site is free to use — no paywalls, no subscriptions, no sign‑up required.</p>
+        </div>
+
+        <div class="pillar-card">
+          <span class="pillar-icon" aria-hidden="true">⚡</span>
+          <strong>Fast &amp; Lightweight</strong>
+          <p>Pages load in milliseconds. Tools run instantly. No frameworks, no bloat — just clean HTML, CSS, and JS.</p>
+        </div>
+
+        <div class="pillar-card">
+          <span class="pillar-icon" aria-hidden="true">🔒</span>
+          <strong>Private by Design</strong>
+          <p>All calculations happen directly in your browser. Nothing you enter is ever sent to a server or stored anywhere.</p>
+        </div>
+
+        <div class="pillar-card">
+          <span class="pillar-icon" aria-hidden="true">✅</span>
+          <strong>Accurate &amp; Reliable</strong>
+          <p>Each tool is carefully built and tested against known reference values so you can trust the results.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MISSION -->
+    <section class="about-section" aria-labelledby="mission-heading">
+      <h2 id="mission-heading">Our Mission</h2>
+      <p>MonkeyTactics started from a simple frustration: too many calculator sites are slow, cluttered with ads,
+         or demand you create an account just to run a basic calculation. We set out to fix that.</p>
+      <p>The goal is straightforward — build a growing library of tools that are genuinely useful, immediately
+         accessible, and respectful of your time and privacy. Every page is hand‑crafted, tested on real devices,
+         and designed to get out of your way as fast as possible.</p>
+    </section>
+
+    <!-- WHAT WE COVER -->
+    <section aria-labelledby="coverage-heading">
+      <h2 id="coverage-heading">What we cover</h2>
+      <p class="text-muted">Tools span four core categories — and we're adding more regularly.</p>
+
+      <ul class="category-list" role="list">
+        <li><a href="/tools/finance.html">💰 Finance</a></li>
+        <li><a href="/tools/health.html">🏥 Health &amp; Body</a></li>
+        <li><a href="/tools/utilities.html">🔧 Everyday Utilities</a></li>
+        <li><a href="/tools/productivity.html">⚡ Productivity</a></li>
+      </ul>
+
+      <div class="tools-grid" style="margin-top: 1.25rem;">
+
+        <a href="/tools/compound-interest-calculator.html" class="tool-card">
+          <strong>Compound Interest Calculator</strong>
+          <div>Model investment growth with contributions, inflation, and tax scenarios.</div>
+        </a>
+
+        <a href="/tools/bmi-calculator.html" class="tool-card">
+          <strong>BMI Calculator</strong>
+          <div>Calculate your Body Mass Index and healthy weight range.</div>
+        </a>
+
+        <a href="/tools/loan-mortgage-calculator.html" class="tool-card">
+          <strong>Loan &amp; Mortgage Calculator</strong>
+          <div>Monthly payments, total interest, and full amortization schedules.</div>
+        </a>
+
+        <a href="/tools/qr-code-generator.html" class="tool-card">
+          <strong>QR Code Generator</strong>
+          <div>Create instant QR codes for URLs, text, or Wi&#8209;Fi credentials.</div>
+        </a>
+
+        <a href="/tools/age-calculator.html" class="tool-card">
+          <strong>Age Calculator</strong>
+          <div>Find your exact age in years, months, and days from any date.</div>
+        </a>
+
+        <a href="/tools/password-generator.html" class="tool-card">
+          <strong>Password Generator</strong>
+          <div>Generate strong, random passwords with customisable rules.</div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- PRIVACY COMMITMENT -->
+    <section class="about-section" aria-labelledby="privacy-commitment-heading">
+      <h2 id="privacy-commitment-heading">Privacy &amp; Data</h2>
+      <p>MonkeyTactics does not collect, store, or transmit any data you enter into its tools. Every calculation
+         runs entirely inside your browser using JavaScript — the numbers you type never leave your device.</p>
+      <p>The site uses standard web analytics to understand broad usage patterns (page views, traffic sources),
+         but no personally identifiable information is collected and no cookies are used to track you across other sites.</p>
+      <p>For full details, see the <a href="/privacy.html" class="text-accent">Privacy Policy</a>.</p>
+    </section>
+
+    <!-- CTA -->
+    <div class="about-cta">
+      <a href="/tools/index.html" class="btn-primary">⚡ Explore all tools</a>
+      <a href="/sitemap.html" class="btn-ghost">View sitemap</a>
+    </div>
+
+    <!-- AD -->
+    <div class="ad-container" aria-label="Advertisement">
+      <!-- AdSense: Bottom Display Ad -->
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html" class="active">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+</body>
+</html>

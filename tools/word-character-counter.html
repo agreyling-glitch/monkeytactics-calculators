@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Word &amp; Character Counter — Reading Time &amp; Keyword Density | MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Free word and character counter — count words and characters (with and without spaces), estimate reading time, and see keyword density for any text. No sign-up required." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Word &amp; Character Counter — MonkeyTactics" />
+  <meta property="og:description" content="Count words and characters, estimate reading time, and spot top keywords — all in your browser. Free and private." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/word-character-counter.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/word-character-counter.html" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐒</text></svg>" />
+
+  <!-- Breadcrumb structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",        "item": "https://monkeytactics.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Productivity", "item": "https://monkeytactics.com/tools/productivity.html" },
+      { "@type": "ListItem", "position": 3, "name": "Word & Character Counter", "item": "https://monkeytactics.com/tools/word-character-counter.html" }
+    ]
+  }
+  </script>
+
+  <!-- WebApplication structured data -->
+
+  <!-- FAQPage structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How are words counted in this tool?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Words are counted by splitting text on whitespace and stripping leading and trailing punctuation. Hyphenated terms like \"well-known\" count as a single word, which matches the behaviour of common word processors like Microsoft Word and Google Docs." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between characters and characters without spaces?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Characters includes every visible character plus spaces and line breaks. Characters without spaces excludes all whitespace, which is useful when comparing against publisher or platform limits that ignore whitespace (for example some SMS and metadata limits)." }
+      },
+      {
+        "@type": "Question",
+        "name": "How is reading time calculated?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Reading time is estimated by dividing the word count by a reading speed measured in words per minute (WPM). The default is 200 WPM. You can change it to roughly 250–300 WPM for skimmable web content or 150–180 WPM for dense technical material." }
+      },
+      {
+        "@type": "Question",
+        "name": "What does keyword density mean?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Keyword density is the percentage of total words that a given word represents. The list shows the most frequent words in your text, with common stopwords (the, and, of, to, etc.) excluded by default so meaningful terms are easier to spot." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my text private?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes — all analysis runs entirely in your browser using JavaScript. Nothing you paste is transmitted to any server or stored anywhere. See our Privacy Policy for details." }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+    /* ── Hero ── */
+    .hero--inner        { padding: 1.75rem 2rem; }
+    .hero--inner h1     { font-size: 1.9rem; }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .breadcrumb a        { color: var(--muted); transition: color 0.15s; }
+    .breadcrumb a:hover  { color: var(--accent); }
+    .breadcrumb .sep     { opacity: 0.4; }
+
+    /* ── Tool widget ── */
+    .tool-widget {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      box-shadow: var(--shadow-card);
+      margin-top: 1.5rem;
+    }
+
+    .tool-widget h2 {
+      margin: 0 0 1.25rem;
+      font-size: 1.05rem;
+    }
+
+    /* ── Two-col layout: inputs | results ── */
+    .calc-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ── Inputs ── */
+    .input-group        { margin-bottom: 1.1rem; }
+    .input-group:last-child { margin-bottom: 0; }
+
+    .input-group label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group label .live-val {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .input-group input[type="number"],
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .input-group textarea {
+      min-height: 240px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .input-group input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+      margin-top: 0.35rem;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+
+    .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ── Inline toggle row (WPM number + stopwords) ── */
+    .options-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .options-row .wpm-number { width: 90px; }
+    .options-row label.check {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .options-row label.check input { accent-color: var(--accent); }
+
+    /* ── Action buttons ── */
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-calculate {
+      flex: 1 1 auto;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.35);
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .btn-calculate:hover  { opacity: 0.9; transform: translateY(-1px); }
+    .btn-calculate:active { transform: translateY(0); }
+
+    .btn-ghost {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.8rem 1.4rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Results panel ── */
+    .results-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .result-card {
+      background: rgba(34,197,94,0.06);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem;
+    }
+
+    .result-card.primary {
+      background: rgba(34,197,94,0.12);
+      border-color: rgba(34,197,94,0.4);
+    }
+
+    .result-card .result-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+
+    .result-card .result-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .result-card.primary .result-value { font-size: 2.2rem; }
+
+    .result-card .result-sub {
+      font-size: 0.775rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Tightly grouped trio of secondary stats */
+    .stat-trio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+    }
+    .stat-trio .result-card { padding: 0.85rem 0.9rem; }
+    .stat-trio .result-value { font-size: 1.3rem; }
+    .stat-trio .result-label { font-size: 0.7rem; margin-bottom: 0.2rem; }
+
+    /* ── Empty state for results ── */
+    .results-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      gap: 0.5rem;
+      min-height: 240px;
+    }
+    .results-empty .empty-icon { font-size: 2rem; }
+    .results-empty p           { margin: 0; font-size: 0.875rem; }
+
+    /* ── Keyword density table ── */
+    .keywords-section { margin-top: 2rem; }
+    .keywords-section h2 { font-size: 1.05rem; margin: 0 0 0.75rem; }
+
+    .keywords-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .keywords-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .keywords-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 360px;
+    }
+
+    .keywords-table th {
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-weight: 600;
+      padding: 0.65rem 0.85rem;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .keywords-table th:first-child { text-align: left; }
+
+    .keywords-table td {
+      padding: 0.55rem 0.85rem;
+      text-align: right;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--muted);
+    }
+    .keywords-table td:first-child {
+      text-align: left;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .keywords-table td:last-child { color: var(--accent); font-weight: 600; }
+
+    .keywords-table tr:last-child td { border-bottom: none; }
+    .keywords-table tr:hover td      { background: rgba(255,255,255,0.02); }
+
+    .keywords-empty {
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-style: italic;
+    }
+
+    /* ── SEO / content ── */
+    .seo-section          { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p        { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+
+    .formula-block {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin: 0.75rem 0;
+      line-height: 1.6;
+    }
+
+    /* ── FAQ ── */
+    .faq-list             { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-item             { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child  { border-bottom: none; }
+    .faq-item h3          { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
+    .faq-item p           { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    /* ── Related tools ── */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .related-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .related-card:hover  { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { font-size: 0.9rem; }
+    .related-card span   { color: var(--muted); font-size: 0.8rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 800px) {
+      .calc-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .hero--inner  { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+      .tool-widget  { padding: 1.25rem; }
+      .result-card.primary .result-value { font-size: 1.75rem; }
+      .stat-trio    { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://monkeytactics.com/tools/word-character-counter.html#app",
+      "name": "Word & Character Counter",
+      "url": "https://monkeytactics.com/tools/word-character-counter.html",
+      "description": "Count words and characters in text.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "author": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "reviewedBy": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "dateModified": "2026-07-22"
+    }
+  ]
+}
+  </script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html" class="active">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero hero--inner" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/index.html">Home</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <a href="/tools/productivity.html">Productivity</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <span aria-current="page">Word &amp; Character Counter</span>
+      </nav>
+      <h1 id="tool-heading">Word &amp; Character Counter</h1>
+      <p>Count words and characters, estimate reading time, and spot your most-used keywords.
+         Counts update live as you type — everything runs privately in your browser.</p>
+    </section>
+
+    <!-- TOP AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
+
+    <!-- COUNTER WIDGET -->
+    <section aria-labelledby="calc-heading">
+      <div class="tool-widget">
+        <h2 id="calc-heading">Enter Your Text</h2>
+
+        <div class="calc-layout">
+
+          <!-- ── LEFT: INPUTS ── -->
+          <div class="inputs-col">
+
+            <!-- Textarea -->
+            <div class="input-group">
+              <label for="text-input">
+                Your Text
+                <span class="live-val" id="liveWords">0 words</span>
+              </label>
+              <textarea id="text-input"
+                        placeholder="Paste or type your text here..."
+                        aria-label="Text to analyse"></textarea>
+              <p class="input-hint">Counts update automatically as you type or paste.</p>
+            </div>
+
+            <!-- Reading speed -->
+            <div class="input-group">
+              <label for="wpmSlider">
+                Reading Speed
+                <span class="live-val" id="wpmVal">200 wpm</span>
+              </label>
+              <input type="range" id="wpmSlider"
+                     min="50" max="1000" step="10" value="200"
+                     aria-label="Reading speed slider" />
+              <div class="options-row">
+                <input type="number" id="wpm" class="wpm-number"
+                       min="50" max="1000" step="10" value="200"
+                       aria-label="Reading speed in words per minute" />
+                <label class="check">
+                  <input type="checkbox" id="exclude-stopwords" checked />
+                  Exclude common stopwords from keywords
+                </label>
+              </div>
+              <p class="input-hint">Typical reading speeds: 150–180 for technical text, 200 average, 250–300 for skimmable web content.</p>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-calculate" id="clear-btn" type="button">
+                Clear text
+              </button>
+              <button class="btn-ghost" id="copy-btn" type="button">
+                Copy text
+              </button>
+            </div>
+
+          </div><!-- /inputs-col -->
+
+          <!-- ── RIGHT: RESULTS ── -->
+          <div class="results-col" id="resultsCol" aria-live="polite">
+
+            <!-- Empty state -->
+            <div class="results-empty" id="resultsEmpty">
+              <span class="empty-icon" aria-hidden="true">📝</span>
+              <strong>Your counts will appear here</strong>
+              <p>Start typing on the left to see word and character counts instantly.</p>
+            </div>
+
+            <!-- Results (hidden until text is entered) -->
+            <div id="resultsCards" style="display:none;">
+
+              <div class="result-card primary">
+                <div class="result-label">Words</div>
+                <div class="result-value" id="resWords">0</div>
+                <div class="result-sub" id="resWordsSub">— sentences · — paragraphs</div>
+              </div>
+
+              <div class="stat-trio">
+                <div class="result-card">
+                  <div class="result-label">Characters</div>
+                  <div class="result-value" id="resChars">0</div>
+                </div>
+                <div class="result-card">
+                  <div class="result-label">No Spaces</div>
+                  <div class="result-value" id="resCharsNoSpaces">0</div>
+                </div>
+                <div class="result-card">
+                  <div class="result-label">Read Time</div>
+                  <div class="result-value" id="resReading">—</div>
+                </div>
+              </div>
+
+            </div><!-- /resultsCards -->
+          </div><!-- /results-col -->
+
+        </div><!-- /calc-layout -->
+      </div><!-- /tool-widget -->
+    </section>
+
+    <!-- MID AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Mid Display Ad --></div>
+
+    <!-- KEYWORD DENSITY TABLE -->
+    <section class="keywords-section" id="keywordsSection" style="display:none;" aria-labelledby="kw-heading">
+      <h2 id="kw-heading">Keyword Density</h2>
+
+      <div class="keywords-controls">
+        <span id="kwInfo">Top keywords in your text</span>
+      </div>
+
+      <div class="keywords-wrap">
+        <table class="keywords-table" aria-label="Keyword density">
+          <thead>
+            <tr>
+              <th>Word</th>
+              <th>Count</th>
+              <th>Density</th>
+            </tr>
+          </thead>
+          <tbody id="kwBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- HOW TO USE -->
+    <div class="seo-section">
+      <h2>How to use the Word &amp; Character Counter</h2>
+      <p>Paste or type any text into the box on the left. Word and character counts appear
+         instantly on the right — there is no need to click a button. Adjust the
+         <strong>Reading Speed</strong> slider to match your audience, and the estimated reading
+         time recalculates on the fly.</p>
+      <p>Scroll down to the <strong>Keyword Density</strong> table to see the most frequent words
+         in your text and the percentage of the total each one represents. Tick
+         <em>Exclude common stopwords</em> to hide words like "the", "and", and "of" so meaningful
+         terms are easier to spot.</p>
+    </div>
+
+    <!-- FORMULA -->
+    <div class="seo-section">
+      <h2>How are the counts calculated?</h2>
+      <p>Words are counted by splitting the text on whitespace and trimming punctuation from
+         each token. Hyphenated words like "well-known" count as one word, matching the behaviour
+         of common word processors.</p>
+      <div class="formula-block" role="img" aria-label="Word counting formula">
+        words = text.trim().split(/\s+/).length
+        density = ( word count ÷ total words ) × 100
+      </div>
+      <p>Reading time uses the formula <strong>reading time = word count ÷ WPM</strong>, where WPM
+         (words per minute) defaults to 200. <strong>Characters</strong> includes every character
+         and space; <strong>No Spaces</strong> excludes all whitespace — useful when checking text
+         against platform limits that ignore whitespace.</p>
+    </div>
+
+    <!-- FAQ -->
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+
+        <li class="faq-item">
+          <h3>How are words counted?</h3>
+          <p>Words are counted by splitting the text on whitespace and removing leading and trailing
+             punctuation. Hyphenated terms like "well-known" count as a single word, matching the
+             behaviour of Microsoft Word and Google Docs.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>What is the difference between characters and characters without spaces?</h3>
+          <p>Characters includes every character plus spaces and line breaks. Characters without
+             spaces excludes all whitespace, which is useful when comparing against publisher or
+             platform limits that ignore whitespace — for example some SMS and metadata limits.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>How is reading time calculated?</h3>
+          <p>Reading time is estimated by dividing the word count by a reading speed in words per
+             minute (WPM). The default is 200 WPM. Adjust it to roughly 250–300 WPM for skimmable
+             web content or 150–180 WPM for dense technical material.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>What does keyword density mean?</h3>
+          <p>Keyword density is the percentage of total words that a given word represents. The
+             list shows the most frequent words in your text, with common stopwords (the, and, of,
+             to, etc.) excluded by default so meaningful terms are easier to spot. It is a
+             lightweight indicator — for full SEO work, also consider context, synonyms, and
+             natural language variations.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Can I use this counter for text in other languages?</h3>
+          <p>Yes — the counter works with any Unicode text, including accented characters, non-Latin
+             scripts, and emoji. Word counting accuracy may vary for languages that do not use
+             spaces to separate words (for example Chinese or Japanese).</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Is my data private?</h3>
+          <p>Yes — all analysis runs entirely in your browser using JavaScript. No text you enter
+             is transmitted to any server or stored anywhere. See our
+             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for details.</p>
+        </li>
+
+      </ul>
+    </section>
+
+    <!-- RELATED TOOLS -->
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Related Tools</h2>
+      <div class="related-grid">
+
+        <a href="/tools/password-generator.html" class="related-card">
+          <strong>🔑 Password Generator</strong>
+          <span>Create strong, random passwords with custom length and character rules.</span>
+        </a>
+
+        <a href="/tools/qr-code-generator.html" class="related-card">
+          <strong>📱 QR Code Generator</strong>
+          <span>Turn any link or text into a downloadable, scannable QR code.</span>
+        </a>
+
+        <a href="/tools/time-zone-converter.html" class="related-card">
+          <strong>🌍 Time Zone Converter</strong>
+          <span>Convert times across cities and schedule meetings across time zones.</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- BOTTOM AD -->
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+  <!-- COUNTER SCRIPT -->
+  <script type="module">
+    import { analyzeText, humanizeReadingTime } from "/assets/js/word-counter.js";
+
+    /* ── Element refs ── */
+    const textInput      = document.getElementById('text-input');
+    const wpmInput       = document.getElementById('wpm');
+    const wpmSlider      = document.getElementById('wpmSlider');
+    const wpmVal         = document.getElementById('wpmVal');
+    const excludeStop    = document.getElementById('exclude-stopwords');
+    const clearBtn       = document.getElementById('clear-btn');
+    const copyBtn        = document.getElementById('copy-btn');
+
+    const liveWords      = document.getElementById('liveWords');
+    const resultsEmpty   = document.getElementById('resultsEmpty');
+    const resultsCards   = document.getElementById('resultsCards');
+    const resWords       = document.getElementById('resWords');
+    const resWordsSub    = document.getElementById('resWordsSub');
+    const resChars       = document.getElementById('resChars');
+    const resCharsNoSpaces = document.getElementById('resCharsNoSpaces');
+    const resReading     = document.getElementById('resReading');
+
+    const keywordsSection = document.getElementById('keywordsSection');
+    const kwBody          = document.getElementById('kwBody');
+    const kwInfo          = document.getElementById('kwInfo');
+
+    /* ── Local sentence + paragraph counts (lightweight, not in module) ── */
+    function countSentences(text) {
+      const matches = text.match(/[^.!?\n]+[.!?]+(?=\s|$)|[^.!?\n]+$/g);
+      return matches ? matches.length : 0;
+    }
+    function countParagraphs(text) {
+      const paras = text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+      return paras.length;
+    }
+
+    /* ── Slider <-> number input sync ── */
+    function syncWPM(source, target) {
+      source.addEventListener('input', function () {
+        const v = parseInt(source.value, 10);
+        if (!isNaN(v)) {
+          target.value = v;
+          wpmVal.textContent = v + ' wpm';
+          renderAnalysis();
+        }
+      });
+    }
+    syncWPM(wpmSlider, wpmInput);
+    syncWPM(wpmInput, wpmSlider);
+
+    /* ── Render results ── */
+    function renderAnalysis() {
+      const text = textInput.value;
+      const wpm  = parseInt(wpmInput.value, 10) || 200;
+      const res  = analyzeText(text, { wpm, excludeStopwords: excludeStop.checked });
+
+      /* Always reflect live word count next to the label */
+      liveWords.textContent = res.words.toLocaleString() +
+        (res.words === 1 ? ' word' : ' words');
+
+      if (!text.trim()) {
+        resultsEmpty.style.display = 'flex';
+        resultsCards.style.display = 'none';
+        keywordsSection.style.display = 'none';
+        return;
+      }
+
+      resultsEmpty.style.display = 'none';
+      resultsCards.style.display = 'block';
+
+      const sentences  = countSentences(text);
+      const paragraphs = countParagraphs(text);
+
+      resWords.textContent         = res.words.toLocaleString();
+      resWordsSub.textContent      =
+        sentences + (sentences === 1 ? ' sentence' : ' sentences') + ' · ' +
+        paragraphs + (paragraphs === 1 ? ' paragraph' : ' paragraphs');
+      resChars.textContent         = res.characters.toLocaleString();
+      resCharsNoSpaces.textContent = res.charactersNoSpaces.toLocaleString();
+      resReading.textContent       = humanizeReadingTime(res.readingTimeSeconds);
+
+      /* ── Keyword density table ── */
+      const list = res.topWords.slice(0, 10);
+
+      if (list.length === 0) {
+        keywordsSection.style.display = 'none';
+      } else {
+        keywordsSection.style.display = 'block';
+        kwInfo.textContent = excludeStop.checked
+          ? 'Top ' + list.length + ' keywords (excluding stopwords)'
+          : 'Top ' + list.length + ' keywords (including stopwords)';
+        kwBody.innerHTML = list.map(function (w) {
+          return '<tr><td>' + escapeHTML(w.word) + '</td>' +
+                 '<td>' + w.count + '</td>' +
+                 '<td>' + w.density.toFixed(1) + '%</td></tr>';
+        }).join('');
+      }
+    }
+
+    function escapeHTML(s) {
+      return s.replace(/[&<>"']/g, function (c) {
+        return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+      });
+    }
+
+    /* ── Listeners ── */
+    textInput.addEventListener('input', renderAnalysis);
+    excludeStop.addEventListener('change', renderAnalysis);
+
+    clearBtn.addEventListener('click', function () {
+      textInput.value = '';
+      renderAnalysis();
+      textInput.focus();
+    });
+
+    copyBtn.addEventListener('click', function () {
+      if (!textInput.value) return;
+      navigator.clipboard.writeText(textInput.value).then(function () {
+        const original = copyBtn.textContent;
+        copyBtn.textContent = '✅ Copied!';
+        setTimeout(function () { copyBtn.textContent = original; }, 2000);
+      });
+    });
+
+    /* ── Init ── */
+    renderAnalysis();
+  </script>
+
+</body>
+</html>

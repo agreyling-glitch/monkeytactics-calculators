@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Free Finance Calculators — Mortgage, Interest &amp; Percentage | MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Free online finance calculators — calculate mortgage payments, model compound interest growth, and work out percentages instantly. No sign-up. Runs in your browser." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Free Finance Calculators — MonkeyTactics" />
+  <meta property="og:description" content="Mortgage calculator, compound interest calculator, and percentage calculator. Free, private, no sign-up required." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/finance.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/finance.html" />
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+    .hero--inner { padding: 1.75rem 2rem; }
+    .hero--inner h1 { font-size: 1.9rem; }
+
+    /* Tool cards enhanced */
+    .tool-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .tool-card .card-icon { font-size: 1.4rem; margin-bottom: 0.15rem; display: block; }
+    .tool-card strong { font-size: 0.95rem; }
+    .tool-card .card-tags { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.4rem; }
+    .tool-card .card-tag {
+      font-size: 0.7rem;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.1rem 0.5rem;
+    }
+    .tool-card .card-arrow {
+      position: absolute; bottom: 1rem; right: 1rem;
+      color: var(--muted); font-size: 0.9rem;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .tool-card:hover .card-arrow { color: var(--accent); transform: translateX(3px); }
+
+    /* SEO prose */
+    .seo-section { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2 { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+
+    /* FAQ */
+    .faq-list { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h3 { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
+    .faq-item p { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    /* Related categories */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .related-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .related-card:hover { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { display: block; margin-bottom: 0.2rem; }
+    .related-card span { color: var(--muted); font-size: 0.8rem; }
+
+    @media (max-width: 600px) {
+      .hero--inner { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://monkeytactics.com/tools/finance.html#collection",
+      "url": "https://monkeytactics.com/tools/finance.html",
+      "name": "Free Finance Calculators",
+      "isPartOf": {
+        "@id": "https://monkeytactics.com/#website"
+      },
+      "publisher": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "url": "https://monkeytactics.com/tools/loan-mortgage-calculator.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "url": "https://monkeytactics.com/tools/compound-interest-calculator.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "url": "https://monkeytactics.com/tools/percentage-calculator.html"
+          }
+        ]
+      }
+    }
+  ]
+}
+  </script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html" class="active">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero hero--inner" aria-labelledby="finance-heading">
+      <h1 id="finance-heading">Free Finance Calculators</h1>
+      <p>Plan loans, model investments, and calculate percentages instantly — all in your browser,
+         with no data ever leaving your device.</p>
+      <div class="hero-actions">
+        <a href="/tools/compound-interest-calculator.html" class="btn-primary">📈 Try Compound Interest Calculator</a>
+        <a href="/tools/index.html" class="btn-ghost">Browse all tools</a>
+      </div>
+    </section>
+
+    <!-- AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
+
+    <!-- TOOLS -->
+    <section aria-labelledby="finance-tools-heading">
+      <h2 id="finance-tools-heading" style="margin-bottom:0.75rem;">💰 Finance Tools <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">3 tools</span></h2>
+      <div class="tools-grid">
+
+        <a href="/tools/loan-mortgage-calculator.html" class="tool-card">
+          <span class="card-icon" aria-hidden="true">🏠</span>
+          <strong>Loan &amp; Mortgage Calculator</strong>
+          <div>Calculate monthly payments, total interest paid, and view a full amortization schedule for any loan or mortgage.</div>
+          <div class="card-tags">
+            <span class="card-tag">Mortgage</span>
+            <span class="card-tag">Loans</span>
+            <span class="card-tag">Amortization</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/compound-interest-calculator.html" class="tool-card">
+          <span class="card-icon" aria-hidden="true">📈</span>
+          <strong>Compound Interest Calculator</strong>
+          <div>Model investment and savings growth with regular contributions, inflation adjustments, and tax scenarios.</div>
+          <div class="card-tags">
+            <span class="card-tag">Investing</span>
+            <span class="card-tag">Savings</span>
+            <span class="card-tag">Growth</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/percentage-calculator.html" class="tool-card">
+          <span class="card-icon" aria-hidden="true">💯</span>
+          <strong>Percentage Calculator</strong>
+          <div>Work out X% of Y, find percentage change, increase or decrease, and reverse percentages instantly.</div>
+          <div class="card-tags">
+            <span class="card-tag">Percentage</span>
+            <span class="card-tag">Math</span>
+            <span class="card-tag">Discount</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- SEO CONTENT -->
+    <div class="seo-section">
+      <h2>Why use MonkeyTactics finance calculators?</h2>
+      <p>Making confident financial decisions requires accurate numbers — and getting those numbers shouldn't
+         require a spreadsheet or a financial advisor for every calculation. MonkeyTactics finance calculators
+         are built to handle the most common personal finance calculations quickly, accurately, and privately.</p>
+      <p>Whether you're comparing mortgage deals, projecting how much your savings will grow, or simply
+         figuring out what a 15% discount actually saves you — these tools give you clear answers in seconds.
+         Everything runs directly in your browser, so your financial details never touch a server.</p>
+    </div>
+
+    <!-- FAQ -->
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+        <li class="faq-item">
+          <h3>How accurate is the mortgage calculator?</h3>
+          <p>The loan and mortgage calculator uses standard amortization formulas identical to those used by banks.
+             Results are accurate for fixed-rate loans. For variable-rate or interest-only mortgages, treat the
+             output as an estimate and consult your lender for exact figures.</p>
+        </li>
+        <li class="faq-item">
+          <h3>Does the compound interest calculator account for taxes?</h3>
+          <p>Yes — the compound interest calculator includes optional fields for tax rate and inflation, allowing
+             you to model real after-tax returns and the true purchasing power of your savings over time.</p>
+        </li>
+        <li class="faq-item">
+          <h3>Is my financial data stored or shared?</h3>
+          <p>No. All calculations happen entirely in your browser using JavaScript. No numbers you enter are
+             transmitted to any server, stored in a database, or shared with any third party. See our
+             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for full details.</p>
+        </li>
+        <li class="faq-item">
+          <h3>Can I use these calculators on mobile?</h3>
+          <p>Yes — all MonkeyTactics tools are fully responsive and work on any device including smartphones
+             and tablets, with no app download required.</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- RELATED CATEGORIES -->
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Explore Other Categories</h2>
+      <div class="related-grid">
+        <a href="/tools/health.html" class="related-card">
+          <strong>🏥 Health &amp; Body</strong>
+          <span>BMI Calculator, Age Calculator</span>
+        </a>
+        <a href="/tools/utilities.html" class="related-card">
+          <strong>🔧 Everyday Utilities</strong>
+          <span>Date Difference, Unit Converter, Tip Calculator &amp; more</span>
+        </a>
+        <a href="/tools/productivity.html" class="related-card">
+          <strong>⚡ Productivity</strong>
+          <span>Password Generator, Word &amp; Character Counter</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- AD -->
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+
+  </main>
+
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+</body>
+</html>

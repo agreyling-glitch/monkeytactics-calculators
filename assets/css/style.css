@@ -1,0 +1,386 @@
+/* ============================================================
+   MonkeyTactics — Global Stylesheet
+   Site: monkeytactics.com
+   ============================================================ */
+
+
+/* ============================================================
+   1. DESIGN TOKENS (CSS Custom Properties)
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --bg:          #0f172a;
+  --bg-alt:      #020617;
+  --card-bg:     #0b1120;
+
+  /* Accent */
+  --accent:      #22c55e;
+  --accent-soft: rgba(34, 197, 94, 0.15);
+
+  /* Typography */
+  --text:        #e5e7eb;
+  --muted:       #9ca3af;
+
+  /* UI */
+  --border:      #1f2937;
+  --radius:      0.75rem;
+
+  /* Shadows */
+  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.75);
+  --shadow-card: 0 14px 30px rgba(15, 23, 42, 0.85);
+}
+
+
+/* ============================================================
+   2. RESET & BASE
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #1e293b 0, #020617 55%, #000 100%);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+li {
+  margin-bottom: 0.35rem;
+}
+
+h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.4rem;
+}
+
+
+/* ============================================================
+   3. LAYOUT
+   ============================================================ */
+
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+
+/* ============================================================
+   4. HEADER & BRAND
+   ============================================================ */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: none;
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.4),
+    0 12px 30px rgba(34, 197, 94, 0.35); 
+  flex-shrink: 0;
+}
+
+.brand-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.brand-name {
+  font-weight: 600;
+}
+
+.brand-tagline {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+
+/* ============================================================
+   5. NAVIGATION
+   ============================================================ */
+
+nav {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+nav a {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  transition: background 0.15s, color 0.15s;
+}
+
+nav a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+}
+
+nav a.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+
+/* ============================================================
+   6. HERO
+   ============================================================ */
+
+.hero {
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9)),
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), transparent 55%);
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 2rem;
+}
+
+.hero h1 {
+  font-size: 2.2rem;
+  margin: 0 0 0.75rem;
+  line-height: 1.25;
+}
+
+.hero p {
+  color: var(--muted);
+  max-width: 40rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+
+/* ============================================================
+   7. BUTTONS
+   ============================================================ */
+
+.btn-primary {
+  display: inline-block;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  padding: 0.6rem 1.3rem;
+  border-radius: 999px;
+  font-weight: 600;
+  color: #022c22;
+  box-shadow: 0 12px 30px rgba(34, 197, 94, 0.45);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  display: inline-block;
+  padding: 0.6rem 1.3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  color: var(--muted);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Dark theme fix — native select dropdown options */
+select option {
+  background-color: #0f1a12;
+  color: #e2e8f0;
+}
+
+/* ============================================================
+   8. AD CONTAINERS
+   ============================================================ */
+
+.ad-container {
+  margin: 1.5rem 0;
+  padding: 0.75rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  text-align: center;
+  min-height: 90px;
+}
+
+.ad-slot__label {
+  color: var(--muted);
+  display: inline-block;
+  font-size: 0.75rem;
+  line-height: 72px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+
+/* ============================================================
+   9. GRIDS — Tools & Categories
+   ============================================================ */
+
+.tools-grid,
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+
+/* ============================================================
+   10. CARDS — Tool & Category
+   ============================================================ */
+
+.tool-card,
+.category-card {
+  background: var(--card-bg);
+  padding: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.tool-card:hover,
+.category-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.tool-card strong,
+.category-card strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+
+.tool-card div,
+.category-card div {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+
+/* ============================================================
+   11. FOOTER
+   ============================================================ */
+
+footer {
+  margin-top: 2rem;
+  padding: 1.5rem 1.5rem 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+footer a:hover {
+  color: var(--text);
+}
+
+
+/* ============================================================
+   12. UTILITY CLASSES
+   ============================================================ */
+
+.text-muted   { color: var(--muted); }
+.text-accent  { color: var(--accent); }
+.text-sm      { font-size: 0.875rem; }
+.text-xs      { font-size: 0.8rem; }
+.mt-0         { margin-top: 0; }
+.mb-0         { margin-bottom: 0; }
+
+
+/* ============================================================
+   13. RESPONSIVE — Mobile
+   ============================================================ */
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 1.25rem;
+  }
+
+  .hero h1 {
+    font-size: 1.65rem;
+  }
+
+  nav {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+}
+
+/* Disclaimer / methodology block */
+.methodology {
+  margin-top: 2.5rem;
+}
+
+.methodology h4 {
+  font-size: 0.95rem;
+}
+
+.disclaimer {
+  font-size: 0.75rem;     
+  color: #555;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+
+/* Reserve a predictable layout area only while configured ads are active. */
+html[data-ads-enabled="true"] .ad-container { min-height: 250px; }
+@media (min-width: 768px) { html[data-ads-enabled="true"] .ad-container { min-height: 280px; } }

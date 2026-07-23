@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>[TOOL NAME] — Free Online [TOOL TYPE] | MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="[150–160 char description. Include tool name, what it does, and key benefit.]" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="[TOOL NAME] — MonkeyTactics" />
+  <meta property="og:description" content="[Shorter OG description, ~120 chars max.]" />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/[tool-slug].html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/[tool-slug].html" />
+
+  <!-- Breadcrumb structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",        "item": "https://monkeytactics.com/" },
+      { "@type": "ListItem", "position": 2, "name": "[CATEGORY]",  "item": "https://monkeytactics.com/tools/[category].html" },
+      { "@type": "ListItem", "position": 3, "name": "[TOOL NAME]", "item": "https://monkeytactics.com/tools/[tool-slug].html" }
+    ]
+  }
+  </script>
+
+  <!-- FAQPage structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "[FAQ QUESTION 1]",
+        "acceptedAnswer": { "@type": "Answer", "text": "[FAQ ANSWER 1]" }
+      },
+      {
+        "@type": "Question",
+        "name": "[FAQ QUESTION 2]",
+        "acceptedAnswer": { "@type": "Answer", "text": "[FAQ ANSWER 2]" }
+      },
+      {
+        "@type": "Question",
+        "name": "[FAQ QUESTION 3]",
+        "acceptedAnswer": { "@type": "Answer", "text": "[FAQ ANSWER 3]" }
+      },
+      {
+        "@type": "Question",
+        "name": "[FAQ QUESTION 4]",
+        "acceptedAnswer": { "@type": "Answer", "text": "[FAQ ANSWER 4]" }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+
+    .hero--inner        { padding: 1.75rem 2rem; }
+    .hero--inner h1     { font-size: 1.9rem; }
+
+    .breadcrumb {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .breadcrumb a        { color: var(--muted); transition: color 0.15s; }
+    .breadcrumb a:hover  { color: var(--accent); }
+    .breadcrumb .sep     { opacity: 0.4; }
+
+    .tool-widget {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      box-shadow: var(--shadow-card);
+      margin-top: 1.5rem;
+    }
+
+    .tool-widget h2 { margin: 0 0 1.25rem; font-size: 1.05rem; }
+
+    .input-group { margin-bottom: 1.1rem; }
+    .input-group:last-of-type { margin-bottom: 0; }
+
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group input[type="number"],
+    .input-group input[type="text"],
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .input-group input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+      margin-top: 0.35rem;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+
+    .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
+
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .btn-calculate {
+      display: inline-block;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.35);
+      transition: opacity 0.15s, transform 0.15s;
+      margin-top: 0.75rem;
+    }
+    .btn-calculate:hover  { opacity: 0.9; transform: translateY(-1px); }
+    .btn-calculate:active { transform: translateY(0); }
+    .btn-calculate.full-width { width: 100%; }
+
+    .calc-error {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 0.5rem;
+      color: #fca5a5;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .results-panel {
+      display: none;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .results-panel h3 { margin: 0 0 0.75rem; font-size: 1rem; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+
+    .result-card {
+      background: rgba(34,197,94,0.06);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      text-align: center;
+    }
+
+    .result-card.primary {
+      background: rgba(34,197,94,0.12);
+      border-color: rgba(34,197,94,0.4);
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+
+    .result-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .result-card.primary .result-value { font-size: 2rem; }
+
+    .result-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
+
+    .seo-section          { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p        { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+
+    .formula-block {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin: 0.75rem 0;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    .faq-list            { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-item            { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h3         { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
+    .faq-item p          { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .related-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .related-card:hover  { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { font-size: 0.9rem; }
+    .related-card span   { color: var(--muted); font-size: 0.8rem; }
+
+    @media (max-width: 600px) {
+      .hero--inner    { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+      .tool-widget    { padding: 1.25rem; }
+      .input-row      { grid-template-columns: 1fr; }
+      .result-card.primary .result-value { font-size: 1.6rem; }
+    }
+
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="robots" content="noindex, nofollow" />
+</head>
+
+<body>
+  <main>
+
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <section class="hero hero--inner" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/index.html">Home</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <a href="/tools/[category].html">[Category Name]</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <span aria-current="page">[Tool Name]</span>
+      </nav>
+      <h1 id="tool-heading">[Tool Name]</h1>
+      <p>[One or two sentences describing what the tool does and who benefits from it.]</p>
+    </section>
+
+    <div class="ad-container" aria-label="Advertisement">
+      <!-- AdSense: Top Display Ad -->
+    </div>
+
+    <section aria-labelledby="calc-heading">
+      <div class="tool-widget">
+        <h2 id="calc-heading">[Calculate / Enter / Generate] [Tool Name]</h2>
+
+        <div class="input-group">
+          <label for="inputA">[Input A Label]</label>
+          <input type="number" id="inputA" placeholder="e.g. 100" min="0" />
+          <p class="input-hint">[Helper text.]</p>
+        </div>
+
+        <div class="input-group">
+          <label for="inputB">[Input B Label]</label>
+          <input type="number" id="inputB" placeholder="e.g. 5" min="0" step="0.01" />
+          <p class="input-hint">[Helper text.]</p>
+        </div>
+
+        <div class="input-group">
+          <label for="inputC">[Input C Label]</label>
+          <select id="inputC">
+            <option value="opt1">[Option 1]</option>
+            <option value="opt2">[Option 2]</option>
+          </select>
+        </div>
+
+        <div class="calc-error" id="calcError" role="alert">
+          ⚠️ [Error message — e.g. "Please enter valid values in all required fields."]
+        </div>
+
+        <button class="btn-calculate" id="calcBtn" type="button">
+          Calculate [Tool Name]
+        </button>
+
+        <div class="results-panel" id="resultsPanel" role="region"
+             aria-label="Calculation results" aria-live="polite">
+          <h3>Results</h3>
+          <div class="results-grid">
+
+            <div class="result-card primary">
+              <div class="result-label">[Primary Result Label]</div>
+              <div class="result-value" id="result1">—</div>
+              <div class="result-sub">[Unit or context]</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">[Secondary Result Label]</div>
+              <div class="result-value" id="result2">—</div>
+              <div class="result-sub">[Unit or context]</div>
+            </div>
+
+            <div class="result-card">
+              <div class="result-label">[Tertiary Result Label]</div>
+              <div class="result-value" id="result3">—</div>
+              <div class="result-sub">[Unit or context]</div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="ad-container" aria-label="Advertisement">
+      <!-- AdSense: Mid Display Ad -->
+    </div>
+
+    <div class="seo-section">
+      <h2>How to use the [Tool Name]</h2>
+      <p>[Step-by-step explanation of what to enter and how to read the results.]</p>
+      <p>[Tips, edge cases, or caveats if needed.]</p>
+    </div>
+
+    <div class="seo-section">
+      <h2>[How is [result] calculated?]</h2>
+      <p>[Explain the formula or methodology in plain English.]</p>
+      <div class="formula-block" role="img" aria-label="[Formula name]">
+        [RESULT] = [variable A] x [variable B] / [variable C]
+      </div>
+      <p>Where: <strong>A</strong> = ..., <strong>B</strong> = ..., <strong>C</strong> = ...</p>
+    </div>
+
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+
+        <li class="faq-item">
+          <h3>[Question 1 — phrase as the user would type into Google]</h3>
+          <p>[Answer 1 — clear, factual, 2–4 sentences.]</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>[Question 2]</h3>
+          <p>[Answer 2]</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>[Question 3]</h3>
+          <p>[Answer 3]</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>[Question 4]</h3>
+          <p>[Answer 4]</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Is my data kept private?</h3>
+          <p>Yes — all calculations run entirely in your browser using JavaScript. Nothing you
+             enter is transmitted to any server or stored anywhere. See our
+             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for full details.</p>
+        </li>
+
+      </ul>
+    </section>
+
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Related Tools</h2>
+      <div class="related-grid">
+
+        <a href="/tools/[related-slug-1].html" class="related-card">
+          <strong>[emoji] [Related Tool 1]</strong>
+          <span>[One-line description.]</span>
+        </a>
+
+        <a href="/tools/[related-slug-2].html" class="related-card">
+          <strong>[emoji] [Related Tool 2]</strong>
+          <span>[One-line description.]</span>
+        </a>
+
+        <a href="/tools/[related-slug-3].html" class="related-card">
+          <strong>[emoji] [Related Tool 3]</strong>
+          <span>[One-line description.]</span>
+        </a>
+
+      </div>
+    </section>
+
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;">
+      <!-- AdSense: Bottom Display Ad -->
+    </div>
+
+  </main>
+
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+  <script>
+  (function () {
+
+    const calcBtn      = document.getElementById('calcBtn');
+    const calcError    = document.getElementById('calcError');
+    const resultsPanel = document.getElementById('resultsPanel');
+
+    calcBtn.addEventListener('click', function () {
+
+      calcError.style.display    = 'none';
+      resultsPanel.style.display = 'none';
+
+      const a = parseFloat(document.getElementById('inputA').value);
+      const b = parseFloat(document.getElementById('inputB').value);
+
+      if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) {
+        calcError.style.display = 'block';
+        calcError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+
+      // TODO: replace with real formula for this tool
+      const result1 = a * b;
+      const result2 = a + b;
+      const result3 = Math.abs(a - b);
+
+      document.getElementById('result1').textContent = result1.toFixed(2);
+      document.getElementById('result2').textContent = result2.toFixed(2);
+      document.getElementById('result3').textContent = result3.toFixed(2);
+
+      resultsPanel.style.display = 'block';
+      resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+  })();
+  </script>
+
+</body>
+</html>

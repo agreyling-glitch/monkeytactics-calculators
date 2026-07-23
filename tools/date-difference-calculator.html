@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Date Difference Calculator — Days, Business Days &amp; Deadline Planner | MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Free date difference calculator — find the exact years, months and days (or total days, hours, minutes) between two dates, count business days excluding holidays, plan deadlines with buffer days, and list recurring dates. No sign-up required." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Date Difference Calculator — MonkeyTactics" />
+  <meta property="og:description" content="Find the exact difference between two dates, count business days, plan deadlines, and list recurring dates. Free and private." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/date-difference-calculator.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/date-difference-calculator.html" />
+
+  <!-- Breadcrumb structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",       "item": "https://monkeytactics.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Utilities",  "item": "https://monkeytactics.com/tools/utilities.html" },
+      { "@type": "ListItem", "position": 3, "name": "Date Difference Calculator", "item": "https://monkeytactics.com/tools/date-difference-calculator.html" }
+    ]
+  }
+  </script>
+
+  <!-- FAQPage structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I calculate the exact number of years, months, and days between two dates?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter a start date and end date, then choose the 'Exact (years, months, days)' precision mode. The calculator subtracts the dates using calendar-aware logic, borrowing from months and years the same way you would count by hand, so the result matches how people naturally describe age or duration." }
+      },
+      {
+        "@type": "Question",
+        "name": "How are business days calculated?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Business day mode counts every day between the two dates, skips Saturdays and Sundays, and also skips any date in your chosen holiday calendar (US, EU, or a custom list). What remains is the number of working days available for the task." }
+      },
+      {
+        "@type": "Question",
+        "name": "What holidays does the calculator include?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The US calendar includes New Year's Day, Memorial Day, Independence Day, Labor Day, Thanksgiving, and Christmas. The EU calendar includes New Year's Day, Labour Day (May 1), Christmas, and St. Stephen's Day (December 26). You can also switch to a custom list and enter your own holiday dates." }
+      },
+      {
+        "@type": "Question",
+        "name": "What are buffer days in work planning mode?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Buffer days are extra working days added after your target end date as a safety margin for delays. The calculator adds them as business days, skipping weekends and holidays, and shows the resulting buffered deadline alongside the original one." }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the recurring date calculator work?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter a start date and an interval in days, and the calculator lists the next set of occurrences by repeatedly adding that interval, showing each resulting date and day of the week. It's useful for recurring bills, checkups, maintenance schedules, or any fixed-interval reminder." }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+    /* ── Hero ── */
+    .hero--inner        { padding: 1.75rem 2rem; }
+    .hero--inner h1     { font-size: 1.9rem; }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .breadcrumb a        { color: var(--muted); transition: color 0.15s; }
+    .breadcrumb a:hover  { color: var(--accent); }
+    .breadcrumb .sep     { opacity: 0.4; }
+
+    /* ── Tool widget ── */
+    .tool-widget {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      box-shadow: var(--shadow-card);
+      margin-top: 1.5rem;
+    }
+
+    .tool-widget h2 { margin: 0 0 1.25rem; font-size: 1.05rem; }
+
+    /* ── Mode tabs ── */
+    .mode-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    .mode-tab {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.825rem;
+      font-weight: 600;
+      padding: 0.5rem 1.1rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .mode-tab:hover  { color: var(--text); border-color: rgba(148,163,184,0.5); }
+    .mode-tab.active {
+      background: var(--accent-soft);
+      border-color: rgba(34,197,94,0.5);
+      color: var(--accent);
+    }
+
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
+
+    /* ── Inputs ── */
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .input-group        { margin-bottom: 1.1rem; }
+    .input-group:last-child { margin-bottom: 0; }
+
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group input[type="number"],
+    .input-group input[type="date"],
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      color-scheme: dark;
+    }
+
+    .input-group textarea { resize: vertical; min-height: 4.5rem; font-size: 0.85rem; }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+
+    .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ── Calculate button ── */
+    .btn-calculate {
+      display: inline-block;
+      width: 100%;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.35);
+      transition: opacity 0.15s, transform 0.15s;
+      margin-top: 0.5rem;
+    }
+    .btn-calculate:hover  { opacity: 0.9; transform: translateY(-1px); }
+    .btn-calculate:active { transform: translateY(0); }
+
+    /* ── Error ── */
+    .calc-error {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 0.5rem;
+      color: #fca5a5;
+      font-size: 0.875rem;
+    }
+
+    /* ── Results panel ── */
+    .results-panel {
+      display: none;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .results-panel h3 { margin: 0 0 0.85rem; font-size: 1rem; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+
+    .result-card {
+      background: rgba(34,197,94,0.06);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      text-align: center;
+    }
+    .result-card.primary { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.4); grid-column: span 2; }
+    .result-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+    .result-value { font-size: 1.5rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
+    .result-card.primary .result-value { font-size: 2rem; }
+    .result-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ── Deadline risk banner ── */
+    .risk-banner {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.85rem 1.1rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .risk-banner .risk-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .risk-low    { background: rgba(34,197,94,0.1);  border: 1px solid rgba(34,197,94,0.35);  color: #86efac; }
+    .risk-low    .risk-dot { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.7); }
+    .risk-medium { background: rgba(234,179,8,0.1);  border: 1px solid rgba(234,179,8,0.35);  color: #fde68a; }
+    .risk-medium .risk-dot { background: #eab308; box-shadow: 0 0 8px rgba(234,179,8,0.7); }
+    .risk-high   { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.35); color: #fca5a5; }
+    .risk-high   .risk-dot { background: #f87171; box-shadow: 0 0 8px rgba(248,113,113,0.7); }
+    .risk-past   { background: rgba(148,163,184,0.1); border: 1px solid rgba(148,163,184,0.35); color: var(--muted); }
+    .risk-past   .risk-dot { background: #94a3b8; }
+
+    /* ── Copy link ── */
+    .share-line {
+      display: none;
+      margin-top: 1.25rem;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .btn-copy-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 999px;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-copy-link:hover { background: rgba(34,197,94,0.15); }
+    .copy-confirm { font-size: 0.8rem; color: var(--accent); display: none; }
+
+    /* ── Gantt-style mini timeline ── */
+    .gantt-wrap { margin-top: 1.5rem; }
+    .gantt-wrap h4 { font-size: 0.85rem; margin: 0 0 0.6rem; color: var(--text); }
+    .gantt-bar {
+      display: flex;
+      width: 100%;
+      height: 26px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .gantt-seg { flex: 1 1 0; min-width: 2px; }
+    .gantt-seg.workday { background: var(--accent); }
+    .gantt-seg.weekend { background: rgba(148,163,184,0.35); }
+    .gantt-seg.holiday { background: #f87171; }
+    .gantt-seg.buffer  { background: #eab308; }
+    .gantt-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
+    .gantt-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.775rem; color: var(--muted); margin-top: 0.6rem; }
+    .gantt-legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+    .gantt-legend .dot.workday { background: var(--accent); }
+    .gantt-legend .dot.weekend { background: rgba(148,163,184,0.6); }
+    .gantt-legend .dot.holiday { background: #f87171; }
+    .gantt-legend .dot.buffer  { background: #eab308; }
+
+    /* ── Recurring table ── */
+    .recur-wrap { margin-top: 1.5rem; overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    .recur-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 380px; }
+    .recur-table th {
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-weight: 600;
+      padding: 0.6rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .recur-table td {
+      padding: 0.5rem 0.85rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--muted);
+    }
+    .recur-table td:first-child { color: var(--text); font-weight: 500; }
+    .recur-table tr:last-child td { border-bottom: none; }
+    .recur-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* ── SEO / content ── */
+    .seo-section          { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p        { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+
+    .formula-block {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin: 0.75rem 0;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    /* ── FAQ ── */
+    .faq-list             { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-item             { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child  { border-bottom: none; }
+    .faq-item h3          { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
+    .faq-item p           { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    /* ── Related tools ── */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .related-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .related-card:hover  { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { font-size: 0.9rem; }
+    .related-card span   { color: var(--muted); font-size: 0.8rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .hero--inner  { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+      .tool-widget  { padding: 1.25rem; }
+      .input-row    { grid-template-columns: 1fr; }
+      .result-card.primary { grid-column: span 1; }
+      .result-card.primary .result-value { font-size: 1.75rem; }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://monkeytactics.com/tools/date-difference-calculator.html#app",
+      "name": "Date Difference Calculator",
+      "url": "https://monkeytactics.com/tools/date-difference-calculator.html",
+      "description": "Calculate the difference between two dates.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "author": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "reviewedBy": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "dateModified": "2026-07-22"
+    }
+  ]
+}
+  </script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html" class="active">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero hero--inner" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/index.html">Home</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <a href="/tools/utilities.html">Utilities</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <span aria-current="page">Date Difference Calculator</span>
+      </nav>
+      <h1 id="tool-heading">Date Difference Calculator</h1>
+      <p>Find the exact time between two dates, count business days for work planning, calculate
+         a deadline's risk level, or list recurring dates at a fixed interval. Everything runs
+         privately in your browser.</p>
+    </section>
+
+    <!-- TOP AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
+
+    <!-- CALCULATOR WIDGET -->
+    <section aria-labelledby="calc-heading">
+      <div class="tool-widget">
+        <h2 id="calc-heading">Date Difference Calculator</h2>
+
+        <!-- MODE TABS -->
+        <div class="mode-tabs" role="tablist" aria-label="Calculator mode">
+          <button class="mode-tab active" data-mode="diff" role="tab" aria-selected="true">📏 Date Difference</button>
+          <button class="mode-tab" data-mode="work" role="tab" aria-selected="false">🗓️ Work Planning</button>
+          <button class="mode-tab" data-mode="recur" role="tab" aria-selected="false">🔁 Recurring Dates</button>
+        </div>
+
+        <!-- ══════════════════════ MODE 1: DATE DIFFERENCE ══════════════════════ -->
+        <div class="mode-panel active" id="panel-diff">
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="diffStart">Start Date</label>
+              <input type="date" id="diffStart" aria-label="Start date" />
+            </div>
+            <div class="input-group">
+              <label for="diffEnd">End Date</label>
+              <input type="date" id="diffEnd" aria-label="End date" />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="diffPrecision">Precision Mode</label>
+            <select id="diffPrecision" aria-label="Precision mode">
+              <option value="exact">Exact (years, months, days)</option>
+              <option value="days">Total days</option>
+              <option value="hours">Total hours</option>
+              <option value="minutes">Total minutes</option>
+              <option value="business">Business days only (excl. weekends + holidays)</option>
+            </select>
+            <p class="input-hint" id="diffPrecisionHint">Choose how the difference should be broken down.</p>
+          </div>
+
+          <div class="input-group" id="diffHolidayGroup" style="display:none;">
+            <label for="diffHolidayRegion">Holiday Calendar</label>
+            <select id="diffHolidayRegion" aria-label="Holiday calendar">
+              <option value="none">None</option>
+              <option value="us">United States</option>
+              <option value="eu">European Union</option>
+              <option value="custom">Custom list</option>
+            </select>
+          </div>
+
+          <div class="input-group" id="diffCustomHolidayGroup" style="display:none;">
+            <label for="diffCustomHolidays">Custom Holiday Dates</label>
+            <textarea id="diffCustomHolidays" placeholder="2026-01-01, 2026-07-04, 2026-12-25"></textarea>
+            <p class="input-hint">Comma or newline-separated dates in YYYY-MM-DD format.</p>
+          </div>
+
+          <div class="calc-error" id="diffError" role="alert">
+            ⚠️ Please enter a valid start date and end date.
+          </div>
+
+          <button class="btn-calculate" id="diffBtn" type="button">Calculate Difference</button>
+
+          <!-- Deadline risk banner -->
+          <div class="risk-banner" id="riskBanner" role="status">
+            <span class="risk-dot" aria-hidden="true"></span>
+            <span id="riskText"></span>
+          </div>
+
+          <div class="results-panel" id="diffResults" role="region" aria-label="Date difference results" aria-live="polite">
+            <h3>Result</h3>
+            <div class="results-grid" id="diffResultsGrid"></div>
+          </div>
+
+          <div class="share-line" id="diffShareLine">
+            <button class="btn-copy-link" id="diffCopyBtn" type="button">🔗 Copy bookmarkable link</button>
+            <span class="copy-confirm" id="diffCopyConfirm">✅ Link copied!</span>
+          </div>
+
+        </div><!-- /panel-diff -->
+
+        <!-- ══════════════════════ MODE 2: WORK PLANNING ══════════════════════ -->
+        <div class="mode-panel" id="panel-work">
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="workStart">Project Start Date</label>
+              <input type="date" id="workStart" aria-label="Project start date" />
+            </div>
+            <div class="input-group">
+              <label for="workEnd">Target End Date</label>
+              <input type="date" id="workEnd" aria-label="Target end date" />
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="workHolidayRegion">Holiday Calendar</label>
+              <select id="workHolidayRegion" aria-label="Holiday calendar">
+                <option value="none">None</option>
+                <option value="us" selected>United States</option>
+                <option value="eu">European Union</option>
+                <option value="custom">Custom list</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="workBuffer">Buffer Days (business days)</label>
+              <input type="number" id="workBuffer" min="0" max="90" step="1" value="3" aria-label="Buffer days" />
+              <p class="input-hint">Extra working days added after the target date as a safety margin.</p>
+            </div>
+          </div>
+
+          <div class="input-group" id="workCustomHolidayGroup" style="display:none;">
+            <label for="workCustomHolidays">Custom Holiday Dates</label>
+            <textarea id="workCustomHolidays" placeholder="2026-01-01, 2026-07-04, 2026-12-25"></textarea>
+            <p class="input-hint">Comma or newline-separated dates in YYYY-MM-DD format.</p>
+          </div>
+
+          <div class="calc-error" id="workError" role="alert">
+            ⚠️ Please enter a valid start date and a target end date on or after the start date.
+          </div>
+
+          <button class="btn-calculate" id="workBtn" type="button">Plan Work Schedule</button>
+
+          <div class="results-panel" id="workResults" role="region" aria-label="Work planning results" aria-live="polite">
+            <h3>Result</h3>
+            <div class="results-grid" id="workResultsGrid"></div>
+
+            <div class="gantt-wrap">
+              <h4>Mini Timeline</h4>
+              <div class="gantt-bar" id="ganttBar"></div>
+              <div class="gantt-labels">
+                <span id="ganttStartLabel">—</span>
+                <span id="ganttEndLabel">—</span>
+              </div>
+              <div class="gantt-legend">
+                <span><span class="dot workday"></span>Work day</span>
+                <span><span class="dot weekend"></span>Weekend</span>
+                <span><span class="dot holiday"></span>Holiday</span>
+                <span><span class="dot buffer"></span>Buffer</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="share-line" id="workShareLine">
+            <button class="btn-copy-link" id="workCopyBtn" type="button">🔗 Copy bookmarkable link</button>
+            <span class="copy-confirm" id="workCopyConfirm">✅ Link copied!</span>
+          </div>
+
+        </div><!-- /panel-work -->
+
+        <!-- ══════════════════════ MODE 3: RECURRING DATES ══════════════════════ -->
+        <div class="mode-panel" id="panel-recur">
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="recurStart">Start Date</label>
+              <input type="date" id="recurStart" aria-label="Recurring start date" />
+            </div>
+            <div class="input-group">
+              <label for="recurInterval">Interval (days)</label>
+              <input type="number" id="recurInterval" min="1" max="3650" step="1" value="17" aria-label="Interval in days" />
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="recurCount">Number of Occurrences</label>
+            <input type="number" id="recurCount" min="1" max="200" step="1" value="20" aria-label="Number of occurrences" />
+            <p class="input-hint">How many upcoming dates to list, starting from the start date itself.</p>
+          </div>
+
+          <div class="calc-error" id="recurError" role="alert">
+            ⚠️ Please enter a valid start date, an interval of at least 1 day, and at least 1 occurrence.
+          </div>
+
+          <button class="btn-calculate" id="recurBtn" type="button">List Occurrences</button>
+
+          <div class="results-panel" id="recurResults" role="region" aria-label="Recurring dates results" aria-live="polite">
+            <h3>Upcoming Occurrences</h3>
+            <div class="recur-wrap">
+              <table class="recur-table" aria-label="Recurring dates">
+                <thead>
+                  <tr><th>#</th><th>Date</th><th>Day of Week</th><th>Days From Start</th></tr>
+                </thead>
+                <tbody id="recurBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="share-line" id="recurShareLine">
+            <button class="btn-copy-link" id="recurCopyBtn" type="button">🔗 Copy bookmarkable link</button>
+            <span class="copy-confirm" id="recurCopyConfirm">✅ Link copied!</span>
+          </div>
+
+        </div><!-- /panel-recur -->
+
+      </div><!-- /tool-widget -->
+    </section>
+
+    <!-- MID AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Mid Display Ad --></div>
+
+    <!-- HOW TO USE -->
+    <div class="seo-section">
+      <h2>How to use the Date Difference Calculator</h2>
+      <p>Pick a mode at the top of the tool. <strong>Date Difference</strong> gives you the gap
+         between two dates in whichever unit you need — an exact years/months/days breakdown,
+         a single total (days, hours, or minutes), or business days only. <strong>Work Planning</strong>
+         is built for scheduling: it counts business days between a start and target date, lets you
+         choose a holiday calendar, adds buffer days as a safety margin, and draws a mini timeline of
+         the whole span. <strong>Recurring Dates</strong> lists every occurrence of a fixed interval
+         starting from a given date — handy for billing cycles, checkups, or maintenance schedules.</p>
+      <p>Every result updates the page URL, so you can copy the bookmarkable link to save or share
+         a calculation exactly as you configured it.</p>
+    </div>
+
+    <!-- FORMULA -->
+    <div class="seo-section">
+      <h2>How are business days calculated?</h2>
+      <p>Business day mode walks through every calendar day between the start and end date and
+         keeps a running count, skipping two kinds of days:</p>
+      <div class="formula-block" role="img" aria-label="Business day exclusion rule">
+        Business Days = Total Days − Weekend Days − Holiday Days (within range)
+      </div>
+      <p>Weekends are any Saturday or Sunday. Holidays come from the calendar you select — a
+         built-in US or EU list of common public holidays, or your own custom list of dates.
+         The same logic is used to add buffer days: the calculator steps forward one day at a
+         time, only counting days that are not a weekend or holiday, until it has added the
+         requested number of buffer days.</p>
+    </div>
+
+    <!-- FAQ -->
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+
+        <li class="faq-item">
+          <h3>How do I calculate the exact number of years, months, and days between two dates?</h3>
+          <p>Enter a start date and end date, then choose the "Exact (years, months, days)"
+             precision mode. The calculator subtracts the dates using calendar-aware logic,
+             borrowing from months and years the same way you would count by hand, so the result
+             matches how people naturally describe age or duration.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>How are business days calculated?</h3>
+          <p>Business day mode counts every day between the two dates, skips Saturdays and
+             Sundays, and also skips any date in your chosen holiday calendar (US, EU, or a
+             custom list). What remains is the number of working days available for the task.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>What holidays does the calculator include?</h3>
+          <p>The US calendar includes New Year's Day, Memorial Day, Independence Day, Labor Day,
+             Thanksgiving, and Christmas. The EU calendar includes New Year's Day, Labour Day
+             (May 1), Christmas, and St. Stephen's Day (December 26). You can also switch to a
+             custom list and enter your own holiday dates.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>What are buffer days in work planning mode?</h3>
+          <p>Buffer days are extra working days added after your target end date as a safety
+             margin for delays. The calculator adds them as business days, skipping weekends and
+             holidays, and shows the resulting buffered deadline alongside the original one.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>How does the recurring date calculator work?</h3>
+          <p>Enter a start date and an interval in days, and the calculator lists the next set of
+             occurrences by repeatedly adding that interval, showing each resulting date and day
+             of the week. It's useful for recurring bills, checkups, maintenance schedules, or
+             any fixed-interval reminder.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Is my data private?</h3>
+          <p>Yes — all calculations run entirely in your browser using JavaScript. No dates
+             you enter are transmitted to any server or stored anywhere. See our
+             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for details.</p>
+        </li>
+
+      </ul>
+    </section>
+
+    <!-- RELATED TOOLS -->
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Related Tools</h2>
+      <div class="related-grid">
+
+        <a href="/tools/loan-mortgage-calculator.html" class="related-card">
+          <strong>🏠 Loan &amp; Mortgage Calculator</strong>
+          <span>Calculate monthly payments, total interest, and a full amortization schedule.</span>
+        </a>
+
+        <a href="/tools/percentage-calculator.html" class="related-card">
+          <strong>💯 Percentage Calculator</strong>
+          <span>Work out discounts, percentage changes, and reverse percentages instantly.</span>
+        </a>
+
+        <a href="/tools/compound-interest-calculator.html" class="related-card">
+          <strong>📈 Compound Interest Calculator</strong>
+          <span>Model investment growth, savings, contributions, inflation, and tax scenarios.</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- BOTTOM AD -->
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+  <!-- CALCULATOR SCRIPT -->
+  <script>
+  (function () {
+
+  /* ══════════════════════════════════════════════════
+     DATE HELPERS
+  ══════════════════════════════════════════════════ */
+  const DAY_MS = 86400000;
+
+  function parseDateInput(str) {
+    if (!str) return null;
+    const parts = str.split('-');
+    if (parts.length !== 3) return null;
+    const y = parseInt(parts[0], 10), m = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+    if (isNaN(y) || isNaN(m) || isNaN(d)) return null;
+    const dt = new Date(y, m - 1, d);
+    dt.setHours(0, 0, 0, 0);
+    return dt;
+  }
+
+  function dateStr(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function fmtDateLong(d) {
+    return d.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  function fmtDateShort(d) {
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  function todayDate() {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    return t;
+  }
+
+  function isWeekend(d) {
+    const day = d.getDay();
+    return day === 0 || day === 6;
+  }
+
+  function addDays(d, n) {
+    const r = new Date(d);
+    r.setDate(r.getDate() + n);
+    return r;
+  }
+
+  function nthWeekdayOfMonth(year, monthIdx, weekday, n) {
+    const first = new Date(year, monthIdx, 1);
+    let offset = (weekday - first.getDay() + 7) % 7;
+    const day = 1 + offset + (n - 1) * 7;
+    return new Date(year, monthIdx, day);
+  }
+
+  function lastWeekdayOfMonth(year, monthIdx, weekday) {
+    const last = new Date(year, monthIdx + 1, 0);
+    let offset = (last.getDay() - weekday + 7) % 7;
+    return new Date(year, monthIdx, last.getDate() - offset);
+  }
+
+  /* ══════════════════════════════════════════════════
+     HOLIDAYS
+  ══════════════════════════════════════════════════ */
+  function buildHolidaySet(region, startDate, endDate, customText) {
+    const set = new Set();
+    if (region === 'none') return set;
+
+    if (region === 'custom') {
+      if (!customText) return set;
+      customText.split(/[,\n]/).map(s => s.trim()).filter(Boolean).forEach(s => {
+        const d = parseDateInput(s);
+        if (d) set.add(dateStr(d));
+      });
+      return set;
+    }
+
+    const y0 = startDate.getFullYear();
+    const y1 = endDate.getFullYear();
+    for (let year = y0; year <= y1; year++) {
+      set.add(year + '-01-01');
+      set.add(year + '-12-25');
+      if (region === 'us') {
+        set.add(year + '-07-04');
+        set.add(dateStr(lastWeekdayOfMonth(year, 4, 1)));   // Memorial Day — last Monday of May
+        set.add(dateStr(nthWeekdayOfMonth(year, 8, 1, 1)));  // Labor Day — 1st Monday of September
+        set.add(dateStr(nthWeekdayOfMonth(year, 10, 4, 4))); // Thanksgiving — 4th Thursday of November
+      } else if (region === 'eu') {
+        set.add(year + '-05-01');  // Labour Day
+        set.add(year + '-12-26');  // St. Stephen's Day / Boxing Day
+      }
+    }
+    return set;
+  }
+
+  function countBusinessDays(start, end, holidaySet) {
+    let count = 0;
+    let d = new Date(start);
+    while (d <= end) {
+      if (!isWeekend(d) && !holidaySet.has(dateStr(d))) count++;
+      d = addDays(d, 1);
+    }
+    return count;
+  }
+
+  function addBusinessDays(start, n, holidaySet) {
+    let d = new Date(start);
+    let added = 0;
+    while (added < n) {
+      d = addDays(d, 1);
+      if (!isWeekend(d) && !holidaySet.has(dateStr(d))) added++;
+    }
+    return d;
+  }
+
+  /* ══════════════════════════════════════════════════
+     EXACT (Y/M/D) DIFFERENCE
+  ══════════════════════════════════════════════════ */
+  function exactDiff(start, end) {
+    let a = start, b = end, negative = false;
+    if (b < a) { const t = a; a = b; b = t; negative = true; }
+    let years = b.getFullYear() - a.getFullYear();
+    let months = b.getMonth() - a.getMonth();
+    let days = b.getDate() - a.getDate();
+    if (days < 0) {
+      months -= 1;
+      const prevMonthLastDay = new Date(b.getFullYear(), b.getMonth(), 0).getDate();
+      days += prevMonthLastDay;
+    }
+    if (months < 0) { years -= 1; months += 12; }
+    return { years, months, days, negative };
+  }
+
+  /* ══════════════════════════════════════════════════
+     TAB SWITCHING
+  ══════════════════════════════════════════════════ */
+  const tabs = document.querySelectorAll('.mode-tab');
+  const panels = {
+    diff:  document.getElementById('panel-diff'),
+    work:  document.getElementById('panel-work'),
+    recur: document.getElementById('panel-recur')
+  };
+
+  function setActiveTab(mode, skipUrl) {
+    tabs.forEach(t => {
+      const active = t.dataset.mode === mode;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    Object.keys(panels).forEach(k => panels[k].classList.toggle('active', k === mode));
+    if (!skipUrl) writeURLParams();
+  }
+
+  tabs.forEach(t => t.addEventListener('click', function () { setActiveTab(this.dataset.mode); }));
+
+  /* ══════════════════════════════════════════════════
+     DEFAULTS
+  ══════════════════════════════════════════════════ */
+  const today = todayDate();
+  const in30 = addDays(today, 30);
+
+  document.getElementById('diffStart').value  = dateStr(today);
+  document.getElementById('diffEnd').value    = dateStr(in30);
+  document.getElementById('workStart').value  = dateStr(today);
+  document.getElementById('workEnd').value    = dateStr(in30);
+  document.getElementById('recurStart').value = dateStr(today);
+
+  /* ══════════════════════════════════════════════════
+     MODE 1: DATE DIFFERENCE
+  ══════════════════════════════════════════════════ */
+  const diffStart          = document.getElementById('diffStart');
+  const diffEnd             = document.getElementById('diffEnd');
+  const diffPrecision       = document.getElementById('diffPrecision');
+  const diffHolidayGroup    = document.getElementById('diffHolidayGroup');
+  const diffHolidayRegion   = document.getElementById('diffHolidayRegion');
+  const diffCustomGroup     = document.getElementById('diffCustomHolidayGroup');
+  const diffCustomHolidays  = document.getElementById('diffCustomHolidays');
+  const diffError           = document.getElementById('diffError');
+  const diffBtn             = document.getElementById('diffBtn');
+  const diffResults         = document.getElementById('diffResults');
+  const diffResultsGrid     = document.getElementById('diffResultsGrid');
+  const riskBanner          = document.getElementById('riskBanner');
+  const riskText            = document.getElementById('riskText');
+  const diffShareLine       = document.getElementById('diffShareLine');
+
+  diffPrecision.addEventListener('change', function () {
+    const isBusiness = this.value === 'business';
+    diffHolidayGroup.style.display = isBusiness ? 'block' : 'none';
+    diffCustomGroup.style.display = (isBusiness && diffHolidayRegion.value === 'custom') ? 'block' : 'none';
+  });
+  diffHolidayRegion.addEventListener('change', function () {
+    diffCustomGroup.style.display = this.value === 'custom' ? 'block' : 'none';
+  });
+
+  function resultCardHTML(label, value, sub, primary) {
+    return '<div class="result-card' + (primary ? ' primary' : '') + '">' +
+      '<div class="result-label">' + label + '</div>' +
+      '<div class="result-value">' + value + '</div>' +
+      (sub ? '<div class="result-sub">' + sub + '</div>' : '') +
+      '</div>';
+  }
+
+  function updateDeadlineRisk(endDate) {
+    const daysLeft = Math.round((endDate - today) / DAY_MS);
+    riskBanner.style.display = 'flex';
+    riskBanner.className = 'risk-banner';
+    if (daysLeft < 0) {
+      riskBanner.classList.add('risk-past');
+      riskText.textContent = 'This date is ' + Math.abs(daysLeft) + ' day' + (Math.abs(daysLeft) === 1 ? '' : 's') + ' in the past.';
+    } else if (daysLeft <= 3) {
+      riskBanner.classList.add('risk-high');
+      riskText.textContent = 'You have ' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + ' left (high risk).';
+    } else if (daysLeft <= 14) {
+      riskBanner.classList.add('risk-medium');
+      riskText.textContent = 'You have ' + daysLeft + ' days left (medium risk).';
+    } else {
+      riskBanner.classList.add('risk-low');
+      riskText.textContent = 'You have ' + daysLeft + ' days left (low risk).';
+    }
+  }
+
+  function runDiffCalculation() {
+    diffError.style.display = 'none';
+    diffResults.style.display = 'none';
+    riskBanner.style.display = 'none';
+
+    const s = parseDateInput(diffStart.value);
+    const e = parseDateInput(diffEnd.value);
+    if (!s || !e) {
+      diffError.style.display = 'block';
+      return;
+    }
+
+    const mode = diffPrecision.value;
+    const swapped = e < s;
+    const a = swapped ? e : s;
+    const b = swapped ? s : e;
+    const totalDays = Math.round((b - a) / DAY_MS);
+
+    let html = '';
+
+    if (mode === 'exact') {
+      const r = exactDiff(s, e);
+      html += resultCardHTML('Exact Difference', r.years + 'y ' + r.months + 'm ' + r.days + 'd', (swapped ? 'end date is before start date' : ''), true);
+      html += resultCardHTML('Total Days', totalDays.toLocaleString());
+      html += resultCardHTML('Total Weeks', (totalDays / 7).toFixed(1));
+    } else if (mode === 'days') {
+      html += resultCardHTML('Total Days', totalDays.toLocaleString(), swapped ? 'end date is before start date' : '', true);
+      html += resultCardHTML('Total Weeks', (totalDays / 7).toFixed(2));
+      html += resultCardHTML('Total Months (approx.)', (totalDays / 30.44).toFixed(2));
+    } else if (mode === 'hours') {
+      const totalHours = Math.round((b - a) / 3600000);
+      html += resultCardHTML('Total Hours', totalHours.toLocaleString(), swapped ? 'end date is before start date' : '', true);
+      html += resultCardHTML('Total Days', totalDays.toLocaleString());
+      html += resultCardHTML('Total Minutes', (totalHours * 60).toLocaleString());
+    } else if (mode === 'minutes') {
+      const totalMinutes = Math.round((b - a) / 60000);
+      html += resultCardHTML('Total Minutes', totalMinutes.toLocaleString(), swapped ? 'end date is before start date' : '', true);
+      html += resultCardHTML('Total Hours', Math.round(totalMinutes / 60).toLocaleString());
+      html += resultCardHTML('Total Days', totalDays.toLocaleString());
+    } else if (mode === 'business') {
+      const holidaySet = buildHolidaySet(diffHolidayRegion.value, a, b, diffCustomHolidays.value);
+      const bDays = countBusinessDays(a, b, holidaySet);
+      const weekendDays = totalDays + 1 - bDays - Array.from(holidaySet).filter(h => { const d = parseDateInput(h); return d >= a && d <= b && !isWeekend(d); }).length;
+      html += resultCardHTML('Business Days', bDays.toLocaleString(), swapped ? 'end date is before start date' : '', true);
+      html += resultCardHTML('Total Calendar Days', (totalDays + 1).toLocaleString());
+      html += resultCardHTML('Non-Business Days', ((totalDays + 1) - bDays).toLocaleString());
+    }
+
+    diffResultsGrid.innerHTML = html;
+    diffResults.style.display = 'block';
+    diffShareLine.style.display = 'flex';
+
+    // Deadline risk indicator uses the later of the two dates
+    updateDeadlineRisk(b);
+
+    writeURLParams();
+    diffResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  diffBtn.addEventListener('click', runDiffCalculation);
+
+  /* ══════════════════════════════════════════════════
+     MODE 2: WORK PLANNING
+  ══════════════════════════════════════════════════ */
+  const workStart         = document.getElementById('workStart');
+  const workEnd            = document.getElementById('workEnd');
+  const workHolidayRegion  = document.getElementById('workHolidayRegion');
+  const workCustomGroup    = document.getElementById('workCustomHolidayGroup');
+  const workCustomHolidays = document.getElementById('workCustomHolidays');
+  const workBuffer         = document.getElementById('workBuffer');
+  const workError          = document.getElementById('workError');
+  const workBtn            = document.getElementById('workBtn');
+  const workResults        = document.getElementById('workResults');
+  const workResultsGrid    = document.getElementById('workResultsGrid');
+  const workShareLine      = document.getElementById('workShareLine');
+  const ganttBar           = document.getElementById('ganttBar');
+  const ganttStartLabel    = document.getElementById('ganttStartLabel');
+  const ganttEndLabel      = document.getElementById('ganttEndLabel');
+
+  workHolidayRegion.addEventListener('change', function () {
+    workCustomGroup.style.display = this.value === 'custom' ? 'block' : 'none';
+  });
+
+  function renderGantt(start, end, bufferEnd) {
+    ganttBar.innerHTML = '';
+    const holidaySet = buildHolidaySet(workHolidayRegion.value, start, bufferEnd, workCustomHolidays.value);
+
+    const days = [];
+    let d = new Date(start);
+    while (d <= bufferEnd) {
+      let cat;
+      const ds = dateStr(d);
+      if (d > end) cat = 'buffer';
+      else if (holidaySet.has(ds)) cat = 'holiday';
+      else if (isWeekend(d)) cat = 'weekend';
+      else cat = 'workday';
+      days.push({ date: new Date(d), cat });
+      d = addDays(d, 1);
+    }
+
+    let segments = days;
+    // Aggregate into weekly blocks if the range is long, so the bar stays legible
+    if (days.length > 120) {
+      const weeks = [];
+      for (let i = 0; i < days.length; i += 7) {
+        const chunk = days.slice(i, i + 7);
+        const counts = { workday: 0, weekend: 0, holiday: 0, buffer: 0 };
+        chunk.forEach(x => counts[x.cat]++);
+        const dominant = Object.keys(counts).reduce((a, b) => counts[a] >= counts[b] ? a : b);
+        weeks.push({ date: chunk[0].date, cat: dominant, span: chunk.length });
+      }
+      segments = weeks;
+    }
+
+    segments.forEach(seg => {
+      const el = document.createElement('div');
+      el.className = 'gantt-seg ' + seg.cat;
+      el.title = fmtDateShort(seg.date) + ' — ' + seg.cat;
+      if (seg.span) el.style.flexGrow = seg.span;
+      ganttBar.appendChild(el);
+    });
+
+    ganttStartLabel.textContent = fmtDateShort(start);
+    ganttEndLabel.textContent = fmtDateShort(bufferEnd) + ' (incl. buffer)';
+  }
+
+  function runWorkCalculation() {
+    workError.style.display = 'none';
+    workResults.style.display = 'none';
+
+    const s = parseDateInput(workStart.value);
+    const e = parseDateInput(workEnd.value);
+    const buffer = parseInt(workBuffer.value, 10);
+
+    if (!s || !e || e < s || isNaN(buffer) || buffer < 0) {
+      workError.style.display = 'block';
+      return;
+    }
+
+    const holidaySet = buildHolidaySet(workHolidayRegion.value, s, addDays(e, Math.max(buffer, 1) * 3 + 30), workCustomHolidays.value);
+    const businessDays = countBusinessDays(s, e, holidaySet);
+    const totalCalendarDays = Math.round((e - s) / DAY_MS) + 1;
+    const bufferedEnd = buffer > 0 ? addBusinessDays(e, buffer, holidaySet) : e;
+
+    let html = '';
+    html += resultCardHTML('Business Days', businessDays.toLocaleString(), 'excl. weekends + holidays', true);
+    html += resultCardHTML('Total Calendar Days', totalCalendarDays.toLocaleString());
+    html += resultCardHTML('Buffered Deadline', fmtDateShort(bufferedEnd), buffer > 0 ? ('+' + buffer + ' business day' + (buffer === 1 ? '' : 's')) : 'no buffer added');
+
+    workResultsGrid.innerHTML = html;
+    workResults.style.display = 'block';
+    workShareLine.style.display = 'flex';
+
+    renderGantt(s, e, bufferedEnd);
+
+    writeURLParams();
+    workResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  workBtn.addEventListener('click', runWorkCalculation);
+
+  /* ══════════════════════════════════════════════════
+     MODE 3: RECURRING DATES
+  ══════════════════════════════════════════════════ */
+  const recurStart    = document.getElementById('recurStart');
+  const recurInterval = document.getElementById('recurInterval');
+  const recurCount    = document.getElementById('recurCount');
+  const recurError    = document.getElementById('recurError');
+  const recurBtn      = document.getElementById('recurBtn');
+  const recurResults  = document.getElementById('recurResults');
+  const recurBody     = document.getElementById('recurBody');
+  const recurShareLine = document.getElementById('recurShareLine');
+
+  const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  function runRecurCalculation() {
+    recurError.style.display = 'none';
+    recurResults.style.display = 'none';
+
+    const s = parseDateInput(recurStart.value);
+    const interval = parseInt(recurInterval.value, 10);
+    const count = parseInt(recurCount.value, 10);
+
+    if (!s || isNaN(interval) || interval < 1 || isNaN(count) || count < 1) {
+      recurError.style.display = 'block';
+      return;
+    }
+
+    let rows = '';
+    let d = new Date(s);
+    for (let i = 0; i < count; i++) {
+      rows += '<tr><td>' + (i + 1) + '</td><td>' + fmtDateLong(d) + '</td><td>' + WEEKDAY_NAMES[d.getDay()] + '</td><td>' + (i * interval) + '</td></tr>';
+      d = addDays(d, interval);
+    }
+
+    recurBody.innerHTML = rows;
+    recurResults.style.display = 'block';
+    recurShareLine.style.display = 'flex';
+
+    writeURLParams();
+    recurResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  recurBtn.addEventListener('click', runRecurCalculation);
+
+  /* ══════════════════════════════════════════════════
+     URL PARAMS — READ on page load
+  ══════════════════════════════════════════════════ */
+  function readURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    let mode = 'diff';
+
+    if (params.has('mode')) mode = params.get('mode');
+
+    if (params.has('start')) diffStart.value = workStart.value = params.get('start');
+    if (params.has('end'))   diffEnd.value   = workEnd.value   = params.get('end');
+    if (params.has('precision')) diffPrecision.value = params.get('precision');
+    if (params.has('region')) { diffHolidayRegion.value = params.get('region'); workHolidayRegion.value = params.get('region'); }
+    if (params.has('custom')) { diffCustomHolidays.value = params.get('custom'); workCustomHolidays.value = params.get('custom'); }
+    if (params.has('buffer')) workBuffer.value = params.get('buffer');
+
+    if (params.has('rstart'))    recurStart.value    = params.get('rstart');
+    if (params.has('rinterval')) recurInterval.value = params.get('rinterval');
+    if (params.has('rcount'))    recurCount.value     = params.get('rcount');
+
+    diffPrecision.dispatchEvent(new Event('change'));
+    diffHolidayRegion.dispatchEvent(new Event('change'));
+    workHolidayRegion.dispatchEvent(new Event('change'));
+
+    setActiveTab(mode, true);
+
+    if (mode === 'diff' && params.has('start') && params.has('end')) runDiffCalculation();
+    if (mode === 'work' && params.has('start') && params.has('end')) runWorkCalculation();
+    if (mode === 'recur' && params.has('rstart') && params.has('rinterval')) runRecurCalculation();
+  }
+
+  /* ══════════════════════════════════════════════════
+     URL PARAMS — WRITE on calculate / tab switch
+  ══════════════════════════════════════════════════ */
+  function writeURLParams() {
+    const activeMode = document.querySelector('.mode-tab.active').dataset.mode;
+    const params = new URLSearchParams();
+    params.set('mode', activeMode);
+
+    if (activeMode === 'diff' || activeMode === 'work') {
+      params.set('start', (activeMode === 'diff' ? diffStart : workStart).value);
+      params.set('end', (activeMode === 'diff' ? diffEnd : workEnd).value);
+    }
+    if (activeMode === 'diff') {
+      params.set('precision', diffPrecision.value);
+      if (diffPrecision.value === 'business') {
+        params.set('region', diffHolidayRegion.value);
+        if (diffHolidayRegion.value === 'custom' && diffCustomHolidays.value.trim()) params.set('custom', diffCustomHolidays.value.trim());
+      }
+    }
+    if (activeMode === 'work') {
+      params.set('region', workHolidayRegion.value);
+      params.set('buffer', workBuffer.value);
+      if (workHolidayRegion.value === 'custom' && workCustomHolidays.value.trim()) params.set('custom', workCustomHolidays.value.trim());
+    }
+    if (activeMode === 'recur') {
+      params.set('rstart', recurStart.value);
+      params.set('rinterval', recurInterval.value);
+      params.set('rcount', recurCount.value);
+    }
+
+    const newURL = window.location.pathname + '?' + params.toString();
+    history.replaceState(null, '', newURL);
+  }
+
+  /* ══════════════════════════════════════════════════
+     COPY LINK buttons
+  ══════════════════════════════════════════════════ */
+  function wireCopyButton(btnId, confirmId) {
+    document.getElementById(btnId).addEventListener('click', function () {
+      navigator.clipboard.writeText(window.location.href).then(function () {
+        const confirmEl = document.getElementById(confirmId);
+        confirmEl.style.display = 'inline';
+        setTimeout(function () { confirmEl.style.display = 'none'; }, 2500);
+      });
+    });
+  }
+  wireCopyButton('diffCopyBtn', 'diffCopyConfirm');
+  wireCopyButton('workCopyBtn', 'workCopyConfirm');
+  wireCopyButton('recurCopyBtn', 'recurCopyConfirm');
+
+  /* ══════════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════════ */
+  readURLParams();
+
+  })();
+  </script>
+
+</body>
+</html>

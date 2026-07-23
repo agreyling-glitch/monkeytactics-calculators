@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Age Calculator — Exact Age, Next Birthday &amp; Retirement Countdown | MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Free age calculator — find your exact age in years, months, and days, count down to your next birthday, next decade milestone, and retirement date. Handles leap-year (Feb 29) birthdays correctly." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Age Calculator — MonkeyTactics" />
+  <meta property="og:description" content="Calculate your exact age plus countdowns to your next birthday, next decade, and retirement. Free and private." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/age-calculator.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/age-calculator.html" />
+
+  <!-- Breadcrumb structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",   "item": "https://monkeytactics.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Health", "item": "https://monkeytactics.com/tools/health.html" },
+      { "@type": "ListItem", "position": 3, "name": "Age Calculator", "item": "https://monkeytactics.com/tools/age-calculator.html" }
+    ]
+  }
+  </script>
+
+  <!-- FAQPage structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How is exact age calculated?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Exact age is calculated by finding the difference between your date of birth and today's date, broken into years, months, and days. Whole years are counted first, then the remaining months, then the remaining days — the same method used on birth certificates and legal documents." }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the calculator handle people born on February 29?",
+        "acceptedAnswer": { "@type": "Answer", "text": "People born on February 29 (leap day) only have a true birthday once every four years. In non-leap years, this calculator observes the birthday on February 28, which is the most common convention, so birthday and milestone countdowns still work correctly every year." }
+      },
+      {
+        "@type": "Question",
+        "name": "How is the next decade milestone calculated?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The calculator finds the next age that is a multiple of ten — 30, 40, 50, and so on — that is greater than your current age, then counts down to that birthday." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I change the retirement age used in the countdown?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes — enter any retirement age you like. The calculator defaults to 65, a common retirement benchmark, but you can set it to match your own pension plan, country, or personal goal." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my date of birth stored or sent anywhere?",
+        "acceptedAnswer": { "@type": "Answer", "text": "No — all calculations run entirely in your browser using JavaScript. Your date of birth is never transmitted to or stored on any server." }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+    /* ── Hero ── */
+    .hero--inner        { padding: 1.75rem 2rem; }
+    .hero--inner h1     { font-size: 1.9rem; }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .breadcrumb a        { color: var(--muted); transition: color 0.15s; }
+    .breadcrumb a:hover  { color: var(--accent); }
+    .breadcrumb .sep     { opacity: 0.4; }
+
+    /* ── Tool widget ── */
+    .tool-widget {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      box-shadow: var(--shadow-card);
+      margin-top: 1.5rem;
+    }
+
+    .tool-widget h2 { margin: 0 0 1.25rem; font-size: 1.05rem; }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .input-group        { margin-bottom: 1.1rem; }
+    .input-group:last-child { margin-bottom: 0; }
+
+    .input-group label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group input[type="date"],
+    .input-group input[type="number"] {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      color-scheme: dark;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+
+    .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
+
+    .leap-note {
+      display: none;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 1.1rem;
+      padding: 0.7rem 0.9rem;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: var(--radius);
+      font-size: 0.825rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .leap-note .leap-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    .btn-calculate {
+      width: 100%;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.35);
+      transition: opacity 0.15s, transform 0.15s;
+      margin-top: 0.25rem;
+    }
+    .btn-calculate:hover  { opacity: 0.9; transform: translateY(-1px); }
+    .btn-calculate:active { transform: translateY(0); }
+
+    .calc-error {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 0.5rem;
+      color: #fca5a5;
+      font-size: 0.875rem;
+    }
+
+    /* ── Results ── */
+    .results-panel {
+      display: none;
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .results-panel h3 {
+      margin: 0 0 0.9rem;
+      font-size: 1rem;
+    }
+
+    .current-age-card {
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.4);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .current-age-card .result-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+    .current-age-card .result-value {
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.15;
+    }
+    .current-age-card .result-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+
+    .milestone-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .milestone-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+    }
+    .milestone-card .m-icon { font-size: 1.3rem; margin-bottom: 0.4rem; display: block; }
+    .milestone-card .m-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+    .milestone-card .m-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .milestone-card .m-sub {
+      font-size: 0.775rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+      line-height: 1.4;
+    }
+    .milestone-card.reached .m-value { color: var(--accent); }
+
+    /* ── Life stats strip ── */
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+    .stat-box {
+      text-align: center;
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 0.8rem 0.5rem;
+    }
+    .stat-box .s-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .stat-box .s-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── SEO / content ── */
+    .seo-section          { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p        { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+
+    .formula-block {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin: 0.75rem 0;
+      line-height: 1.6;
+    }
+
+    /* ── FAQ ── */
+    .faq-list             { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-item             { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child  { border-bottom: none; }
+    .faq-item h3          { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
+    .faq-item p           { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    /* ── Related tools ── */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .related-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .related-card:hover  { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { font-size: 0.9rem; }
+    .related-card span   { color: var(--muted); font-size: 0.8rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .hero--inner  { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+      .tool-widget  { padding: 1.25rem; }
+      .input-row    { grid-template-columns: 1fr; }
+      .current-age-card .result-value { font-size: 1.65rem; }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://monkeytactics.com/tools/age-calculator.html#app",
+      "name": "Age Calculator",
+      "url": "https://monkeytactics.com/tools/age-calculator.html",
+      "description": "Calculate age and the time between dates.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "author": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "reviewedBy": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "dateModified": "2026-07-22"
+    }
+  ]
+}
+  </script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html" class="active">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero hero--inner" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/index.html">Home</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <a href="/tools/health.html">Health</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <span aria-current="page">Age Calculator</span>
+      </nav>
+      <h1 id="tool-heading">Age Calculator</h1>
+      <p>Find your exact age in years, months, and days, then count down to your next birthday,
+         your next decade milestone, and your retirement date. Correctly handles February 29
+         (leap day) birthdays. Everything runs privately in your browser.</p>
+    </section>
+
+    <!-- TOP AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
+
+    <!-- CALCULATOR WIDGET -->
+    <section aria-labelledby="calc-heading">
+      <div class="tool-widget">
+        <h2 id="calc-heading">Enter Your Details</h2>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" aria-label="Date of birth" />
+            <p class="input-hint">Used to calculate your exact age and milestones.</p>
+          </div>
+
+          <div class="input-group">
+            <label for="retireAge">Retirement Age</label>
+            <input type="number" id="retireAge" min="1" max="120" step="1" value="65"
+                   aria-label="Retirement age" />
+            <p class="input-hint">Change this to match your own retirement plan (default 65).</p>
+          </div>
+        </div>
+
+        <div class="leap-note" id="leapNote">
+          <span class="leap-icon" aria-hidden="true">🐸</span>
+          <span>You were born on a leap day! Since February 29 only occurs once every four
+            years, this calculator observes your birthday on <strong>February 28</strong>
+            in non-leap years so your countdowns stay accurate every year.</span>
+        </div>
+
+        <div class="calc-error" id="calcError" role="alert">
+          ⚠️ Please enter a valid date of birth (in the past) and a retirement age greater than your current age.
+        </div>
+
+        <button class="btn-calculate" id="calcBtn" type="button">
+          Calculate My Age
+        </button>
+
+        <div class="results-panel" id="resultsPanel" role="region" aria-label="Age results" aria-live="polite">
+
+          <div class="current-age-card">
+            <div class="result-label">Your Current Age</div>
+            <div class="result-value" id="currentAge">—</div>
+            <div class="result-sub" id="currentAgeSub">—</div>
+          </div>
+
+          <h3>Life Milestones</h3>
+          <div class="milestone-grid">
+
+            <div class="milestone-card" id="cardBirthday">
+              <span class="m-icon" aria-hidden="true">🎂</span>
+              <div class="m-label">Next Birthday</div>
+              <div class="m-value" id="mBirthdayCountdown">—</div>
+              <div class="m-sub" id="mBirthdayDate">—</div>
+            </div>
+
+            <div class="milestone-card" id="cardDecade">
+              <span class="m-icon" aria-hidden="true">🎉</span>
+              <div class="m-label">Next Decade Milestone</div>
+              <div class="m-value" id="mDecadeCountdown">—</div>
+              <div class="m-sub" id="mDecadeDate">—</div>
+            </div>
+
+            <div class="milestone-card" id="cardRetire">
+              <span class="m-icon" aria-hidden="true">🌴</span>
+              <div class="m-label">Retirement Countdown</div>
+              <div class="m-value" id="mRetireCountdown">—</div>
+              <div class="m-sub" id="mRetireDate">—</div>
+            </div>
+
+          </div>
+
+          <h3>Your Life in Numbers</h3>
+          <div class="stats-strip">
+            <div class="stat-box">
+              <div class="s-value" id="statDays">—</div>
+              <div class="s-label">Days Lived</div>
+            </div>
+            <div class="stat-box">
+              <div class="s-value" id="statWeeks">—</div>
+              <div class="s-label">Weeks Lived</div>
+            </div>
+            <div class="stat-box">
+              <div class="s-value" id="statMonths">—</div>
+              <div class="s-label">Months Lived</div>
+            </div>
+            <div class="stat-box">
+              <div class="s-value" id="statHours">—</div>
+              <div class="s-label">Hours Lived</div>
+            </div>
+            <div class="stat-box">
+              <div class="s-value" id="statWeekday">—</div>
+              <div class="s-label">Born On A</div>
+            </div>
+            <div class="stat-box">
+              <div class="s-value" id="statZodiac">—</div>
+              <div class="s-label">Zodiac Sign</div>
+            </div>
+          </div>
+
+          <!-- COPY LINK BUTTON -->
+          <div id="shareLine" style="margin-top:1.25rem; display:none; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+            <button id="copyLinkBtn" type="button" style="
+              display: inline-flex;
+              align-items: center;
+              gap: 0.4rem;
+              background: rgba(34,197,94,0.08);
+              border: 1px solid rgba(34,197,94,0.3);
+              border-radius: 999px;
+              color: var(--accent);
+              font-family: inherit;
+              font-size: 0.85rem;
+              font-weight: 600;
+              padding: 0.45rem 1rem;
+              cursor: pointer;
+              transition: background 0.15s;
+            ">
+              🔗 Copy bookmarkable link
+            </button>
+            <span id="copyConfirm" style="font-size:0.8rem; color:var(--accent); display:none;">✅ Link copied!</span>
+          </div>
+
+        </div><!-- /resultsPanel -->
+
+      </div><!-- /tool-widget -->
+    </section>
+
+    <!-- MID AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Mid Display Ad --></div>
+
+    <!-- HOW TO USE -->
+    <div class="seo-section">
+      <h2>How to use the Age Calculator</h2>
+      <p>Enter your <strong>date of birth</strong> and, if you'd like a personalized retirement
+         countdown, your target <strong>retirement age</strong> (it defaults to 65). Click
+         <strong>Calculate My Age</strong> to instantly see your exact age in years, months, and
+         days, plus countdowns to your next birthday, your next decade milestone (30, 40, 50, and
+         so on), and your retirement date.</p>
+      <p>If you were born on February 29, the calculator automatically flags your leap-day
+         birthday and observes it on February 28 in years that aren't leap years, so every
+         countdown still lands on the right day.</p>
+    </div>
+
+    <!-- FORMULA -->
+    <div class="seo-section">
+      <h2>How is exact age calculated?</h2>
+      <p>Your exact age is found by subtracting your date of birth from today's date, then
+         breaking the difference into whole years, whole months, and remaining days:</p>
+      <div class="formula-block" role="img" aria-label="Age calculation method">
+        Age = (Today − Birth Date), expressed as [Years, Months, Days]
+      </div>
+      <p>Milestone countdowns work the same way in reverse: the calculator finds how many years,
+         months, and days remain between today and the target date — your next birthday, your
+         next decade birthday, or the date you reach your chosen retirement age.</p>
+    </div>
+
+    <!-- FAQ -->
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+
+        <li class="faq-item">
+          <h3>How is exact age calculated?</h3>
+          <p>Exact age is calculated by finding the difference between your date of birth and
+             today's date, broken into years, months, and days. Whole years are counted first,
+             then the remaining months, then the remaining days — the same method used on birth
+             certificates and legal documents.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>How does the calculator handle people born on February 29?</h3>
+          <p>People born on February 29 (leap day) only have a true birthday once every four
+             years. In non-leap years, this calculator observes the birthday on February 28,
+             which is the most common convention, so birthday and milestone countdowns still
+             work correctly every year.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>How is the next decade milestone calculated?</h3>
+          <p>The calculator finds the next age that is a multiple of ten — 30, 40, 50, and so
+             on — that is greater than your current age, then counts down to that birthday.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Can I change the retirement age used in the countdown?</h3>
+          <p>Yes — enter any retirement age you like. The calculator defaults to 65, a common
+             retirement benchmark, but you can set it to match your own pension plan, country,
+             or personal goal.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Is my date of birth stored or sent anywhere?</h3>
+          <p>No — all calculations run entirely in your browser using JavaScript. Your date of
+             birth is never transmitted to or stored on any server. See our
+             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for details.</p>
+        </li>
+
+      </ul>
+    </section>
+
+    <!-- RELATED TOOLS -->
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Related Tools</h2>
+      <div class="related-grid">
+
+        <a href="/tools/date-difference-calculator.html" class="related-card">
+          <strong>📅 Date Difference Calculator</strong>
+          <span>Find the exact number of days, weeks, or months between any two dates.</span>
+        </a>
+
+        <a href="/tools/bmi-calculator.html" class="related-card">
+          <strong>⚖️ BMI Calculator</strong>
+          <span>Calculate your body mass index and see which healthy weight range you fall in.</span>
+        </a>
+
+        <a href="/tools/health.html" class="related-card">
+          <strong>🔥 Calorie Calculator</strong>
+          <span>Estimate your daily calorie needs based on age, weight, height, and activity.</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- BOTTOM AD -->
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+  <!-- CALCULATOR SCRIPT -->
+  <script>
+  (function () {
+
+  /* ── Element refs ── */
+  const dobInput       = document.getElementById('dob');
+  const retireAgeInput = document.getElementById('retireAge');
+  const leapNote        = document.getElementById('leapNote');
+  const calcBtn         = document.getElementById('calcBtn');
+  const calcError       = document.getElementById('calcError');
+  const resultsPanel    = document.getElementById('resultsPanel');
+
+  const currentAge      = document.getElementById('currentAge');
+  const currentAgeSub   = document.getElementById('currentAgeSub');
+
+  const mBirthdayCountdown = document.getElementById('mBirthdayCountdown');
+  const mBirthdayDate      = document.getElementById('mBirthdayDate');
+  const mDecadeCountdown   = document.getElementById('mDecadeCountdown');
+  const mDecadeDate        = document.getElementById('mDecadeDate');
+  const mRetireCountdown   = document.getElementById('mRetireCountdown');
+  const mRetireDate        = document.getElementById('mRetireDate');
+  const cardRetire         = document.getElementById('cardRetire');
+
+  const statDays    = document.getElementById('statDays');
+  const statWeeks   = document.getElementById('statWeeks');
+  const statMonths  = document.getElementById('statMonths');
+  const statHours   = document.getElementById('statHours');
+  const statWeekday = document.getElementById('statWeekday');
+  const statZodiac  = document.getElementById('statZodiac');
+
+  const shareLine    = document.getElementById('shareLine');
+  const copyLinkBtn  = document.getElementById('copyLinkBtn');
+  const copyConfirm  = document.getElementById('copyConfirm');
+
+  const DAY_MS = 86400000;
+
+  /* ── Helpers ── */
+  function isLeapYear(y) {
+    return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+  }
+
+  function isLeapBirthday(birth) {
+    return birth.getMonth() === 1 && birth.getDate() === 29;
+  }
+
+  // Returns the "observed" birthday Date for a given calendar year,
+  // handling Feb 29 birthdays by falling back to Feb 28 in non-leap years.
+  function observedBirthday(year, birthMonth, birthDay) {
+    if (birthMonth === 1 && birthDay === 29 && !isLeapYear(year)) {
+      return new Date(year, 1, 28);
+    }
+    return new Date(year, birthMonth, birthDay);
+  }
+
+  function startOfDay(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  // Generic Y/M/D breakdown between two dates where end >= start.
+  function diffYMD(start, end) {
+    let years  = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    let days   = end.getDate() - start.getDate();
+
+    if (days < 0) {
+      months--;
+      const prevMonthLastDay = new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+      days += prevMonthLastDay;
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    return { years, months, days };
+  }
+
+  function fmtYMD(ymd, opts) {
+    opts = opts || {};
+    const parts = [];
+    if (ymd.years > 0 || opts.forceYears) {
+      parts.push(ymd.years + (ymd.years === 1 ? ' year' : ' years'));
+    }
+    if (ymd.months > 0 || parts.length) {
+      parts.push(ymd.months + (ymd.months === 1 ? ' month' : ' months'));
+    }
+    parts.push(ymd.days + (ymd.days === 1 ? ' day' : ' days'));
+    return parts.join(', ');
+  }
+
+  function fmtDateLong(d) {
+    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function zodiacSign(month, day) {
+    // month is 0-indexed. Each entry is [end-month, end-day, sign] — the sign that
+    // runs from just after the previous cutoff up through this cutoff date.
+    const cutoffs = [
+      [0, 19, 'Capricorn'], [1, 18, 'Aquarius'], [2, 20, 'Pisces'],
+      [3, 19, 'Aries'],     [4, 20, 'Taurus'],    [5, 20, 'Gemini'],
+      [6, 22, 'Cancer'],    [7, 22, 'Leo'],       [8, 22, 'Virgo'],
+      [9, 22, 'Libra'],     [10, 21, 'Scorpio'],  [11, 21, 'Sagittarius'],
+      [11, 31, 'Capricorn']
+    ];
+    for (const [cm, cd, name] of cutoffs) {
+      if (month < cm || (month === cm && day <= cd)) return name;
+    }
+    return 'Capricorn';
+  }
+
+  /* ══════════════════════════════════════════════════
+     URL PARAMS
+  ══════════════════════════════════════════════════ */
+  function readURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    let hasDob = false;
+
+    if (params.has('dob')) {
+      const v = params.get('dob');
+      if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+        dobInput.value = v;
+        hasDob = true;
+      }
+    }
+    if (params.has('retire')) {
+      const v = parseInt(params.get('retire'), 10);
+      if (!isNaN(v) && v > 0) retireAgeInput.value = v;
+    }
+
+    if (hasDob) runCalculation();
+  }
+
+  function writeURLParams() {
+    const params = new URLSearchParams();
+    params.set('dob', dobInput.value);
+    params.set('retire', retireAgeInput.value);
+    const newURL = window.location.pathname + '?' + params.toString();
+    history.replaceState(null, '', newURL);
+  }
+
+  /* ── Live leap-day note toggle ── */
+  dobInput.addEventListener('change', function () {
+    const v = dobInput.value;
+    if (!v) { leapNote.style.display = 'none'; return; }
+    const parts = v.split('-').map(Number);
+    const birth = new Date(parts[0], parts[1] - 1, parts[2]);
+    leapNote.style.display = isLeapBirthday(birth) ? 'flex' : 'none';
+  });
+
+  /* ══════════════════════════════════════════════════
+     MAIN CALCULATION
+  ══════════════════════════════════════════════════ */
+  function runCalculation() {
+    calcError.style.display    = 'none';
+    resultsPanel.style.display = 'none';
+
+    const dobVal = dobInput.value;
+    const retireAge = parseInt(retireAgeInput.value, 10);
+
+    if (!dobVal) {
+      calcError.textContent = '⚠️ Please enter your date of birth.';
+      calcError.style.display = 'block';
+      return;
+    }
+
+    const parts = dobVal.split('-').map(Number);
+    const birth = new Date(parts[0], parts[1] - 1, parts[2]);
+    const today = startOfDay(new Date());
+
+    if (isNaN(birth.getTime()) || birth > today) {
+      calcError.textContent = '⚠️ Please enter a valid date of birth in the past.';
+      calcError.style.display = 'block';
+      return;
+    }
+    if (isNaN(retireAge) || retireAge <= 0 || retireAge > 120) {
+      calcError.textContent = '⚠️ Please enter a valid retirement age between 1 and 120.';
+      calcError.style.display = 'block';
+      return;
+    }
+
+    const leap = isLeapBirthday(birth);
+    leapNote.style.display = leap ? 'flex' : 'none';
+
+    const birthMonth = birth.getMonth();
+    const birthDay   = birth.getDate();
+
+    /* ── Current age ── */
+    const age = diffYMD(birth, today);
+    currentAge.textContent = fmtYMD(age, { forceYears: true });
+    currentAgeSub.textContent = 'Born ' + fmtDateLong(birth);
+
+    /* ── Next birthday ── */
+    let nextBday = observedBirthday(today.getFullYear(), birthMonth, birthDay);
+    if (nextBday < today) {
+      nextBday = observedBirthday(today.getFullYear() + 1, birthMonth, birthDay);
+    }
+    const bdayCountdown = diffYMD(today, nextBday);
+    const turningAge = nextBday.getFullYear() - birth.getFullYear();
+    mBirthdayCountdown.textContent = fmtYMD(bdayCountdown) + ' left';
+    mBirthdayDate.textContent = 'Turning ' + turningAge + ' on ' + fmtDateLong(nextBday) +
+      (leap && nextBday.getDate() === 28 ? ' (observed)' : '');
+
+    /* ── Next decade milestone ── */
+    const nextDecadeAge = Math.ceil((age.years + 1) / 10) * 10;
+    const decadeYear = birth.getFullYear() + nextDecadeAge;
+    const decadeDate = observedBirthday(decadeYear, birthMonth, birthDay);
+    const decadeCountdown = diffYMD(today, decadeDate);
+    mDecadeCountdown.textContent = fmtYMD(decadeCountdown) + ' left';
+    mDecadeDate.textContent = 'Turning ' + nextDecadeAge + ' on ' + fmtDateLong(decadeDate) +
+      (leap && decadeDate.getDate() === 28 ? ' (observed)' : '');
+
+    /* ── Retirement countdown ── */
+    const retireYear = birth.getFullYear() + retireAge;
+    const retireDate = observedBirthday(retireYear, birthMonth, birthDay);
+    cardRetire.classList.remove('reached');
+    if (retireDate <= today) {
+      mRetireCountdown.textContent = 'Reached! 🎉';
+      mRetireDate.textContent = 'You reached retirement age (' + retireAge + ') on ' + fmtDateLong(retireDate);
+      cardRetire.classList.add('reached');
+    } else {
+      const retireCountdown = diffYMD(today, retireDate);
+      mRetireCountdown.textContent = fmtYMD(retireCountdown) + ' left';
+      mRetireDate.textContent = 'At age ' + retireAge + ' — ' + fmtDateLong(retireDate);
+    }
+
+    /* ── Life stats ── */
+    const totalDaysLived = Math.floor((today - birth) / DAY_MS);
+    statDays.textContent    = totalDaysLived.toLocaleString();
+    statWeeks.textContent   = Math.floor(totalDaysLived / 7).toLocaleString();
+    statMonths.textContent  = (age.years * 12 + age.months).toLocaleString();
+    statHours.textContent   = (totalDaysLived * 24).toLocaleString();
+    statWeekday.textContent = birth.toLocaleDateString('en-US', { weekday: 'long' });
+    statZodiac.textContent  = zodiacSign(birthMonth, birthDay);
+
+    resultsPanel.style.display = 'block';
+    shareLine.style.display    = 'flex';
+
+    writeURLParams();
+
+    resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  calcBtn.addEventListener('click', runCalculation);
+
+  copyLinkBtn.addEventListener('click', function () {
+    navigator.clipboard.writeText(window.location.href).then(function () {
+      copyConfirm.style.display = 'inline';
+      setTimeout(function () { copyConfirm.style.display = 'none'; }, 2500);
+    });
+  });
+
+  /* ── INIT ── */
+  readURLParams();
+
+  })();
+  </script>
+
+</body>
+</html>

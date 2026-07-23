@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Free Health Calculators — BMI &amp; Age Calculator | MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Free online health calculators — calculate your BMI and healthy weight range, or find your exact age in years, months, and days. Private, instant, no sign-up." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Free Health &amp; Body Calculators — MonkeyTactics" />
+  <meta property="og:description" content="BMI calculator and age calculator. Free, private, runs entirely in your browser." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/health.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/health.html" />
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+    .hero--inner { padding: 1.75rem 2rem; }
+    .hero--inner h1 { font-size: 1.9rem; }
+
+    .tool-card { display: flex; flex-direction: column; gap: 0.35rem; position: relative; overflow: hidden; }
+    .tool-card .card-icon { font-size: 1.4rem; margin-bottom: 0.15rem; display: block; }
+    .tool-card strong { font-size: 0.95rem; }
+    .tool-card .card-tags { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.4rem; }
+    .tool-card .card-tag { font-size: 0.7rem; background: rgba(255,255,255,0.06); color: var(--muted); border-radius: 999px; padding: 0.1rem 0.5rem; }
+    .tool-card .card-arrow { position: absolute; bottom: 1rem; right: 1rem; color: var(--muted); font-size: 0.9rem; transition: color 0.15s, transform 0.15s; }
+    .tool-card:hover .card-arrow { color: var(--accent); transform: translateX(3px); }
+
+    .seo-section { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2 { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+
+    /* BMI reference table */
+    .bmi-table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.875rem; max-width: 500px; }
+    .bmi-table th, .bmi-table td { text-align: left; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--border); }
+    .bmi-table th { color: var(--text); font-weight: 600; background: rgba(255,255,255,0.03); }
+    .bmi-table td { color: var(--muted); }
+    .bmi-table tr:last-child td { border-bottom: none; }
+    .bmi-badge { display: inline-block; border-radius: 999px; padding: 0.1rem 0.6rem; font-size: 0.75rem; font-weight: 600; }
+    .bmi-under  { background: rgba(96,165,250,0.15); color: #93c5fd; }
+    .bmi-normal { background: rgba(34,197,94,0.15);  color: var(--accent); }
+    .bmi-over   { background: rgba(251,191,36,0.15); color: #fcd34d; }
+    .bmi-obese  { background: rgba(248,113,113,0.15);color: #fca5a5; }
+
+    .faq-list { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h3 { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
+    .faq-item p { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-top: 1rem; }
+    .related-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem 1rem; font-size: 0.9rem; transition: border-color 0.15s, transform 0.15s; }
+    .related-card:hover { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { display: block; margin-bottom: 0.2rem; }
+    .related-card span { color: var(--muted); font-size: 0.8rem; }
+
+    .disclaimer { margin-top: 1.5rem; padding: 0.85rem 1rem; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); border-radius: var(--radius); font-size: 0.825rem; color: var(--muted); line-height: 1.6; max-width: 740px; }
+    .disclaimer strong { color: #fcd34d; }
+
+    @media (max-width: 600px) {
+      .hero--inner { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://monkeytactics.com/tools/health.html#collection",
+      "url": "https://monkeytactics.com/tools/health.html",
+      "name": "Free Health Calculators",
+      "isPartOf": {
+        "@id": "https://monkeytactics.com/#website"
+      },
+      "publisher": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "url": "https://monkeytactics.com/tools/bmi-calculator.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "url": "https://monkeytactics.com/tools/age-calculator.html"
+          }
+        ]
+      }
+    }
+  ]
+}
+  </script>
+</head>
+
+<body>
+  <main>
+
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html" class="active">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <section class="hero hero--inner" aria-labelledby="health-heading">
+      <h1 id="health-heading">Free Health &amp; Body Calculators</h1>
+      <p>Quick, private health and body calculations — your inputs stay on your device and are never shared.</p>
+      <div class="hero-actions">
+        <a href="/tools/bmi-calculator.html" class="btn-primary">⚖️ Try BMI Calculator</a>
+        <a href="/tools/index.html" class="btn-ghost">Browse all tools</a>
+      </div>
+    </section>
+
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
+
+    <!-- TOOLS -->
+    <section aria-labelledby="health-tools-heading">
+      <h2 id="health-tools-heading" style="margin-bottom:0.75rem;">🏥 Health &amp; Body Tools <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">2 tools</span></h2>
+      <div class="tools-grid">
+
+        <a href="/tools/bmi-calculator.html" class="tool-card">
+          <span class="card-icon" aria-hidden="true">⚖️</span>
+          <strong>BMI Calculator</strong>
+          <div>Calculate your Body Mass Index and see where you fall within healthy weight ranges for your height. Supports metric and imperial units.</div>
+          <div class="card-tags">
+            <span class="card-tag">BMI</span>
+            <span class="card-tag">Weight</span>
+            <span class="card-tag">Health</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/age-calculator.html" class="tool-card">
+          <span class="card-icon" aria-hidden="true">🎂</span>
+          <strong>Age Calculator</strong>
+          <div>Find your exact age in years, months, and days from any birth date, or calculate the time between any two dates.</div>
+          <div class="card-tags">
+            <span class="card-tag">Age</span>
+            <span class="card-tag">Birthday</span>
+            <span class="card-tag">Date</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- BMI REFERENCE -->
+    <div class="seo-section">
+      <h2>BMI Reference Ranges</h2>
+      <p>Body Mass Index is calculated as weight (kg) ÷ height² (m²). The World Health Organization defines the following ranges for adults:</p>
+      <table class="bmi-table" aria-label="BMI reference ranges">
+        <thead>
+          <tr><th>BMI Range</th><th>Category</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Below 18.5</td><td><span class="bmi-badge bmi-under">Underweight</span></td></tr>
+          <tr><td>18.5 – 24.9</td><td><span class="bmi-badge bmi-normal">Healthy weight</span></td></tr>
+          <tr><td>25.0 – 29.9</td><td><span class="bmi-badge bmi-over">Overweight</span></td></tr>
+          <tr><td>30.0 and above</td><td><span class="bmi-badge bmi-obese">Obese</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <p class="disclaimer">
+      <strong>Health Disclaimer:</strong> MonkeyTactics health calculators are informational tools only and are
+      not a substitute for professional medical advice, diagnosis, or treatment. BMI is a general screening
+      tool and does not account for muscle mass, bone density, age, or sex differences. Always consult a
+      qualified healthcare professional for personalised health guidance.
+    </p>
+
+    <!-- SEO CONTENT -->
+    <div class="seo-section">
+      <h2>About these health calculators</h2>
+      <p>MonkeyTactics health tools are designed to give you quick reference figures for common body measurements.
+         The BMI Calculator supports both metric (kg/cm) and imperial (lbs/inches) inputs, while the Age
+         Calculator handles any date combination — useful not just for birthdays but for calculating gestational
+         age, medication schedules, or time-sensitive eligibility checks.</p>
+      <p>As with all MonkeyTactics tools, every calculation runs locally in your browser. No health data
+         you enter is transmitted, stored, or shared.</p>
+    </div>
+
+    <!-- FAQ -->
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+        <li class="faq-item">
+          <h3>Is BMI an accurate measure of health?</h3>
+          <p>BMI is a useful screening tool but has known limitations — it does not distinguish between fat and
+             muscle mass, and the same BMI can mean very different things for different body types, ages, and
+             ethnicities. Use it as a general guide, not a definitive health assessment.</p>
+        </li>
+        <li class="faq-item">
+          <h3>Does the BMI calculator work for children?</h3>
+          <p>The standard BMI formula is designed for adults aged 18 and over. BMI for children and teenagers
+             uses age- and sex-specific percentile charts. Consult your paediatrician for an accurate assessment
+             for anyone under 18.</p>
+        </li>
+        <li class="faq-item">
+          <h3>Can the age calculator work for future dates?</h3>
+          <p>Yes — the age calculator accepts any two dates, past or future, making it useful for countdowns,
+             eligibility calculations, and planning.</p>
+        </li>
+        <li class="faq-item">
+          <h3>Is my health data kept private?</h3>
+          <p>Yes. All calculations run entirely in your browser. No weight, height, date of birth, or any other
+             value you enter is ever sent to a server or stored anywhere. See our
+             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for details.</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- RELATED -->
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Explore Other Categories</h2>
+      <div class="related-grid">
+        <a href="/tools/finance.html" class="related-card">
+          <strong>💰 Finance</strong>
+          <span>Mortgage Calculator, Compound Interest, Percentage</span>
+        </a>
+        <a href="/tools/utilities.html" class="related-card">
+          <strong>🔧 Everyday Utilities</strong>
+          <span>Date Difference, Unit Converter, Tip Calculator &amp; more</span>
+        </a>
+        <a href="/tools/productivity.html" class="related-card">
+          <strong>⚡ Productivity</strong>
+          <span>Password Generator, Word &amp; Character Counter</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+
+  </main>
+
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+</body>
+</html>

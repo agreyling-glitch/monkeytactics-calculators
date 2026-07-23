@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Percentage Calculator — Free Online % Calculator | MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Free percentage calculator — find X% of Y, work out what percent one number is of another, or calculate percentage increase and decrease. Instant results, no sign-up required." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Percentage Calculator — MonkeyTactics" />
+  <meta property="og:description" content="Calculate X% of Y, what percent X is of Y, and percentage increase/decrease — instantly and for free." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/percentage-calculator.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/percentage-calculator.html" />
+
+  <!-- Breadcrumb structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",      "item": "https://monkeytactics.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance.html" },
+      { "@type": "ListItem", "position": 3, "name": "Percentage Calculator", "item": "https://monkeytactics.com/tools/percentage-calculator.html" }
+    ]
+  }
+  </script>
+
+  <!-- FAQPage structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I calculate X% of Y?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Divide X by 100, then multiply by Y: (X ÷ 100) × Y. For example, 20% of 150 is (20 ÷ 100) × 150 = 30." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I find out what percent one number is of another?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Divide the first number by the second, then multiply by 100: (X ÷ Y) × 100. For example, 30 is what percent of 150? (30 ÷ 150) × 100 = 20%." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do you calculate percentage change or percentage increase/decrease?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Subtract the old value from the new value, divide by the absolute value of the old value, then multiply by 100: ((New − Old) ÷ |Old|) × 100. A positive result is a percentage increase; a negative result is a percentage decrease." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why do I use the absolute value of the old number in percentage change?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Using the absolute value of the old (starting) number keeps the sign of the result meaningful — a growth from a negative starting value still shows correctly as an increase or decrease rather than flipping sign unexpectedly." }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between percentage points and percent change?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A percentage point is a simple difference between two percentages, e.g. going from 40% to 50% is a 10 percentage point increase. Percent change measures that same move relative to the starting value: (50 − 40) ÷ 40 × 100 = 25% change." }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+    /* ── Hero ── */
+    .hero--inner        { padding: 1.75rem 2rem; }
+    .hero--inner h1     { font-size: 1.9rem; }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .breadcrumb a        { color: var(--muted); transition: color 0.15s; }
+    .breadcrumb a:hover  { color: var(--accent); }
+    .breadcrumb .sep     { opacity: 0.4; }
+
+    /* ── Tool widget ── */
+    .tool-widget {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      box-shadow: var(--shadow-card);
+      margin-top: 1.5rem;
+    }
+
+    .tool-widget h2 { margin: 0 0 1.25rem; font-size: 1.05rem; }
+
+    /* ── Mode tabs ── */
+    .calc-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+    }
+
+    .calc-tab {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.55rem 1.1rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .calc-tab:hover {
+      color: var(--text);
+      border-color: rgba(34,197,94,0.4);
+    }
+
+    .calc-tab.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(34,197,94,0.5);
+    }
+
+    /* ── Panels ── */
+    .calc-panel { display: none; }
+    .calc-panel.active { display: block; }
+
+    .panel-question {
+      font-size: 1rem;
+      color: var(--text);
+      margin: 0 0 1.25rem;
+      line-height: 1.6;
+    }
+
+    .panel-question .q-input {
+      display: inline-block;
+      min-width: 90px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0.35rem 0.6rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .panel-question .q-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+
+    .input-group        { margin-bottom: 1.1rem; }
+    .input-group:last-of-type { margin-bottom: 0; }
+
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group input[type="number"] {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+
+    .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
+
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .btn-calculate {
+      display: inline-block;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.35);
+      transition: opacity 0.15s, transform 0.15s;
+      margin-top: 0.75rem;
+    }
+    .btn-calculate:hover  { opacity: 0.9; transform: translateY(-1px); }
+    .btn-calculate:active { transform: translateY(0); }
+
+    .calc-error {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 0.5rem;
+      color: #fca5a5;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+
+    .results-panel {
+      display: none;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .results-panel h3 { margin: 0 0 0.75rem; font-size: 1rem; }
+
+    .result-card {
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.4);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.25rem;
+      text-align: center;
+      max-width: 360px;
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.35rem;
+    }
+
+    .result-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .result-sub { font-size: 0.8rem; color: var(--muted); margin-top: 0.4rem; line-height: 1.5; }
+
+    .result-value.negative { color: #f87171; }
+
+    /* ── Copy link ── */
+    .share-line {
+      display: none;
+      margin-top: 1.1rem;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .btn-copy-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 999px;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .copy-confirm { font-size: 0.8rem; color: var(--accent); display: none; }
+
+    /* ── SEO / content ── */
+    .seo-section          { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p        { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+
+    .formula-block {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1.1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin: 0.75rem 0;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    .example-block {
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin: 0.5rem 0 1rem;
+    }
+    .example-block strong { color: var(--text); }
+
+    /* ── FAQ ── */
+    .faq-list            { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-item            { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h3         { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
+    .faq-item p          { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    /* ── Related tools ── */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .related-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .related-card:hover  { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { font-size: 0.9rem; }
+    .related-card span   { color: var(--muted); font-size: 0.8rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .hero--inner    { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+      .tool-widget    { padding: 1.25rem; }
+      .input-row      { grid-template-columns: 1fr; }
+      .result-value   { font-size: 1.85rem; }
+      .calc-tabs      { gap: 0.4rem; }
+      .calc-tab       { font-size: 0.8rem; padding: 0.5rem 0.85rem; }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://monkeytactics.com/tools/percentage-calculator.html#app",
+      "name": "Percentage Calculator",
+      "url": "https://monkeytactics.com/tools/percentage-calculator.html",
+      "description": "Calculate percentages and percentage changes.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "author": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "reviewedBy": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "dateModified": "2026-07-22"
+    }
+  ]
+}
+  </script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html" class="active">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero hero--inner" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/index.html">Home</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <a href="/tools/finance.html">Finance</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <span aria-current="page">Percentage Calculator</span>
+      </nav>
+      <h1 id="tool-heading">Percentage Calculator</h1>
+      <p>Find X% of Y, work out what percent one number is of another, or calculate a percentage
+         increase or decrease. Pick a calculation below and get an instant, exact result.</p>
+    </section>
+
+    <!-- TOP AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
+
+    <!-- CALCULATOR WIDGET -->
+    <section aria-labelledby="calc-heading">
+      <div class="tool-widget">
+        <h2 id="calc-heading">Choose a Calculation</h2>
+
+        <div class="calc-tabs" role="tablist" aria-label="Percentage calculation type">
+          <button class="calc-tab active" id="tabOf"     type="button" role="tab" aria-selected="true"  data-panel="panelOf">X% of Y</button>
+          <button class="calc-tab"        id="tabIs"     type="button" role="tab" aria-selected="false" data-panel="panelIs">X is what % of Y</button>
+          <button class="calc-tab"        id="tabChange" type="button" role="tab" aria-selected="false" data-panel="panelChange">% Increase / Decrease</button>
+        </div>
+
+        <!-- ══════ PANEL 1: X% of Y ══════ -->
+        <div class="calc-panel active" id="panelOf" role="tabpanel" aria-labelledby="tabOf">
+          <p class="panel-question">
+            What is
+            <input type="number" class="q-input" id="ofX" value="20" aria-label="Percentage value">%
+            of
+            <input type="number" class="q-input" id="ofY" value="150" aria-label="Base value">?
+          </p>
+
+          <div class="calc-error" id="ofError" role="alert">
+            ⚠️ Please enter a valid number in both fields.
+          </div>
+
+          <button class="btn-calculate" id="ofBtn" type="button">Calculate</button>
+
+          <div class="results-panel" id="ofResults" role="region" aria-live="polite">
+            <h3>Result</h3>
+            <div class="result-card">
+              <div class="result-label" id="ofResultLabel">— % of —</div>
+              <div class="result-value" id="ofResultValue">—</div>
+              <div class="result-sub" id="ofResultSub">Formula: (X ÷ 100) × Y</div>
+            </div>
+            <div class="share-line" id="ofShareLine">
+              <button class="btn-copy-link" type="button" data-copy="of">🔗 Copy bookmarkable link</button>
+              <span class="copy-confirm">✅ Link copied!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════ PANEL 2: X is what % of Y ══════ -->
+        <div class="calc-panel" id="panelIs" role="tabpanel" aria-labelledby="tabIs">
+          <p class="panel-question">
+            <input type="number" class="q-input" id="isX" value="30" aria-label="Part value">
+            is what percent of
+            <input type="number" class="q-input" id="isY" value="150" aria-label="Whole value">?
+          </p>
+
+          <div class="calc-error" id="isError" role="alert">
+            ⚠️ Please enter a valid number in both fields. The second value cannot be 0.
+          </div>
+
+          <button class="btn-calculate" id="isBtn" type="button">Calculate</button>
+
+          <div class="results-panel" id="isResults" role="region" aria-live="polite">
+            <h3>Result</h3>
+            <div class="result-card">
+              <div class="result-label" id="isResultLabel">— is what % of —</div>
+              <div class="result-value" id="isResultValue">—</div>
+              <div class="result-sub" id="isResultSub">Formula: (X ÷ Y) × 100</div>
+            </div>
+            <div class="share-line" id="isShareLine">
+              <button class="btn-copy-link" type="button" data-copy="is">🔗 Copy bookmarkable link</button>
+              <span class="copy-confirm">✅ Link copied!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════ PANEL 3: Percentage Change ══════ -->
+        <div class="calc-panel" id="panelChange" role="tabpanel" aria-labelledby="tabChange">
+          <div class="input-row">
+            <div class="input-group">
+              <label for="chOld">Old (starting) value</label>
+              <input type="number" id="chOld" value="80" aria-label="Old value" />
+              <p class="input-hint">The value you're measuring the change from.</p>
+            </div>
+            <div class="input-group">
+              <label for="chNew">New (ending) value</label>
+              <input type="number" id="chNew" value="100" aria-label="New value" />
+              <p class="input-hint">The value you're measuring the change to.</p>
+            </div>
+          </div>
+
+          <div class="calc-error" id="chError" role="alert">
+            ⚠️ Please enter valid numbers in both fields. The old value cannot be 0.
+          </div>
+
+          <button class="btn-calculate" id="chBtn" type="button">Calculate Change</button>
+
+          <div class="results-panel" id="chResults" role="region" aria-live="polite">
+            <h3>Result</h3>
+            <div class="result-card">
+              <div class="result-label" id="chResultLabel">Percentage Change</div>
+              <div class="result-value" id="chResultValue">—</div>
+              <div class="result-sub" id="chResultSub">Formula: ((New − Old) ÷ |Old|) × 100</div>
+            </div>
+            <div class="share-line" id="chShareLine">
+              <button class="btn-copy-link" type="button" data-copy="change">🔗 Copy bookmarkable link</button>
+              <span class="copy-confirm">✅ Link copied!</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tool-widget -->
+    </section>
+
+    <!-- MID AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Mid Display Ad --></div>
+
+    <!-- HOW TO USE -->
+    <div class="seo-section">
+      <h2>How to use the Percentage Calculator</h2>
+      <p>Pick the tab that matches your question. <strong>"X% of Y"</strong> tells you what a
+         percentage of a number equals — useful for tips, discounts, and commissions.
+         <strong>"X is what % of Y"</strong> tells you what percentage one number represents of
+         another — useful for test scores, quotas, and market share. <strong>"% Increase /
+         Decrease"</strong> tells you how much a value has grown or shrunk between two points —
+         useful for price changes, salary raises, and growth rates.</p>
+      <p>Enter your numbers and click Calculate to see the exact result along with the formula
+         used, so you can see exactly how the answer was reached.</p>
+    </div>
+
+    <!-- FORMULAS -->
+    <div class="seo-section">
+      <h2>Percentage formulas explained</h2>
+
+      <p><strong>1. X% of Y</strong> — used to find a percentage of a number, such as calculating
+         a tip, a discount, or a commission.</p>
+      <div class="formula-block" role="img" aria-label="X percent of Y formula">
+        Result = (X ÷ 100) × Y
+      </div>
+      <div class="example-block">
+        <strong>Example:</strong> 20% of 150 = (20 ÷ 100) × 150 = <strong>30</strong>
+      </div>
+
+      <p><strong>2. X is what % of Y</strong> — used to express one number as a percentage of
+         another, such as a test score out of a total or a portion of a budget.</p>
+      <div class="formula-block" role="img" aria-label="X is what percent of Y formula">
+        Result = (X ÷ Y) × 100
+      </div>
+      <div class="example-block">
+        <strong>Example:</strong> 30 is what percent of 150? (30 ÷ 150) × 100 = <strong>20%</strong>
+      </div>
+
+      <p><strong>3. Percentage change</strong> — used to measure growth or decline between an old
+         value and a new value, such as a price change or a year-over-year comparison.</p>
+      <div class="formula-block" role="img" aria-label="Percentage change formula">
+        Result = ((New − Old) ÷ |Old|) × 100
+      </div>
+      <div class="example-block">
+        <strong>Example:</strong> Old = 80, New = 100 → ((100 − 80) ÷ 80) × 100 =
+        <strong>25% increase</strong>
+      </div>
+
+      <p>All three calculations use only basic arithmetic, so results are exact — there's no
+         rounding or approximation beyond standard decimal display.</p>
+    </div>
+
+    <!-- FAQ -->
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+
+        <li class="faq-item">
+          <h3>How do I calculate X% of Y?</h3>
+          <p>Divide X by 100, then multiply by Y: (X ÷ 100) × Y. For example, 20% of 150 is
+             (20 ÷ 100) × 150 = 30.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>How do I find out what percent one number is of another?</h3>
+          <p>Divide the first number by the second, then multiply by 100: (X ÷ Y) × 100. For
+             example, 30 is what percent of 150? (30 ÷ 150) × 100 = 20%.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>How do you calculate percentage change or percentage increase/decrease?</h3>
+          <p>Subtract the old value from the new value, divide by the absolute value of the old
+             value, then multiply by 100: ((New − Old) ÷ |Old|) × 100. A positive result is a
+             percentage increase; a negative result is a percentage decrease.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Why use the absolute value of the old number in percentage change?</h3>
+          <p>Using the absolute value of the old (starting) number keeps the sign of the result
+             meaningful — a change from a negative starting value still shows correctly as an
+             increase or decrease rather than flipping sign unexpectedly.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>What's the difference between percentage points and percent change?</h3>
+          <p>A percentage point is a simple difference between two percentages — going from 40%
+             to 50% is a 10 percentage point increase. Percent change measures that same move
+             relative to the starting value: (50 − 40) ÷ 40 × 100 = 25% change.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Is my data kept private?</h3>
+          <p>Yes — all calculations run entirely in your browser using JavaScript. Nothing you
+             enter is transmitted to any server or stored anywhere. See our
+             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for full details.</p>
+        </li>
+
+      </ul>
+    </section>
+
+    <!-- RELATED TOOLS -->
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Related Tools</h2>
+      <div class="related-grid">
+
+        <a href="/tools/loan-mortgage-calculator.html" class="related-card">
+          <strong>🏠 Loan &amp; Mortgage Calculator</strong>
+          <span>Calculate monthly payments, total interest, and a full amortization schedule.</span>
+        </a>
+
+        <a href="/tools/compound-interest-calculator.html" class="related-card">
+          <strong>📈 Compound Interest Calculator</strong>
+          <span>Model investment growth, savings, contributions, inflation, and tax scenarios.</span>
+        </a>
+
+        <a href="/tools/date-difference-calculator.html" class="related-card">
+          <strong>📅 Date Difference Calculator</strong>
+          <span>Find the exact number of days between any two dates.</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- BOTTOM AD -->
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+  <!-- CALCULATOR SCRIPT -->
+  <script>
+  (function () {
+
+    /* ── Tab switching ── */
+    const tabs   = document.querySelectorAll('.calc-tab');
+    const panels = document.querySelectorAll('.calc-panel');
+
+    function activateTab(tab) {
+      tabs.forEach(function (t) {
+        const isActive = t === tab;
+        t.classList.toggle('active', isActive);
+        t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+      panels.forEach(function (p) {
+        p.classList.toggle('active', p.id === tab.dataset.panel);
+      });
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { activateTab(tab); });
+    });
+
+    /* ── Number formatting ── */
+    function fmtNumber(n) {
+      // Trim to at most 6 decimal places, no trailing zeros
+      const rounded = Math.round(n * 1e6) / 1e6;
+      return rounded.toLocaleString(undefined, { maximumFractionDigits: 6 });
+    }
+
+    /* ══════════════════════════════════════════════════
+       PANEL 1 — X% of Y
+    ══════════════════════════════════════════════════ */
+    const ofX       = document.getElementById('ofX');
+    const ofY       = document.getElementById('ofY');
+    const ofError   = document.getElementById('ofError');
+    const ofResults = document.getElementById('ofResults');
+    const ofLabel   = document.getElementById('ofResultLabel');
+    const ofValue   = document.getElementById('ofResultValue');
+    const ofShare   = document.getElementById('ofShareLine');
+
+    function calcOf() {
+      ofError.style.display   = 'none';
+      ofResults.style.display = 'none';
+
+      const x = parseFloat(ofX.value);
+      const y = parseFloat(ofY.value);
+
+      if (isNaN(x) || isNaN(y)) {
+        ofError.style.display = 'block';
+        return;
+      }
+
+      const result = (x / 100) * y;
+      ofLabel.textContent = x + '% of ' + y;
+      ofValue.textContent = fmtNumber(result);
+      ofResults.style.display = 'block';
+      ofShare.style.display   = 'flex';
+      writeURLParams('of', { x: x, y: y });
+      ofResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('ofBtn').addEventListener('click', calcOf);
+
+    /* ══════════════════════════════════════════════════
+       PANEL 2 — X is what % of Y
+    ══════════════════════════════════════════════════ */
+    const isX       = document.getElementById('isX');
+    const isY       = document.getElementById('isY');
+    const isError   = document.getElementById('isError');
+    const isResults = document.getElementById('isResults');
+    const isLabel   = document.getElementById('isResultLabel');
+    const isValue   = document.getElementById('isResultValue');
+    const isShare   = document.getElementById('isShareLine');
+
+    function calcIs() {
+      isError.style.display   = 'none';
+      isResults.style.display = 'none';
+
+      const x = parseFloat(isX.value);
+      const y = parseFloat(isY.value);
+
+      if (isNaN(x) || isNaN(y) || y === 0) {
+        isError.style.display = 'block';
+        return;
+      }
+
+      const result = (x / y) * 100;
+      isLabel.textContent = x + ' is what % of ' + y;
+      isValue.textContent = fmtNumber(result) + '%';
+      isResults.style.display = 'block';
+      isShare.style.display   = 'flex';
+      writeURLParams('is', { x: x, y: y });
+      isResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('isBtn').addEventListener('click', calcIs);
+
+    /* ══════════════════════════════════════════════════
+       PANEL 3 — Percentage Change
+    ══════════════════════════════════════════════════ */
+    const chOld     = document.getElementById('chOld');
+    const chNew     = document.getElementById('chNew');
+    const chError   = document.getElementById('chError');
+    const chResults = document.getElementById('chResults');
+    const chValue   = document.getElementById('chResultValue');
+    const chSub     = document.getElementById('chResultSub');
+    const chShare   = document.getElementById('chShareLine');
+
+    function calcChange() {
+      chError.style.display   = 'none';
+      chResults.style.display = 'none';
+
+      const oldVal = parseFloat(chOld.value);
+      const newVal = parseFloat(chNew.value);
+
+      if (isNaN(oldVal) || isNaN(newVal) || oldVal === 0) {
+        chError.style.display = 'block';
+        return;
+      }
+
+      const result = ((newVal - oldVal) / Math.abs(oldVal)) * 100;
+      const isNegative = result < 0;
+      const direction = isNegative ? 'decrease' : 'increase';
+
+      chValue.textContent = (isNegative ? '' : '+') + fmtNumber(result) + '%';
+      chValue.classList.toggle('negative', isNegative);
+      chSub.textContent = 'A ' + fmtNumber(Math.abs(result)) + '% ' + direction +
+        ' from ' + oldVal + ' to ' + newVal + '. Formula: ((New − Old) ÷ |Old|) × 100';
+
+      chResults.style.display = 'block';
+      chShare.style.display   = 'flex';
+      writeURLParams('change', { old: oldVal, newv: newVal });
+      chResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('chBtn').addEventListener('click', calcChange);
+
+    /* ══════════════════════════════════════════════════
+       URL PARAMS — read & write for shareable links
+    ══════════════════════════════════════════════════ */
+    function writeURLParams(mode, values) {
+      const params = new URLSearchParams();
+      params.set('mode', mode);
+      Object.keys(values).forEach(function (k) { params.set(k, values[k]); });
+      const newURL = window.location.pathname + '?' + params.toString();
+      history.replaceState(null, '', newURL);
+    }
+
+    function readURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      const mode = params.get('mode');
+      if (!mode) return;
+
+      if (mode === 'of' && params.has('x') && params.has('y')) {
+        ofX.value = params.get('x');
+        ofY.value = params.get('y');
+        activateTab(document.getElementById('tabOf'));
+        calcOf();
+      } else if (mode === 'is' && params.has('x') && params.has('y')) {
+        isX.value = params.get('x');
+        isY.value = params.get('y');
+        activateTab(document.getElementById('tabIs'));
+        calcIs();
+      } else if (mode === 'change' && params.has('old') && params.has('newv')) {
+        chOld.value = params.get('old');
+        chNew.value = params.get('newv');
+        activateTab(document.getElementById('tabChange'));
+        calcChange();
+      }
+    }
+
+    /* ══════════════════════════════════════════════════
+       COPY LINK buttons
+    ══════════════════════════════════════════════════ */
+    document.querySelectorAll('.btn-copy-link').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        navigator.clipboard.writeText(window.location.href).then(function () {
+          const confirmEl = btn.parentElement.querySelector('.copy-confirm');
+          confirmEl.style.display = 'inline';
+          setTimeout(function () { confirmEl.style.display = 'none'; }, 2500);
+        });
+      });
+    });
+
+    /* ══════════════════════════════════════════════════
+       INIT
+    ══════════════════════════════════════════════════ */
+    readURLParams();
+
+  })();
+  </script>
+
+<section class="seo-section methodology" aria-labelledby="methodology-heading">
+      <h2 id="methodology-heading">How this works and limitations</h2>
+      <p>This tool performs the calculation locally in your browser using the values you enter.</p>
+      <p><strong>Limitations:</strong> Results are estimates for general information and do not replace professional advice where it is needed.</p>
+      <p class="text-muted">Prepared and reviewed by MonkeyTactics. Last reviewed <time datetime="2026-07-22">2026-07-22</time>.</p>
+    </section>
+</body>
+</html>

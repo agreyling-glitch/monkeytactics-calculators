@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Zone Converter &amp; Meeting Planner — Free Tool | MonkeyTactics</title>
+  <meta name="description" content="Free time zone converter and meeting planner. Pick cities, set a time, and see everyone's local clock, business hours, and a shareable link." />
+  <link rel="canonical" href="https://monkeytactics.com/tools/time-zone-converter.html" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Time Zone Converter &amp; Meeting Planner — MonkeyTactics" />
+  <meta property="og:description" content="Plan meetings across cities, compare time zones, and share a link with everyone's local time." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://monkeytactics.com/tools/time-zone-converter.html" />
+
+  <!-- Breadcrumb structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",      "item": "https://monkeytactics.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Utilities", "item": "https://monkeytactics.com/tools/utilities.html" },
+      { "@type": "ListItem", "position": 3, "name": "Time Zone Converter", "item": "https://monkeytactics.com/tools/time-zone-converter.html" }
+    ]
+  }
+  </script>
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐒</text></svg>" />
+
+  <style>
+    /* ── Hero ── */
+    .hero--inner        { padding: 1.75rem 2rem; }
+    .hero--inner h1     { font-size: 1.9rem; }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .breadcrumb a        { color: var(--muted); transition: color 0.15s; }
+    .breadcrumb a:hover  { color: var(--accent); }
+    .breadcrumb .sep     { opacity: 0.4; }
+
+    /* ── Tool widget ── */
+    .tool-widget {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      box-shadow: var(--shadow-card);
+      margin-top: 1.5rem;
+    }
+    .tool-widget h2 { margin: 0 0 1.25rem; font-size: 1.05rem; }
+
+    /* ── Two-col layout: controls | live summary ── */
+    .calc-layout {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ── Inputs ── */
+    .input-group        { margin-bottom: 1.1rem; }
+    .input-group:last-child { margin-bottom: 0; }
+
+    .input-group label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-group input[type="datetime-local"],
+    .input-group input[type="text"],
+    .input-group select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    }
+
+    .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
+
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-bottom: 1.1rem;
+    }
+    .toggle-row input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+
+    /* ── Add-city row ── */
+    .add-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .add-row select  { flex: 1 1 220px; }
+    .add-row input   { flex: 1 1 180px; }
+
+    /* ── Buttons ── */
+    .btn-calculate {
+      width: 100%;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #022c22;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.7rem 1.3rem;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.35);
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .btn-calculate:hover  { opacity: 0.9; transform: translateY(-1px); }
+    .btn-calculate:active { transform: translateY(0); }
+    .btn-calculate.btn-compact { width: auto; padding: 0.65rem 1.1rem; font-size: 0.9rem; flex: 0 0 auto; }
+
+    .btn-ghost.btn-compact { font-size: 0.85rem; padding: 0.5rem 1rem; white-space: nowrap; }
+
+    /* ── City list ── */
+    .city-list {
+      list-style: none;
+      margin: 0 0 1rem;
+      padding: 0;
+    }
+    .city-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.6rem 0.85rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .city-list li .city-name { flex: 1; font-weight: 600; color: var(--text); }
+    .city-list li .city-tz {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    .city-list li button {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 0.4rem;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.55rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .city-list li button:hover { border-color: var(--accent); color: var(--accent); }
+
+    .empty-hint {
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 1rem;
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.02);
+    }
+
+    /* ── Share row ── */
+    .share-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .share-row input {
+      flex: 1;
+      min-width: 160px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--muted);
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      padding: 0.55rem 0.75rem;
+    }
+
+    /* ── Error ── */
+    .calc-error {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 0.5rem;
+      color: #fca5a5;
+      font-size: 0.875rem;
+    }
+
+    /* ── Results / summary column ── */
+    .results-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .result-card {
+      background: rgba(34,197,94,0.06);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem;
+    }
+    .result-card.primary {
+      background: rgba(34,197,94,0.12);
+      border-color: rgba(34,197,94,0.4);
+    }
+    .result-card .result-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+    .result-card .result-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.25;
+    }
+    .result-card .result-sub {
+      font-size: 0.775rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+
+    .results-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      gap: 0.5rem;
+    }
+    .results-empty .empty-icon { font-size: 2rem; }
+    .results-empty p           { margin: 0; font-size: 0.875rem; }
+
+    /* ── Legend ── */
+    .bar-legend {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.775rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .bar-legend .dot {
+      display: inline-block;
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .dot-work { background: var(--accent); }
+    .dot-off  { background: #6b7280; }
+
+    /* ── Planner / difference tables ── */
+    .amort-section { margin-top: 2rem; }
+    .amort-section h2 { font-size: 1.05rem; margin: 0 0 0.75rem; }
+
+    .amort-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .amort-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 480px;
+    }
+    .amort-table th {
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-weight: 600;
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .amort-table td {
+      padding: 0.55rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--muted);
+    }
+    .amort-table td:first-child { color: var(--text); font-weight: 500; }
+    .amort-table tr:last-child td { border-bottom: none; }
+    .amort-table tr:hover td      { background: rgba(255,255,255,0.02); }
+    .amort-table .td-work    { color: var(--accent); font-weight: 600; }
+    .amort-table .td-off     { color: var(--muted); }
+    .amort-table td.offset-cell { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+
+    /* ── SEO / content ── */
+    .seo-section          { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p        { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+    .seo-section ul       { color: var(--muted); line-height: 1.75; }
+    .seo-section code     { background: rgba(255,255,255,0.06); padding: 0.1rem 0.35rem; border-radius: 0.3rem; font-size: 0.85em; }
+
+    /* ── Related tools ── */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+    .related-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .related-card:hover  { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { font-size: 0.9rem; }
+    .related-card span   { color: var(--muted); font-size: 0.8rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 800px) {
+      .calc-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .hero--inner  { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+      .tool-widget  { padding: 1.25rem; }
+      .input-row    { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://monkeytactics.com/tools/time-zone-converter.html#app",
+      "name": "Time Zone Converter",
+      "url": "https://monkeytactics.com/tools/time-zone-converter.html",
+      "description": "Convert times across time zones.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "author": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "reviewedBy": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "dateModified": "2026-07-22"
+    }
+  ]
+}
+  </script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html" class="active">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero hero--inner" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/index.html">Home</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <a href="/tools/utilities.html">Utilities</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <span aria-current="page">Time Zone Converter</span>
+      </nav>
+      <h1 id="tool-heading">Time Zone Converter &amp; Meeting Planner</h1>
+      <p>Pick cities, set a time, and see everyone's local clock, business hours, and a
+         shareable link — everything runs privately in your browser.</p>
+    </section>
+
+    <!-- TOP AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
+
+    <!-- CONVERTER WIDGET -->
+    <section aria-labelledby="calc-heading">
+      <div class="tool-widget">
+        <h2 id="calc-heading">Convert Time Across Cities</h2>
+
+        <div class="calc-layout">
+
+          <!-- ── LEFT: CONTROLS ── -->
+          <div class="inputs-col">
+
+            <div class="input-group">
+              <label for="ref-time">Meeting time (in the first city)</label>
+              <input type="datetime-local" id="ref-time" step="60" />
+              <p class="input-hint">Enter the time as it should appear in the first city on your list.</p>
+            </div>
+
+            <div class="input-row" style="margin-bottom:1.1rem;">
+              <div class="input-group" style="margin-bottom:0;">
+                <label for="format-select">Time format</label>
+                <select id="format-select">
+                  <option value="24h">24-hour</option>
+                  <option value="12h">12-hour</option>
+                </select>
+              </div>
+              <div class="input-group" style="margin-bottom:0;">
+                <label for="view-select">View</label>
+                <select id="view-select">
+                  <option value="planner">Meeting planner</option>
+                  <option value="worldclock">World clock</option>
+                  <option value="difference">Time difference</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="toggle-row">
+              <input id="highlight-toggle" type="checkbox" />
+              <label for="highlight-toggle" style="margin:0;">Highlight business hours (Mon–Fri, 09:00–17:59)</label>
+            </div>
+
+            <div class="input-group">
+              <label for="city-select">Add a city</label>
+              <div class="add-row">
+                <select id="city-select" aria-label="Add a city">
+                  <option value="">+ Choose a city…</option>
+                </select>
+                <input id="city-text" type="text" placeholder="or IANA zone e.g. Europe/Berlin" aria-label="Or enter an IANA time zone" />
+                <button id="add-btn" type="button" class="btn-calculate btn-compact">Add</button>
+              </div>
+              <p class="input-hint">Add up to 20 cities — reorder or remove them below.</p>
+            </div>
+
+            <div class="calc-error" id="calcError" role="alert" style="display:none;">
+              ⚠️ That city or time zone wasn't recognized. Try a curated city or a valid IANA zone name.
+            </div>
+
+            <ul id="city-list" class="city-list" aria-label="Selected cities"></ul>
+            <p id="empty-hint" class="empty-hint" hidden>No cities yet — add one above to begin.</p>
+
+          </div><!-- /inputs-col -->
+
+          <!-- ── RIGHT: SHARE + SUMMARY ── -->
+          <div class="results-col" id="resultsCol">
+
+            <div class="result-card primary">
+              <div class="result-label">Reference city</div>
+              <div class="result-value" id="now-summary">—</div>
+              <div class="result-sub">First city in your list sets the reference time</div>
+            </div>
+
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="now-btn" style="margin-bottom:0.5rem;">Not sure of the time?</label>
+              <button id="now-btn" type="button" class="btn-ghost btn-compact" style="width:100%; text-align:center; cursor:pointer; background:transparent; font-family:inherit;">
+                Use current time
+              </button>
+            </div>
+
+            <div class="share-row">
+              <input id="share-url" type="text" readonly aria-label="Shareable link" />
+              <button id="copy-btn" type="button" class="btn-ghost btn-compact" style="cursor:pointer; background:transparent; font-family:inherit;">Copy link</button>
+            </div>
+            <p class="input-hint">Share this link — recipients open it and see the exact same plan.</p>
+
+          </div><!-- /results-col -->
+
+        </div><!-- /calc-layout -->
+      </div><!-- /tool-widget -->
+    </section>
+
+    <!-- MID AD -->
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Mid Display Ad --></div>
+
+    <!-- RESULTS: PLANNER / WORLD CLOCK -->
+    <section class="amort-section" id="results" hidden aria-labelledby="results-heading">
+
+      <div id="planner-view" hidden>
+        <h2 id="results-heading">Local Time in Each City</h2>
+        <div class="amort-wrap">
+          <table class="amort-table" aria-label="Time zone comparison">
+            <thead>
+              <tr><th>City</th><th>Time</th><th>Date</th><th>UTC offset</th><th>Hours</th></tr>
+            </thead>
+            <tbody id="planner-body"></tbody>
+          </table>
+        </div>
+        <div class="bar-legend">
+          <span><span class="dot dot-work"></span>Working hours (Mon–Fri, 09:00–17:59)</span>
+          <span><span class="dot dot-off"></span>Outside working hours</span>
+        </div>
+
+        <div class="result-card primary" id="overlap-card" style="margin-top:1.25rem;" hidden>
+          <div class="result-label">Suggested meeting window</div>
+          <div class="result-sub" id="overlap-text" style="font-size:0.9rem; color:var(--text); margin-top:0.4rem;"></div>
+        </div>
+      </div>
+
+      <div id="difference-view" hidden>
+        <h2>Time Difference from <span id="diff-base"></span></h2>
+        <div class="amort-wrap">
+          <table class="amort-table" aria-label="Time zone differences">
+            <thead><tr><th>City</th><th>UTC offset</th><th>Difference</th></tr></thead>
+            <tbody id="difference-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- SEO / CONTENT -->
+    <div class="seo-section">
+      <h2>About this Time Zone Converter</h2>
+      <p>This tool helps you compare time across cities, plan meetings for distributed teams,
+         and share a single link that everyone can open to see the meeting time in their own
+         time zone. Pick the cities, choose a meeting time, and the converter shows each
+         city's local clock, UTC offset, and whether the slot falls inside standard business
+         hours. The shareable link encodes everything in the URL, so recipients see the
+         identical plan without having to type anything.</p>
+    </div>
+
+    <div class="seo-section">
+      <h2>How time zones work</h2>
+      <p>The world is divided into 24 nominal hourly offsets from Coordinated Universal Time
+         (UTC), but in practice the offsets are far from uniform. Many zones sit on the half
+         hour — India is UTC+5:30, Adelaide in South Australia is UTC+9:30 in winter — and a
+         few use quarter-hour offsets, the best known being Nepal at UTC+5:45. A smaller
+         number of regions, such as the Chatham Islands in New Zealand, use UTC+12:45.
+         Because this converter relies on the browser's native
+         <abbr title="International Components for Unicode">ICU</abbr> timezone database via
+         IANA names like <code>Asia/Kolkata</code>, all of these offsets are handled
+         automatically.</p>
+    </div>
+
+    <div class="seo-section">
+      <h2>Daylight Saving Time (DST)</h2>
+      <p>Many countries shift their clocks forward in spring and back in autumn, which means
+         the offset between two cities can change by an hour twice a year. The conversion
+         here always uses the offset that applies on the specific date you choose, so a
+         meeting planned in July between London and New York uses summer offsets
+         (UTC+1 and UTC-4), while the same meeting in January uses winter offsets
+         (UTC+0 and UTC-5). Two edge cases deserve care: the missing hour during a
+         spring-forward transition, and the repeated hour during a fall-back transition. The
+         tool resolves both by referring to the IANA database's rules for the chosen zone.</p>
+    </div>
+
+    <!-- FAQ -->
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+
+        <li class="faq-item">
+          <h3>How do I schedule a meeting across time zones?</h3>
+          <p>Put the city with the most awkward hours first — it becomes the reference. Add
+             every other city, switch on the business-hours highlight, and use the suggested
+             meeting window to find a slot that works for everyone.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Does this handle half-hour and quarter-hour offsets?</h3>
+          <p>Yes — India (UTC+5:30), Adelaide (UTC+9:30 in winter), Nepal (UTC+5:45), and the
+             Chatham Islands (UTC+12:45) are all handled correctly using the browser's native
+             IANA time zone database.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Does the shareable link update automatically?</h3>
+          <p>Yes — every change to cities, time, format, or view updates the URL. Copy the link
+             and anyone who opens it sees the identical plan, converted to their own screen.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>What happens during a Daylight Saving Time transition?</h3>
+          <p>The tool always uses the offset that applies on your chosen date. For recurring
+             meetings, re-check the plan around DST changes in March and October/November.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Is my data private?</h3>
+          <p>Yes — all calculations run entirely in your browser using JavaScript. No cities,
+             times, or plans are transmitted to any server or stored anywhere. See our
+             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for details.</p>
+        </li>
+
+      </ul>
+    </section>
+
+    <!-- RELATED TOOLS -->
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Related Tools</h2>
+      <div class="related-grid">
+
+        <a href="/tools/date-difference-calculator.html" class="related-card">
+          <strong>📅 Date Difference Calculator</strong>
+          <span>Find the exact number of days between any two dates.</span>
+        </a>
+
+        <a href="/tools/loan-mortgage-calculator.html" class="related-card">
+          <strong>🏠 Loan &amp; Mortgage Calculator</strong>
+          <span>Calculate monthly payments and view a full amortization schedule.</span>
+        </a>
+
+        <a href="/tools/percentage-calculator.html" class="related-card">
+          <strong>💯 Percentage Calculator</strong>
+          <span>Work out discounts, percentage changes, and reverse percentages instantly.</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- BOTTOM AD -->
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+  <script type="module">
+    import {
+      CITIES,
+      resolveCity,
+      parseUrlState,
+      buildUrlState,
+      isValidTimeISO,
+      wallClockToUTC,
+      formatInZone,
+      isBusinessHour,
+      getOffsetMinutes,
+      formatOffset,
+    } from "/assets/js/time-zone-converter.js";
+
+    // ---- DOM refs ----
+    const refTime = document.getElementById("ref-time");
+    const nowBtn = document.getElementById("now-btn");
+    const nowSummary = document.getElementById("now-summary");
+    const formatSelect = document.getElementById("format-select");
+    const viewSelect = document.getElementById("view-select");
+    const highlightToggle = document.getElementById("highlight-toggle");
+    const citySelect = document.getElementById("city-select");
+    const cityText = document.getElementById("city-text");
+    const addBtn = document.getElementById("add-btn");
+    const cityListEl = document.getElementById("city-list");
+    const emptyHint = document.getElementById("empty-hint");
+    const calcError = document.getElementById("calcError");
+    const shareUrl = document.getElementById("share-url");
+    const copyBtn = document.getElementById("copy-btn");
+    const results = document.getElementById("results");
+    const plannerView = document.getElementById("planner-view");
+    const differenceView = document.getElementById("difference-view");
+    const plannerBody = document.getElementById("planner-body");
+    const differenceBody = document.getElementById("difference-body");
+    const diffBase = document.getElementById("diff-base");
+    const overlapCard = document.getElementById("overlap-card");
+    const overlapText = document.getElementById("overlap-text");
+
+    // ---- State ----
+    let state = { cities: [], timeISO: null, format: "24h", view: "planner", highlight: true };
+
+    // ---- Populate the curated city dropdown ----
+    for (const c of CITIES) {
+      const opt = document.createElement("option");
+      opt.value = c.code;
+      opt.textContent = `${c.name}, ${c.country}`;
+      citySelect.appendChild(opt);
+    }
+
+    // ---- Helpers ----
+    function toLocalInputValue(date) {
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+
+    function currentISO() {
+      const v = refTime.value;
+      return isValidTimeISO(v) ? v : null;
+    }
+
+    function pushUrl() {
+      const sp = buildUrlState(state);
+      const qs = sp.toString();
+      const next = qs ? `${location.pathname}?${qs}` : location.pathname;
+      history.replaceState(null, "", next + location.hash);
+      shareUrl.value = location.href;
+    }
+
+    function setDefaultTimeIfEmpty() {
+      if (!state.timeISO) {
+        refTime.value = toLocalInputValue(new Date());
+      } else {
+        refTime.value = state.timeISO;
+      }
+    }
+
+    // ---- Render the selected-cities list ----
+    function renderCityList() {
+      cityListEl.innerHTML = "";
+      if (state.cities.length === 0) {
+        emptyHint.hidden = false;
+        return;
+      }
+      emptyHint.hidden = true;
+      state.cities.forEach((city, idx) => {
+        const li = document.createElement("li");
+        const name = document.createElement("span");
+        name.className = "city-name";
+        name.textContent = city.name;
+        const tz = document.createElement("span");
+        tz.className = "city-tz";
+        tz.textContent = city.tz;
+        li.appendChild(name);
+        li.appendChild(tz);
+
+        const up = document.createElement("button");
+        up.type = "button";
+        up.textContent = "↑";
+        up.title = "Move up";
+        up.disabled = idx === 0;
+        if (idx === 0) up.style.visibility = "hidden";
+        up.addEventListener("click", () => moveCity(idx, idx - 1));
+        li.appendChild(up);
+
+        const down = document.createElement("button");
+        down.type = "button";
+        down.textContent = "↓";
+        down.title = "Move down";
+        down.disabled = idx === state.cities.length - 1;
+        if (idx === state.cities.length - 1) down.style.visibility = "hidden";
+        down.addEventListener("click", () => moveCity(idx, idx + 1));
+        li.appendChild(down);
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "Remove";
+        remove.addEventListener("click", () => {
+          state.cities.splice(idx, 1);
+          updateAll();
+        });
+        li.appendChild(remove);
+
+        cityListEl.appendChild(li);
+      });
+    }
+
+    function moveCity(from, to) {
+      if (to < 0 || to >= state.cities.length) return;
+      const [item] = state.cities.splice(from, 1);
+      state.cities.splice(to, 0, item);
+      updateAll();
+    }
+
+    // ---- Render the conversion result ----
+    function renderResults() {
+      const iso = currentISO();
+      const refTz = state.cities[0]?.tz || Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const utcDate = iso ? wallClockToUTC(iso, refTz) : new Date();
+
+      if (state.cities.length === 0) {
+        results.hidden = true;
+        nowSummary.textContent = "—";
+        return;
+      }
+      results.hidden = false;
+
+      const firstFormatted = formatInZone(utcDate, refTz, { hour12: state.format === "12h" });
+      nowSummary.textContent = firstFormatted ? `${firstFormatted.time} · ${state.cities[0].name}` : "—";
+
+      const showDifference = state.view === "difference";
+      plannerView.hidden = showDifference;
+      differenceView.hidden = !showDifference;
+
+      if (!showDifference) {
+        plannerBody.innerHTML = "";
+        state.cities.forEach((city) => {
+          const formatted = formatInZone(utcDate, city.tz, { hour12: state.format === "12h" });
+          if (!formatted) return;
+          const working = isBusinessHour(utcDate, city.tz);
+          const tr = document.createElement("tr");
+          const hoursCellClass = state.highlight ? (working ? "td-work" : "td-off") : "";
+          tr.innerHTML = `
+            <td>${escapeHtml(city.name)}</td>
+            <td>${formatted.time}</td>
+            <td>${formatted.weekday} ${formatted.dateLabel}</td>
+            <td class="offset-cell">${formatted.offsetLabel}</td>
+            <td class="${hoursCellClass}">${working ? "Working hours" : "Outside"}</td>
+          `;
+          plannerBody.appendChild(tr);
+        });
+
+        if (state.view === "planner") {
+          renderOverlap(utcDate);
+        } else {
+          overlapCard.hidden = true;
+        }
+      } else {
+        diffBase.textContent = state.cities[0].name;
+        const baseOffset = getOffsetMinutes(state.cities[0].tz, utcDate);
+        differenceBody.innerHTML = "";
+        state.cities.forEach((city) => {
+          const off = getOffsetMinutes(city.tz, utcDate);
+          const diff = off - baseOffset;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${escapeHtml(city.name)}</td>
+            <td class="offset-cell">${formatOffset(off)}</td>
+            <td>${diff === 0 ? "Same time" : (diff > 0 ? "+" : "−") + Math.abs(diff) / 60 + " h"}</td>
+          `;
+          differenceBody.appendChild(tr);
+        });
+      }
+    }
+
+    function renderOverlap(refUtc) {
+      const stepMs = 15 * 60 * 1000;
+      const dayMs = 24 * 60 * 60 * 1000;
+      let bestStart = null;
+      for (let t = refUtc.getTime(); t < refUtc.getTime() + dayMs; t += stepMs) {
+        const d = new Date(t);
+        if (state.cities.every((c) => isBusinessHour(d, c.tz))) {
+          bestStart = d;
+          break;
+        }
+      }
+      if (!bestStart) {
+        overlapCard.hidden = true;
+        return;
+      }
+      overlapCard.hidden = false;
+      const first = formatInZone(bestStart, state.cities[0].tz, { hour12: state.format === "12h" });
+      overlapText.textContent =
+        `All selected cities are within business hours starting at ${first.time} (${first.weekday} ${first.dateLabel}) in ${state.cities[0].name}.`;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    // ---- Add-city handlers ----
+    function addCity(token) {
+      if (state.cities.length >= 20) return true;
+      const resolved = resolveCity(token);
+      if (!resolved) return false;
+      if (state.cities.some((c) => c.tz === resolved.tz && c.name === resolved.name)) return true;
+      state.cities.push(resolved);
+      return true;
+    }
+
+    addBtn.addEventListener("click", () => {
+      const fromSelect = citySelect.value;
+      const fromText = cityText.value.trim();
+      const token = fromSelect || fromText;
+      if (!token) return;
+      const ok = addCity(token);
+      calcError.style.display = ok ? "none" : "block";
+      if (ok) {
+        citySelect.value = "";
+        cityText.value = "";
+        updateAll();
+      }
+    });
+
+    cityText.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addBtn.click();
+      }
+    });
+
+    // ---- Control handlers ----
+    refTime.addEventListener("change", () => {
+      state.timeISO = currentISO();
+      updateAll();
+    });
+
+    nowBtn.addEventListener("click", () => {
+      refTime.value = toLocalInputValue(new Date());
+      state.timeISO = currentISO();
+      updateAll();
+    });
+
+    formatSelect.addEventListener("change", () => {
+      state.format = formatSelect.value;
+      updateAll();
+    });
+
+    viewSelect.addEventListener("change", () => {
+      state.view = viewSelect.value;
+      updateAll();
+    });
+
+    highlightToggle.addEventListener("change", () => {
+      state.highlight = highlightToggle.checked;
+      updateAll();
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrl.value);
+        copyBtn.textContent = "Copied!";
+        setTimeout(() => { copyBtn.textContent = "Copy link"; }, 1500);
+      } catch {
+        shareUrl.focus();
+        shareUrl.select();
+      }
+    });
+
+    // ---- Single re-render entry point ----
+    function updateAll() {
+      renderCityList();
+      renderResults();
+      pushUrl();
+    }
+
+    // ---- Boot: load state from the URL ----
+    function boot() {
+      state = parseUrlState(location.search);
+      if (state.cities.length === 0) {
+        const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const local = resolveCity(localTz) || { name: localTz.split("/").pop().replace(/_/g, " "), tz: localTz };
+        state.cities = [local, resolveCity("LON")].filter(Boolean);
+      }
+      formatSelect.value = state.format;
+      viewSelect.value = state.view;
+      highlightToggle.checked = state.highlight;
+      setDefaultTimeIfEmpty();
+      updateAll();
+    }
+
+    boot();
+  </script>
+</body>
+</html>

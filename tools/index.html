@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Tools — MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Browse all free online calculators and tools on MonkeyTactics — finance, health, utilities, and productivity tools that run privately in your browser." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="All Tools — MonkeyTactics" />
+  <meta property="og:description" content="Browse every free calculator and tool on MonkeyTactics. Finance, health, utilities, and productivity — all private, all free." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/index.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/index.html" />
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <!-- Tools index overrides -->
+  <style>
+    /* Hero variant for inner pages */
+    .hero--inner {
+      padding: 1.75rem 2rem;
+    }
+    .hero--inner h1 {
+      font-size: 1.9rem;
+    }
+
+    /* ── SEARCH BAR ── */
+    .tools-search-wrap {
+      position: relative;
+      max-width: 480px;
+      margin-top: 1.25rem;
+    }
+
+    .tools-search-wrap .search-icon {
+      position: absolute;
+      left: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      font-style: normal;
+      font-size: 1rem;
+    }
+
+    #toolSearch {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    #toolSearch::placeholder {
+      color: var(--muted);
+      opacity: 0.8;
+    }
+
+    #toolSearch:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+    }
+
+    /* ── FILTER TABS ── */
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0 0.25rem;
+    }
+
+    .filter-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .filter-tab:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+
+    .filter-tab.active {
+      background: var(--accent-soft);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: var(--accent);
+    }
+
+    .filter-tab .tab-count {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      padding: 0.05rem 0.45rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .filter-tab.active .tab-count {
+      background: rgba(34, 197, 94, 0.2);
+    }
+
+    /* ── CATEGORY SECTIONS ── */
+    .category-section {
+      margin-top: 2rem;
+    }
+
+    .category-section h2 {
+      font-size: 1.05rem;
+      margin: 0 0 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text);
+    }
+
+    .category-section h2 .cat-count {
+      font-size: 0.75rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 0.15rem 0.55rem;
+      font-weight: 600;
+    }
+
+    /* ── TOOL CARDS (enhanced) ── */
+    .tool-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card .card-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.15rem;
+      display: block;
+    }
+
+    .tool-card strong {
+      font-size: 0.95rem;
+    }
+
+    .tool-card .card-tags {
+      display: flex;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      margin-top: 0.4rem;
+    }
+
+    .tool-card .card-tag {
+      font-size: 0.7rem;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.1rem 0.5rem;
+    }
+
+    .tool-card .card-arrow {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      transition: color 0.15s, transform 0.15s;
+    }
+
+    .tool-card:hover .card-arrow {
+      color: var(--accent);
+      transform: translateX(3px);
+    }
+
+    /* ── EMPTY STATE ── */
+    .no-results {
+      display: none;
+      margin-top: 2rem;
+      text-align: center;
+      color: var(--muted);
+      padding: 3rem 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .no-results .no-results-icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+
+    .no-results p {
+      margin: 0.25rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    /* ── STATS BAR ── */
+    .tools-stats {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    .tools-stats span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .hero--inner {
+        padding: 1.25rem;
+      }
+      .hero--inner h1 {
+        font-size: 1.5rem;
+      }
+      .tools-search-wrap {
+        max-width: 100%;
+      }
+      .filter-tabs {
+        gap: 0.4rem;
+      }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html" class="active">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- PAGE HERO -->
+    <section class="hero hero--inner" aria-labelledby="tools-heading">
+      <h1 id="tools-heading">All Tools</h1>
+      <p>Every free calculator and utility on MonkeyTactics — all running privately in your browser,
+         no sign-up required.</p>
+
+      <!-- SEARCH -->
+      <div class="tools-search-wrap">
+        <i class="search-icon" aria-hidden="true">🔍</i>
+        <input
+          type="search"
+          id="toolSearch"
+          placeholder="Search tools…"
+          aria-label="Search all tools"
+          autocomplete="off"
+        />
+      </div>
+    </section>
+
+    <!-- AD -->
+    <div class="ad-container" aria-label="Advertisement">
+      <!-- AdSense: Top Display Ad -->
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="filter-tabs" role="tablist" aria-label="Filter tools by category">
+      <button class="filter-tab active" data-filter="all"    role="tab" aria-selected="true">All  <span class="tab-count">11</span></button>
+      <button class="filter-tab"        data-filter="finance"     role="tab" aria-selected="false">💰 Finance <span class="tab-count">3</span></button>
+      <button class="filter-tab"        data-filter="health"      role="tab" aria-selected="false">🏥 Health <span class="tab-count">2</span></button>
+      <button class="filter-tab"        data-filter="utilities"   role="tab" aria-selected="false">🔧 Utilities <span class="tab-count">5</span></button>
+      <button class="filter-tab"        data-filter="productivity" role="tab" aria-selected="false">⚡ Productivity <span class="tab-count">2</span></button>
+    </div>
+
+    <!-- STATS BAR -->
+    <p class="tools-stats" id="toolsStats">Showing <span id="visibleCount">11</span> of 11 tools</p>
+
+    <!-- NO RESULTS -->
+    <div class="no-results" id="noResults" role="status" aria-live="polite">
+      <span class="no-results-icon" aria-hidden="true">🔍</span>
+      <strong>No tools found</strong>
+      <p>Try a different search term or clear the filter.</p>
+    </div>
+
+    <!-- ── FINANCE ── -->
+    <section class="category-section" data-category-section="finance" aria-labelledby="cat-finance">
+      <h2 id="cat-finance">
+        <span aria-hidden="true">💰</span> Finance Tools
+        <span class="cat-count">3</span>
+      </h2>
+      <div class="tools-grid">
+
+        <a href="/tools/loan-mortgage-calculator.html"
+           class="tool-card"
+           data-category="finance"
+           data-keywords="loan mortgage payment interest amortization schedule monthly">
+          <span class="card-icon" aria-hidden="true">🏠</span>
+          <strong>Loan &amp; Mortgage Calculator</strong>
+          <div>Calculate monthly payments, total interest paid, and view a full amortization schedule for any loan.</div>
+          <div class="card-tags">
+            <span class="card-tag">Mortgage</span>
+            <span class="card-tag">Loans</span>
+            <span class="card-tag">Amortization</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/compound-interest-calculator.html"
+           class="tool-card"
+           data-category="finance"
+           data-keywords="compound interest investment growth savings contributions inflation tax">
+          <span class="card-icon" aria-hidden="true">📈</span>
+          <strong>Compound Interest Calculator</strong>
+          <div>Model investment growth with regular contributions, inflation adjustments, and tax scenarios.</div>
+          <div class="card-tags">
+            <span class="card-tag">Investing</span>
+            <span class="card-tag">Savings</span>
+            <span class="card-tag">Growth</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/percentage-calculator.html"
+           class="tool-card"
+           data-category="finance"
+           data-keywords="percentage percent change increase decrease of what is">
+          <span class="card-icon" aria-hidden="true">💯</span>
+          <strong>Percentage Calculator</strong>
+          <div>Work out X% of Y, find percentage change, increase or decrease, and reverse percentages.</div>
+          <div class="card-tags">
+            <span class="card-tag">Percentage</span>
+            <span class="card-tag">Math</span>
+            <span class="card-tag">Discount</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ── HEALTH ── -->
+    <section class="category-section" data-category-section="health" aria-labelledby="cat-health">
+      <h2 id="cat-health">
+        <span aria-hidden="true">🏥</span> Health &amp; Body Tools
+        <span class="cat-count">2</span>
+      </h2>
+      <div class="tools-grid">
+
+        <a href="/tools/bmi-calculator.html"
+           class="tool-card"
+           data-category="health"
+           data-keywords="bmi body mass index weight height healthy overweight obesity">
+          <span class="card-icon" aria-hidden="true">⚖️</span>
+          <strong>BMI Calculator</strong>
+          <div>Calculate your Body Mass Index and see where you fall within healthy weight ranges for your height.</div>
+          <div class="card-tags">
+            <span class="card-tag">BMI</span>
+            <span class="card-tag">Weight</span>
+            <span class="card-tag">Health</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/age-calculator.html"
+           class="tool-card"
+           data-category="health"
+           data-keywords="age birthday years months days born exact how old">
+          <span class="card-icon" aria-hidden="true">🎂</span>
+          <strong>Age Calculator</strong>
+          <div>Find your exact age in years, months, and days from any date — or calculate time between two dates.</div>
+          <div class="card-tags">
+            <span class="card-tag">Age</span>
+            <span class="card-tag">Birthday</span>
+            <span class="card-tag">Date</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ── UTILITIES ── -->
+    <section class="category-section" data-category-section="utilities" aria-labelledby="cat-utilities">
+      <h2 id="cat-utilities">
+        <span aria-hidden="true">🔧</span> Everyday Utilities
+        <span class="cat-count">5</span>
+      </h2>
+      <div class="tools-grid">
+
+        <a href="/tools/date-difference-calculator.html"
+           class="tool-card"
+           data-category="utilities"
+           data-keywords="date difference days between two dates weeks months countdown">
+          <span class="card-icon" aria-hidden="true">📅</span>
+          <strong>Date Difference Calculator</strong>
+          <div>Find the exact number of days, weeks, or months between any two dates — great for countdowns and deadlines.</div>
+          <div class="card-tags">
+            <span class="card-tag">Dates</span>
+            <span class="card-tag">Countdown</span>
+            <span class="card-tag">Calendar</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/unit-converter.html"
+           class="tool-card"
+           data-category="utilities"
+           data-keywords="unit converter length weight temperature volume speed metric imperial">
+          <span class="card-icon" aria-hidden="true">🔄</span>
+          <strong>Unit Converter</strong>
+          <div>Convert between metric and imperial units — length, weight, temperature, volume, speed, and more.</div>
+          <div class="card-tags">
+            <span class="card-tag">Metric</span>
+            <span class="card-tag">Imperial</span>
+            <span class="card-tag">Convert</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/tip-calculator.html"
+           class="tool-card"
+           data-category="utilities"
+           data-keywords="tip calculator restaurant bill split gratuity percentage per person">
+          <span class="card-icon" aria-hidden="true">🍽️</span>
+          <strong>Tip Calculator</strong>
+          <div>Calculate tip amounts and split the bill evenly across any number of people at any tip percentage.</div>
+          <div class="card-tags">
+            <span class="card-tag">Tip</span>
+            <span class="card-tag">Restaurant</span>
+            <span class="card-tag">Split Bill</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/time-zone-converter.html"
+           class="tool-card"
+           data-category="utilities"
+           data-keywords="time zone converter world clock UTC GMT meeting schedule international">
+          <span class="card-icon" aria-hidden="true">🌍</span>
+          <strong>Time Zone Converter</strong>
+          <div>Convert times between any world time zones instantly — perfect for scheduling international meetings.</div>
+          <div class="card-tags">
+            <span class="card-tag">Time Zones</span>
+            <span class="card-tag">World Clock</span>
+            <span class="card-tag">UTC</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/qr-code-generator.html"
+           class="tool-card"
+           data-category="utilities"
+           data-keywords="qr code generator url link wifi text download scan">
+          <span class="card-icon" aria-hidden="true">📱</span>
+          <strong>QR Code Generator</strong>
+          <div>Generate downloadable QR codes instantly for URLs, plain text, or Wi&#8209;Fi credentials.</div>
+          <div class="card-tags">
+            <span class="card-tag">QR Code</span>
+            <span class="card-tag">URL</span>
+            <span class="card-tag">Wi-Fi</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ── PRODUCTIVITY ── -->
+    <section class="category-section" data-category-section="productivity" aria-labelledby="cat-productivity">
+      <h2 id="cat-productivity">
+        <span aria-hidden="true">⚡</span> Productivity Tools
+        <span class="cat-count">2</span>
+      </h2>
+      <div class="tools-grid">
+
+        <a href="/tools/password-generator.html"
+           class="tool-card"
+           data-category="productivity"
+           data-keywords="password generator strong random secure symbols numbers letters">
+          <span class="card-icon" aria-hidden="true">🔑</span>
+          <strong>Password Generator</strong>
+          <div>Generate strong, random passwords with custom length, symbols, numbers, and character rules.</div>
+          <div class="card-tags">
+            <span class="card-tag">Security</span>
+            <span class="card-tag">Password</span>
+            <span class="card-tag">Random</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/word-character-counter.html"
+           class="tool-card"
+           data-category="productivity"
+           data-keywords="word count character counter text length essay writing limit">
+          <span class="card-icon" aria-hidden="true">📝</span>
+          <strong>Word &amp; Character Counter</strong>
+          <div>Count words, characters, sentences, and paragraphs in any text — useful for essays, tweets, and bios.</div>
+          <div class="card-tags">
+            <span class="card-tag">Writing</span>
+            <span class="card-tag">Words</span>
+            <span class="card-tag">Characters</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- AD -->
+    <div class="ad-container" aria-label="Advertisement">
+      <!-- AdSense: Bottom Display Ad -->
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+  <!-- TOOLS FILTER + SEARCH SCRIPT -->
+  <script>
+    (function () {
+      const searchInput  = document.getElementById('toolSearch');
+      const filterTabs   = document.querySelectorAll('.filter-tab');
+      const toolCards    = document.querySelectorAll('.tool-card');
+      const catSections  = document.querySelectorAll('.category-section');
+      const noResults    = document.getElementById('noResults');
+      const visibleCount = document.getElementById('visibleCount');
+
+      let activeFilter = 'all';
+
+      /* ── Apply filter + search ── */
+      function applyFilters() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visible = 0;
+
+        toolCards.forEach(function (card) {
+          const cat      = card.dataset.category;
+          const keywords = (card.dataset.keywords + ' ' + card.querySelector('strong').textContent + ' ' + card.querySelector('div').textContent).toLowerCase();
+
+          const matchesFilter = activeFilter === 'all' || cat === activeFilter;
+          const matchesSearch = !query || keywords.includes(query);
+          const show          = matchesFilter && matchesSearch;
+
+          card.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+
+        /* Show/hide category section headings */
+        catSections.forEach(function (section) {
+          const cat         = section.dataset.categorySection;
+          const anyVisible  = activeFilter === 'all' || activeFilter === cat;
+          const hasCards    = Array.from(section.querySelectorAll('.tool-card'))
+                                   .some(function (c) { return c.style.display !== 'none'; });
+
+          section.style.display = (anyVisible && hasCards) ? '' : 'none';
+        });
+
+        /* Update stats */
+        visibleCount.textContent = visible;
+        noResults.style.display  = visible === 0 ? 'block' : 'none';
+      }
+
+      /* ── Filter tabs ── */
+      filterTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          filterTabs.forEach(function (t) {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+          activeFilter = tab.dataset.filter;
+          applyFilters();
+        });
+      });
+
+      /* ── Search ── */
+      searchInput.addEventListener('input', applyFilters);
+
+      /* ── Clear search on Escape ── */
+      searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          searchInput.value = '';
+          applyFilters();
+        }
+      });
+
+    })();
+  </script>
+
+</body>
+</html>

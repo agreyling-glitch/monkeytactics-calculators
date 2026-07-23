@@ -1,0 +1,6 @@
+# robots.txt for monkeytactics.com
+User-agent: *
+Allow: /
+
+# Sitemap (update if you move domain)
+Sitemap: https://monkeytactics.com/sitemap.xml

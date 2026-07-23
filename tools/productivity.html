@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Free Productivity Tools — Password Generator &amp; Word Counter | MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Free online productivity tools — generate strong random passwords and count words, characters, and sentences in any text. Fast, private, no sign-up required." />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Free Productivity Tools — MonkeyTactics" />
+  <meta property="og:description" content="Password generator and word &amp; character counter. Free, private, runs entirely in your browser." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/productivity.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/tools/productivity.html" />
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <style>
+    .hero--inner { padding: 1.75rem 2rem; }
+    .hero--inner h1 { font-size: 1.9rem; }
+
+    .tool-card { display: flex; flex-direction: column; gap: 0.35rem; position: relative; overflow: hidden; }
+    .tool-card .card-icon { font-size: 1.4rem; margin-bottom: 0.15rem; display: block; }
+    .tool-card strong { font-size: 0.95rem; }
+    .tool-card .card-tags { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.4rem; }
+    .tool-card .card-tag { font-size: 0.7rem; background: rgba(255,255,255,0.06); color: var(--muted); border-radius: 999px; padding: 0.1rem 0.5rem; }
+    .tool-card .card-arrow { position: absolute; bottom: 1rem; right: 1rem; color: var(--muted); font-size: 0.9rem; transition: color 0.15s, transform 0.15s; }
+    .tool-card:hover .card-arrow { color: var(--accent); transform: translateX(3px); }
+
+    .seo-section { max-width: 740px; margin-top: 2rem; }
+    .seo-section h2 { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section p { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section p:last-child { margin-bottom: 0; }
+
+    /* Password strength tips */
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-top: 0.85rem;
+    }
+    .tip-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+    }
+    .tip-card strong { display: block; font-size: 0.875rem; margin-bottom: 0.3rem; color: var(--accent); }
+    .tip-card p { margin: 0; color: var(--muted); font-size: 0.8rem; line-height: 1.55; }
+
+    /* Character limit reference table */
+    .limits-table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.875rem; max-width: 560px; }
+    .limits-table th, .limits-table td { text-align: left; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--border); }
+    .limits-table th { color: var(--text); font-weight: 600; background: rgba(255,255,255,0.03); }
+    .limits-table td { color: var(--muted); }
+    .limits-table tr:last-child td { border-bottom: none; }
+    .limits-table td:last-child { color: var(--accent); font-weight: 600; font-size: 0.8rem; }
+
+    .faq-list { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-item h3 { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
+    .faq-item p { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; margin-top: 1rem; }
+    .related-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem 1rem; font-size: 0.9rem; transition: border-color 0.15s, transform 0.15s; }
+    .related-card:hover { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
+    .related-card strong { display: block; margin-bottom: 0.2rem; }
+    .related-card span { color: var(--muted); font-size: 0.8rem; }
+
+    @media (max-width: 600px) {
+      .hero--inner { padding: 1.25rem; }
+      .hero--inner h1 { font-size: 1.5rem; }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://monkeytactics.com/tools/productivity.html#collection",
+      "url": "https://monkeytactics.com/tools/productivity.html",
+      "name": "Free Productivity Tools",
+      "isPartOf": {
+        "@id": "https://monkeytactics.com/#website"
+      },
+      "publisher": {
+        "@id": "https://monkeytactics.com/#organization"
+      },
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "url": "https://monkeytactics.com/tools/password-generator.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "url": "https://monkeytactics.com/tools/word-character-counter.html"
+          }
+        ]
+      }
+    }
+  ]
+}
+  </script>
+</head>
+
+<body>
+  <main>
+
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html" class="active">Productivity</a>
+      </nav>
+    </header>
+
+    <section class="hero hero--inner" aria-labelledby="productivity-heading">
+      <h1 id="productivity-heading">Free Productivity Tools</h1>
+      <p>Two sharp tools to help you work smarter — generate uncrackable passwords and count
+         every word and character in your writing instantly.</p>
+      <div class="hero-actions">
+        <a href="/tools/password-generator.html" class="btn-primary">🔑 Try Password Generator</a>
+        <a href="/tools/index.html" class="btn-ghost">Browse all tools</a>
+      </div>
+    </section>
+
+    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
+
+    <!-- TOOLS -->
+    <section aria-labelledby="productivity-tools-heading">
+      <h2 id="productivity-tools-heading" style="margin-bottom:0.75rem;">⚡ Productivity Tools <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">2 tools</span></h2>
+      <div class="tools-grid">
+
+        <a href="/tools/password-generator.html" class="tool-card">
+          <span class="card-icon" aria-hidden="true">🔑</span>
+          <strong>Password Generator</strong>
+          <div>Generate strong, random passwords with customisable length, uppercase, lowercase, numbers, and special symbols. Copy to clipboard instantly.</div>
+          <div class="card-tags">
+            <span class="card-tag">Security</span>
+            <span class="card-tag">Password</span>
+            <span class="card-tag">Random</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/word-character-counter.html" class="tool-card">
+          <span class="card-icon" aria-hidden="true">📝</span>
+          <strong>Word &amp; Character Counter</strong>
+          <div>Paste or type any text to instantly count words, characters (with and without spaces), sentences, and paragraphs.</div>
+          <div class="card-tags">
+            <span class="card-tag">Writing</span>
+            <span class="card-tag">Words</span>
+            <span class="card-tag">Characters</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- PASSWORD TIPS -->
+    <div class="seo-section">
+      <h2>What makes a strong password?</h2>
+      <p>A strong password combines length with unpredictability. The Password Generator uses a
+         cryptographically random algorithm to ensure no two generated passwords are alike.</p>
+      <div class="tips-grid">
+        <div class="tip-card">
+          <strong>📏 Length matters most</strong>
+          <p>A 16-character password is exponentially harder to crack than an 8-character one, even with simple characters.</p>
+        </div>
+        <div class="tip-card">
+          <strong>🔀 Mix character types</strong>
+          <p>Combining uppercase, lowercase, numbers, and symbols dramatically increases the number of possible combinations.</p>
+        </div>
+        <div class="tip-card">
+          <strong>🎲 Avoid patterns</strong>
+          <p>Random passwords are far stronger than memorable ones. Use a password manager to store them securely.</p>
+        </div>
+        <div class="tip-card">
+          <strong>🔁 Use unique passwords</strong>
+          <p>Never reuse passwords across sites. If one account is breached, unique passwords protect all others.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARACTER LIMITS REFERENCE -->
+    <div class="seo-section">
+      <h2>Common character limit reference</h2>
+      <p>Use the Word &amp; Character Counter to check your text against platform limits before publishing:</p>
+      <table class="limits-table" aria-label="Common platform character limits">
+        <thead>
+          <tr><th>Platform / Context</th><th>Limit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>X (Twitter) post</td><td>280 characters</td></tr>
+          <tr><td>LinkedIn post</td><td>3,000 characters</td></tr>
+          <tr><td>Instagram caption</td><td>2,200 characters</td></tr>
+          <tr><td>Google meta description</td><td>~155–160 characters</td></tr>
+          <tr><td>Email subject line (best practice)</td><td>~50 characters</td></tr>
+          <tr><td>YouTube video title</td><td>100 characters</td></tr>
+          <tr><td>SMS message</td><td>160 characters</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SEO CONTENT -->
+    <div class="seo-section">
+      <h2>Why these tools are built with privacy in mind</h2>
+      <p>The Password Generator runs entirely in your browser using the Web Crypto API — the same
+         standard used by browsers for secure random number generation. Generated passwords are never
+         transmitted to any server, logged, or stored. They exist only in your browser window until
+         you copy them.</p>
+      <p>Similarly, text you paste into the Word &amp; Character Counter never leaves your device.
+         It is processed locally by JavaScript with zero server involvement, making it safe to use
+         with sensitive documents, drafts, or confidential writing.</p>
+    </div>
+
+    <!-- FAQ -->
+    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
+      <h2 id="faq-heading">Frequently Asked Questions</h2>
+      <ul class="faq-list">
+        <li class="faq-item">
+          <h3>Are the generated passwords truly random?</h3>
+          <p>Yes — the Password Generator uses the browser's built-in Web Crypto API
+             (<code style="font-size:0.8rem;background:rgba(255,255,255,0.07);padding:0.1rem 0.4rem;border-radius:4px;">crypto.getRandomValues()</code>),
+             which provides cryptographically secure randomness. This is the same standard used in
+             professional security applications.</p>
+        </li>
+        <li class="faq-item">
+          <h3>What is the maximum password length supported?</h3>
+          <p>The Password Generator supports passwords up to 128 characters. For most use cases,
+             16–32 characters provides an excellent balance of security and usability.</p>
+        </li>
+        <li class="faq-item">
+          <h3>Does the word counter count hyphenated words as one or two?</h3>
+          <p>Hyphenated words (e.g. "well-known") are counted as a single word, consistent with
+             standard word-processing software like Microsoft Word.</p>
+        </li>
+        <li class="faq-item">
+          <h3>Can I use the word counter for text in other languages?</h3>
+          <p>Yes — the counter works with any Unicode text, including accented characters, non-Latin
+             scripts, and emoji. Word counting accuracy may vary for languages that don't use spaces
+             to separate words (e.g. Chinese, Japanese).</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- RELATED -->
+    <section aria-labelledby="related-heading" style="margin-top:2rem;">
+      <h2 id="related-heading">Explore Other Categories</h2>
+      <div class="related-grid">
+        <a href="/tools/finance.html" class="related-card">
+          <strong>💰 Finance</strong>
+          <span>Mortgage Calculator, Compound Interest, Percentage</span>
+        </a>
+        <a href="/tools/health.html" class="related-card">
+          <strong>🏥 Health &amp; Body</strong>
+          <span>BMI Calculator, Age Calculator</span>
+        </a>
+        <a href="/tools/utilities.html" class="related-card">
+          <strong>🔧 Everyday Utilities</strong>
+          <span>Date Difference, Unit Converter, Tip Calculator &amp; more</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+
+  </main>
+
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a> 
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+</body>
+</html>

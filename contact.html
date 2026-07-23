@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contact — MonkeyTactics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Get in touch with MonkeyTactics — report a bug, suggest a new tool, or ask a question. We read every message." />
+  <meta name="robots" content="noindex, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="Contact — MonkeyTactics" />
+  <meta property="og:description" content="Have a question, bug report, or tool suggestion? Reach out to MonkeyTactics." />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://monkeytactics.com/contact.html" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://monkeytactics.com/contact.html" />
+
+  <!-- Global Stylesheet -->
+  <link rel="stylesheet" href="/assets/css/style.css" />
+
+  <!-- Contact-page overrides -->
+  <style>
+    /* Hero variant for inner pages */
+    .hero--inner {
+      padding: 1.75rem 2rem;
+    }
+
+    .hero--inner h1 {
+      font-size: 1.9rem;
+    }
+
+    /* Two-column layout: form + sidebar */
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+      align-items: start;
+    }
+
+    /* ── FORM ── */
+    .contact-form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .contact-form-card h2 {
+      margin: 0 0 0.25rem;
+      font-size: 1.15rem;
+    }
+
+    .contact-form-card > p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0 0 1.5rem;
+      line-height: 1.55;
+    }
+
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-group label .required {
+      color: var(--accent);
+      margin-left: 2px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.65rem 0.85rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: var(--muted);
+      opacity: 0.7;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+    }
+
+    .form-group select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      padding-right: 2.2rem;
+      cursor: pointer;
+    }
+
+    .form-group select option {
+      background: #0f172a;
+      color: var(--text);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 140px;
+      line-height: 1.6;
+    }
+
+    .form-hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-submit {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .form-submit .btn-primary {
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      padding: 0.7rem 1.6rem;
+    }
+
+    .form-privacy-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .form-privacy-note a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Success / error states (shown via JS) */
+    .form-message {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .form-message.success {
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #86efac;
+    }
+
+    .form-message.error {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      color: #fca5a5;
+    }
+
+    /* ── SIDEBAR ── */
+    .contact-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .info-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.25rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .info-card h3 {
+      font-size: 0.95rem;
+      margin: 0 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--accent);
+    }
+
+    .info-card p,
+    .info-card ul {
+      color: var(--muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .info-card ul {
+      padding-left: 1.2rem;
+    }
+
+    .info-card ul li {
+      margin-bottom: 0.3rem;
+    }
+
+    .response-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 800px) {
+      .contact-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .info-card {
+        flex: 1 1 240px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero--inner {
+        padding: 1.25rem;
+      }
+
+      .hero--inner h1 {
+        font-size: 1.5rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-sidebar {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <script src="/assets/js/ads.js" defer></script>
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+</head>
+
+<body>
+  <main>
+
+    <!-- HEADER -->
+    <header>
+      <a href="/index.html" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index.html">All Tools</a>
+        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/health.html">Health</a>
+        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/productivity.html">Productivity</a>
+      </nav>
+    </header>
+
+    <!-- PAGE HERO -->
+    <section class="hero hero--inner" aria-labelledby="contact-heading">
+      <h1 id="contact-heading">Get in Touch</h1>
+      <p>Have a question, found a bug, or want to suggest a new tool? We read every message and
+         aim to respond within 2 business days.</p>
+    </section>
+
+    <!-- AD -->
+    <div class="ad-container" aria-label="Advertisement">
+      <!-- AdSense: Top Display Ad -->
+    </div>
+
+    <!-- CONTACT LAYOUT -->
+    <div class="contact-layout">
+
+      <!-- CONTACT FORM -->
+      <div class="contact-form-card">
+        <h2>Send us a message</h2>
+        <p>Fill out the form below and we'll get back to you as soon as possible.</p>
+
+        <form id="contactForm" novalidate>
+
+          <!-- Name row -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First name <span class="required" aria-hidden="true">*</span></label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                placeholder="Jane"
+                autocomplete="given-name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last name</label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                placeholder="Smith"
+                autocomplete="family-name"
+              />
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email address <span class="required" aria-hidden="true">*</span></label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="jane@example.com"
+              autocomplete="email"
+              required
+            />
+            <p class="form-hint">We'll only use this to reply to your message.</p>
+          </div>
+
+          <!-- Subject / Topic -->
+          <div class="form-group">
+            <label for="topic">Topic <span class="required" aria-hidden="true">*</span></label>
+            <select id="topic" name="topic" required>
+              <option value="" disabled selected>Select a topic…</option>
+              <option value="bug">🐛 Bug report</option>
+              <option value="suggestion">💡 Tool suggestion</option>
+              <option value="feedback">⭐ General feedback</option>
+              <option value="calculator">🔢 Calculator question</option>
+              <option value="privacy">🔒 Privacy or data question</option>
+              <option value="partnership">🤝 Partnership or advertising</option>
+              <option value="other">💬 Other</option>
+            </select>
+          </div>
+
+          <!-- Message -->
+          <div class="form-group">
+            <label for="message">Message <span class="required" aria-hidden="true">*</span></label>
+            <textarea
+              id="message"
+              name="message"
+              placeholder="Describe your question, bug, or idea in as much detail as you'd like…"
+              required
+            ></textarea>
+            <p class="form-hint">Minimum 20 characters. For bug reports, include the tool name and what went wrong.</p>
+          </div>
+
+          <!-- Submit -->
+          <div class="form-submit">
+            <button type="submit" class="btn-primary">Send message ›</button>
+            <p class="form-privacy-note">
+              Your details are only used to reply to your message.<br />
+              See our <a href="/privacy.html">Privacy Policy</a> for details.
+            </p>
+          </div>
+
+          <!-- Feedback messages -->
+          <div class="form-message success" id="formSuccess" role="alert">
+            ✅ <strong>Message sent!</strong> Thanks for reaching out — we'll get back to you within 2 business days.
+          </div>
+          <div class="form-message error" id="formError" role="alert">
+            ❌ <strong>Something went wrong.</strong> Please check the required fields and try again.
+          </div>
+
+        </form>
+      </div><!-- /contact-form-card -->
+
+      <!-- SIDEBAR -->
+      <aside class="contact-sidebar" aria-label="Contact information">
+
+        <!-- Response time -->
+        <div class="info-card">
+          <h3><span aria-hidden="true">⏱️</span> Response Time</h3>
+          <p>We aim to reply to all messages within 2 business days.</p>
+          <span class="response-time">⚡ Usually within 48 hours</span>
+        </div>
+
+        <!-- Good to report -->
+        <div class="info-card">
+          <h3><span aria-hidden="true">🐛</span> Reporting a Bug?</h3>
+          <p>Helpful things to include:</p>
+          <ul>
+            <li>The tool or page name</li>
+            <li>What you expected to happen</li>
+            <li>What actually happened</li>
+            <li>Your browser and device type</li>
+          </ul>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="info-card">
+          <h3><span aria-hidden="true">💡</span> Suggesting a Tool?</h3>
+          <p>We love hearing ideas for new calculators or utilities. Tell us what you'd like to calculate
+             and what problem it solves — we consider every suggestion.</p>
+        </div>
+
+        <!-- What we don't handle -->
+        <div class="info-card">
+          <h3><span aria-hidden="true">ℹ️</span> Good to Know</h3>
+          <ul>
+            <li>We don't offer phone support</li>
+            <li>We can't provide personalised financial or medical advice</li>
+            <li>For privacy questions, see our <a href="/privacy.html" style="color: var(--accent);">Privacy Policy</a></li>
+          </ul>
+        </div>
+
+      </aside>
+
+    </div><!-- /contact-layout -->
+
+    <!-- AD -->
+    <div class="ad-container" aria-label="Advertisement">
+      <!-- AdSense: Bottom Display Ad -->
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about.html">About</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/contact.html" class="active">Contact</a>
+      <a href="/sitemap.html">Sitemap</a>
+    </nav>
+  </footer>
+
+  <!-- FORM SCRIPT -->
+  <script>
+    (function () {
+      const form    = document.getElementById('contactForm');
+      const success = document.getElementById('formSuccess');
+      const error   = document.getElementById('formError');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Hide previous messages
+        success.style.display = 'none';
+        error.style.display   = 'none';
+
+        // Basic validation
+        const firstName = form.firstName.value.trim();
+        const email     = form.email.value.trim();
+        const topic     = form.topic.value;
+        const message   = form.message.value.trim();
+
+        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        if (!firstName || !email || !emailValid || !topic || message.length < 20) {
+          error.style.display = 'block';
+          error.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          return;
+        }
+
+        /*
+         * TODO: Wire up to your form backend here.
+         * Options: Formspree (formspree.io), Netlify Forms, EmailJS, or your own endpoint.
+         *
+         * Example with Formspree:
+         *   fetch('https://formspree.io/f/YOUR_FORM_ID', {
+         *     method: 'POST',
+         *     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+         *     body: JSON.stringify({ firstName, email, topic, message })
+         *   })
+         *   .then(r => r.ok ? showSuccess() : showError())
+         *   .catch(() => showError());
+         */
+
+        // Demo: show success immediately (remove this line when backend is wired up)
+        showSuccess();
+      });
+
+      function showSuccess() {
+        form.reset();
+        success.style.display = 'block';
+        success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function showError() {
+        error.style.display = 'block';
+        error.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    })();
+  </script>
+
+</body>
+</html>
