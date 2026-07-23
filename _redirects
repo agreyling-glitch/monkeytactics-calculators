@@ -5,7 +5,6 @@
 # Redirect www -> apex (canonical)
 # (Cloudflare Pages also does this automatically when both are added,
 #  but explicit rule guarantees consistent behaviour.)
-/*  https://monkeytactics.com/:splat  301!
 
 # Directory URLs: serve the index.html cleanly without trailing-slash
 # duplication. Pages handles this by default, but these rules make it
