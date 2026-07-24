@@ -144,3 +144,7 @@ vite.config.ts.timestamp-*
 
 .continue
 .wrangler
+
+# Codex-generated work files and deliverables
+.codex/
+outputs/
