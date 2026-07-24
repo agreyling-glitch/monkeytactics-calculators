@@ -1,11 +1,11 @@
-# 🐒 MonkeyTactics.com
+# 🐒 MonkeyTactics.com — Free Online Calculators & Utility Tools
 
-> **Free online calculators, utility tools, and productivity apps — built fast, designed clean, ranked high.**
+> Fast, privacy-friendly calculators and utilities for everyday math, finance, health, productivity, and web tasks.
 
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fmonkeytactics.com&label=monkeytactics.com&style=flat-square&color=4CAF50)](https://monkeytactics.com)
-[![GitHub Stars](https://img.shields.io/github/stars/agreyling-glitch/monkeytactics?style=flat-square&color=FFD700)](https://github.com/agreyling-glitch/monkeytactics/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/agreyling-glitch/monkeytactics?style=flat-square&color=blue)](https://github.com/agreyling-glitch/monkeytactics/network/members)
-[![Last Commit](https://img.shields.io/github/last-commit/agreyling-glitch/monkeytactics?style=flat-square)](https://github.com/agreyling-glitch/monkeytactics/commits/main)
+[![GitHub Stars](https://img.shields.io/github/stars/agreyling-glitch/monkeytactics-calculators?style=flat-square&color=FFD700)](https://github.com/agreyling-glitch/monkeytactics-calculators/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/agreyling-glitch/monkeytactics-calculators?style=flat-square&color=blue)](https://github.com/agreyling-glitch/monkeytactics-calculators/network/members)
+[![Last Commit](https://img.shields.io/github/last-commit/agreyling-glitch/monkeytactics-calculators?style=flat-square)](https://github.com/agreyling-glitch/monkeytactics-calculators/commits/main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
 
@@ -13,28 +13,37 @@
 
 ## 🔍 What Is MonkeyTactics?
 
-**MonkeyTactics.com** is a growing collection of **free online calculators, converters, and utility tools** built with lightweight HTML, CSS, and JavaScript — no frameworks, no login, no bloat. Each tool is a standalone web app designed to load instantly, rank on Google, and solve real everyday problems.
+MonkeyTactics.com is a growing collection of free online calculators, converters, and utility tools built with lightweight HTML, CSS, and JavaScript. The site is designed for people who want quick answers without sign-ups, account creation, or unnecessary clutter.
 
-Whether you need a **percentage calculator**, a **unit converter**, a **date difference calculator**, a **loan amortization tool**, or a **random number generator**, MonkeyTactics delivers accurate results in seconds — directly in your browser, with zero data collection.
+Whether you need a percentage calculator, BMI calculator, unit converter, loan calculator, date difference calculator, password generator, QR code generator, or word counter, MonkeyTactics helps users solve everyday problems in seconds directly from the browser.
 
-**Target users:** students, professionals, developers, and anyone who needs a fast, reliable, ad-light calculator without the clutter of legacy sites.
-
----
-
-## ✨ Features
-
-- ⚡ **Instant load times** — Pure HTML/CSS/JS, no build step, no bundler required
-- 🧮 **Accurate calculations** — Every formula is documented and tested
-- 📱 **Fully responsive** — Mobile-first design, works on any screen size
-- 🔒 **Privacy-first** — No user accounts, no data sent to servers, no tracking cookies
-- 🎨 **Consistent UI** — Shared design system across all tools for a cohesive experience
-- 🔎 **SEO-optimized pages** — Semantic HTML, structured data (JSON-LD), canonical tags, and fast Core Web Vitals
-- ♿ **Accessible** — WCAG 2.1 AA compliant, keyboard navigable, screen-reader friendly
-- 🌐 **No dependencies** — Zero npm packages, zero CDN lock-in, zero runtime errors from third-party outages
+This project is especially useful for students, professionals, developers, small business owners, and anyone searching for simple, ad-light tools that work well on desktop and mobile.
 
 ---
 
-## 🧰 Tool Categories
+## ✨ Why This Project Is Useful
+
+- ⚡ Fast-loading, lightweight tools with no build step or framework overhead
+- 🧮 Accurate calculators for finance, health, dates, and everyday math
+- 📱 Mobile-friendly and responsive across phones, tablets, and desktops
+- 🔒 Privacy-first experience with no account requirements and no tracking overload
+- 🔎 Search-friendly pages built around clear content, semantic HTML, and fast performance
+- ♿ Accessible and easy to use for a broad audience
+
+---
+
+## 🧰 Popular Tools
+
+The site currently features the following tools across its main categories:
+
+- Finance: [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator), [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator), [Percentage Calculator](https://monkeytactics.com/tools/percentage-calculator)
+- Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Calorie Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
+- Utilities: [Date Difference Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator)
+- Productivity: [Password Generator](https://monkeytactics.com/tools/password-generator), [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter)
+
+---
+
+## 🗂️ Tool Categories
 
 | Category | Examples | Status |
 |---|---|---|
@@ -43,12 +52,31 @@ Whether you need a **percentage calculator**, a **unit converter**, a **date dif
 | **Unit Converters** | Unit Converter | ✅ Live |
 | **Text & String Tools** | Word Counter, Character Counter | ✅ Live |
 | **Health & Fitness** | BMI Calculator, Calorie Calculator | ✅ Live |
-| **Health & Fitness** | Calorie Calculator | 🔄 In Progress |
 | **Developer Utilities** | QR Code Generator, Password Generator | ✅ Live |
-| **Productivity** | 📋 Planned |
+| **Productivity** | Planned and expanding | 🔄 Growing |
+
 ---
 
 ## 🏗️ Architecture Overview
 
-MonkeyTactics is intentionally dependency-free. The architecture prioritizes simplicity, portability, and SEO performance.
+MonkeyTactics is intentionally dependency-free. The site uses simple HTML, CSS, and JavaScript files for each tool, with a focus on fast page loads, portability, and strong on-page SEO performance.
+
+---
+
+## 🔑 SEO Keywords Covered
+
+This project is built around terms such as:
+
+- free online calculators
+- percentage calculator
+- BMI calculator
+- loan calculator
+- mortgage calculator
+- unit converter
+- date difference calculator
+- password generator
+- QR code generator
+- word counter
+
+These phrases are reflected in the site content, page titles, and tool structure to help users discover the right calculator quickly.
 
