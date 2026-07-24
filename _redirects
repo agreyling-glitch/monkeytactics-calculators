@@ -15,3 +15,11 @@
 /about/  /about.html  301
 /privacy/  /privacy.html  301
 /contact/  /contact.html  301
+
+# Consolidate legacy tools-index aliases on the public directory URL.
+/tools/index  /tools/  301
+/tools/index/  /tools/  301
+/tools/index.html  /tools/  301
+
+# Calculator pages use extensionless URLs without trailing slashes.
+/tools/calorie-calculator/  /tools/calorie-calculator  301
