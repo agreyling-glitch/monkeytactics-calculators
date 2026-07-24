@@ -11,10 +11,10 @@
   <meta property="og:title"       content="All Tools — MonkeyTactics" />
   <meta property="og:description" content="Browse every free calculator and tool on MonkeyTactics. Finance, health, utilities, and productivity — all private, all free." />
   <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://monkeytactics.com/tools/index.html" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/index" />
 
   <!-- Canonical -->
-  <link rel="canonical" href="https://monkeytactics.com/tools/index.html" />
+  <link rel="canonical" href="https://monkeytactics.com/tools/index" />
 
   <!-- Global Stylesheet -->
   <link rel="stylesheet" href="/assets/css/style.css" />
@@ -251,7 +251,7 @@
 
     <!-- HEADER -->
     <header>
-      <a href="/index.html" class="brand">
+      <a href="/index" class="brand">
         <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
              alt="MonkeyTactics logo"
              class="brand-logo" width="383" height="375" />
@@ -262,11 +262,11 @@
       </a>
 
       <nav aria-label="Primary navigation">
-        <a href="/tools/index.html" class="active">All Tools</a>
-        <a href="/tools/finance.html">Finance</a>
-        <a href="/tools/health.html">Health</a>
-        <a href="/tools/utilities.html">Utilities</a>
-        <a href="/tools/productivity.html">Productivity</a>
+        <a href="/tools/index" class="active">All Tools</a>
+        <a href="/tools/finance">Finance</a>
+        <a href="/tools/health">Health</a>
+        <a href="/tools/utilities">Utilities</a>
+        <a href="/tools/productivity">Productivity</a>
       </nav>
     </header>
 
@@ -296,15 +296,15 @@
 
     <!-- FILTER TABS -->
     <div class="filter-tabs" role="tablist" aria-label="Filter tools by category">
-      <button class="filter-tab active" data-filter="all"    role="tab" aria-selected="true">All  <span class="tab-count">11</span></button>
+      <button class="filter-tab active" data-filter="all"    role="tab" aria-selected="true">All  <span class="tab-count">13</span></button>
       <button class="filter-tab"        data-filter="finance"     role="tab" aria-selected="false">💰 Finance <span class="tab-count">3</span></button>
-      <button class="filter-tab"        data-filter="health"      role="tab" aria-selected="false">🏥 Health <span class="tab-count">2</span></button>
+      <button class="filter-tab"        data-filter="health"      role="tab" aria-selected="false">🏥 Health <span class="tab-count">3</span></button>
       <button class="filter-tab"        data-filter="utilities"   role="tab" aria-selected="false">🔧 Utilities <span class="tab-count">5</span></button>
       <button class="filter-tab"        data-filter="productivity" role="tab" aria-selected="false">⚡ Productivity <span class="tab-count">2</span></button>
     </div>
 
     <!-- STATS BAR -->
-    <p class="tools-stats" id="toolsStats">Showing <span id="visibleCount">11</span> of 11 tools</p>
+    <p class="tools-stats" id="toolsStats">Showing <span id="visibleCount">13</span> of 13 tools</p>
 
     <!-- NO RESULTS -->
     <div class="no-results" id="noResults" role="status" aria-live="polite">
@@ -321,7 +321,7 @@
       </h2>
       <div class="tools-grid">
 
-        <a href="/tools/loan-mortgage-calculator.html"
+        <a href="/tools/loan-mortgage-calculator"
            class="tool-card"
            data-category="finance"
            data-keywords="loan mortgage payment interest amortization schedule monthly">
@@ -336,7 +336,7 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/compound-interest-calculator.html"
+        <a href="/tools/compound-interest-calculator"
            class="tool-card"
            data-category="finance"
            data-keywords="compound interest investment growth savings contributions inflation tax">
@@ -351,7 +351,7 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/percentage-calculator.html"
+        <a href="/tools/percentage-calculator"
            class="tool-card"
            data-category="finance"
            data-keywords="percentage percent change increase decrease of what is">
@@ -373,11 +373,11 @@
     <section class="category-section" data-category-section="health" aria-labelledby="cat-health">
       <h2 id="cat-health">
         <span aria-hidden="true">🏥</span> Health &amp; Body Tools
-        <span class="cat-count">2</span>
+        <span class="cat-count">3</span>
       </h2>
       <div class="tools-grid">
 
-        <a href="/tools/bmi-calculator.html"
+        <a href="/tools/bmi-calculator"
            class="tool-card"
            data-category="health"
            data-keywords="bmi body mass index weight height healthy overweight obesity">
@@ -392,7 +392,22 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/age-calculator.html"
+        <a href="/tools/calorie-calculator"
+           class="tool-card"
+           data-category="health"
+           data-keywords="calorie calories bmr basal metabolic rate tdee daily energy expenditure maintenance weight loss gain activity nutrition">
+          <span class="card-icon" aria-hidden="true">🔥</span>
+          <strong>Calorie Calculator</strong>
+          <div>Estimate your BMR, daily calorie needs (TDEE), maintenance calories, and calorie goals based on your activity level.</div>
+          <div class="card-tags">
+            <span class="card-tag">Calories</span>
+            <span class="card-tag">BMR</span>
+            <span class="card-tag">TDEE</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/age-calculator"
            class="tool-card"
            data-category="health"
            data-keywords="age birthday years months days born exact how old">
@@ -418,7 +433,7 @@
       </h2>
       <div class="tools-grid">
 
-        <a href="/tools/date-difference-calculator.html"
+        <a href="/tools/date-difference-calculator"
            class="tool-card"
            data-category="utilities"
            data-keywords="date difference days between two dates weeks months countdown">
@@ -433,7 +448,7 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/unit-converter.html"
+        <a href="/tools/unit-converter"
            class="tool-card"
            data-category="utilities"
            data-keywords="unit converter length weight temperature volume speed metric imperial">
@@ -448,7 +463,7 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/tip-calculator.html"
+        <a href="/tools/tip-calculator"
            class="tool-card"
            data-category="utilities"
            data-keywords="tip calculator restaurant bill split gratuity percentage per person">
@@ -463,7 +478,7 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/time-zone-converter.html"
+        <a href="/tools/time-zone-converter"
            class="tool-card"
            data-category="utilities"
            data-keywords="time zone converter world clock UTC GMT meeting schedule international">
@@ -478,7 +493,7 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/qr-code-generator.html"
+        <a href="/tools/qr-code-generator"
            class="tool-card"
            data-category="utilities"
            data-keywords="qr code generator url link wifi text download scan">
@@ -504,7 +519,7 @@
       </h2>
       <div class="tools-grid">
 
-        <a href="/tools/password-generator.html"
+        <a href="/tools/password-generator"
            class="tool-card"
            data-category="productivity"
            data-keywords="password generator strong random secure symbols numbers letters">
@@ -519,7 +534,7 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/word-character-counter.html"
+        <a href="/tools/word-character-counter"
            class="tool-card"
            data-category="productivity"
            data-keywords="word count character counter text length essay writing limit">
@@ -548,10 +563,10 @@
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
-      <a href="/about.html">About</a>
-      <a href="/privacy.html">Privacy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/sitemap.html">Sitemap</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/contact">Contact</a>
+      <a href="/sitemap">Sitemap</a>
     </nav>
   </footer>
 

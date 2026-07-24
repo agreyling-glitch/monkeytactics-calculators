@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calorie Calculator — BMR, TDEE &amp; Daily Calorie Needs | MonkeyTactics</title>
+  <meta name="description"
+        content="Calculate BMR, TDEE, maintenance calories, and daily calorie needs with activity levels. Supports metric and imperial units and runs privately in your browser." />
+
+  <meta property="og:title" content="Calorie Calculator — MonkeyTactics" />
+  <meta property="og:description"
+        content="Estimate BMR, TDEE, maintenance calories, and daily calorie needs with metric or imperial units." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://monkeytactics.com/tools/calorie-calculator/" />
+  <meta property="og:image"
+        content="https://monkeytactics.com/assets/img/logo/monkeytactics-monkey-logo.png" />
+  <meta property="og:site_name" content="MonkeyTactics" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Calorie Calculator — MonkeyTactics" />
+  <meta name="twitter:description"
+        content="Estimate BMR, TDEE, maintenance calories, and daily calorie needs using the Mifflin–St Jeor formula." />
+  <meta name="twitter:image"
+        content="https://monkeytactics.com/assets/img/logo/monkeytactics-monkey-logo.png" />
+
+  <link rel="canonical" href="https://monkeytactics.com/tools/calorie-calculator/" />
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/calorie-calculator.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Calorie Calculator",
+    "url": "https://monkeytactics.com/tools/calorie-calculator.html",
+    "description": "A daily calorie needs calculator for estimating BMR, TDEE, maintenance calories, and calorie goals with the Mifflin–St Jeor formula.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MonkeyTactics",
+      "url": "https://monkeytactics.com/"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is BMR?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Basal metabolic rate, or BMR, estimates how many calories your body uses in a day at complete rest to support essential functions such as breathing, circulation, and temperature regulation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is TDEE?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Total daily energy expenditure, or TDEE, is an estimate of the calories you use each day after your BMR is adjusted for everyday movement, exercise, and digestion."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How accurate is the Mifflin–St Jeor formula?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Mifflin–St Jeor equation is a research-based estimate, not a direct measurement. Actual calorie needs can differ because of body composition, health, medications, training, and other individual factors."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How many calories do I need per day?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Your estimated daily calorie need is the TDEE result. It combines your BMR with the activity level that best represents your typical work, movement, and weekly exercise."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does activity level affect calorie needs?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. More movement and exercise generally increase daily energy use, so the calculator applies an activity multiplier from 1.2 for sedentary routines to 1.9 for exceptionally active routines."
+        }
+      }
+    ]
+  }
+  </script>
+  <script src="/assets/js/ads.js" defer></script>
+  <script src="/assets/js/calorie-calculator.js" defer></script>
+</head>
+
+<body>
+  <main>
+    <header>
+      <a href="/index/" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo"
+             width="383"
+             height="375" />
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/index/">All Tools</a>
+        <a href="/tools/finance/">Finance</a>
+        <a href="/tools/health/" class="active">Health</a>
+        <a href="/tools/utilities/">Utilities</a>
+        <a href="/tools/productivity/">Productivity</a>
+      </nav>
+    </header>
+
+    <section class="hero hero--inner" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/index/">Home</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <a href="/tools/health/">Health</a>
+        <span class="sep" aria-hidden="true">›</span>
+        <span aria-current="page">Calorie Calculator</span>
+      </nav>
+      <h1 id="tool-heading">Calorie Calculator</h1>
+      <p class="hero-tagline hero-intro">
+        Wondering, “How many calories do I need per day?” This daily calorie needs
+        calculator estimates your basal metabolic rate (BMR), total daily energy
+        expenditure (TDEE), and maintenance calories with the Mifflin–St Jeor formula.
+        Designed as a BMR calculator for men and women and a TDEE calculator with activity
+        levels, it supports metric and imperial measurements and processes every value
+        privately in your browser.
+      </p>
+    </section>
+
+    <div class="ad-container ad-container--spaced" aria-label="Advertisement">
+      <!-- AdSense: Top Display Ad -->
+    </div>
+
+    <section class="tool-widget" aria-labelledby="details-heading">
+      <div class="section-heading">
+        <span class="section-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-5 0-9 2.5-9 5.5V21h18v-1.5C21 16.5 17 14 12 14Z" /></svg>
+        </span>
+        <div>
+          <h2 id="details-heading">Enter Your Details for the BMR &amp; TDEE Calculator</h2>
+          <p>Choose metric or imperial units; values convert automatically in your browser.</p>
+        </div>
+      </div>
+
+      <form id="calorieForm" novalidate>
+        <div class="details-card">
+          <fieldset class="unit-switcher">
+            <legend>Preferred units</legend>
+            <div class="segmented-control">
+              <input type="radio" id="unitMetric" name="unitSystem" value="metric" checked />
+              <label for="unitMetric">Metric <span>cm, kg</span></label>
+              <input type="radio" id="unitImperial" name="unitSystem" value="imperial" />
+              <label for="unitImperial">Imperial <span>ft, in, lb</span></label>
+            </div>
+          </fieldset>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="age">Age <span class="unit">years</span></label>
+              <input type="number" id="age" name="age" value="30" min="18" max="120"
+                     step="1" inputmode="numeric" aria-describedby="ageHint ageError" required />
+              <p class="input-hint" id="ageHint">For adults ages 18–120.</p>
+              <p class="field-error" id="ageError" aria-live="polite"></p>
+            </div>
+
+            <div class="input-group">
+              <label for="sex">Sex <span class="unit">used by the formula</span></label>
+              <select id="sex" name="sex" aria-describedby="sexError" required>
+                <option value="" selected>Select sex</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+              <p class="input-hint">Needed because the formula uses a sex-specific constant.</p>
+              <p class="field-error" id="sexError" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group" data-unit-panel="metric">
+              <label for="heightCm">Height <span class="unit">centimeters</span></label>
+              <input type="number" id="heightCm" name="heightCm" value="170" min="100"
+                     max="250" step="0.1" inputmode="decimal"
+                     aria-describedby="heightMetricHint heightMetricError" required />
+              <p class="input-hint" id="heightMetricHint">Enter 100–250 cm.</p>
+              <p class="field-error" id="heightMetricError" aria-live="polite"></p>
+            </div>
+
+            <div class="input-group" data-unit-panel="metric">
+              <label for="weightKg">Weight <span class="unit">kilograms</span></label>
+              <input type="number" id="weightKg" name="weightKg" value="70" min="30"
+                     max="300" step="0.1" inputmode="decimal"
+                     aria-describedby="weightMetricHint weightMetricError" required />
+              <p class="input-hint" id="weightMetricHint">Enter 30–300 kg.</p>
+              <p class="field-error" id="weightMetricError" aria-live="polite"></p>
+            </div>
+
+            <div class="input-group" data-unit-panel="imperial" hidden>
+              <span class="field-label" id="heightImperialLabel">
+                Height <span class="unit">feet and inches</span>
+              </span>
+              <div class="compound-input" role="group" aria-labelledby="heightImperialLabel">
+                <div>
+                  <label class="visually-hidden" for="heightFt">Height in feet</label>
+                  <input type="number" id="heightFt" name="heightFt" value="5" min="3"
+                         max="8" step="1" inputmode="numeric" aria-describedby="heightImperialHint heightImperialError" />
+                  <span aria-hidden="true">ft</span>
+                </div>
+                <div>
+                  <label class="visually-hidden" for="heightIn">Additional height in inches</label>
+                  <input type="number" id="heightIn" name="heightIn" value="7" min="0"
+                         max="11.99" step="0.01" inputmode="decimal" aria-describedby="heightImperialHint heightImperialError" />
+                  <span aria-hidden="true">in</span>
+                </div>
+              </div>
+              <p class="input-hint" id="heightImperialHint">Enter a total height of 3 ft 3 in–8 ft 2 in.</p>
+              <p class="field-error" id="heightImperialError" aria-live="polite"></p>
+            </div>
+
+            <div class="input-group" data-unit-panel="imperial" hidden>
+              <label for="weightLb">Weight <span class="unit">pounds</span></label>
+              <input type="number" id="weightLb" name="weightLb" value="154.32" min="66.14"
+                     max="661.39" step="0.01" inputmode="decimal"
+                     aria-describedby="weightImperialHint weightImperialError" />
+              <p class="input-hint" id="weightImperialHint">Enter 66–661 lb.</p>
+              <p class="field-error" id="weightImperialError" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="input-group input-group--last">
+            <h3 class="activity-heading">TDEE Calculator with Activity Levels</h3>
+            <label for="activityLevel">Choose your typical activity level</label>
+            <select id="activityLevel" name="activityLevel" aria-describedby="activityHint" required>
+              <option value="sedentary" data-factor="1.2" data-level="1" selected>Sedentary — 1.2; desk job and little exercise</option>
+              <option value="light" data-factor="1.375" data-level="2">Lightly active — 1.375; light exercise 1–3 days/week</option>
+              <option value="moderate" data-factor="1.55" data-level="3">Moderately active — 1.55; active job or exercise 3–5 days/week</option>
+              <option value="heavy" data-factor="1.725" data-level="4">Very active — 1.725; physical job or hard exercise 6–7 days/week</option>
+              <option value="athlete" data-factor="1.9" data-level="5">Extra active — 1.9; athlete training or strenuous labor</option>
+            </select>
+            <p class="input-hint" id="activityHint">
+              Include your job, everyday movement, and structured weekly exercise when choosing.
+            </p>
+            <div class="activity-meter" aria-hidden="true">
+              <span class="activity-meter__fill" id="activityMeterFill"></span>
+            </div>
+            <div class="activity-scale" aria-hidden="true">
+              <span>Lower activity</span>
+              <span>Higher activity</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="calculate-action">
+          <button class="btn-reset" type="reset">Reset</button>
+          <div class="share-line">
+            <button class="btn-copy-link" id="copyLinkBtn" type="button">🔗 Copy bookmarkable link</button>
+            <span class="copy-confirm" id="copyConfirm" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+      </form>
+      <p class="visually-hidden" id="resultsAnnouncement" role="status" aria-live="polite"></p>
+
+      <section class="results-panel"
+               id="resultsPanel"
+               aria-labelledby="results-heading"
+               hidden>
+        <div class="section-divider"></div>
+        <div class="section-heading">
+          <span class="section-icon section-icon--results" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 20V10h4v10H4Zm6 0V4h4v16h-4Zm6 0v-7h4v7h-4Z" /></svg>
+          </span>
+          <div>
+            <h2 id="results-heading">Your Daily Calorie Needs Results</h2>
+            <p>BMR, TDEE, and calorie maintenance calculator estimates based on your details.</p>
+          </div>
+        </div>
+
+        <div class="results-grid">
+          <article class="result-card">
+            <div class="result-label">Basal Metabolic Rate (BMR)</div>
+            <div class="result-value"><span id="bmrResult">—</span> <small>kcal/day</small></div>
+            <p>Energy your body uses each day at complete rest.</p>
+          </article>
+
+          <article class="result-card result-card--primary">
+            <div class="result-label">Daily Calorie Needs (TDEE)</div>
+            <div class="result-value"><span id="tdeeResult">—</span> <small>kcal/day</small></div>
+            <p>Estimated calories to maintain your current weight.</p>
+          </article>
+        </div>
+
+        <details class="breakdown" id="breakdown">
+          <summary>Show breakdown</summary>
+          <div class="breakdown-content">
+            <div>
+              <span>BMR formula</span>
+              <strong id="bmrFormula">—</strong>
+            </div>
+            <div>
+              <span>Activity multiplier</span>
+              <strong id="activityBreakdown">—</strong>
+            </div>
+            <div>
+              <span>TDEE calculation</span>
+              <strong id="tdeeFormula">—</strong>
+            </div>
+          </div>
+        </details>
+
+        <div class="goals-section">
+          <h3>Calorie goal recommendations</h3>
+          <p class="goals-intro">Use these as starting points and adjust based on your progress.</p>
+          <div class="goals-grid">
+            <article class="goal-card goal-card--loss">
+              <span>Weight loss</span>
+              <strong id="lossResult">—</strong>
+              <small>kcal/day · 500 below maintenance</small>
+            </article>
+            <article class="goal-card goal-card--maintain">
+              <span>Maintenance</span>
+              <strong id="maintenanceResult">—</strong>
+              <small>kcal/day · estimated TDEE</small>
+            </article>
+            <article class="goal-card goal-card--gain">
+              <span>Weight gain</span>
+              <strong id="gainResult">—</strong>
+              <small>kcal/day · 300 above maintenance</small>
+            </article>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="how-it-works" aria-labelledby="how-heading">
+      <details>
+        <summary>
+          <span class="info-icon" aria-hidden="true">i</span>
+          <span>
+            <h2 id="how-heading">How This Calorie Maintenance Calculator Works</h2>
+            <small>Formula, activity levels, ranges, and limitations</small>
+          </span>
+        </summary>
+        <div class="how-content">
+          <h3>The Mifflin–St Jeor formula</h3>
+          <p>
+            The calculator estimates BMR as 10 × weight (kg) + 6.25 × height (cm)
+            − 5 × age, then adds 5 for males or subtracts 161 for females.
+            This is why the tool functions as a BMR calculator for men and women while
+            using the same underlying equation.
+          </p>
+          <h3>Why activity level matters</h3>
+          <p>
+            BMR covers rest only. Multiplying it by an activity factor estimates TDEE—the
+            energy used through everyday movement, exercise, and digestion.
+          </p>
+          <ul class="activity-examples">
+            <li><strong>Sedentary (1.2):</strong> office or desk job with little structured exercise.</li>
+            <li><strong>Lightly active (1.375):</strong> mostly seated work plus exercise 1–3 days per week.</li>
+            <li><strong>Moderately active (1.55):</strong> an active job or moderate exercise 3–5 days per week.</li>
+            <li><strong>Very active (1.725):</strong> construction, delivery, or another physical job, or hard exercise 6–7 days per week.</li>
+            <li><strong>Extra active (1.9):</strong> strenuous labor, twice-daily training, or a competitive athlete routine.</li>
+          </ul>
+          <h3>Typical calorie ranges</h3>
+          <p>
+            Many adults fall around 1,600–3,000 calories per day, but body size, age,
+            activity, health, and goals can move individual needs outside that range.
+          </p>
+          <div class="trust-note">
+            <strong>Editorial and evidence review:</strong>
+            Formula details were checked against the original peer-reviewed
+            <a href="https://pubmed.ncbi.nlm.nih.gov/2305711/"
+               target="_blank"
+               rel="noopener noreferrer">Mifflin–St Jeor research publication</a>.
+            Last evidence review: July 23, 2026. This page has not been medically reviewed
+            and does not replace advice from a qualified health professional.
+          </div>
+
+          <section class="faq-section" aria-labelledby="faq-heading">
+            <h3 id="faq-heading">Calorie Calculator FAQ</h3>
+
+            <h4>What is BMR?</h4>
+            <p>
+              Basal metabolic rate, or BMR, estimates how many calories your body uses in a
+              day at complete rest to support essential functions such as breathing,
+              circulation, and temperature regulation.
+            </p>
+
+            <h4>What is TDEE?</h4>
+            <p>
+              Total daily energy expenditure, or TDEE, is an estimate of the calories you
+              use each day after your BMR is adjusted for everyday movement, exercise, and
+              digestion.
+            </p>
+
+            <h4>How accurate is the Mifflin–St Jeor formula?</h4>
+            <p>
+              The Mifflin–St Jeor equation is a research-based estimate, not a direct
+              measurement. Actual calorie needs can differ because of body composition,
+              health, medications, training, and other individual factors.
+            </p>
+
+            <h4>How many calories do I need per day?</h4>
+            <p>
+              Your estimated daily calorie need is the TDEE result. It combines your BMR
+              with the activity level that best represents your typical work, movement, and
+              weekly exercise.
+            </p>
+
+            <h4>Does activity level affect calorie needs?</h4>
+            <p>
+              Yes. More movement and exercise generally increase daily energy use, so the
+              calculator applies an activity multiplier from 1.2 for sedentary routines to
+              1.9 for exceptionally active routines.
+            </p>
+          </section>
+
+          <div class="disclaimer-box">
+            <strong>Important:</strong> This calculator is for general informational and
+            planning purposes only, not medical advice. Avoid aggressive calorie restriction
+            and consult a qualified health professional for personalized guidance, especially
+            if you are pregnant, under 18, have a medical condition, take medication that
+            affects weight or metabolism, or have a history of disordered eating.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="related-tools" aria-labelledby="related-tools-heading">
+      <h2 id="related-tools-heading">Related Health Calculators and Tools</h2>
+      <p>Continue exploring body measurements, age, and wellness planning tools.</p>
+      <div class="related-tools-grid">
+        <a href="/tools/bmi-calculator/">
+          <strong>BMI Calculator</strong>
+          <span>Estimate body mass index using metric or imperial measurements.</span>
+        </a>
+        <a href="/tools/age-calculator/">
+          <strong>Age Calculator</strong>
+          <span>Calculate exact age and useful date-based milestones.</span>
+        </a>
+        <a href="/tools/health/">
+          <strong>Health Tools</strong>
+          <span>Browse all available health and wellness calculators.</span>
+        </a>
+        <a href="/tools/index/">
+          <strong>All Calculators</strong>
+          <span>Explore every free MonkeyTactics calculator and utility.</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="ad-container ad-container--bottom" aria-label="Advertisement">
+      <!-- AdSense: Bottom Display Ad -->
+    </div>
+  </main>
+
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/contact/">Contact</a>
+      <a href="/sitemap/">Sitemap</a>
+    </nav>
+  </footer>
+</body>
+</html>

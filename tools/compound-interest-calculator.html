@@ -10,8 +10,8 @@
   <meta property="og:title"       content="Compound Interest Calculator — MonkeyTactics" />
   <meta property="og:description" content="Calculate after-tax, inflation-adjusted investment growth with compound interest and regular contributions. Free and private." />
   <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://monkeytactics.com/tools/compound-interest-calculator.html" />
-  <link rel="canonical"           href="https://monkeytactics.com/tools/compound-interest-calculator.html" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/compound-interest-calculator" />
+  <link rel="canonical"           href="https://monkeytactics.com/tools/compound-interest-calculator" />
 
   <script type="application/ld+json">
   {
@@ -187,7 +187,16 @@
     .formula-block { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.85rem 1.1rem; font-family: monospace; font-size: 0.9rem; color: var(--accent); margin: 0.75rem 0; line-height: 1.7; overflow-x: auto; }
 
     /* FAQ */
-    .faq-list { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-section { max-width: 740px; margin-top: 2rem; }
+    .faq-section details { border: 1px solid var(--border); border-radius: 0.75rem; background: rgba(255,255,255,0.02); }
+    .faq-section summary { position: relative; display: flex; align-items: center; gap: 0.8rem; padding: 1rem 3rem 1rem 1rem; cursor: pointer; list-style: none; }
+    .faq-section summary::-webkit-details-marker { display: none; }
+    .faq-section summary::after { position: absolute; top: 50%; right: 1rem; color: var(--accent); font-size: 1.2rem; content: "+"; transform: translateY(-50%); }
+    .faq-section details[open] summary::after { content: "−"; }
+    .faq-section summary h2 { margin: 0; color: var(--text); font-size: 0.98rem; }
+    .faq-info-icon { display: grid; width: 2rem; height: 2rem; flex: 0 0 auto; place-items: center; border-radius: 50%; background: rgba(74,222,128,0.12); color: var(--accent); font-family: Georgia, serif; font-weight: 700; }
+    .faq-content { padding: 0 1.25rem 1.25rem 3.8rem; border-top: 1px solid rgba(148,163,184,0.12); }
+    .faq-list { list-style: none; padding: 0; margin: 0; max-width: 740px; }
     .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
     .faq-item:last-child { border-bottom: none; }
     .faq-item h3 { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
@@ -253,7 +262,7 @@
   <main>
 
     <header>
-      <a href="/index.html" class="brand">
+      <a href="/index" class="brand">
         <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
              alt="MonkeyTactics logo"
              class="brand-logo" width="383" height="375" />
@@ -263,19 +272,19 @@
         </div>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="/tools/index.html">All Tools</a>
-        <a href="/tools/finance.html" class="active">Finance</a>
-        <a href="/tools/health.html">Health</a>
-        <a href="/tools/utilities.html">Utilities</a>
-        <a href="/tools/productivity.html">Productivity</a>
+        <a href="/tools/index">All Tools</a>
+        <a href="/tools/finance" class="active">Finance</a>
+        <a href="/tools/health">Health</a>
+        <a href="/tools/utilities">Utilities</a>
+        <a href="/tools/productivity">Productivity</a>
       </nav>
     </header>
 
     <section class="hero hero--inner" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="/index.html">Home</a>
+        <a href="/index">Home</a>
         <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/finance.html">Finance</a>
+        <a href="/tools/finance">Finance</a>
         <span class="sep" aria-hidden="true">›</span>
         <span aria-current="page">Compound Interest Calculator</span>
       </nav>
@@ -443,8 +452,6 @@
       </div>
     </section>
 
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Mid --></div>
-
     <!-- GROWTH TABLE -->
     <section class="growth-section" id="growthSection" style="display:none;" aria-labelledby="growth-heading">
       <h2 id="growth-heading">Year-by-Year Growth</h2>
@@ -495,9 +502,11 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
     </div>
 
     <!-- FAQ -->
-    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
-      <h2 id="faq-heading">Frequently Asked Questions</h2>
-      <ul class="faq-list">
+    <section class="faq-section" aria-labelledby="faq-heading">
+      <details>
+        <summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Frequently Asked Questions</h2></summary>
+        <div class="faq-content">
+          <ul class="faq-list">
 
         <li class="faq-item">
           <h3>What is compound interest?</h3>
@@ -543,10 +552,12 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
           <h3>Is my data kept private?</h3>
           <p>Yes — all calculations run entirely in your browser using JavaScript. Nothing you
              enter is sent to any server or stored anywhere. See our
-             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for details.</p>
+             <a href="/privacy" style="color:var(--accent)">Privacy Policy</a> for details.</p>
         </li>
 
-      </ul>
+          </ul>
+        </div>
+      </details>
     </section>
 
     <section class="seo-section methodology" aria-labelledby="methodology-heading">
@@ -561,15 +572,15 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
     <section aria-labelledby="related-heading" style="margin-top:2rem;">
       <h2 id="related-heading">Related Tools</h2>
       <div class="related-grid">
-        <a href="/tools/loan-mortgage-calculator.html" class="related-card">
+        <a href="/tools/loan-mortgage-calculator" class="related-card">
           <strong>🏠 Loan &amp; Mortgage Calculator</strong>
           <span>Monthly payments and full amortization schedules for any loan.</span>
         </a>
-        <a href="/tools/percentage-calculator.html" class="related-card">
+        <a href="/tools/percentage-calculator" class="related-card">
           <strong>💯 Percentage Calculator</strong>
           <span>Work out percentage change, discounts, and reverse percentages instantly.</span>
         </a>
-        <a href="/tools/date-difference-calculator.html" class="related-card">
+        <a href="/tools/date-difference-calculator" class="related-card">
           <strong>📅 Date Difference Calculator</strong>
           <span>Find exact days, months, or years between any two dates.</span>
         </a>
@@ -583,10 +594,10 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
-      <a href="/about.html">About</a>
-      <a href="/privacy.html">Privacy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/sitemap.html">Sitemap</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/contact">Contact</a>
+      <a href="/sitemap">Sitemap</a>
     </nav>
   </footer>
 

@@ -14,7 +14,7 @@
   <meta property="og:url"         content="https://monkeytactics.com/tools/unit-converter/" />
 
   <!-- Canonical -->
-  <link rel="canonical" href="https://monkeytactics.com/tools/unit-converter.html" />
+  <link rel="canonical" href="https://monkeytactics.com/tools/unit-converter" />
 
   <!-- Breadcrumb structured data -->
   <script type="application/ld+json">
@@ -276,7 +276,16 @@
     }
 
     /* ── FAQ ── */
-    .faq-list             { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
+    .faq-section { max-width: 740px; margin-top: 2rem; }
+    .faq-section details { border: 1px solid var(--border); border-radius: 0.75rem; background: rgba(255,255,255,0.02); }
+    .faq-section summary { position: relative; display: flex; align-items: center; gap: 0.8rem; padding: 1rem 3rem 1rem 1rem; cursor: pointer; list-style: none; }
+    .faq-section summary::-webkit-details-marker { display: none; }
+    .faq-section summary::after { position: absolute; top: 50%; right: 1rem; color: var(--accent); font-size: 1.2rem; content: "+"; transform: translateY(-50%); }
+    .faq-section details[open] summary::after { content: "−"; }
+    .faq-section summary h2 { margin: 0; color: var(--text); font-size: 0.98rem; }
+    .faq-info-icon { display: grid; width: 2rem; height: 2rem; flex: 0 0 auto; place-items: center; border-radius: 50%; background: rgba(74,222,128,0.12); color: var(--accent); font-family: Georgia, serif; font-weight: 700; }
+    .faq-content { padding: 0 1.25rem 1.25rem 3.8rem; border-top: 1px solid rgba(148,163,184,0.12); }
+    .faq-list             { list-style: none; padding: 0; margin: 0; max-width: 740px; }
     .faq-item             { border-bottom: 1px solid var(--border); padding: 1rem 0; }
     .faq-item:last-child  { border-bottom: none; }
     .faq-item h3          { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
@@ -360,7 +369,7 @@
 
     <!-- HEADER -->
     <header>
-      <a href="/index.html" class="brand">
+      <a href="/index" class="brand">
         <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
              alt="MonkeyTactics logo"
              class="brand-logo" width="383" height="375" />
@@ -370,20 +379,20 @@
         </div>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="/tools/index.html">All Tools</a>
-        <a href="/tools/finance.html">Finance</a>
-        <a href="/tools/health.html">Health</a>
-        <a href="/tools/utilities.html" class="active">Utilities</a>
-        <a href="/tools/productivity.html">Productivity</a>
+        <a href="/tools/index">All Tools</a>
+        <a href="/tools/finance">Finance</a>
+        <a href="/tools/health">Health</a>
+        <a href="/tools/utilities" class="active">Utilities</a>
+        <a href="/tools/productivity">Productivity</a>
       </nav>
     </header>
 
     <!-- HERO -->
     <section class="hero hero--inner" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="/index.html">Home</a>
+        <a href="/index">Home</a>
         <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/utilities.html">Utilities</a>
+        <a href="/tools/utilities">Utilities</a>
         <span class="sep" aria-hidden="true">›</span>
         <span aria-current="page">Unit Converter</span>
       </nav>
@@ -473,9 +482,6 @@
       </div><!-- /tool-widget -->
     </section>
 
-    <!-- MID AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Mid Display Ad --></div>
-
     <!-- HOW TO USE -->
     <div class="seo-section">
       <h2>How to use the Unit Converter</h2>
@@ -509,9 +515,11 @@
     </div>
 
     <!-- FAQ -->
-    <section aria-labelledby="faq-heading" style="margin-top:2rem;">
-      <h2 id="faq-heading">Frequently Asked Questions</h2>
-      <ul class="faq-list">
+    <section class="faq-section" aria-labelledby="faq-heading">
+      <details>
+        <summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Frequently Asked Questions</h2></summary>
+        <div class="faq-content">
+          <ul class="faq-list">
 
         <li class="faq-item">
           <h3>Does this converter support both metric and imperial units?</h3>
@@ -550,10 +558,12 @@
           <h3>Is my data private?</h3>
           <p>Yes — all conversions run entirely in your browser using JavaScript. Nothing you type
              is transmitted to any server. See our
-             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for details.</p>
+             <a href="/privacy" style="color:var(--accent)">Privacy Policy</a> for details.</p>
         </li>
 
-      </ul>
+          </ul>
+        </div>
+      </details>
     </section>
 
     <!-- RELATED TOOLS -->
@@ -561,17 +571,17 @@
       <h2 id="related-heading">Related Tools</h2>
       <div class="related-grid">
 
-        <a href="/tools/time-zone-converter.html" class="related-card">
+        <a href="/tools/time-zone-converter" class="related-card">
           <strong>🌍 Time Zone Converter</strong>
           <span>Compare times across cities and schedule across time zones.</span>
         </a>
 
-        <a href="/tools/date-difference-calculator.html" class="related-card">
+        <a href="/tools/date-difference-calculator" class="related-card">
           <strong>📅 Date Difference Calculator</strong>
           <span>Find the exact number of days, weeks, or months between two dates.</span>
         </a>
 
-        <a href="/tools/percentage-calculator.html" class="related-card">
+        <a href="/tools/percentage-calculator" class="related-card">
           <strong>💯 Percentage Calculator</strong>
           <span>Work out discounts, percentage changes, and reverse percentages.</span>
         </a>
@@ -588,10 +598,10 @@
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
-      <a href="/about.html">About</a>
-      <a href="/privacy.html">Privacy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/sitemap.html">Sitemap</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/contact">Contact</a>
+      <a href="/sitemap">Sitemap</a>
     </nav>
   </footer>
 

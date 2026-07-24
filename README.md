@@ -3,9 +3,9 @@
 > **Free online calculators, utility tools, and productivity apps — built fast, designed clean, ranked high.**
 
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fmonkeytactics.com&label=monkeytactics.com&style=flat-square&color=4CAF50)](https://monkeytactics.com)
-[![GitHub Stars](https://img.shields.io/github/stars/YOUR_USERNAME/monkeytactics?style=flat-square&color=FFD700)](https://github.com/YOUR_USERNAME/monkeytactics/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/YOUR_USERNAME/monkeytactics?style=flat-square&color=blue)](https://github.com/YOUR_USERNAME/monkeytactics/network/members)
-[![Last Commit](https://img.shields.io/github/last-commit/YOUR_USERNAME/monkeytactics?style=flat-square)](https://github.com/YOUR_USERNAME/monkeytactics/commits/main)
+[![GitHub Stars](https://img.shields.io/github/stars/agreyling-glitch/monkeytactics?style=flat-square&color=FFD700)](https://github.com/agreyling-glitch/monkeytactics/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/agreyling-glitch/monkeytactics?style=flat-square&color=blue)](https://github.com/agreyling-glitch/monkeytactics/network/members)
+[![Last Commit](https://img.shields.io/github/last-commit/agreyling-glitch/monkeytactics?style=flat-square)](https://github.com/agreyling-glitch/monkeytactics/commits/main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
 
@@ -38,15 +38,14 @@ Whether you need a **percentage calculator**, a **unit converter**, a **date dif
 
 | Category | Examples | Status |
 |---|---|---|
-| **Math & Finance** | Percentage Calculator, Loan Calculator, ROI Calculator | ✅ Live |
-| **Date & Time** | Date Difference Calculator, Age Calculator, Days Until... | ✅ Live |
-| **Unit Converters** | Length, Weight, Temperature, Speed, Volume | ✅ Live |
-| **Text & String Tools** | Word Counter, Character Counter, Case Converter | ✅ Live |
-| **Random Generators** | Random Number, Password Generator, UUID Generator | ✅ Live |
-| **Health & Fitness** | BMI Calculator, Calorie Estimator, Body Fat Calculator | 🔄 In Progress |
-| **Developer Utilities** | Base64 Encode/Decode, URL Encoder, Color Picker | 🔄 In Progress |
-| **Productivity** | Tip Calculator, Grade Calculator, GPA Calculator | 📋 Planned |
-
+| **Math & Finance** | Percentage Calculator, Compound Interest Calculator, Loan/Mortgage Calculator, Tip Calculator | ✅ Live |
+| **Date & Time** | Age Calculator, Date Difference Calculator, Time Zone Converter | ✅ Live |
+| **Unit Converters** | Unit Converter | ✅ Live |
+| **Text & String Tools** | Word Counter, Character Counter | ✅ Live |
+| **Health & Fitness** | BMI Calculator, Calorie Calculator | ✅ Live |
+| **Health & Fitness** | Calorie Calculator | 🔄 In Progress |
+| **Developer Utilities** | QR Code Generator, Password Generator | ✅ Live |
+| **Productivity** | 📋 Planned |
 ---
 
 ## 🏗️ Architecture Overview

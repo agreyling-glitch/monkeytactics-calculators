@@ -12,10 +12,10 @@
   <meta property="og:title"       content="Contact — MonkeyTactics" />
   <meta property="og:description" content="Have a question, bug report, or tool suggestion? Reach out to MonkeyTactics." />
   <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://monkeytactics.com/contact.html" />
+  <meta property="og:url"         content="https://monkeytactics.com/contact" />
 
   <!-- Canonical -->
-  <link rel="canonical" href="https://monkeytactics.com/contact.html" />
+  <link rel="canonical" href="https://monkeytactics.com/contact" />
 
   <!-- Global Stylesheet -->
   <link rel="stylesheet" href="/assets/css/style.css" />
@@ -287,7 +287,7 @@
 
     <!-- HEADER -->
     <header>
-      <a href="/index.html" class="brand">
+      <a href="/index" class="brand">
         <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
              alt="MonkeyTactics logo"
              class="brand-logo" width="383" height="375" />
@@ -298,11 +298,11 @@
       </a>
 
       <nav aria-label="Primary navigation">
-        <a href="/tools/index.html">All Tools</a>
-        <a href="/tools/finance.html">Finance</a>
-        <a href="/tools/health.html">Health</a>
-        <a href="/tools/utilities.html">Utilities</a>
-        <a href="/tools/productivity.html">Productivity</a>
+        <a href="/tools/index">All Tools</a>
+        <a href="/tools/finance">Finance</a>
+        <a href="/tools/health">Health</a>
+        <a href="/tools/utilities">Utilities</a>
+        <a href="/tools/productivity">Productivity</a>
       </nav>
     </header>
 
@@ -399,7 +399,7 @@
             <button type="submit" class="btn-primary">Send message ›</button>
             <p class="form-privacy-note">
               Your details are only used to reply to your message.<br />
-              See our <a href="/privacy.html">Privacy Policy</a> for details.
+              See our <a href="/privacy">Privacy Policy</a> for details.
             </p>
           </div>
 
@@ -449,7 +449,7 @@
           <ul>
             <li>We don't offer phone support</li>
             <li>We can't provide personalised financial or medical advice</li>
-            <li>For privacy questions, see our <a href="/privacy.html" style="color: var(--accent);">Privacy Policy</a></li>
+            <li>For privacy questions, see our <a href="/privacy" style="color: var(--accent);">Privacy Policy</a></li>
           </ul>
         </div>
 
@@ -468,10 +468,10 @@
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
-      <a href="/about.html">About</a>
-      <a href="/privacy.html">Privacy</a>
-      <a href="/contact.html" class="active">Contact</a>
-      <a href="/sitemap.html">Sitemap</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/contact" class="active">Contact</a>
+      <a href="/sitemap">Sitemap</a>
     </nav>
   </footer>
 
@@ -503,22 +503,16 @@
           return;
         }
 
-        /*
-         * TODO: Wire up to your form backend here.
-         * Options: Formspree (formspree.io), Netlify Forms, EmailJS, or your own endpoint.
-         *
-         * Example with Formspree:
-         *   fetch('https://formspree.io/f/YOUR_FORM_ID', {
-         *     method: 'POST',
-         *     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-         *     body: JSON.stringify({ firstName, email, topic, message })
-         *   })
-         *   .then(r => r.ok ? showSuccess() : showError())
-         *   .catch(() => showError());
-         */
-
-        // Demo: show success immediately (remove this line when backend is wired up)
-        showSuccess();
+        fetch('https://formspree.io/f/xgognprq', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({ firstName, email, topic, message })
+        })
+          .then(response => response.ok ? showSuccess() : showError())
+          .catch(showError);
       });
 
       function showSuccess() {

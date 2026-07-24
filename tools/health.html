@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Free Health Calculators — BMI &amp; Age Calculator | MonkeyTactics</title>
+  <title>Free Health Calculators — Calorie, BMI &amp; Age | MonkeyTactics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Free online health calculators — calculate your BMI and healthy weight range, or find your exact age in years, months, and days. Private, instant, no sign-up." />
+        content="Free online health calculators — estimate calorie needs and BMR, calculate BMI and healthy weight ranges, or find your exact age. Private, instant, no sign-up." />
 
   <!-- Open Graph -->
   <meta property="og:title"       content="Free Health &amp; Body Calculators — MonkeyTactics" />
-  <meta property="og:description" content="BMI calculator and age calculator. Free, private, runs entirely in your browser." />
+  <meta property="og:description" content="Calorie, BMI, and age calculators. Free, private, and runs entirely in your browser." />
   <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://monkeytactics.com/tools/health.html" />
+  <meta property="og:url"         content="https://monkeytactics.com/tools/health" />
 
   <!-- Canonical -->
-  <link rel="canonical" href="https://monkeytactics.com/tools/health.html" />
+  <link rel="canonical" href="https://monkeytactics.com/tools/health" />
 
   <!-- Global Stylesheet -->
   <link rel="stylesheet" href="/assets/css/style.css" />
@@ -99,6 +99,11 @@
           {
             "@type": "ListItem",
             "position": 2,
+            "url": "https://monkeytactics.com/tools/calorie-calculator.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
             "url": "https://monkeytactics.com/tools/age-calculator.html"
           }
         ]
@@ -113,7 +118,7 @@
   <main>
 
     <header>
-      <a href="/index.html" class="brand">
+      <a href="/index" class="brand">
         <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
              alt="MonkeyTactics logo"
              class="brand-logo" width="383" height="375" />
@@ -123,11 +128,11 @@
         </div>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="/tools/index.html">All Tools</a>
-        <a href="/tools/finance.html">Finance</a>
-        <a href="/tools/health.html" class="active">Health</a>
-        <a href="/tools/utilities.html">Utilities</a>
-        <a href="/tools/productivity.html">Productivity</a>
+        <a href="/tools/index">All Tools</a>
+        <a href="/tools/finance">Finance</a>
+        <a href="/tools/health" class="active">Health</a>
+        <a href="/tools/utilities">Utilities</a>
+        <a href="/tools/productivity">Productivity</a>
       </nav>
     </header>
 
@@ -135,8 +140,8 @@
       <h1 id="health-heading">Free Health &amp; Body Calculators</h1>
       <p>Quick, private health and body calculations — your inputs stay on your device and are never shared.</p>
       <div class="hero-actions">
-        <a href="/tools/bmi-calculator.html" class="btn-primary">⚖️ Try BMI Calculator</a>
-        <a href="/tools/index.html" class="btn-ghost">Browse all tools</a>
+        <a href="/tools/bmi-calculator" class="btn-primary">⚖️ Try BMI Calculator</a>
+        <a href="/tools/index" class="btn-ghost">Browse all tools</a>
       </div>
     </section>
 
@@ -144,10 +149,10 @@
 
     <!-- TOOLS -->
     <section aria-labelledby="health-tools-heading">
-      <h2 id="health-tools-heading" style="margin-bottom:0.75rem;">🏥 Health &amp; Body Tools <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">2 tools</span></h2>
+      <h2 id="health-tools-heading" style="margin-bottom:0.75rem;">🏥 Health &amp; Body Tools <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">3 tools</span></h2>
       <div class="tools-grid">
 
-        <a href="/tools/bmi-calculator.html" class="tool-card">
+        <a href="/tools/bmi-calculator" class="tool-card">
           <span class="card-icon" aria-hidden="true">⚖️</span>
           <strong>BMI Calculator</strong>
           <div>Calculate your Body Mass Index and see where you fall within healthy weight ranges for your height. Supports metric and imperial units.</div>
@@ -159,7 +164,19 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
-        <a href="/tools/age-calculator.html" class="tool-card">
+        <a href="/tools/calorie-calculator" class="tool-card">
+          <span class="card-icon" aria-hidden="true">🔥</span>
+          <strong>Calorie Calculator</strong>
+          <div>Estimate your BMR, daily calorie needs (TDEE), maintenance calories, and calorie goals based on your activity level.</div>
+          <div class="card-tags">
+            <span class="card-tag">Calories</span>
+            <span class="card-tag">BMR</span>
+            <span class="card-tag">TDEE</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/age-calculator" class="tool-card">
           <span class="card-icon" aria-hidden="true">🎂</span>
           <strong>Age Calculator</strong>
           <div>Find your exact age in years, months, and days from any birth date, or calculate the time between any two dates.</div>
@@ -203,8 +220,9 @@
     <div class="seo-section">
       <h2>About these health calculators</h2>
       <p>MonkeyTactics health tools are designed to give you quick reference figures for common body measurements.
-         The BMI Calculator supports both metric (kg/cm) and imperial (lbs/inches) inputs, while the Age
-         Calculator handles any date combination — useful not just for birthdays but for calculating gestational
+         The Calorie Calculator estimates BMR, TDEE, maintenance calories, and calorie goals from your
+         measurements and activity level. The BMI Calculator supports both metric (kg/cm) and imperial
+         (lbs/inches) inputs, while the Age Calculator handles any date combination — useful not just for birthdays but for calculating gestational
          age, medication schedules, or time-sensitive eligibility checks.</p>
       <p>As with all MonkeyTactics tools, every calculation runs locally in your browser. No health data
          you enter is transmitted, stored, or shared.</p>
@@ -235,7 +253,7 @@
           <h3>Is my health data kept private?</h3>
           <p>Yes. All calculations run entirely in your browser. No weight, height, date of birth, or any other
              value you enter is ever sent to a server or stored anywhere. See our
-             <a href="/privacy.html" style="color:var(--accent)">Privacy Policy</a> for details.</p>
+             <a href="/privacy" style="color:var(--accent)">Privacy Policy</a> for details.</p>
         </li>
       </ul>
     </section>
@@ -244,15 +262,15 @@
     <section aria-labelledby="related-heading" style="margin-top:2rem;">
       <h2 id="related-heading">Explore Other Categories</h2>
       <div class="related-grid">
-        <a href="/tools/finance.html" class="related-card">
+        <a href="/tools/finance" class="related-card">
           <strong>💰 Finance</strong>
           <span>Mortgage Calculator, Compound Interest, Percentage</span>
         </a>
-        <a href="/tools/utilities.html" class="related-card">
+        <a href="/tools/utilities" class="related-card">
           <strong>🔧 Everyday Utilities</strong>
           <span>Date Difference, Unit Converter, Tip Calculator &amp; more</span>
         </a>
-        <a href="/tools/productivity.html" class="related-card">
+        <a href="/tools/productivity" class="related-card">
           <strong>⚡ Productivity</strong>
           <span>Password Generator, Word &amp; Character Counter</span>
         </a>
@@ -266,10 +284,10 @@
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
-      <a href="/about.html">About</a>
-      <a href="/privacy.html">Privacy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/sitemap.html">Sitemap</a>
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/contact">Contact</a>
+      <a href="/sitemap">Sitemap</a>
     </nav>
   </footer>
 
