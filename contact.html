@@ -134,6 +134,20 @@
       margin-top: 0.35rem;
     }
 
+    .field-error {
+      display: none;
+      color: #fca5a5;
+      font-size: 0.78rem;
+      margin-top: 0.35rem;
+    }
+
+    .form-group.has-error input,
+    .form-group.has-error select,
+    .form-group.has-error textarea {
+      border-color: #f87171;
+      box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12);
+    }
+
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -153,6 +167,11 @@
       cursor: pointer;
       font-size: 0.95rem;
       padding: 0.7rem 1.6rem;
+    }
+
+    .form-submit .btn-primary:disabled {
+      cursor: wait;
+      opacity: 0.7;
     }
 
     .form-privacy-note {
@@ -338,8 +357,10 @@
                 name="firstName"
                 placeholder="Jane"
                 autocomplete="given-name"
+                aria-describedby="firstNameError"
                 required
               />
+              <p class="field-error" id="firstNameError">Enter your first name.</p>
             </div>
             <div class="form-group">
               <label for="lastName">Last name</label>
@@ -362,15 +383,17 @@
               name="email"
               placeholder="jane@example.com"
               autocomplete="email"
+              aria-describedby="emailHint emailError"
               required
             />
-            <p class="form-hint">We'll only use this to reply to your message.</p>
+            <p class="form-hint" id="emailHint">We'll only use this to reply to your message.</p>
+            <p class="field-error" id="emailError">Enter a valid email address.</p>
           </div>
 
           <!-- Subject / Topic -->
           <div class="form-group">
             <label for="topic">Topic <span class="required" aria-hidden="true">*</span></label>
-            <select id="topic" name="topic" required>
+            <select id="topic" name="topic" aria-describedby="topicError" required>
               <option value="" disabled selected>Select a topic…</option>
               <option value="bug">🐛 Bug report</option>
               <option value="suggestion">💡 Tool suggestion</option>
@@ -380,6 +403,7 @@
               <option value="partnership">🤝 Partnership or advertising</option>
               <option value="other">💬 Other</option>
             </select>
+            <p class="field-error" id="topicError">Select a topic.</p>
           </div>
 
           <!-- Message -->
@@ -388,15 +412,18 @@
             <textarea
               id="message"
               name="message"
+              minlength="20"
+              aria-describedby="messageHint messageError"
               placeholder="Describe your question, bug, or idea in as much detail as you'd like…"
               required
             ></textarea>
-            <p class="form-hint">Minimum 20 characters. For bug reports, include the tool name and what went wrong.</p>
+            <p class="form-hint" id="messageHint">Minimum 20 characters. For bug reports, include the tool name and what went wrong.</p>
+            <p class="field-error" id="messageError">Enter a message containing at least 20 characters.</p>
           </div>
 
           <!-- Submit -->
           <div class="form-submit">
-            <button type="submit" class="btn-primary">Send message ›</button>
+            <button type="submit" class="btn-primary" id="submitButton">Send message ›</button>
             <p class="form-privacy-note">
               Your details are only used to reply to your message.<br />
               See our <a href="/privacy">Privacy Policy</a> for details.
@@ -408,7 +435,7 @@
             ✅ <strong>Message sent!</strong> Thanks for reaching out — we'll get back to you within 2 business days.
           </div>
           <div class="form-message error" id="formError" role="alert">
-            ❌ <strong>Something went wrong.</strong> Please check the required fields and try again.
+            ❌ <strong>Message not sent.</strong> <span id="formErrorText">Please try again.</span>
           </div>
 
         </form>
@@ -481,47 +508,123 @@
       const form    = document.getElementById('contactForm');
       const success = document.getElementById('formSuccess');
       const error   = document.getElementById('formError');
+      const errorText = document.getElementById('formErrorText');
+      const submitButton = document.getElementById('submitButton');
+      const defaultButtonText = submitButton.textContent;
+      const fields = {
+        firstName: {
+          input: form.firstName,
+          error: document.getElementById('firstNameError'),
+          message: 'Enter your first name.',
+          valid: value => Boolean(value)
+        },
+        email: {
+          input: form.email,
+          error: document.getElementById('emailError'),
+          message: 'Enter a valid email address.',
+          valid: value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+        },
+        topic: {
+          input: form.topic,
+          error: document.getElementById('topicError'),
+          message: 'Select a topic.',
+          valid: value => Boolean(value)
+        },
+        message: {
+          input: form.message,
+          error: document.getElementById('messageError'),
+          message: 'Enter a message containing at least 20 characters.',
+          valid: value => value.length >= 20
+        }
+      };
 
-      form.addEventListener('submit', function (e) {
+      Object.values(fields).forEach(field => {
+        field.input.addEventListener('input', () => validateField(field));
+        field.input.addEventListener('change', () => validateField(field));
+      });
+
+      form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         // Hide previous messages
         success.style.display = 'none';
         error.style.display   = 'none';
 
-        // Basic validation
         const firstName = form.firstName.value.trim();
+        const lastName  = form.lastName.value.trim();
         const email     = form.email.value.trim();
         const topic     = form.topic.value;
         const message   = form.message.value.trim();
 
-        const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const values = { firstName, email, topic, message };
+        const invalidFields = Object.entries(fields)
+          .filter(([name, field]) => !validateField(field, values[name]))
+          .map(([, field]) => field);
 
-        if (!firstName || !email || !emailValid || !topic || message.length < 20) {
-          error.style.display = 'block';
-          error.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (invalidFields.length) {
+          invalidFields[0].input.focus();
+          form.reportValidity();
           return;
         }
 
-        fetch('https://formspree.io/f/xgognprq', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify({ firstName, email, topic, message })
-        })
-          .then(response => response.ok ? showSuccess() : showError())
-          .catch(showError);
+        setSubmitting(true);
+
+        try {
+          const response = await fetch('https://formspree.io/f/xgognprq', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify({ firstName, lastName, email, topic, message })
+          });
+
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            const responseMessage = data.error ||
+              (Array.isArray(data.errors) && data.errors[0] && data.errors[0].message) ||
+              'Your message could not be sent. Please try again.';
+            throw new Error(responseMessage);
+          }
+
+          showSuccess();
+        } catch (submissionError) {
+          showError(submissionError.message);
+        } finally {
+          setSubmitting(false);
+        }
       });
+
+      function validateField(field, suppliedValue) {
+        const value = suppliedValue === undefined ? field.input.value.trim() : suppliedValue;
+        const isValid = field.valid(value);
+
+        field.input.setCustomValidity(isValid ? '' : field.message);
+        field.input.closest('.form-group').classList.toggle('has-error', !isValid);
+        field.input.setAttribute('aria-invalid', String(!isValid));
+        field.error.style.display = isValid ? 'none' : 'block';
+        return isValid;
+      }
+
+      function setSubmitting(isSubmitting) {
+        submitButton.disabled = isSubmitting;
+        submitButton.textContent = isSubmitting ? 'Sending…' : defaultButtonText;
+      }
 
       function showSuccess() {
         form.reset();
+        Object.values(fields).forEach(field => {
+          field.input.setCustomValidity('');
+          field.input.closest('.form-group').classList.remove('has-error');
+          field.input.removeAttribute('aria-invalid');
+          field.error.style.display = 'none';
+        });
         success.style.display = 'block';
         success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
-      function showError() {
+      function showError(message) {
+        errorText.textContent = message || 'Your message could not be sent. Please try again.';
         error.style.display = 'block';
         error.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
