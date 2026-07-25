@@ -8,7 +8,9 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
-  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  # Camera remains origin-restricted and still requires browser permission.
+  # It is used by the client-side QR decoder.
+  Permissions-Policy: geolocation=(), microphone=(), camera=(self)
 
 # Long-cache the static assets (they're fingerprintable later if needed)
 /assets/*

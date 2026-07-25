@@ -15,7 +15,7 @@
 
 MonkeyTactics.com is a growing collection of free online calculators, converters, and utility tools built with lightweight HTML, CSS, and JavaScript. The site is designed for people who want quick answers without sign-ups, account creation, or unnecessary clutter.
 
-Whether you need a percentage calculator, BMI calculator, unit converter, loan calculator, date difference calculator, password generator, QR code generator, or word counter, MonkeyTactics helps users solve everyday problems in seconds directly from the browser.
+Whether you need a percentage calculator, BMI calculator, unit converter, loan calculator, date difference calculator, password generator, QR code generator, QR code decoder, or word counter, MonkeyTactics helps users solve everyday problems in seconds directly from the browser.
 
 This project is especially useful for students, professionals, developers, small business owners, and anyone searching for simple, ad-light tools that work well on desktop and mobile.
 
@@ -38,7 +38,7 @@ The site currently features the following tools across its main categories:
 
 - Finance: [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator), [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator), [Percentage Calculator](https://monkeytactics.com/tools/percentage-calculator)
 - Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Calorie Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
-- Utilities: [Date Difference Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator)
+- Utilities: [Date Difference Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator), [QR Code Decoder](https://monkeytactics.com/tools/qr-code-decoder)
 - Productivity: [Password Generator](https://monkeytactics.com/tools/password-generator), [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter)
 
 ---
@@ -52,7 +52,7 @@ The site currently features the following tools across its main categories:
 | **Unit Converters** | Unit Converter | ✅ Live |
 | **Text & String Tools** | Word Counter, Character Counter | ✅ Live |
 | **Health & Fitness** | BMI Calculator, Calorie Calculator | ✅ Live |
-| **Developer Utilities** | QR Code Generator, Password Generator | ✅ Live |
+| **Developer Utilities** | QR Code Generator, QR Code Decoder, Password Generator | ✅ Live |
 | **Productivity** | Planned and expanding | 🔄 Growing |
 
 ---
@@ -76,6 +76,7 @@ This project is built around terms such as:
 - date difference calculator
 - password generator
 - QR code generator
+- QR code decoder
 - word counter
 
 These phrases are reflected in the site content, page titles, and tool structure to help users discover the right calculator quickly.

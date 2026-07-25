@@ -10,11 +10,11 @@
   <title>Free Online Utility Tools: Date, Unit, Tip &amp; QR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Free everyday utility tools — date difference calculator, unit converter, tip calculator, time zone converter, and QR code generator. Fast, private, no sign-up." />
+        content="Free everyday utility tools — date difference calculator, unit converter, tip calculator, time zone converter, QR generator, and QR decoder. Fast, private, no sign-up." />
 
   <!-- Open Graph -->
   <meta property="og:title"       content="Free Everyday Utility Tools — MonkeyTactics" />
-  <meta property="og:description" content="Date calculator, unit converter, tip splitter, time zone converter, QR code generator. All free, all private." />
+  <meta property="og:description" content="Date calculator, unit converter, tip splitter, time zone converter, QR generator, and QR decoder. All free, all private." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/utilities" />
 
@@ -42,8 +42,15 @@
     .seo-section p:last-child { margin-bottom: 0; }
 
     /* Use-case chips */
-    .use-cases { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; padding: 0; list-style: none; }
-    .use-cases li {
+    .use-cases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+      padding: 0;
+      list-style: none;
+    }
+    .use-cases-grid li {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -52,7 +59,7 @@
       color: var(--muted);
       line-height: 1.4;
     }
-    .use-cases li strong { display: block; color: var(--text); margin-bottom: 0.15rem; font-size: 0.85rem; }
+    .use-cases-grid li strong { display: block; color: var(--text); margin-bottom: 0.15rem; font-size: 0.85rem; }
 
     .faq-list { list-style: none; padding: 0; margin: 0.5rem 0 0; max-width: 740px; }
     .faq-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
@@ -69,6 +76,7 @@
     @media (max-width: 600px) {
       .hero--inner { padding: 1.25rem; }
       .hero--inner h1 { font-size: 1.5rem; }
+      .use-cases-grid { grid-template-columns: 1fr; }
     }
   </style>
   <script src="/assets/js/ads.js" defer></script>
@@ -117,6 +125,11 @@
           {
             "@type": "ListItem",
             "position": 5,
+            "url": "https://monkeytactics.com/tools/qr-code-decoder.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 6,
             "url": "https://monkeytactics.com/tools/time-zone-converter.html"
           }
         ]
@@ -151,7 +164,7 @@
 
     <section class="hero hero--inner" aria-labelledby="utilities-heading">
       <h1 id="utilities-heading">Free Everyday Utility Tools</h1>
-      <p>Five essential tools for everyday tasks — from splitting a restaurant bill to generating a QR code.
+      <p>Six essential tools for everyday tasks — from splitting a restaurant bill to generating or decoding a QR code.
          All free, all instant, all private.</p>
       <div class="hero-actions">
         <a href="/tools/qr-code-generator" class="btn-primary">📱 Try QR Code Generator</a>
@@ -163,7 +176,7 @@
 
     <!-- TOOLS -->
     <section aria-labelledby="utilities-tools-heading">
-      <h2 id="utilities-tools-heading" style="margin-bottom:0.75rem;">🔧 Everyday Utilities <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">5 tools</span></h2>
+      <h2 id="utilities-tools-heading" style="margin-bottom:0.75rem;">🔧 Everyday Utilities <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">6 tools</span></h2>
       <div class="tools-grid">
 
         <a href="/tools/date-difference-calculator" class="tool-card">
@@ -226,6 +239,18 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
+        <a href="/tools/qr-code-decoder" class="tool-card">
+          <span class="card-icon" aria-hidden="true">🔍</span>
+          <strong>QR Code Decoder</strong>
+          <div>Decode QR codes privately from images, screenshots, public image URLs, or your camera.</div>
+          <div class="card-tags">
+            <span class="card-tag">QR Code</span>
+            <span class="card-tag">Scanner</span>
+            <span class="card-tag">Private</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
       </div>
     </section>
 
@@ -233,19 +258,20 @@
     <div class="seo-section">
       <h2>What can you do with these tools?</h2>
       <p>Everyday utilities cover the small but time-consuming tasks that don't need a dedicated app:</p>
-      <ul class="use-cases">
+      <ul class="use-cases-grid">
         <li><strong>📅 Date Difference</strong>How many days until your holiday? How long has a contract been running?</li>
         <li><strong>🔄 Unit Converter</strong>Convert miles to km for a run, or kg to lbs for a recipe.</li>
         <li><strong>🍽️ Tip Calculator</strong>Split a dinner bill fairly — no mental arithmetic required.</li>
         <li><strong>🌍 Time Zone Converter</strong>Schedule a meeting across New York, London, and Tokyo.</li>
         <li><strong>📱 QR Code Generator</strong>Share your Wi-Fi password or a link without typing it out.</li>
+        <li><strong>🔍 QR Code Decoder</strong>Inspect a QR code from an image or camera before opening its link.</li>
       </ul>
     </div>
 
     <!-- SEO CONTENT -->
     <div class="seo-section">
       <h2>Privacy-first utility tools</h2>
-      <p>All five tools on this page run entirely within your browser. Whether you're entering a bill amount,
+      <p>All six tools on this page run entirely within your browser. Whether you're entering a bill amount,
          a Wi-Fi password, or travel dates — none of that information is ever sent to a server or stored in
          any database. The tools work offline once the page has loaded.</p>
     </div>
@@ -306,6 +332,7 @@
     <nav aria-label="Footer navigation">
       <a href="/about">About</a>
       <a href="/privacy">Privacy</a>
+      <a href="/terms-of-service">Terms</a>
       <a href="/contact">Contact</a>
       <a href="/sitemap">Sitemap</a>
     </nav>
