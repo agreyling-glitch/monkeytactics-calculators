@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://monkeytactics.com/</loc>
-    <lastmod>2026-07-24</lastmod>
+    <lastmod>2026-07-26</lastmod>
   </url>
   <url>
     <loc>https://monkeytactics.com/tools/</loc>
-    <lastmod>2026-07-24</lastmod>
+    <lastmod>2026-07-26</lastmod>
   </url>
   <url>
     <loc>https://monkeytactics.com/tools/finance</loc>
@@ -22,7 +22,39 @@
   </url>
   <url>
     <loc>https://monkeytactics.com/tools/productivity</loc>
-    <lastmod>2026-07-24</lastmod>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/construction</loc>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/concrete-calculator</loc>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/drywall-calculator</loc>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/paint-calculator</loc>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/tile-calculator</loc>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/roofing-shingle-calculator</loc>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/lumber-board-foot-calculator</loc>
+    <lastmod>2026-07-26</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/insulation-calculator</loc>
+    <lastmod>2026-07-26</lastmod>
   </url>
   <url>
     <loc>https://monkeytactics.com/tools/age-calculator</loc>
@@ -51,6 +83,10 @@
   <url>
     <loc>https://monkeytactics.com/tools/password-generator</loc>
     <lastmod>2026-07-24</lastmod>
+  </url>
+  <url>
+    <loc>https://monkeytactics.com/tools/ocr-utility</loc>
+    <lastmod>2026-07-26</lastmod>
   </url>
   <url>
     <loc>https://monkeytactics.com/tools/percentage-calculator</loc>
@@ -86,7 +122,7 @@
   </url>
   <url>
     <loc>https://monkeytactics.com/about</loc>
-    <lastmod>2026-07-24</lastmod>
+    <lastmod>2026-07-26</lastmod>
   </url>
   <url>
     <loc>https://monkeytactics.com/privacy/</loc>

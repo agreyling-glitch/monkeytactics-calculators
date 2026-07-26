@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!-- Concrete calculator -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Concrete Calculator &mdash; Slabs &amp; Fence Posts | MonkeyTactics</title>
+  <meta name="description" content="Calculate concrete for slabs or fence posts, including cubic yards, bag quantities, post depth, hole size, and total weight." />
+  <meta property="og:title" content="Concrete Calculator &mdash; Slabs &amp; Fence Posts" />
+  <meta property="og:description" content="Estimate concrete volume and bags for slabs, or calculate fence-post depth, hole size, and concrete per post." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://monkeytactics.com/tools/concrete-calculator" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Concrete Calculator","url":"https://monkeytactics.com/tools/concrete-calculator","applicationCategory":"ConstructionApplication","operatingSystem":"Any","isAccessibleForFree":true}</script>
+  <link rel="canonical" href="https://monkeytactics.com/tools/concrete-calculator" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260726-concrete-segments" />
+  <script src="/assets/js/ads.js" defer></script>
+  <script src="/assets/js/concrete-calculator.js?v=20260726-slab-payload" defer></script>
+</head>
+<body class="construction-calculator-page">
+<main>
+  <header>
+    <a href="/" class="brand"><img src="/assets/img/logo/monkeytactics-monkey-logo.png" alt="MonkeyTactics logo" class="brand-logo" width="383" height="375" /><div><div class="brand-name">MonkeyTactics</div><div class="brand-tagline">Free Online Calculators &amp; Tools</div></div></a>
+    <nav aria-label="Primary navigation"><a href="/tools/">All Tools</a><a href="/tools/finance">Finance</a><a href="/tools/health">Health</a><a href="/tools/utilities">Utilities</a><a href="/tools/productivity">Productivity</a><a href="/tools/construction" class="active">Construction</a></nav>
+  </header>
+
+  <section class="hero hero--inner">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">&rsaquo;</span><a href="/tools/construction">Construction</a><span class="sep">&rsaquo;</span><span>Concrete Calculator</span></nav>
+    <h1>Concrete Calculator</h1>
+    <p>Estimate concrete for a slab or size a durable concrete footing for a fence post.</p>
+  </section>
+
+  <div class="ad-container" aria-label="Advertisement"></div>
+
+  <section class="tool-widget" aria-labelledby="calc-heading">
+    <h2 id="calc-heading">Choose a concrete project</h2>
+    <div class="mode-tabs" role="tablist" aria-label="Concrete project type">
+      <button class="mode-tab active" id="tab-slab" data-mode="slab" type="button" role="tab" aria-selected="true" aria-controls="panel-slab">&#9638; Slab</button>
+      <button class="mode-tab" id="tab-fence" data-mode="fence" type="button" role="tab" aria-selected="false" aria-controls="panel-fence">&#9878; Fence Post</button>
+    </div>
+
+    <script type="application/json" id="concretePresetData">
+    [
+      {
+        "group": "Home / DIY",
+        "items": [
+          { "name": "Sidewalk Section", "dimensions": { "lengthFeet": 5, "widthFeet": 5 }, "depthInches": 4 },
+          { "name": "AC Unit Pad", "dimensions": { "lengthFeet": 3, "widthFeet": 3 }, "depthInches": 4 },
+          { "name": "Fire Pit Pad", "dimensions": { "lengthFeet": 6, "widthFeet": 6 }, "depthInches": 4 },
+          { "name": "Grill Pad", "dimensions": { "lengthFeet": 5, "widthFeet": 8 }, "depthInches": 4 },
+          { "name": "Step Pad", "dimensions": { "lengthFeet": 4, "widthFeet": 2 }, "depthInches": 6 },
+          { "name": "Mailbox Pad", "dimensions": { "lengthFeet": 2, "widthFeet": 2 }, "depthInches": 4 }
+        ]
+      },
+      {
+        "group": "Outdoor",
+        "items": [
+          { "name": "Small Patio", "dimensions": { "lengthFeet": 10, "widthFeet": 10 }, "depthInches": 4 },
+          { "name": "Large Patio", "dimensions": { "lengthFeet": 16, "widthFeet": 12 }, "depthInches": 4 },
+          { "name": "Garden Shed Pad", "dimensions": { "lengthFeet": 12, "widthFeet": 12 }, "depthInches": 4 },
+          { "name": "Hot Tub Pad", "dimensions": { "lengthFeet": 8, "widthFeet": 8 }, "depthInches": 6 }
+        ]
+      },
+      {
+        "group": "Construction / Pro",
+        "items": [
+          { "name": "Driveway Panel (Standard)", "dimensions": { "lengthFeet": 10, "widthFeet": 10 }, "depthInches": 5 },
+          { "name": "Driveway Panel (Heavy Duty)", "dimensions": { "lengthFeet": 10, "widthFeet": 10 }, "depthInches": 6 },
+          { "name": "Garage Slab (Single Stall)", "dimensions": { "lengthFeet": 12, "widthFeet": 20 }, "depthInches": 4 },
+          { "name": "Garage Slab (Double Stall)", "dimensions": { "lengthFeet": 24, "widthFeet": 20 }, "depthInches": 4 },
+          { "name": "Dumpster Pad", "dimensions": { "lengthFeet": 10, "widthFeet": 10 }, "depthInches": 6 }
+        ]
+      }
+    ]
+    </script>
+
+    <script type="application/json" id="fencePresetData">
+    [
+      { "name": "Fence Post (Above Frost Line)", "heightFeet": 6, "postType": "wood4", "frostLineInches": 0, "description": "6 ft wood 4x4, no frost adjustment" },
+      { "name": "Northern US", "heightFeet": 6, "postType": "wood4", "frostLineInches": 42, "description": "6 ft wood 4x4, 42 in frost line" },
+      { "name": "Central US", "heightFeet": 6, "postType": "wood4", "frostLineInches": 30, "description": "6 ft wood 4x4, 30 in frost line" },
+      { "name": "Southern US", "heightFeet": 6, "postType": "wood4", "frostLineInches": 18, "description": "6 ft wood 4x4, 18 in frost line" }
+    ]
+    </script>
+
+    <div class="mode-panel active" id="panel-slab" role="tabpanel" aria-labelledby="tab-slab">
+      <details class="preset-panel" open>
+        <summary class="preset-label">Common slab presets</summary>
+        <div class="preset-groups" id="presetGroups"></div>
+      </details>
+      <div class="calc-layout">
+        <div class="inputs-col">
+          <div class="input-row">
+            <div class="input-group"><label for="length">Length (feet)</label><input id="length" type="number" min="0" step="0.01" placeholder="e.g. 12" /></div>
+            <div class="input-group"><label for="width">Width (feet)</label><input id="width" type="number" min="0" step="0.01" placeholder="e.g. 10" /></div>
+          </div>
+          <div class="input-group">
+            <label for="depth">Depth (inches)<span class="live-val" id="depthVal">4 in</span></label>
+            <input id="depthSlider" type="range" min="1" max="12" step="0.25" value="4" aria-label="Concrete depth slider" />
+            <input id="depth" type="number" min="0.01" step="0.01" value="4" aria-label="Concrete depth in inches" />
+            <p class="input-hint">Move the slider from 1 to 12 inches or enter an exact depth.</p>
+          </div>
+          <div class="input-group">
+            <label for="slabBagWeight">Concrete bag weight (lb)</label>
+            <input id="slabBagWeight" type="number" min="1" step="1" value="60" />
+            <p class="input-hint">Default: 60 lb. Confirm the concrete yield printed on the bag.</p>
+          </div>
+          <div class="input-group">
+            <label for="slabVehiclePayload">Vehicle payload capacity (lb)</label>
+            <input id="slabVehiclePayload" type="number" min="0" step="1" value="0" />
+            <p class="input-hint">Optional: enter 0 to skip the trip estimate. Otherwise, use the available payload after accounting for passengers, tools, and other cargo.</p>
+          </div>
+          <div class="calc-error" id="calcError" role="alert">Enter valid slab dimensions, a bag weight greater than zero, and either 0 or a vehicle payload that can carry at least one bag.</div>
+          <button class="btn-calculate" id="calcBtn" type="button">Calculate Slab Concrete</button>
+        </div>
+        <div class="results-col">
+          <div class="results-empty" id="resultsEmpty"><span class="empty-icon" aria-hidden="true">&#9638;</span><strong>Your results will appear here</strong><p>Enter the slab dimensions and click Calculate.</p></div>
+          <div class="results-panel" id="resultsPanel" aria-live="polite">
+            <h3>Results</h3>
+            <div class="results-grid">
+              <div class="result-card primary"><div class="result-label">Concrete volume</div><div class="result-value" id="cubicYards">&mdash;</div><div class="result-sub">cubic yards</div></div>
+              <div class="result-card"><div class="result-label" id="slabBagLabel"># bags needed (60 lb)</div><div class="result-value" id="slabBags">&mdash;</div><div class="result-sub" id="slabBagDetails">&mdash;</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mode-panel" id="panel-fence" role="tabpanel" aria-labelledby="tab-fence" hidden>
+      <details class="preset-panel" open>
+        <summary class="preset-label">Fence post presets</summary>
+        <div class="fence-presets" id="fencePresetGroups"></div>
+      </details>
+      <div class="calc-layout">
+        <div class="inputs-col">
+          <div class="input-group">
+            <label for="postCount">Number of posts<span class="live-val" id="postCountVal">1 post</span></label>
+            <input id="postCountSlider" type="range" min="1" max="100" step="1" value="1" aria-label="Number of fence posts slider" />
+            <input id="postCount" type="number" min="1" step="1" value="1" />
+            <p class="input-hint">Use the slider for 1 to 100 posts or enter a larger whole number.</p>
+          </div>
+          <div class="input-group">
+            <label for="fenceHeight">Finished fence height (feet)</label>
+            <input id="fenceHeight" type="number" min="1" max="16" step="0.25" value="6" />
+            <p class="input-hint">Enter the height that will remain above ground.</p>
+          </div>
+          <div class="input-group">
+            <label for="postType">Post type</label>
+            <select id="postType">
+              <option value="wood4">Wood 4&times;4 (3.5 in actual)</option>
+              <option value="wood6">Wood 6&times;6 (5.5 in actual)</option>
+              <option value="steel238">Steel 2&#8540; in round (chain link)</option>
+              <option value="steel3">Steel 3 in round</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="frostLine">Local frost line (inches)</label>
+            <input id="frostLine" type="number" min="0" max="120" step="1" value="0" />
+            <p class="input-hint">Enter 0 if none.</p>
+          </div>
+          <div class="input-group">
+            <label for="bagWeight">Concrete bag weight (lb)</label>
+            <input id="bagWeight" type="number" min="1" step="1" value="60" />
+            <p class="input-hint">Default: 60 lb. Confirm the concrete yield printed on the bag.</p>
+          </div>
+          <div class="input-group">
+            <label for="vehiclePayload">Vehicle payload capacity (lb)</label>
+            <input id="vehiclePayload" type="number" min="0" step="1" value="0" />
+            <p class="input-hint">Optional: enter 0 to skip the trip estimate. Otherwise, use the available payload after accounting for passengers, tools, and other cargo.</p>
+          </div>
+          <div class="calc-error" id="fenceError" role="alert">Enter a valid fence height, a whole number of posts, a frost line of zero or more, a bag weight greater than zero, and either 0 or a vehicle payload that can carry at least one bag.</div>
+          <button class="btn-calculate" id="fenceCalcBtn" type="button">Calculate Fence Posts</button>
+        </div>
+        <div class="results-col">
+          <div class="results-empty" id="fenceResultsEmpty"><span class="empty-icon" aria-hidden="true">&#9878;</span><strong>Your results will appear here</strong><p>Enter the fence details and click Calculate.</p></div>
+          <div class="results-panel" id="fenceResultsPanel" aria-live="polite">
+            <h3>Post footing</h3>
+            <div class="results-grid">
+              <div class="result-card primary"><div class="result-label">Set depth</div><div class="result-value" id="fenceSetDepth">&mdash;</div><div class="result-sub" id="fenceDepthRule">&mdash;</div></div>
+              <div class="result-card"><div class="result-label">Hole diameter</div><div class="result-value" id="fenceHoleDiameter">&mdash;</div><div class="result-sub" id="fenceHoleRule">&mdash;</div></div>
+              <div class="result-card"><div class="result-label">Post length</div><div class="result-value" id="fencePostLength">&mdash;</div><div class="result-sub">next common stock length</div></div>
+            </div>
+            <h3 class="weight-heading">Concrete for all posts</h3>
+            <div class="results-grid">
+              <div class="result-card"><div class="result-label">Total concrete volume</div><div class="result-value" id="fenceConcreteVolume">&mdash;</div><div class="result-sub" id="fenceConcreteBreakdown">&mdash;</div></div>
+              <div class="result-card"><div class="result-label" id="fenceBagLabel"># bags needed (60 lb)</div><div class="result-value" id="fenceBags">&mdash;</div><div class="result-sub" id="fenceWeight">&mdash;</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="assumption-note">Bag counts are rounded up to whole bags. Fence-post results use a 6-inch gravel base below the set post; concrete volume excludes that gravel layer and subtracts the post displacement. Always verify local code, soil, wind, and product yield requirements.</p>
+
+  <section class="seo-section" aria-labelledby="how-to-heading">
+    <h2 id="how-to-heading">How to use the Concrete Calculator</h2>
+    <p>Choose <strong>Slab</strong> for a rectangular pour, then enter its length, width, and finished depth. Choose <strong>Fence Post</strong> to enter the finished fence height, number of posts, post type, and local frost line. In either mode, enter the concrete bag weight and optionally enter available vehicle payload to estimate the number of trips.</p>
+    <p>Bag quantities are rounded up because concrete mix is sold in whole bags. Weight results can help with delivery and vehicle load planning.</p>
+  </section>
+
+  <section class="seo-section" aria-labelledby="formula-heading">
+    <h2 id="formula-heading">How are concrete and fence-post depth calculated?</h2>
+    <p><strong>Slabs:</strong> The calculator converts the entered depth from inches to feet, multiplies length &times; width &times; depth, and converts cubic feet to cubic yards. Bag estimates divide that volume by the selected bag yield and round up to the next whole bag.</p>
+    <p><strong>Fence posts:</strong> The structural baseline is <strong>depth = (&#189; &times; finished fence height) &minus; 6 inches</strong>, limited to a 24-inch minimum and a 48-inch maximum. This wood-post rule is found in official specifications based on <a href="https://store.astm.org/f0537-01r19.html">ASTM F537</a>. The calculator then compares that result with the local frost line plus 6 inches and uses whichever depth is greater.</p>
+    <p><strong>Frost Line Reference</strong><br />Northern US: 36&ndash;48&quot; | Central US: 24&ndash;36&quot; | Southern US: 12&ndash;24&quot;. Check local codes for exact requirements.</p>
+    <p>For chain-link post selections, the estimate assumes the steel post is set in concrete. <a href="https://store.astm.org/f0567-23.html">ASTM F567</a> covers chain-link fence installation, including post setting, but it should not be read as the source of the wood-post depth equation above. The calculator uses the selected post dimensions to estimate a cylindrical hole, then subtracts the volume displaced by the buried post.</p>
+    <div class="formula-block" role="img" aria-label="Concrete volume, fence post depth, and vehicle trip formulas">Slab cubic feet = length &times; width &times; (depth &divide; 12)<br />Structural post depth = (fence height &divide; 2) &minus; 6 in, minimum 24 in, maximum 48 in<br />Set depth = deeper of structural depth or frost line + 6 in<br />Concrete per post = cylindrical hole volume &minus; buried post volume<br />Total post concrete = concrete per post &times; number of posts<br />Bags per trip = whole bags that fit within available payload<br />Trips = bags needed &divide; bags per trip, rounded up</div>
+    <p><strong>Loose or sandy soil:</strong> The calculator does not automatically adjust for soil type. Such conditions can require a deeper and wider footing; move up at least one practical hole size and confirm the final dimensions with local code, the fence manufacturer, or a qualified professional. Soil, wind exposure, gates, corners, privacy slats, and frost can all increase footing requirements.</p>
+    <p>Bag yield is estimated at 0.0075 cubic feet per pound, equivalent to 0.45 cubic feet for a 60 lb bag or 0.60 cubic feet for an 80 lb bag. The selected bag weight is used to estimate yield and total dry mix weight. When payload is greater than zero, trip estimates divide available vehicle payload by bag weight, round down to whole bags per trip, then round the required number of trips up. A payload of 0 skips the trip estimate. Confirm the yield printed on your product and never exceed the vehicle manufacturer's payload rating.</p>
+  </section>
+
+  <section class="faq-section" aria-labelledby="faq-heading">
+    <details>
+      <summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Frequently Asked Questions</h2></summary>
+      <div class="faq-content"><ul class="faq-list">
+        <li class="faq-item"><h3>How deep should a fence post be?</h3><p>The calculator uses half the finished fence height minus 6 inches, with a 24-inch minimum and 48-inch structural maximum, then goes deeper when needed to reach 6 inches below the local frost line.</p></li>
+        <li class="faq-item"><h3>How many concrete bags are in one cubic yard?</h3><p>One cubic yard is about 60 standard 60 lb bags or 45 standard 80 lb bags, based on the yields used by this calculator.</p></li>
+        <li class="faq-item"><h3>Should I order extra concrete?</h3><p>Many projects add 5% to 10% for uneven excavation, spillage, and measurement variation. This calculator reports the measured volume without an automatic waste factor.</p></li>
+        <li class="faq-item"><h3>Does the weight include water?</h3><p>No. Bag weights represent dry concrete mix. Water added during mixing increases the working weight.</p></li>
+      </ul></div>
+    </details>
+  </section>
+
+  <section class="related-tools-section" aria-labelledby="related-heading">
+    <h2 id="related-heading">Related Construction Tools</h2>
+    <div class="related-grid">
+      <a href="/tools/lumber-board-foot-calculator" class="related-card"><strong>Lumber Board Foot Calculator</strong><span>Estimate lumber volume and weight.</span></a>
+      <a href="/tools/tile-calculator" class="related-card"><strong>Tile Calculator</strong><span>Estimate tiles, boxes, waste, and weight.</span></a>
+      <a href="/tools/roofing-shingle-calculator" class="related-card"><strong>Roofing Shingle Calculator</strong><span>Estimate roofing squares and bundles.</span></a>
+    </div>
+  </section>
+
+  <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Bottom Display Ad --></div>
+</main>
+<footer><div>&copy; 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="/about">About</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a><a href="/third-party-notices">Third-Party Notices</a></nav></footer>
+</body>
+</html>

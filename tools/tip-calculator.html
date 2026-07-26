@@ -58,7 +58,7 @@
       {
         "@type": "Question",
         "name": "Should I tip on the pre-tax or post-tax amount?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The most common practice is to tip on the pre-tax subtotal, since sales tax is not part of the service you received. Some people tip on the post-tax total for simplicity. This calculator uses the bill amount you enter, so enter whichever figure you prefer to tip on." }
+        "acceptedAnswer": { "@type": "Answer", "text": "The most common practice is to tip on the pre-tax subtotal, since sales tax is not part of the service you received. Enter the tax rate and this calculator automatically derives the pre-tax subtotal, then lets you choose whether to calculate the tip on the pre-tax or post-tax amount." }
       }
     ]
   }
@@ -189,6 +189,83 @@
       border-color: rgba(34,197,94,0.4);
       color: var(--accent);
     }
+
+    /* Smart rounding adjustments */
+    .smart-adjustments {
+      margin-top: 0.25rem;
+      padding: 0.9rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+    }
+    .smart-adjustments h3 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    .smart-adjustments > p {
+      margin: 0.25rem 0 0.75rem;
+      font-size: 0.775rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .adjustment-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.45rem 0;
+    }
+    .adjustment-row + .adjustment-row {
+      border-top: 1px solid rgba(148,163,184,0.12);
+    }
+    .adjustment-label {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .round-toggle {
+      display: inline-flex;
+      flex: 0 0 auto;
+      padding: 2px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(2,6,23,0.35);
+    }
+    .round-option {
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.32rem 0.55rem;
+      cursor: pointer;
+    }
+    .round-option:hover { color: var(--text); }
+    .round-option.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.25);
+    }
+    .tax-panel {
+      padding: 0.85rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+    }
+    .tax-summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin: 0.6rem 0 0 !important;
+      padding-top: 0.6rem;
+      border-top: 1px solid rgba(148,163,184,0.12);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .tax-summary strong { color: var(--accent); }
 
     /* ── Calculate button ── */
     .btn-calculate {
@@ -433,6 +510,7 @@
         <a href="/tools/health">Health</a>
         <a href="/tools/utilities" class="active">Utilities</a>
         <a href="/tools/productivity">Productivity</a>
+        <a href="/tools/construction">Construction</a>
       </nav>
     </header>
 
@@ -466,7 +544,7 @@
             <!-- Bill Amount -->
             <div class="input-group">
               <label for="billAmount">
-                Bill Amount
+                Bill Amount (including tax)
                 <span class="live-val" id="billAmountVal">$50.00</span>
               </label>
               <input type="range" id="billAmountSlider"
@@ -475,7 +553,34 @@
               <input type="number" id="billAmount"
                      min="0" max="999999" step="0.01" value="50"
                      aria-label="Bill amount in dollars" />
-              <p class="input-hint">The pre-tip bill subtotal (works with any currency).</p>
+              <p class="input-hint">The amount on the check before adding your tip.</p>
+            </div>
+
+            <!-- Tax-aware tipping -->
+            <div class="input-group tax-panel">
+              <label for="taxRate">
+                Local sales tax rate (%)
+                <span class="live-val" id="taxRateVal">0%</span>
+              </label>
+              <input type="range" id="taxRateSlider"
+                     min="0" max="20" step="0.1" value="0"
+                     aria-label="Tax rate slider" />
+              <input type="number" id="taxRate"
+                     min="0" max="100" step="0.01" value="0"
+                     aria-label="Tax rate percentage" />
+
+              <p class="tax-summary" aria-live="polite">
+                <span>Pre-tax subtotal</span>
+                <strong id="preTaxSubtotal">$50.00</strong>
+              </p>
+
+              <div class="adjustment-row">
+                <span class="adjustment-label" id="tip-basis-label">Calculate tip on</span>
+                <div class="round-toggle tip-basis-toggle" role="group" aria-labelledby="tip-basis-label">
+                  <button type="button" class="round-option active" data-basis="pre" aria-pressed="true">Pre-tax</button>
+                  <button type="button" class="round-option" data-basis="post" aria-pressed="false">Post-tax</button>
+                </div>
+              </div>
             </div>
 
             <!-- Tip Percentage -->
@@ -515,10 +620,42 @@
               <p class="input-hint">Number of people sharing the bill.</p>
             </div>
 
+            <div class="smart-adjustments" aria-labelledby="adjustments-heading">
+              <h3 id="adjustments-heading">Smart Adjustments</h3>
+              <p>Optionally round to whole currency units. Adjustments run from top to bottom.</p>
+
+              <div class="adjustment-row">
+                <span class="adjustment-label" id="round-tip-label">Round tip amount</span>
+                <div class="round-toggle" role="group" aria-labelledby="round-tip-label" data-adjustment="tip">
+                  <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
+                  <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
+                  <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
+                </div>
+              </div>
+
+              <div class="adjustment-row">
+                <span class="adjustment-label" id="round-total-label">Round total bill</span>
+                <div class="round-toggle" role="group" aria-labelledby="round-total-label" data-adjustment="total">
+                  <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
+                  <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
+                  <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
+                </div>
+              </div>
+
+              <div class="adjustment-row">
+                <span class="adjustment-label" id="round-split-label">Round per-person split</span>
+                <div class="round-toggle" role="group" aria-labelledby="round-split-label" data-adjustment="split">
+                  <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
+                  <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
+                  <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
+                </div>
+              </div>
+            </div>
+
             <!-- Error -->
             <div class="calc-error" id="calcError" role="alert">
-              ⚠️ Please enter valid values — the bill must be $0 or more, the tip between 0% and 100%,
-              and at least 1 person sharing.
+              ⚠️ Please enter valid values — the bill must be 0 or more, tax and tip must be between
+              0% and 100%, and at least 1 person must be sharing.
             </div>
 
             <button class="btn-calculate" id="calcBtn" type="button">
@@ -581,25 +718,27 @@
     <!-- HOW TO USE -->
     <div class="seo-section">
       <h2>How to use the Tip Calculator</h2>
-      <p>Enter three values: the <strong>bill amount</strong> (the pre-tip subtotal on your check),
-         the <strong>tip percentage</strong> you want to leave, and the <strong>number of people</strong>
-         splitting the bill. Use the sliders for quick adjustments, tap a preset chip for common tip
-         percentages, or type an exact value into the number fields.</p>
+      <p>Enter the <strong>bill amount</strong> shown on your check, its <strong>tax rate</strong>, the
+         <strong>tip percentage</strong> you want to leave, and the <strong>number of people</strong>
+         splitting the bill. The calculator derives the pre-tax subtotal automatically. Choose
+         <strong>Pre-tax</strong> or <strong>Post-tax</strong> to control which amount the tip uses.</p>
       <p>Click <strong>Calculate Tip</strong> to instantly see how much each person pays, the grand total
          including tip, and the tip amount on its own. The breakdown bar shows how much of the total is
-         the bill versus the tip.</p>
+         the bill versus the tip. Smart Adjustments can round the tip, total, or per-person amount up or
+         down to a whole currency unit; when several are selected, they are applied from top to bottom.</p>
     </div>
 
     <!-- FORMULA -->
     <div class="seo-section">
       <h2>How is a tip calculated?</h2>
-      <p>A tip is the bill multiplied by the tip percentage, expressed as a decimal:</p>
+      <p>A tip is the selected pre-tax or post-tax base multiplied by the tip percentage:</p>
       <div class="formula-block" role="img" aria-label="Tip formula">
-        Tip = Bill × ( Tip% ÷ 100 )   ·   Total = Bill + Tip   ·   Per Person = Total ÷ People
+        Pre-tax = Bill ÷ ( 1 + Tax% ÷ 100 )<br />
+        Tip = Selected tip base × ( Tip% ÷ 100 )   ·   Total = Bill + Tip   ·   Per Person = Total ÷ People
       </div>
-      <p>For example, an 18% tip on an $85.50 bill:
-         <strong>85.50 × 0.18 = $15.39</strong> tip, for a total of <strong>$100.89</strong>.
-         Split between 4 people, that's <strong>$25.22</strong> each.</p>
+      <p>For example, an $85.50 bill with 8% tax has a pre-tax subtotal of <strong>$79.17</strong>.
+         An 18% pre-tax tip is <strong>$14.25</strong>, for a total of <strong>$99.75</strong>.
+         Choosing post-tax instead produces a <strong>$15.39</strong> tip.</p>
       <p>For a quick mental shortcut: 10% is just the bill with the decimal shifted one place left,
          20% is double that, and 15% is 10% plus half of 10%.</p>
     </div>
@@ -629,14 +768,15 @@
         <li class="faq-item">
           <h3>What if the split doesn't divide evenly?</h3>
           <p>The calculator rounds each amount to the cent. In practice, one person may pay a few cents
-             more or less to cover rounding — the per-person total shown is the mathematically even split.</p>
+             more or less to cover rounding. Use Smart Adjustments to round each person's share up or
+             down to a whole currency unit and automatically update the total and tip.</p>
         </li>
 
         <li class="faq-item">
           <h3>Should I tip before or after tax?</h3>
           <p>The most common practice is to tip on the pre-tax subtotal, since sales tax isn't part of
-             the service you received. Some people tip on the post-tax total for simplicity. This
-             calculator uses whichever bill amount you enter.</p>
+             the service you received. Some people tip on the post-tax total for simplicity. Enter your
+             tax rate and use the Pre-tax / Post-tax control to choose either method.</p>
         </li>
 
         <li class="faq-item">
@@ -695,6 +835,7 @@
       <a href="/terms-of-service">Terms</a>
       <a href="/contact">Contact</a>
       <a href="/sitemap">Sitemap</a>
+      <a href="/third-party-notices">Third-Party Notices</a>
     </nav>
   </footer>
 
@@ -706,6 +847,11 @@
   const billAmountInput    = document.getElementById('billAmount');
   const billAmountSlider   = document.getElementById('billAmountSlider');
   const billAmountVal      = document.getElementById('billAmountVal');
+  const taxRateInput       = document.getElementById('taxRate');
+  const taxRateSlider      = document.getElementById('taxRateSlider');
+  const taxRateVal         = document.getElementById('taxRateVal');
+  const preTaxSubtotal     = document.getElementById('preTaxSubtotal');
+  const tipBasisToggle     = document.querySelector('.tip-basis-toggle');
   const tipPctInput        = document.getElementById('tipPct');
   const tipPctSlider       = document.getElementById('tipPctSlider');
   const tipPctVal          = document.getElementById('tipPctVal');
@@ -713,6 +859,7 @@
   const splitCountSlider   = document.getElementById('splitCountSlider');
   const splitCountVal      = document.getElementById('splitCountVal');
   const tipPresets         = document.querySelectorAll('.tip-preset');
+  const roundToggles       = document.querySelectorAll('.round-toggle[data-adjustment]');
   const calcBtn            = document.getElementById('calcBtn');
   const calcError          = document.getElementById('calcError');
   const resultsEmpty       = document.getElementById('resultsEmpty');
@@ -733,6 +880,19 @@
     return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
+  function calculatePreTax(bill, taxRate) {
+    return money(bill / (1 + taxRate / 100));
+  }
+
+  function updateTaxPreview() {
+    const bill = parseFloat(billAmountInput.value);
+    const taxRate = parseFloat(taxRateInput.value);
+    preTaxSubtotal.textContent = !isNaN(bill) && !isNaN(taxRate) &&
+      bill >= 0 && taxRate >= 0 && taxRate <= 100
+      ? fmtCurrency(calculatePreTax(bill, taxRate))
+      : '—';
+  }
+
   /* ── Slider <-> Input sync ── */
   function syncSliderToInput(slider, input, displayEl, formatter) {
     slider.addEventListener('input', function () {
@@ -751,6 +911,8 @@
 
   syncSliderToInput(billAmountSlider, billAmountInput, billAmountVal,
     function(v) { return '$' + v.toFixed(2); });
+  syncSliderToInput(taxRateSlider, taxRateInput, taxRateVal,
+    function(v) { return v.toFixed(2).replace(/\.?0+$/, '') + '%'; });
   syncSliderToInput(tipPctSlider, tipPctInput, tipPctVal,
     function(v) { return Math.round(v) + '%'; });
   syncSliderToInput(splitCountSlider, splitCountInput, splitCountVal,
@@ -782,6 +944,23 @@
   }
   tipPctInput.addEventListener('input', clearPresetIfCustom);
   tipPctSlider.addEventListener('input', clearPresetIfCustom);
+  billAmountInput.addEventListener('input', updateTaxPreview);
+  billAmountSlider.addEventListener('input', updateTaxPreview);
+  taxRateInput.addEventListener('input', updateTaxPreview);
+  taxRateSlider.addEventListener('input', updateTaxPreview);
+
+  function getTipBasis() {
+    const active = tipBasisToggle.querySelector('.round-option.active');
+    return active ? active.dataset.basis : 'pre';
+  }
+
+  function setTipBasis(basis) {
+    tipBasisToggle.querySelectorAll('.round-option').forEach(function (option) {
+      const selected = option.dataset.basis === basis;
+      option.classList.toggle('active', selected);
+      option.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
+  }
 
   /* ══════════════════════════════════════════════════
      URL PARAMS — READ on page load
@@ -815,6 +994,28 @@
       }
     }
 
+    if (params.has('tax')) {
+      const v = parseFloat(params.get('tax'));
+      if (!isNaN(v) && v >= 0 && v <= 100) {
+        taxRateInput.value = v;
+        taxRateSlider.value = Math.min(v, parseFloat(taxRateSlider.max));
+        taxRateVal.textContent = v.toFixed(2).replace(/\.?0+$/, '') + '%';
+      }
+    }
+
+    if (params.get('tipOn') === 'post') {
+      setTipBasis('post');
+    }
+
+    ['tip', 'total', 'split'].forEach(function (name) {
+      const direction = params.get('round' + name.charAt(0).toUpperCase() + name.slice(1));
+      if (direction === 'up' || direction === 'down') {
+        setAdjustment(name, direction);
+      }
+    });
+
+    updateTaxPreview();
+
     // Auto-calculate if bill is present (the primary driver)
     if (params.has('bill')) {
       runCalculation();
@@ -827,8 +1028,17 @@
   function writeURLParams() {
     const params = new URLSearchParams();
     params.set('bill',  billAmountInput.value);
+    params.set('tax',   taxRateInput.value);
     params.set('pct',   tipPctInput.value);
     params.set('split', splitCountInput.value);
+    params.set('tipOn', getTipBasis());
+    roundToggles.forEach(function (toggle) {
+      const direction = getAdjustment(toggle.dataset.adjustment);
+      if (direction !== 'off') {
+        params.set('round' + toggle.dataset.adjustment.charAt(0).toUpperCase() +
+          toggle.dataset.adjustment.slice(1), direction);
+      }
+    });
 
     const newURL = window.location.pathname + '?' + params.toString();
     history.replaceState(null, '', newURL);
@@ -837,12 +1047,76 @@
   /* ══════════════════════════════════════════════════
      CORE CALCULATION
   ══════════════════════════════════════════════════ */
-  function calcTip(bill, pct, split) {
-    const tipAmount = Math.round((bill * pct) / 100 * 100) / 100;
-    const total     = Math.round((bill + tipAmount) * 100) / 100;
-    const perPerson = Math.round((total / split) * 100) / 100;
-    const tipPerPerson = Math.round((tipAmount / split) * 100) / 100;
-    return { tipAmount, total, perPerson, tipPerPerson };
+  function money(n) {
+    return Math.round((n + Number.EPSILON) * 100) / 100;
+  }
+
+  function roundWhole(n, direction) {
+    return direction === 'up'
+      ? Math.ceil(n - Number.EPSILON)
+      : Math.floor(n + Number.EPSILON);
+  }
+
+  function getAdjustment(name) {
+    const active = document.querySelector(
+      '.round-toggle[data-adjustment="' + name + '"] .round-option.active'
+    );
+    return active ? active.dataset.direction : 'off';
+  }
+
+  function setAdjustment(name, direction) {
+    const toggle = document.querySelector('.round-toggle[data-adjustment="' + name + '"]');
+    if (!toggle) return;
+    toggle.querySelectorAll('.round-option').forEach(function (option) {
+      const selected = option.dataset.direction === direction;
+      option.classList.toggle('active', selected);
+      option.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
+  }
+
+  function calcTip(bill, taxRate, pct, split, tipBasis) {
+    const preTax = calculatePreTax(bill, taxRate);
+    const tipBase = tipBasis === 'pre' ? preTax : bill;
+    let tipAmount = money((tipBase * pct) / 100);
+    let total = money(bill + tipAmount);
+    const adjustments = [];
+
+    const tipDirection = getAdjustment('tip');
+    if (tipDirection !== 'off') {
+      tipAmount = money(roundWhole(tipAmount, tipDirection));
+      total = money(bill + tipAmount);
+      adjustments.push('tip rounded ' + tipDirection);
+    }
+
+    const totalDirection = getAdjustment('total');
+    if (totalDirection !== 'off') {
+      const roundedTotal = money(roundWhole(total, totalDirection));
+      if (roundedTotal >= bill) {
+        total = roundedTotal;
+        tipAmount = money(total - bill);
+        adjustments.push('total rounded ' + totalDirection);
+      } else {
+        adjustments.push('total kept at bill minimum');
+      }
+    }
+
+    let perPerson = money(total / split);
+    const splitDirection = getAdjustment('split');
+    if (splitDirection !== 'off') {
+      const roundedSplit = roundWhole(total / split, splitDirection);
+      const roundedSplitTotal = money(roundedSplit * split);
+      if (roundedSplitTotal >= bill) {
+        total = roundedSplitTotal;
+        tipAmount = money(total - bill);
+        perPerson = money(total / split);
+        adjustments.push('per-person split rounded ' + splitDirection);
+      } else {
+        adjustments.push('split kept at bill minimum');
+      }
+    }
+
+    const tipPerPerson = money(tipAmount / split);
+    return { tipAmount, total, perPerson, tipPerPerson, preTax, tipBase, adjustments };
   }
 
   /* ── Main calculate function ── */
@@ -851,18 +1125,20 @@
     resultsEmpty.style.display = 'none';
 
     const bill  = parseFloat(billAmountInput.value);
+    const taxRate = parseFloat(taxRateInput.value);
     const pct   = parseFloat(tipPctInput.value);
     const split = parseInt(splitCountInput.value, 10);
+    const tipBasis = getTipBasis();
 
-    if (isNaN(bill) || isNaN(pct) || isNaN(split) ||
-        bill < 0 || pct < 0 || pct > 100 || split < 1) {
+    if (isNaN(bill) || isNaN(taxRate) || isNaN(pct) || isNaN(split) ||
+        bill < 0 || taxRate < 0 || taxRate > 100 || pct < 0 || pct > 100 || split < 1) {
       calcError.style.display    = 'block';
       resultsEmpty.style.display = 'flex';
       resultsCards.style.display = 'none';
       return;
     }
 
-    const result = calcTip(bill, pct, split);
+    const result = calcTip(bill, taxRate, pct, split, tipBasis);
 
     /* Breakdown percentages (of the grand total) */
     const pctTipVal   = result.total > 0 ? (result.tipAmount / result.total) * 100 : 0;
@@ -874,10 +1150,16 @@
       : 'split between ' + split + ' people · ' + fmtCurrency(result.tipPerPerson) + ' tip each';
 
     resTotal.textContent     = fmtCurrency(result.total);
-    resTotalSub.textContent  = fmtCurrency(bill) + ' bill + ' + fmtCurrency(result.tipAmount) + ' tip';
+    resTotalSub.textContent  = fmtCurrency(bill) + ' bill (' + fmtCurrency(result.preTax) +
+      ' pre-tax) + ' + fmtCurrency(result.tipAmount) + ' tip' +
+      (result.adjustments.length ? ' · ' + result.adjustments.join(', ') : '');
 
     resTip.textContent    = fmtCurrency(result.tipAmount);
-    resTipSub.textContent = pct.toFixed(0) + '% of the bill';
+    const effectivePct = result.tipBase > 0 ? (result.tipAmount / result.tipBase) * 100 : 0;
+    const basisLabel = tipBasis === 'pre' ? 'pre-tax subtotal' : 'post-tax bill';
+    resTipSub.textContent = result.adjustments.length
+      ? pct.toFixed(0) + '% ' + basisLabel + ' target · ' + effectivePct.toFixed(1) + '% after adjustments'
+      : pct.toFixed(0) + '% of the ' + basisLabel;
 
     barBill.style.width = pctBillVal.toFixed(1) + '%';
     barTip.style.width  = pctTipVal.toFixed(1) + '%';
@@ -895,8 +1177,24 @@
   /* ── Button listeners ── */
   calcBtn.addEventListener('click', runCalculation);
 
+  tipBasisToggle.addEventListener('click', function (event) {
+    const option = event.target.closest('.round-option');
+    if (!option) return;
+    setTipBasis(option.dataset.basis);
+    if (resultsCards.style.display !== 'none') runCalculation();
+  });
+
+  roundToggles.forEach(function (toggle) {
+    toggle.addEventListener('click', function (event) {
+      const option = event.target.closest('.round-option');
+      if (!option) return;
+      setAdjustment(toggle.dataset.adjustment, option.dataset.direction);
+      if (resultsCards.style.display !== 'none') runCalculation();
+    });
+  });
+
   /* Enter key in any input triggers calculate */
-  [billAmountInput, tipPctInput, splitCountInput].forEach(function (el) {
+  [billAmountInput, taxRateInput, tipPctInput, splitCountInput].forEach(function (el) {
     el.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') { e.preventDefault(); runCalculation(); }
     });

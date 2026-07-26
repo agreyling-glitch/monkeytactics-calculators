@@ -7,14 +7,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>Free Productivity Tools: Password &amp; Word Counter</title>
+  <title>Free Productivity Tools: Password, OCR &amp; Word Counter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Free online productivity tools — generate strong random passwords and count words, characters, and sentences in any text. Fast, private, no sign-up required." />
+        content="Free online productivity tools — generate passwords, extract text from images with OCR, and count words and characters. Fast, private, no sign-up required." />
 
   <!-- Open Graph -->
   <meta property="og:title"       content="Free Productivity Tools — MonkeyTactics" />
-  <meta property="og:description" content="Password generator and word &amp; character counter. Free, private, runs entirely in your browser." />
+  <meta property="og:description" content="Generate passwords, extract text from images, and count words and characters. Free, private, and browser-based." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/productivity" />
 
@@ -84,7 +84,7 @@
   </style>
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-22" />
+  <meta name="date" content="2026-07-26" />
   <script src="/assets/js/web-vitals-rum.js" defer></script>
 
   <script type="application/ld+json">
@@ -114,6 +114,11 @@
             "@type": "ListItem",
             "position": 2,
             "url": "https://monkeytactics.com/tools/word-character-counter.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "url": "https://monkeytactics.com/tools/ocr-utility.html"
           }
         ]
       }
@@ -142,13 +147,14 @@
         <a href="/tools/health">Health</a>
         <a href="/tools/utilities">Utilities</a>
         <a href="/tools/productivity" class="active">Productivity</a>
+        <a href="/tools/construction">Construction</a>
       </nav>
     </header>
 
     <section class="hero hero--inner" aria-labelledby="productivity-heading">
       <h1 id="productivity-heading">Free Productivity Tools</h1>
-      <p>Two sharp tools to help you work smarter — generate uncrackable passwords and count
-         every word and character in your writing instantly.</p>
+      <p>Three sharp tools to help you work smarter — generate secure passwords, extract text
+         from images, and count every word and character in your writing.</p>
       <div class="hero-actions">
         <a href="/tools/password-generator" class="btn-primary">🔑 Try Password Generator</a>
         <a href="/tools/" class="btn-ghost">Browse all tools</a>
@@ -159,7 +165,7 @@
 
     <!-- TOOLS -->
     <section aria-labelledby="productivity-tools-heading">
-      <h2 id="productivity-tools-heading" style="margin-bottom:0.75rem;">⚡ Productivity Tools <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">2 tools</span></h2>
+      <h2 id="productivity-tools-heading" style="margin-bottom:0.75rem;">⚡ Productivity Tools <span style="font-size:0.75rem;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:0.15rem 0.55rem;font-weight:600;margin-left:0.5rem;">3 tools</span></h2>
       <div class="tools-grid">
 
         <a href="/tools/password-generator" class="tool-card">
@@ -182,6 +188,18 @@
             <span class="card-tag">Writing</span>
             <span class="card-tag">Words</span>
             <span class="card-tag">Characters</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+        <a href="/tools/ocr-utility" class="tool-card">
+          <span class="card-icon" aria-hidden="true">📄</span>
+          <strong>OCR Utility</strong>
+          <div>Extract editable text from PNG and JPG images with private, browser-based optical character recognition.</div>
+          <div class="card-tags">
+            <span class="card-tag">OCR</span>
+            <span class="card-tag">Image to Text</span>
+            <span class="card-tag">Private</span>
           </div>
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
@@ -244,6 +262,9 @@
       <p>Similarly, text you paste into the Word &amp; Character Counter never leaves your device.
          It is processed locally by JavaScript with zero server involvement, making it safe to use
          with sensitive documents, drafts, or confidential writing.</p>
+      <p>The OCR Utility also processes selected images locally. Tesseract.js and its English
+         language data run in your browser, so screenshots, scans, and extracted text are not
+         uploaded to MonkeyTactics.</p>
     </div>
 
     <!-- FAQ -->
@@ -307,6 +328,7 @@
       <a href="/terms-of-service">Terms</a>
       <a href="/contact">Contact</a>
       <a href="/sitemap">Sitemap</a>
+      <a href="/third-party-notices">Third-Party Notices</a>
     </nav>
   </footer>
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- Lumber board foot calculator -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lumber Board Foot Calculator &amp; Weight | MonkeyTactics</title>
+  <meta name="description" content="Calculate lumber board feet from thickness, width, and length, plus estimated weight in pounds and kilograms." />
+  <meta property="og:title" content="Lumber Board Foot Calculator &amp; Weight" /><meta property="og:description" content="Calculate lumber board feet and estimated dry-lumber weight." /><meta property="og:type" content="website" /><meta property="og:url" content="https://monkeytactics.com/tools/lumber-board-foot-calculator" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Lumber Board Foot Calculator","url":"https://monkeytactics.com/tools/lumber-board-foot-calculator","applicationCategory":"ConstructionApplication","operatingSystem":"Any","isAccessibleForFree":true}</script>
+  <link rel="canonical" href="https://monkeytactics.com/tools/lumber-board-foot-calculator" /><link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260726-seo" /><script src="/assets/js/lumber-board-foot-calculator.js" defer></script>
+</head>
+<body class="construction-calculator-page"><main>
+  <header><a href="/" class="brand"><img src="/assets/img/logo/monkeytactics-monkey-logo.png" alt="MonkeyTactics logo" class="brand-logo" width="383" height="375" /><div><div class="brand-name">MonkeyTactics</div><div class="brand-tagline">Free Online Calculators &amp; Tools</div></div></a><nav aria-label="Primary navigation"><a href="/tools/">All Tools</a><a href="/tools/finance">Finance</a><a href="/tools/health">Health</a><a href="/tools/utilities">Utilities</a><a href="/tools/productivity">Productivity</a><a href="/tools/construction" class="active">Construction</a></nav></header>
+  <section class="hero hero--inner"><nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">›</span><a href="/tools/construction">Construction</a><span class="sep">›</span><span>Lumber Board Foot Calculator</span></nav><h1>Lumber Board Foot Calculator</h1><p>Calculate board feet and an approximate dry-lumber weight from a board's nominal dimensions.</p></section>
+  <div class="ad-container" aria-label="Advertisement"></div>
+  <section class="tool-widget" aria-labelledby="calc-heading"><h2 id="calc-heading">Enter lumber dimensions</h2><div class="calc-layout"><div class="inputs-col">
+    <div class="input-row"><div class="input-group"><label for="thickness">Thickness (inches)</label><input id="thickness" type="number" min="0" step="0.01" placeholder="e.g. 2" /></div><div class="input-group"><label for="width">Width (inches)</label><input id="width" type="number" min="0" step="0.01" placeholder="e.g. 8" /></div></div>
+    <div class="input-group"><label for="length">Length (feet)</label><input id="length" type="number" min="0" step="0.01" placeholder="e.g. 10" /></div>
+    <div class="calc-error" id="calcError" role="alert">Please enter a number greater than zero for every dimension.</div><button class="btn-calculate" id="calcBtn" type="button">Calculate Board Feet</button></div><div class="results-col"><div class="results-empty" id="resultsEmpty"><span class="empty-icon" aria-hidden="true">🪵</span><strong>Your results will appear here</strong><p>Enter the lumber dimensions and click Calculate.</p></div>
+    <div class="results-panel" id="resultsPanel" aria-live="polite"><h3>Results</h3><div class="results-grid"><div class="result-card primary"><div class="result-label">Board feet</div><div class="result-value" id="boardFeet">—</div><div class="result-sub">for one board</div></div></div>
+      <h3 class="weight-heading">Total Weight</h3><div class="results-grid"><div class="result-card"><div class="result-label">Weight per unit</div><div class="result-value">3.0 lb</div><div class="result-sub">per board foot</div></div><div class="result-card"><div class="result-label">Estimated board weight</div><div class="result-value" id="weightLb">—</div><div class="result-sub" id="weightKg">—</div></div></div>
+    </div></div></div></div>
+  </section><p class="assumption-note">Weight uses 3.0 lb per board foot, a general estimate for dry construction lumber. Species and moisture content can change actual weight substantially.</p>
+  <section class="seo-section" aria-labelledby="how-to-heading"><h2 id="how-to-heading">How to use the Lumber Board Foot Calculator</h2><p>Enter the board’s thickness and width in inches and its length in feet. Click <strong>Calculate Board Feet</strong> to calculate lumber volume and estimated dry weight for one board.</p><p>Use nominal or actual dimensions consistently. Lumber invoices commonly use board feet, while finished dimensions may produce a smaller physical volume than nominal sizing.</p></section>
+  <section class="seo-section" aria-labelledby="formula-heading"><h2 id="formula-heading">How are board feet calculated?</h2><p>A board foot is a volume equal to a board 1 inch thick, 12 inches wide, and 1 foot long. The standard formula combines thickness, width, and length.</p><div class="formula-block" role="img" aria-label="Board foot formula">Board feet = thickness (in) × width (in) × length (ft) ÷ 12<br />Estimated weight = board feet × 3.0 lb</div><p>The weight calculation uses a general 3.0 lb per board foot estimate. Species, treatment, and moisture content can significantly change actual weight.</p></section>
+  <section class="faq-section" aria-labelledby="faq-heading"><details><summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Frequently Asked Questions</h2></summary><div class="faq-content"><ul class="faq-list">
+    <li class="faq-item"><h3>What is a board foot?</h3><p>A board foot is 144 cubic inches of lumber, equivalent to a piece 1 inch thick, 12 inches wide, and 12 inches long.</p></li>
+    <li class="faq-item"><h3>Should I use nominal or actual lumber size?</h3><p>Use the dimensions required by your supplier or estimate. Nominal dimensions are common for purchasing; actual dimensions are better for physical volume.</p></li>
+    <li class="faq-item"><h3>Why is lumber weight only an estimate?</h3><p>Wood density varies by species, grade, pressure treatment, and moisture. Wet or treated lumber may weigh substantially more than dry stock.</p></li>
+  </ul></div></details></section>
+  <section class="related-tools-section" aria-labelledby="related-heading"><h2 id="related-heading">Related Construction Tools</h2><div class="related-grid">
+    <a href="/tools/roofing-shingle-calculator" class="related-card"><strong>🏘️ Roofing Shingle Calculator</strong><span>Estimate roof squares and bundles.</span></a>
+    <a href="/tools/drywall-calculator" class="related-card"><strong>🏠 Drywall Calculator</strong><span>Estimate room wall sheets.</span></a>
+    <a href="/tools/concrete-calculator" class="related-card"><strong>🧱 Concrete Calculator</strong><span>Estimate slab concrete and weight.</span></a>
+  </div></section>
+  <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Bottom Display Ad --></div>
+</main><footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="/about">About</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a><a href="/third-party-notices">Third-Party Notices</a></nav></footer></body></html>

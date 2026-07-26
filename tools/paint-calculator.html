@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!-- Paint calculator -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paint Calculator — Area, Gallons &amp; Weight | MonkeyTactics</title>
+  <meta name="description" content="Calculate wall square footage, gallons of paint needed, and total paint weight for one or more coats." />
+  <meta property="og:title" content="Paint Calculator — Area, Gallons &amp; Weight" /><meta property="og:description" content="Estimate coated wall area, gallons to buy, and total paint weight." /><meta property="og:type" content="website" /><meta property="og:url" content="https://monkeytactics.com/tools/paint-calculator" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Paint Calculator","url":"https://monkeytactics.com/tools/paint-calculator","applicationCategory":"ConstructionApplication","operatingSystem":"Any","isAccessibleForFree":true}</script>
+  <link rel="canonical" href="https://monkeytactics.com/tools/paint-calculator" /><link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260726-seo" /><script src="/assets/js/paint-calculator.js" defer></script>
+</head>
+<body class="construction-calculator-page"><main>
+  <header><a href="/" class="brand"><img src="/assets/img/logo/monkeytactics-monkey-logo.png" alt="MonkeyTactics logo" class="brand-logo" width="383" height="375" /><div><div class="brand-name">MonkeyTactics</div><div class="brand-tagline">Free Online Calculators &amp; Tools</div></div></a><nav aria-label="Primary navigation"><a href="/tools/">All Tools</a><a href="/tools/finance">Finance</a><a href="/tools/health">Health</a><a href="/tools/utilities">Utilities</a><a href="/tools/productivity">Productivity</a><a href="/tools/construction" class="active">Construction</a></nav></header>
+  <section class="hero hero--inner"><nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">›</span><a href="/tools/construction">Construction</a><span class="sep">›</span><span>Paint Calculator</span></nav><h1>Paint Calculator</h1><p>Estimate coated wall area, whole gallons, and the weight of paint required for your project.</p></section>
+  <div class="ad-container" aria-label="Advertisement"></div>
+  <section class="tool-widget" aria-labelledby="calc-heading"><h2 id="calc-heading">Enter wall dimensions</h2><div class="calc-layout"><div class="inputs-col">
+    <div class="input-row"><div class="input-group"><label for="length">Total wall length (feet)</label><input id="length" type="number" min="0" step="0.01" placeholder="e.g. 40" /></div><div class="input-group"><label for="height">Wall height (feet)</label><input id="height" type="number" min="0" step="0.01" placeholder="e.g. 8" /></div></div>
+    <div class="input-group"><label for="coats">Number of coats</label><input id="coats" type="number" min="1" step="1" placeholder="e.g. 2" /></div>
+    <div class="calc-error" id="calcError" role="alert">Enter positive wall dimensions and a whole number of coats.</div><button class="btn-calculate" id="calcBtn" type="button">Calculate Paint</button></div><div class="results-col"><div class="results-empty" id="resultsEmpty"><span class="empty-icon" aria-hidden="true">🎨</span><strong>Your results will appear here</strong><p>Enter the wall details and click Calculate.</p></div>
+    <div class="results-panel" id="resultsPanel" aria-live="polite"><h3>Results</h3><div class="results-grid">
+      <div class="result-card primary"><div class="result-label">Total coated area</div><div class="result-value" id="area">—</div><div class="result-sub">square feet, all coats</div></div>
+      <div class="result-card"><div class="result-label">Paint needed</div><div class="result-value" id="gallonsExact">—</div><div class="result-sub">calculated gallons</div></div>
+      <div class="result-card"><div class="result-label">Buy</div><div class="result-value" id="gallonsBuy">—</div><div class="result-sub">whole gallon cans</div></div>
+    </div><h3 class="weight-heading">Total Weight</h3><div class="results-grid"><div class="result-card"><div class="result-label">Weight per unit</div><div class="result-value">11.5 lb</div><div class="result-sub">per gallon</div></div><div class="result-card"><div class="result-label">Total paint weight</div><div class="result-value" id="weightLb">—</div><div class="result-sub" id="weightKg">—</div></div></div></div></div></div></div>
+  </section><p class="assumption-note">Based on 350 square feet of coverage and 11.5 lb per gallon of interior latex paint. Doors, windows, surface texture, and application method can change actual coverage.</p>
+  <section class="seo-section" aria-labelledby="how-to-heading"><h2 id="how-to-heading">How to use the Paint Calculator</h2><p>Add together the lengths of every wall you plan to paint and enter that total in feet. Enter the wall height and number of coats, then click <strong>Calculate Paint</strong>.</p><p>The result shows total coated square footage, exact calculated gallons, and the whole-gallon quantity to purchase. Total weight uses the rounded purchase quantity.</p></section>
+  <section class="seo-section" aria-labelledby="formula-heading"><h2 id="formula-heading">How is paint quantity calculated?</h2><p>Wall area is multiplied by the number of coats, then divided by an assumed coverage rate of 350 square feet per gallon.</p><div class="formula-block" role="img" aria-label="Paint coverage formula">Coated area = wall length × wall height × coats<br />Gallons = coated area ÷ 350<br />Whole gallons to buy = round up(gallons)</div><p>Actual coverage depends on paint type, color change, surface porosity, texture, and application method.</p></section>
+  <section class="faq-section" aria-labelledby="faq-heading"><details><summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Frequently Asked Questions</h2></summary><div class="faq-content"><ul class="faq-list">
+    <li class="faq-item"><h3>How much area does one gallon of paint cover?</h3><p>A typical gallon of interior latex paint covers about 350 to 400 square feet for one coat. This calculator uses 350 square feet for a conservative estimate.</p></li>
+    <li class="faq-item"><h3>Should I subtract doors and windows?</h3><p>You can subtract large openings, but leaving standard doors and windows in the area provides extra paint for touch-ups and coverage variation.</p></li>
+    <li class="faq-item"><h3>Do dark color changes require more paint?</h3><p>They can. Dramatic color changes, unprimed drywall, and porous surfaces may need primer or an additional coat beyond the estimate.</p></li>
+  </ul></div></details></section>
+  <section class="related-tools-section" aria-labelledby="related-heading"><h2 id="related-heading">Related Construction Tools</h2><div class="related-grid">
+    <a href="/tools/drywall-calculator" class="related-card"><strong>🏠 Drywall Calculator</strong><span>Estimate wall sheets and total weight.</span></a>
+    <a href="/tools/tile-calculator" class="related-card"><strong>◫ Tile Calculator</strong><span>Estimate tile coverage and boxes.</span></a>
+    <a href="/tools/insulation-calculator" class="related-card"><strong>🧰 Insulation Calculator</strong><span>Estimate rolls or packs by wall area.</span></a>
+  </div></section>
+  <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Bottom Display Ad --></div>
+</main><footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="/about">About</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a><a href="/third-party-notices">Third-Party Notices</a></nav></footer></body></html>

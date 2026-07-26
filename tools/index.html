@@ -10,11 +10,11 @@
   <title>All Tools — MonkeyTactics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Browse all free online calculators and tools on MonkeyTactics — finance, health, utilities, and productivity tools that run privately in your browser." />
+        content="Browse all free online calculators and tools on MonkeyTactics — finance, health, utilities, productivity, and construction tools that run privately in your browser." />
 
   <!-- Open Graph -->
   <meta property="og:title"       content="All Tools — MonkeyTactics" />
-  <meta property="og:description" content="Browse every free calculator and tool on MonkeyTactics. Finance, health, utilities, and productivity — all private, all free." />
+  <meta property="og:description" content="Browse every free calculator and tool on MonkeyTactics. Finance, health, utilities, productivity, and construction — all private and free." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/" />
 
@@ -247,7 +247,7 @@
   </style>
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-22" />
+  <meta name="date" content="2026-07-26" />
   <script src="/assets/js/web-vitals-rum.js" defer></script>
 </head>
 
@@ -272,6 +272,7 @@
         <a href="/tools/health">Health</a>
         <a href="/tools/utilities">Utilities</a>
         <a href="/tools/productivity">Productivity</a>
+        <a href="/tools/construction">Construction</a>
       </nav>
     </header>
 
@@ -301,15 +302,16 @@
 
     <!-- FILTER TABS -->
     <div class="filter-tabs" role="tablist" aria-label="Filter tools by category">
-      <button class="filter-tab active" data-filter="all"    role="tab" aria-selected="true">All  <span class="tab-count">15</span></button>
+      <button class="filter-tab active" data-filter="all"    role="tab" aria-selected="true">All  <span class="tab-count">23</span></button>
       <button class="filter-tab"        data-filter="finance"     role="tab" aria-selected="false">💰 Finance <span class="tab-count">3</span></button>
       <button class="filter-tab"        data-filter="health"      role="tab" aria-selected="false">🏥 Health <span class="tab-count">3</span></button>
       <button class="filter-tab"        data-filter="utilities"   role="tab" aria-selected="false">🔧 Utilities <span class="tab-count">7</span></button>
-      <button class="filter-tab"        data-filter="productivity" role="tab" aria-selected="false">⚡ Productivity <span class="tab-count">2</span></button>
+      <button class="filter-tab"        data-filter="productivity" role="tab" aria-selected="false">⚡ Productivity <span class="tab-count">3</span></button>
+      <button class="filter-tab"        data-filter="construction" role="tab" aria-selected="false">🏗️ Construction <span class="tab-count">7</span></button>
     </div>
 
     <!-- STATS BAR -->
-    <p class="tools-stats" id="toolsStats">Showing <span id="visibleCount">15</span> of 15 tools</p>
+    <p class="tools-stats" id="toolsStats">Showing <span id="visibleCount">23</span> of 23 tools</p>
 
     <!-- NO RESULTS -->
     <div class="no-results" id="noResults" role="status" aria-live="polite">
@@ -550,7 +552,7 @@
     <section class="category-section" data-category-section="productivity" aria-labelledby="cat-productivity">
       <h2 id="cat-productivity">
         <span aria-hidden="true">⚡</span> Productivity Tools
-        <span class="cat-count">2</span>
+        <span class="cat-count">3</span>
       </h2>
       <div class="tools-grid">
 
@@ -584,6 +586,35 @@
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
 
+        <a href="/tools/ocr-utility"
+           class="tool-card"
+           data-category="productivity"
+           data-keywords="ocr image text extractor optical character recognition scan screenshot tesseract private">
+          <span class="card-icon" aria-hidden="true">📄</span>
+          <strong>OCR Utility</strong>
+          <div>Extract editable text from PNG and JPG images with private, browser-based OCR.</div>
+          <div class="card-tags">
+            <span class="card-tag">OCR</span>
+            <span class="card-tag">Image to Text</span>
+            <span class="card-tag">Private</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">›</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- CONSTRUCTION -->
+    <section class="category-section" data-category-section="construction" aria-labelledby="cat-construction">
+      <h2 id="cat-construction"><span aria-hidden="true">🏗️</span> Construction Tools <span class="cat-count">7</span></h2>
+      <div class="tools-grid">
+        <a href="/tools/concrete-calculator" class="tool-card" data-category="construction" data-keywords="concrete cement slab cubic yards bags weight"><span class="card-icon" aria-hidden="true">🧱</span><strong>Concrete Calculator</strong><div>Estimate cubic yards, bag quantities, and total material weight.</div><div class="card-tags"><span class="card-tag">Concrete</span><span class="card-tag">Weight</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
+        <a href="/tools/drywall-calculator" class="tool-card" data-category="construction" data-keywords="drywall sheetrock gypsum room walls sheets weight"><span class="card-icon" aria-hidden="true">🏠</span><strong>Drywall Calculator</strong><div>Estimate 4×8 or 4×12 sheets for room walls and their total weight.</div><div class="card-tags"><span class="card-tag">Drywall</span><span class="card-tag">Sheets</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
+        <a href="/tools/paint-calculator" class="tool-card" data-category="construction" data-keywords="paint wall area coats gallons coverage weight"><span class="card-icon" aria-hidden="true">🎨</span><strong>Paint Calculator</strong><div>Calculate coated wall area, whole gallons, and total paint weight.</div><div class="card-tags"><span class="card-tag">Paint</span><span class="card-tag">Gallons</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
+        <a href="/tools/tile-calculator" class="tool-card" data-category="construction" data-keywords="tile flooring area boxes waste ceramic weight"><span class="card-icon" aria-hidden="true">◫</span><strong>Tile Calculator</strong><div>Estimate tiles, boxes, waste allowance, and boxed material weight.</div><div class="card-tags"><span class="card-tag">Tile</span><span class="card-tag">Flooring</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
+        <a href="/tools/roofing-shingle-calculator" class="tool-card" data-category="construction" data-keywords="roof roofing shingles pitch squares bundles weight"><span class="card-icon" aria-hidden="true">🏘️</span><strong>Roofing Shingle Calculator</strong><div>Convert roof area and pitch into squares, bundles, and load weight.</div><div class="card-tags"><span class="card-tag">Roofing</span><span class="card-tag">Shingles</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
+        <a href="/tools/lumber-board-foot-calculator" class="tool-card" data-category="construction" data-keywords="lumber timber wood board foot thickness width length weight"><span class="card-icon" aria-hidden="true">🪵</span><strong>Lumber Board Foot Calculator</strong><div>Calculate board feet and estimated dry-lumber weight.</div><div class="card-tags"><span class="card-tag">Lumber</span><span class="card-tag">Board Feet</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
+        <a href="/tools/insulation-calculator" class="tool-card" data-category="construction" data-keywords="insulation fiberglass r value rolls packs walls weight"><span class="card-icon" aria-hidden="true">🧰</span><strong>Insulation Calculator</strong><div>Estimate rolls or packs for a target R-value and total weight.</div><div class="card-tags"><span class="card-tag">Insulation</span><span class="card-tag">R-value</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
       </div>
     </section>
 
@@ -603,6 +634,7 @@
       <a href="/terms-of-service">Terms</a>
       <a href="/contact">Contact</a>
       <a href="/sitemap">Sitemap</a>
+      <a href="/third-party-notices">Third-Party Notices</a>
     </nav>
   </footer>
 

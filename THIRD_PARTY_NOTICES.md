@@ -54,6 +54,15 @@ SOFTWARE.
 - License: Apache License 2.0
 - Full license: [Apache License 2.0](licenses/apache-2.0.txt)
 
+### Tesseract.js
+
+- Major version: `5`
+- Purpose: Client-side optical character recognition in the OCR Utility
+- Distribution: Loaded from jsDelivr by `tools/ocr-utility.html`
+- Source: <https://github.com/naptha/tesseract.js>
+- License: Apache License 2.0
+- Full license: [Apache License 2.0](licenses/apache-2.0.txt)
+
 ### node-qrcode
 
 - npm package: `qrcode`
