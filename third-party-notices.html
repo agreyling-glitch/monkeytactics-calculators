@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Third-Party Notices | MonkeyTactics</title>
+  <meta name="description"
+        content="Source, license, attribution, and trademark notices for third-party data used by MonkeyTactics.">
+  <meta name="robots" content="noindex, follow">
+  <meta name="author" content="MonkeyTactics">
+  <meta name="date" content="2026-07-25">
+  <link rel="canonical" href="https://monkeytactics.com/third-party-notices">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <script src="/assets/js/web-vitals-rum.js" defer></script>
+
+  <style>
+    .hero--inner {
+      padding: 1.75rem 2rem;
+    }
+
+    .hero--inner h1 {
+      font-size: 1.9rem;
+    }
+
+    .notice-body {
+      max-width: 740px;
+    }
+
+    .last-updated {
+      display: inline-block;
+      margin-bottom: 1.25rem;
+      padding: 0.2rem 0.75rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .notice-section {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .notice-section:first-of-type {
+      margin-top: 1rem;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .notice-section h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.2rem;
+    }
+
+    .notice-section h3 {
+      margin: 1.5rem 0 0.6rem;
+      font-size: 1rem;
+    }
+
+    .notice-section p,
+    .notice-section li {
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .notice-section ul {
+      padding-left: 1.4rem;
+    }
+
+    .notice-section a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .license-text {
+      overflow-x: auto;
+      margin: 1rem 0 0;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card-bg);
+      color: var(--muted);
+      font: 0.8rem/1.65 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: pre-wrap;
+    }
+
+    .notice-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .hero--inner {
+        padding: 1.25rem;
+      }
+
+      .hero--inner h1 {
+        font-size: 1.5rem;
+      }
+
+      .notice-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <header>
+      <a href="/" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo"
+             class="brand-logo" width="383" height="375">
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
+
+      <nav aria-label="Primary navigation">
+        <a href="/tools/">All Tools</a>
+        <a href="/tools/finance">Finance</a>
+        <a href="/tools/health">Health</a>
+        <a href="/tools/utilities">Utilities</a>
+        <a href="/tools/productivity">Productivity</a>
+      </nav>
+    </header>
+
+    <section class="hero hero--inner" aria-labelledby="notices-heading">
+      <h1 id="notices-heading">Third-Party Notices</h1>
+      <p>Source, licensing, attribution, and trademark information for third-party
+         data used by MonkeyTactics.</p>
+    </section>
+
+    <div class="notice-body">
+      <span class="last-updated">Last updated: July 25, 2026</span>
+
+      <section class="notice-section" aria-labelledby="overview-heading">
+        <h2 id="overview-heading">Overview</h2>
+        <p>MonkeyTactics application source code is licensed separately under the
+           repository's MIT License. The Word Unscrambler includes a deduplicated,
+           transformed merge of the word lists described below.</p>
+      </section>
+
+      <section class="notice-section" aria-labelledby="enable-heading">
+        <h2 id="enable-heading">ENABLE</h2>
+        <ul>
+          <li>Full name: Enhanced North American Benchmark LExicon</li>
+          <li>Authors and compilers include Alan Beale and M. Cooper</li>
+          <li>License status: Public Domain</li>
+          <li>Source:
+            <a href="https://www.norvig.com/ngrams/enable1.txt" rel="external">
+              enable1.txt
+            </a>
+          </li>
+        </ul>
+        <p>The ENABLE master word list was formally released into the public domain
+           for anyone to use, modify, and distribute.</p>
+      </section>
+
+      <section class="notice-section" aria-labelledby="sowpods-heading">
+        <h2 id="sowpods-heading">potch/sowpods</h2>
+        <ul>
+          <li>npm package: <code>sowpods</code></li>
+          <li>Version: <code>1.1.0</code></li>
+          <li>Upstream package author: <code>potch</code></li>
+          <li>License declared in the upstream <code>package.json</code>: ISC</li>
+          <li>Source:
+            <a href="https://github.com/potch/sowpods" rel="external">
+              github.com/potch/sowpods
+            </a>
+          </li>
+        </ul>
+        <p>The published npm artifact contains <code>SOWPODS.txt</code>,
+           <code>index.js</code>, and <code>package.json</code>. It declares the ISC
+           license in its package metadata but does not include a separate license file.
+           The following notice is retained with the redistributed and transformed data.</p>
+
+        <h3>ISC License</h3>
+        <pre class="license-text">Copyright (c) potch
+
+Permission to use, copy, modify, and/or distribute this software for any purpose
+with or without fee is hereby granted, provided that the above copyright notice
+and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT,
+OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+SOFTWARE.</pre>
+      </section>
+
+      <section class="notice-section" aria-labelledby="javascript-heading">
+        <h2 id="javascript-heading">JavaScript libraries</h2>
+        <p>The QR Code Generator and QR Code Decoder use the following open-source
+           JavaScript libraries.</p>
+
+        <h3>jsQR 1.4.0</h3>
+        <ul>
+          <li>Purpose: Client-side QR code decoding</li>
+          <li>License: Apache License 2.0</li>
+          <li>Distribution: Embedded in the QR Code Decoder page</li>
+          <li>Source:
+            <a href="https://github.com/cozmo/jsQR" rel="external">
+              github.com/cozmo/jsQR
+            </a>
+          </li>
+          <li>
+            <a href="/licenses/apache-2.0.txt">View the complete Apache License 2.0</a>
+          </li>
+        </ul>
+
+        <h3>node-qrcode 1.1.0</h3>
+        <ul>
+          <li>Purpose: Client-side QR code generation</li>
+          <li>Copyright © 2012 Ryan Day</li>
+          <li>License: MIT</li>
+          <li>Distribution: Loaded from jsDelivr by both QR tools</li>
+          <li>Source:
+            <a href="https://github.com/soldair/node-qrcode" rel="external">
+              github.com/soldair/node-qrcode
+            </a>
+          </li>
+          <li>
+            <a href="/licenses/node-qrcode-MIT.txt">View the complete MIT notice</a>
+          </li>
+        </ul>
+        <p>node-qrcode credits “QRCode for JavaScript” by Kazuhiko Arase, which is
+           also MIT licensed.</p>
+
+        <h3>Libraries bundled by node-qrcode</h3>
+        <ul>
+          <li>
+            <strong>dijkstrajs</strong> (declared dependency range
+            <code>^1.0.1</code>) — Copyright © 2008 Wyatt Baldwin,
+            <a href="/licenses/dijkstrajs-MIT.txt">MIT notice</a>
+          </li>
+          <li>
+            <strong>isarray</strong> (declared dependency range
+            <code>^2.0.1</code>) — Copyright © 2013 Julian Gruber,
+            <a href="/licenses/isarray-MIT.txt">MIT notice</a>
+          </li>
+        </ul>
+
+        <p>“QR Code” is a registered trademark of DENSO WAVE INCORPORATED.</p>
+      </section>
+
+      <section class="notice-section" aria-labelledby="usage-heading">
+        <h2 id="usage-heading">Word-list and trademark notice</h2>
+        <p>The merged list is provided for word-finding and word-game reference. It may
+           contain uncommon, historical, regional, offensive, or
+           general-dictionary-absent terms. Inclusion does not guarantee acceptance by
+           any particular dictionary, edition, region, tournament, or ruleset.</p>
+        <p>MonkeyTactics is not affiliated with or endorsed by Hasbro, Mattel, Collins,
+           or Merriam-Webster. SCRABBLE and related marks belong to their respective owners.</p>
+      </section>
+
+      <div class="notice-actions">
+        <a href="/tools/word-unscrambler" class="btn-primary">Back to Word Unscrambler</a>
+        <a href="/" class="btn-ghost">Back to Home</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="/about">About</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms-of-service">Terms</a>
+      <a href="/contact">Contact</a>
+      <a href="/sitemap">Sitemap</a>
+    </nav>
+  </footer>
+</body>
+</html>
