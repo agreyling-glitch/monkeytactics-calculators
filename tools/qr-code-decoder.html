@@ -89,9 +89,28 @@
     .tool-widget { margin-top:1.5rem; padding:1.75rem; border:1px solid var(--border); border-radius:1rem; background:var(--card-bg); box-shadow:var(--shadow-card); }
     .tool-widget > h2 { margin:0 0 .35rem; font-size:1.05rem; }
     .privacy-note { margin:0 0 1.25rem; color:var(--muted); font-size:.825rem; }
-    .method-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:1rem; }
-    .method-card { padding:1.1rem; border:1px solid var(--border); border-radius:var(--radius); background:rgba(255,255,255,.02); }
-    .method-card h3 { margin:0 0 .75rem; font-size:.95rem; }
+    .method-tabs {
+      display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.35rem; margin-bottom:1rem; padding:.35rem;
+      border:1px solid var(--border); border-radius:.8rem; background:rgba(255,255,255,.025);
+    }
+    .method-tab {
+      display:flex; min-width:0; align-items:center; justify-content:center; gap:.45rem; padding:.7rem .8rem;
+      border:1px solid transparent; border-radius:.55rem; background:transparent; color:var(--muted);
+      font:inherit; font-size:.85rem; font-weight:700; cursor:pointer;
+      transition:border-color .15s, background .15s, color .15s, box-shadow .15s;
+    }
+    .method-tab:hover { color:var(--text); background:rgba(255,255,255,.04); }
+    .method-tab[aria-selected="true"] {
+      border-color:rgba(34,197,94,.45); background:rgba(34,197,94,.12); color:var(--accent);
+      box-shadow:0 4px 14px rgba(0,0,0,.12);
+    }
+    .method-tab-icon { font-size:1rem; line-height:1; }
+    .method-panel {
+      min-height:228px; padding:1.1rem; border:1px solid var(--border); border-radius:var(--radius);
+      background:rgba(255,255,255,.02);
+    }
+    .method-panel[hidden] { display:none; }
+    .method-panel h3 { margin:0 0 .75rem; font-size:.95rem; }
     .input-group label { display:block; margin-bottom:.4rem; color:var(--text); font-size:.85rem; font-weight:600; }
     .input-group input, .paste-zone {
       box-sizing:border-box; width:100%; padding:.65rem .85rem; border:1px solid var(--border); border-radius:.5rem;
@@ -149,6 +168,19 @@
     .btn-trust:hover { border-color:#38bdf8; background:rgba(14,165,233,.2); transform:translateY(-1px); }
     .btn-trust svg { width:.9rem; height:.9rem; fill:currentColor; }
     .result-actions { display:flex; gap:.65rem; margin-top:.85rem; }
+    .link-warning-dialog {
+      width:min(460px,calc(100% - 2rem)); padding:0; border:1px solid rgba(248,113,113,.4);
+      border-radius:1rem; background:#0f172a; color:var(--text); box-shadow:0 24px 70px rgba(0,0,0,.55);
+    }
+    .link-warning-dialog::backdrop { background:rgba(2,6,23,.78); backdrop-filter:blur(3px); }
+    .link-warning-content { padding:1.4rem; }
+    .link-warning-content h2 { margin:0 0 .6rem; font-size:1.1rem; }
+    .link-warning-content p { margin:0; color:var(--muted); font-size:.875rem; line-height:1.6; }
+    .link-warning-url {
+      margin-top:.85rem!important; padding:.7rem .8rem; border:1px solid var(--border); border-radius:.55rem;
+      background:rgba(255,255,255,.04); color:var(--text)!important; overflow-wrap:anywhere;
+    }
+    .link-warning-actions { display:flex; justify-content:flex-end; gap:.65rem; margin-top:1.1rem; }
     .seo-section { max-width:740px; margin-top:2rem; }
     .seo-section h2 { margin:0 0 .5rem; font-size:1.1rem; }
     .seo-section p { margin:0 0 .75rem; color:var(--muted); line-height:1.75; }
@@ -177,12 +209,13 @@
     .related-card strong { font-size:.9rem; }
     .related-card span { color:var(--muted); font-size:.8rem; }
     #decodeCanvas { display:none; }
-    @media (max-width:800px) { .method-grid { grid-template-columns:1fr; } }
     @media (max-width:600px) {
       .hero--inner { padding:1.25rem; }
       .hero--inner h1 { font-size:1.5rem; }
       .tool-widget { padding:1.25rem; }
-      .url-row, .button-row, .result-actions { flex-direction:column; }
+      .method-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .method-panel { min-height:0; }
+      .url-row, .button-row, .result-actions, .link-warning-actions { flex-direction:column; }
     }
   </style>
   <script src="/assets/js/ads.js" defer></script>
@@ -218,8 +251,32 @@
         <h2 id="decoder-heading">Scan a QR Code</h2>
         <p class="privacy-note">Images are processed locally and are never uploaded by this tool.</p>
 
-        <div class="method-grid">
-          <section class="method-card" aria-labelledby="upload-heading">
+        <div class="method-tabs" role="tablist" aria-label="Choose how to provide a QR code image">
+          <button id="upload-tab" class="method-tab" type="button" role="tab"
+                  aria-selected="true" aria-controls="upload-panel" tabindex="0">
+            <span class="method-tab-icon" aria-hidden="true">↥</span>
+            <span>Upload</span>
+          </button>
+          <button id="paste-tab" class="method-tab" type="button" role="tab"
+                  aria-selected="false" aria-controls="paste-panel" tabindex="-1">
+            <span class="method-tab-icon" aria-hidden="true">▣</span>
+            <span>Paste</span>
+          </button>
+          <button id="url-tab" class="method-tab" type="button" role="tab"
+                  aria-selected="false" aria-controls="url-panel" tabindex="-1">
+            <span class="method-tab-icon" aria-hidden="true">↗</span>
+            <span>Image URL</span>
+          </button>
+          <button id="camera-tab" class="method-tab" type="button" role="tab"
+                  aria-selected="false" aria-controls="camera-panel" tabindex="-1">
+            <span class="method-tab-icon" aria-hidden="true">◉</span>
+            <span>Camera</span>
+          </button>
+        </div>
+
+        <div class="method-panels">
+          <section id="upload-panel" class="method-panel" role="tabpanel"
+                   aria-labelledby="upload-tab" tabindex="0">
             <h3 id="upload-heading">Upload an image</h3>
             <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-controls="fileInput">
               <span class="dropzone-icon" aria-hidden="true">↥</span>
@@ -229,13 +286,15 @@
             <input id="fileInput" type="file" accept="image/*" hidden>
           </section>
 
-          <section class="method-card" aria-labelledby="paste-heading">
+          <section id="paste-panel" class="method-panel" role="tabpanel"
+                   aria-labelledby="paste-tab" tabindex="0" hidden>
             <h3 id="paste-heading">Paste an image</h3>
             <textarea id="pasteZone" class="paste-zone" aria-label="Paste an image from your clipboard" placeholder="Click here, then press Ctrl+V (or Command+V) to paste an image."></textarea>
             <p class="input-hint">Screenshots and copied images are detected automatically.</p>
           </section>
 
-          <section class="method-card" aria-labelledby="url-heading">
+          <section id="url-panel" class="method-panel" role="tabpanel"
+                   aria-labelledby="url-tab" tabindex="0" hidden>
             <h3 id="url-heading">Decode from URL</h3>
             <div class="input-group">
               <label for="imageUrl">Image URL</label>
@@ -247,7 +306,8 @@
             </div>
           </section>
 
-          <section class="method-card" aria-labelledby="camera-heading">
+          <section id="camera-panel" class="method-panel" role="tabpanel"
+                   aria-labelledby="camera-tab" tabindex="0" hidden>
             <h3 id="camera-heading">Camera scanner</h3>
             <div class="camera-frame">
               <video id="cameraVideo" playsinline muted aria-label="Camera preview"></video>
@@ -285,6 +345,18 @@
       </div>
     </section>
 
+    <dialog id="linkWarningDialog" class="link-warning-dialog" aria-labelledby="link-warning-heading">
+      <div class="link-warning-content">
+        <h2 id="link-warning-heading">Leave this page?</h2>
+        <p>This decoded link will take you to another website. Are you sure that is what you want?</p>
+        <p id="linkWarningUrl" class="link-warning-url"></p>
+        <div class="link-warning-actions">
+          <button id="confirmLinkButton" class="btn-primary" type="button">Yes take me to the site</button>
+          <button id="cancelLinkButton" class="btn-secondary" type="button" autofocus>Cancel</button>
+        </div>
+      </div>
+    </dialog>
+
     <div class="seo-section">
       <h2>How to decode a QR code</h2>
       <p>Choose an image, paste a screenshot, enter a public image URL, or scan with your camera. For the most reliable result, use a sharp, well-lit image with the entire QR code visible and a clear border around it.</p>
@@ -302,7 +374,7 @@
     </div>
 
     <section class="faq-section" aria-labelledby="faq-heading">
-      <details>
+      <details open>
         <summary>
           <span class="faq-info-icon" aria-hidden="true">?</span>
           <h2 id="faq-heading">Frequently Asked Questions</h2>
@@ -365,7 +437,7 @@
 
   <footer>
     <div>© 2026 MonkeyTactics</div>
-    <nav aria-label="Footer navigation"><a href="/about">About</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a><a href="/third-party-notices">Third-Party Notices</a></nav>
+    <nav aria-label="Footer navigation"><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav>
   </footer>
 
   <!-- jsQR 1.4.0 is Apache-2.0 licensed; see /third-party-notices. -->
@@ -398,12 +470,29 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
       status: $('status'), resultPanel: $('resultPanel'), resultValue: $('resultValue'),
       resultPreview: $('resultPreview'),
       linkSafetyRow: $('linkSafetyRow'), checkLinkButton: $('checkLinkButton'),
-      copyButton: $('copyButton'), clearButton: $('clearButton')
+      copyButton: $('copyButton'), clearButton: $('clearButton'),
+      linkWarningDialog: $('linkWarningDialog'), linkWarningUrl: $('linkWarningUrl'),
+      confirmLinkButton: $('confirmLinkButton'), cancelLinkButton: $('cancelLinkButton')
     };
     const context = elements.canvas.getContext('2d', { willReadFrequently: true });
+    const methodTabs = Array.from(document.querySelectorAll('.method-tab'));
+    const methodPanels = Array.from(document.querySelectorAll('.method-panel'));
     let cameraStream = null;
     let scanFrame = 0;
     let decodedText = '';
+
+    function selectMethod(tab, moveFocus) {
+      methodTabs.forEach((item) => {
+        const selected = item === tab;
+        item.setAttribute('aria-selected', String(selected));
+        item.tabIndex = selected ? 0 : -1;
+      });
+      methodPanels.forEach((panel) => {
+        panel.hidden = panel.id !== tab.getAttribute('aria-controls');
+      });
+      if (tab.id !== 'camera-tab') stopCamera();
+      if (moveFocus) tab.focus();
+    }
 
     function showStatus(message, type) {
       elements.status.textContent = message;
@@ -450,10 +539,13 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
       const containsUrl = isSafeWebUrl(text);
       if (containsUrl) {
         const link = document.createElement('a');
-        link.href = text;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
+        link.href = '#';
         link.textContent = text;
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          elements.linkWarningUrl.textContent = text;
+          elements.linkWarningDialog.showModal();
+        });
         elements.resultValue.appendChild(link);
       } else {
         elements.resultValue.textContent = text;
@@ -621,6 +713,20 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
       hideStatus();
     }
 
+    methodTabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectMethod(tab, false));
+      tab.addEventListener('keydown', (event) => {
+        let nextIndex = index;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (index + 1) % methodTabs.length;
+        else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (index - 1 + methodTabs.length) % methodTabs.length;
+        else if (event.key === 'Home') nextIndex = 0;
+        else if (event.key === 'End') nextIndex = methodTabs.length - 1;
+        else return;
+        event.preventDefault();
+        selectMethod(methodTabs[nextIndex], true);
+      });
+    });
+
     elements.dropzone.addEventListener('click', () => elements.file.click());
     elements.dropzone.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); elements.file.click(); }
@@ -674,6 +780,15 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
       // parameter and redirects known URLs to their report.
       const analysisUrl = 'https://www.virustotal.com/gui/search?query=' + encodeURIComponent(decodedText);
       window.open(analysisUrl, '_blank', 'noopener,noreferrer');
+    });
+    elements.confirmLinkButton.addEventListener('click', () => {
+      if (!isSafeWebUrl(decodedText)) return;
+      elements.linkWarningDialog.close();
+      window.open(decodedText, '_blank', 'noopener,noreferrer');
+    });
+    elements.cancelLinkButton.addEventListener('click', () => elements.linkWarningDialog.close());
+    elements.linkWarningDialog.addEventListener('click', (event) => {
+      if (event.target === elements.linkWarningDialog) elements.linkWarningDialog.close();
     });
     elements.copyButton.addEventListener('click', async () => {
       try {

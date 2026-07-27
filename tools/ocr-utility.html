@@ -178,6 +178,14 @@
       line-height: 1.6;
     }
 
+    .hero-copy p {
+      margin: 0;
+    }
+
+    .hero-copy p + p {
+      margin-top: 0.75rem;
+    }
+
     .workspace {
       display: grid;
       grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -186,6 +194,48 @@
       border-radius: 1rem;
       background: var(--card);
       box-shadow: var(--shadow);
+    }
+
+    .mode-switcher {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      padding: 8px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(2, 6, 23, 0.52);
+    }
+
+    .mode-tab {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: 0.65rem;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .mode-tab:hover:not(:disabled) {
+      color: var(--text);
+    }
+
+    .mode-tab[aria-selected="true"] {
+      border-color: rgba(34, 197, 94, 0.32);
+      background: var(--green-wash);
+      color: #86efac;
+      box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.06);
+    }
+
+    .mode-tab:focus-visible {
+      outline: 3px solid rgba(74, 222, 128, 0.28);
+      outline-offset: 2px;
+    }
+
+    .mode-tab:disabled {
+      cursor: not-allowed;
+      opacity: 0.46;
     }
 
     .panel {
@@ -274,6 +324,111 @@
       font-weight: 750;
     }
 
+    .camera-frame {
+      position: relative;
+      display: grid;
+      min-height: 238px;
+      place-items: center;
+      overflow: hidden;
+      border: 1.5px dashed rgba(157, 179, 165, 0.4);
+      border-radius: var(--radius);
+      background: #07110c;
+    }
+
+    .camera-frame video {
+      display: none;
+      width: 100%;
+      height: 238px;
+      object-fit: cover;
+    }
+
+    .camera-placeholder {
+      max-width: 22rem;
+      padding: 28px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-align: center;
+    }
+
+    .camera-placeholder strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .camera-controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .camera-controls .button-primary {
+      flex: 1;
+    }
+
+    .camera-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .camera-frame[hidden],
+    .camera-controls[hidden],
+    .crop-editor[hidden] {
+      display: none;
+    }
+
+    .crop-editor {
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid rgba(34, 197, 94, 0.24);
+      border-radius: var(--radius);
+      background: rgba(34, 197, 94, 0.045);
+    }
+
+    .crop-editor h3 {
+      margin: 0 0 4px;
+      font-size: 0.92rem;
+    }
+
+    .crop-instructions {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .crop-canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--line);
+      border-radius: 0.55rem;
+      outline: none;
+      background: #020617;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .crop-canvas:focus-visible {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.16);
+    }
+
+    .crop-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .crop-actions .button-primary {
+      flex: 1;
+    }
+
+    .crop-editor + .preview {
+      margin-top: 16px;
+    }
+
     .preview {
       display: none;
       overflow: hidden;
@@ -354,6 +509,10 @@
     .button:disabled {
       cursor: not-allowed;
       opacity: 0.46;
+    }
+
+    .button[hidden] {
+      display: none;
     }
 
     .button-primary {
@@ -741,15 +900,19 @@
       }
 
       .drop-zone,
-      .preview {
+      .preview,
+      .camera-frame {
         min-height: 210px;
       }
 
-      .preview img {
+      .preview img,
+      .camera-frame video {
         height: 210px;
       }
 
       .actions,
+      .camera-controls,
+      .crop-actions,
       .output-actions,
       .site-footer {
         align-items: stretch;
@@ -828,8 +991,11 @@
         <span class="sep" aria-hidden="true">›</span>
         <span aria-current="page">OCR Utility</span>
       </nav>
-      <h1 id="page-title">MonkeyTactics OCR Utility</h1>
-      <p class="hero-copy">Turn a screenshot, scan, or photo into editable text. Your image is processed locally on your device and is never uploaded.</p>
+      <h1 id="page-title">Free OCR Image‑to‑Text Converter (Local Processing, No Uploads)</h1>
+      <div class="hero-copy">
+        <p>Optical character recognition (OCR) converts text in screenshots, scanned documents, and photos into editable, searchable text. Use this free OCR image-to-text converter when you need to copy a quotation, digitize a printed page, capture notes, reuse text from a receipt, or make image-based information easier to search and edit.</p>
+        <p>Unlike cloud OCR services, this tool processes every image locally in your browser. Your image is never uploaded to MonkeyTactics or stored on a server, which helps protect private, personal, and business information. Local processing also removes upload time, so you can begin extracting text as soon as the OCR engine is ready. Choose a PNG, JPG, or JPEG image up to 20 MB, or capture an image with your device camera. Crop the image to focus on the text, then run OCR and copy or edit the result. No account, API key, or file upload is required.</p>
+      </div>
     </section>
 
     <div class="ad-container" aria-label="Advertisement">
@@ -837,7 +1003,13 @@
     </div>
 
     <section class="workspace" aria-label="OCR workspace">
+      <div class="mode-switcher" role="tablist" aria-label="Choose an image source">
+        <button class="mode-tab" id="uploadTab" type="button" role="tab" aria-selected="true" aria-controls="uploadPanel">Upload an Image</button>
+        <button class="mode-tab" id="cameraTab" type="button" role="tab" aria-selected="false" aria-controls="cameraPanel" tabindex="-1">Camera Scanner</button>
+      </div>
+
       <div class="panel">
+        <div id="uploadPanel" role="tabpanel" aria-labelledby="uploadTab">
         <div class="panel-heading">
           <h2>Upload an image</h2>
           <span class="step">Step 01</span>
@@ -854,7 +1026,43 @@
           </div>
         </div>
 
-        <div class="preview" id="preview" aria-label="Uploaded image preview">
+        </div>
+
+        <div id="cameraPanel" role="tabpanel" aria-labelledby="cameraTab" hidden>
+          <div class="panel-heading">
+            <h2>Camera scanner</h2>
+            <span class="step">Step 01</span>
+          </div>
+
+          <div class="camera-frame" id="cameraFrame">
+            <video id="cameraVideo" playsinline muted aria-label="Camera preview"></video>
+            <div class="camera-placeholder" id="cameraPlaceholder">
+              <strong>Scan text with your camera</strong>
+              Start the camera, hold the text steady in the frame, then capture the image.
+            </div>
+          </div>
+
+          <div class="camera-controls" id="cameraControls">
+            <button class="button button-primary" id="startCameraButton" type="button">Start camera</button>
+            <button class="button button-primary" id="captureButton" type="button" hidden>Capture image</button>
+            <button class="button button-secondary" id="stopCameraButton" type="button" hidden>Stop camera</button>
+          </div>
+
+          <p class="camera-note">Camera access requires HTTPS or localhost. Your camera image stays on this device.</p>
+
+        </div>
+
+        <div class="crop-editor" id="cropEditor" hidden>
+          <h3>Crop image</h3>
+          <p class="crop-instructions" id="cropInstructions">Drag across the image to select the text you want OCR to read. Arrow keys move the crop; Shift + arrow keys resize it.</p>
+          <canvas class="crop-canvas" id="cropCanvas" tabindex="0" aria-label="Image crop area" aria-describedby="cropInstructions"></canvas>
+          <div class="crop-actions">
+            <button class="button button-primary" id="applyCropButton" type="button">Use crop</button>
+            <button class="button button-secondary" id="retakeButton" type="button">Retake</button>
+          </div>
+        </div>
+
+        <div class="preview" id="preview" aria-label="Selected image preview">
           <img id="previewImage" alt="Preview of the selected image">
         </div>
 
@@ -908,7 +1116,7 @@
     </section>
 
     <section class="faq-section" aria-labelledby="faq-heading">
-      <details>
+      <details open>
         <summary>
           <span class="faq-info-icon" aria-hidden="true">?</span>
           <h2 id="faq-heading">Frequently Asked Questions</h2>
@@ -967,6 +1175,7 @@
     </div>
 
     <canvas id="processingCanvas" aria-hidden="true"></canvas>
+    <canvas id="cameraCaptureCanvas" aria-hidden="true" hidden></canvas>
   </main>
 
   <footer class="site-footer">
@@ -974,12 +1183,12 @@
       <p>© 2026 MonkeyTactics</p>
     </div>
     <nav class="footer-nav" aria-label="Footer navigation">
-      <a href="/about">About</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms-of-service">Terms</a>
+      <a href="/third-party-notices">Third-Party Notices</a>
+      <a href="/about">About</a>
       <a href="/contact">Contact</a>
       <a href="/sitemap">Sitemap</a>
-      <a href="/third-party-notices">Third-Party Notices</a>
     </nav>
   </footer>
 
@@ -994,8 +1203,24 @@
       const $ = (id) => document.getElementById(id);
 
       const elements = {
+        uploadTab: $("uploadTab"),
+        cameraTab: $("cameraTab"),
+        uploadPanel: $("uploadPanel"),
+        cameraPanel: $("cameraPanel"),
         fileInput: $("fileInput"),
         dropZone: $("dropZone"),
+        cameraFrame: $("cameraFrame"),
+        cameraControls: $("cameraControls"),
+        cameraVideo: $("cameraVideo"),
+        cameraPlaceholder: $("cameraPlaceholder"),
+        startCameraButton: $("startCameraButton"),
+        captureButton: $("captureButton"),
+        stopCameraButton: $("stopCameraButton"),
+        cropEditor: $("cropEditor"),
+        cropCanvas: $("cropCanvas"),
+        applyCropButton: $("applyCropButton"),
+        retakeButton: $("retakeButton"),
+        cameraCaptureCanvas: $("cameraCaptureCanvas"),
         preview: $("preview"),
         previewImage: $("previewImage"),
         fileMeta: $("fileMeta"),
@@ -1019,6 +1244,12 @@
       let imageReady = false;
       let isRecognizing = false;
       let worker = null;
+      let cameraStream = null;
+      let activeMode = "upload";
+      let cropSelection = null;
+      let cropDragStart = null;
+      let cropSourceKind = "";
+      let cropSourceName = "";
 
       function setStatus(message, type) {
         elements.status.textContent = message;
@@ -1058,6 +1289,20 @@
         updateProgress(0, "Preparing OCR…");
       }
 
+      function resetCropEditor() {
+        cropSelection = null;
+        cropDragStart = null;
+        cropSourceKind = "";
+        cropSourceName = "";
+        elements.cropEditor.hidden = true;
+        elements.cameraFrame.hidden = false;
+        elements.cameraControls.hidden = false;
+        elements.cropCanvas.width = 1;
+        elements.cropCanvas.height = 1;
+        elements.cameraCaptureCanvas.width = 1;
+        elements.cameraCaptureCanvas.height = 1;
+      }
+
       function clearImage() {
         if (isRecognizing) return;
         if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -1074,13 +1319,14 @@
         elements.resetButton.disabled = true;
         elements.canvas.width = 1;
         elements.canvas.height = 1;
+        resetCropEditor();
         resetOutput();
         setStatus("");
       }
 
       function drawPreprocessedImage(image) {
-        const naturalWidth = image.naturalWidth;
-        const naturalHeight = image.naturalHeight;
+        const naturalWidth = image.videoWidth || image.naturalWidth || image.width;
+        const naturalHeight = image.videoHeight || image.naturalHeight || image.height;
         const scale = Math.min(1, MAX_CANVAS_EDGE / Math.max(naturalWidth, naturalHeight));
         const width = Math.max(1, Math.round(naturalWidth * scale));
         const height = Math.max(1, Math.round(naturalHeight * scale));
@@ -1105,6 +1351,266 @@
         }
 
         context.putImageData(imageData, 0, 0);
+      }
+
+      function renderCropCanvas() {
+        const context = elements.cropCanvas.getContext("2d");
+        const width = elements.cropCanvas.width;
+        const height = elements.cropCanvas.height;
+        if (!cropSelection || width < 2 || height < 2) return;
+
+        context.clearRect(0, 0, width, height);
+        context.drawImage(elements.cameraCaptureCanvas, 0, 0, width, height);
+        context.fillStyle = "rgba(2, 6, 23, 0.62)";
+        context.fillRect(0, 0, width, height);
+
+        const sourceScaleX = elements.cameraCaptureCanvas.width / width;
+        const sourceScaleY = elements.cameraCaptureCanvas.height / height;
+        context.drawImage(
+          elements.cameraCaptureCanvas,
+          cropSelection.x * sourceScaleX,
+          cropSelection.y * sourceScaleY,
+          cropSelection.width * sourceScaleX,
+          cropSelection.height * sourceScaleY,
+          cropSelection.x,
+          cropSelection.y,
+          cropSelection.width,
+          cropSelection.height
+        );
+        context.strokeStyle = "#4ade80";
+        context.lineWidth = Math.max(2, Math.round(width / 450));
+        context.setLineDash([10, 6]);
+        context.strokeRect(
+          cropSelection.x + 1,
+          cropSelection.y + 1,
+          Math.max(0, cropSelection.width - 2),
+          Math.max(0, cropSelection.height - 2)
+        );
+        context.setLineDash([]);
+      }
+
+      function prepareCropEditor(sourceKind, sourceName) {
+        const sourceWidth = elements.cameraCaptureCanvas.width;
+        const sourceHeight = elements.cameraCaptureCanvas.height;
+        const scale = Math.min(1, 900 / Math.max(sourceWidth, sourceHeight));
+        const width = Math.max(1, Math.round(sourceWidth * scale));
+        const height = Math.max(1, Math.round(sourceHeight * scale));
+        const insetX = Math.max(8, Math.round(width * 0.04));
+        const insetY = Math.max(8, Math.round(height * 0.04));
+
+        elements.cropCanvas.width = width;
+        elements.cropCanvas.height = height;
+        cropSourceKind = sourceKind;
+        cropSourceName = sourceName || "";
+        elements.retakeButton.textContent = sourceKind === "camera" ? "Retake" : "Choose another";
+        cropSelection = {
+          x: insetX,
+          y: insetY,
+          width: Math.max(12, width - (insetX * 2)),
+          height: Math.max(12, height - (insetY * 2))
+        };
+        if (sourceKind === "camera") {
+          elements.cameraFrame.hidden = true;
+          elements.cameraControls.hidden = true;
+        }
+        elements.cropEditor.hidden = false;
+        renderCropCanvas();
+        elements.cropCanvas.focus();
+      }
+
+      function cropPointFromEvent(event) {
+        const bounds = elements.cropCanvas.getBoundingClientRect();
+        return {
+          x: Math.max(0, Math.min(elements.cropCanvas.width, (event.clientX - bounds.left) * (elements.cropCanvas.width / bounds.width))),
+          y: Math.max(0, Math.min(elements.cropCanvas.height, (event.clientY - bounds.top) * (elements.cropCanvas.height / bounds.height)))
+        };
+      }
+
+      function applyCrop() {
+        if (!cropSelection || cropSelection.width < 12 || cropSelection.height < 12) {
+          setStatus("Select a larger crop area around the text.", "error");
+          return;
+        }
+
+        const sourceScaleX = elements.cameraCaptureCanvas.width / elements.cropCanvas.width;
+        const sourceScaleY = elements.cameraCaptureCanvas.height / elements.cropCanvas.height;
+        const sourceX = Math.max(0, Math.floor(cropSelection.x * sourceScaleX));
+        const sourceY = Math.max(0, Math.floor(cropSelection.y * sourceScaleY));
+        const sourceWidth = Math.min(
+          elements.cameraCaptureCanvas.width - sourceX,
+          Math.max(1, Math.round(cropSelection.width * sourceScaleX))
+        );
+        const sourceHeight = Math.min(
+          elements.cameraCaptureCanvas.height - sourceY,
+          Math.max(1, Math.round(cropSelection.height * sourceScaleY))
+        );
+        const croppedCanvas = document.createElement("canvas");
+        croppedCanvas.width = sourceWidth;
+        croppedCanvas.height = sourceHeight;
+        croppedCanvas.getContext("2d").drawImage(
+          elements.cameraCaptureCanvas,
+          sourceX,
+          sourceY,
+          sourceWidth,
+          sourceHeight,
+          0,
+          0,
+          sourceWidth,
+          sourceHeight
+        );
+
+        drawPreprocessedImage(croppedCanvas);
+        elements.previewImage.src = elements.canvas.toDataURL("image/jpeg", 0.92);
+        elements.preview.style.display = "block";
+        elements.fileName.textContent = cropSourceKind === "camera"
+          ? "Cropped camera capture"
+          : (cropSourceName || "Cropped uploaded image");
+        elements.fileSize.textContent = elements.canvas.width + " x " + elements.canvas.height + " px";
+        elements.fileMeta.hidden = false;
+        elements.cropEditor.hidden = true;
+        elements.cameraFrame.hidden = true;
+        elements.cameraControls.hidden = true;
+        elements.cropCanvas.width = 1;
+        elements.cropCanvas.height = 1;
+        elements.cameraCaptureCanvas.width = 1;
+        elements.cameraCaptureCanvas.height = 1;
+        cropSelection = null;
+        imageReady = true;
+        elements.runButton.disabled = false;
+        elements.resetButton.disabled = false;
+        resetOutput();
+        setStatus("Crop ready. Select \"Extract text\" to begin.", "success");
+      }
+
+      function restartCropSource() {
+        if (cropSourceKind === "camera") {
+          startCamera();
+          return;
+        }
+        clearImage();
+        elements.fileInput.click();
+      }
+
+      function stopCamera() {
+        if (cameraStream) {
+          cameraStream.getTracks().forEach(function (track) {
+            track.stop();
+          });
+        }
+        cameraStream = null;
+        elements.cameraVideo.srcObject = null;
+        elements.cameraVideo.style.display = "none";
+        elements.cameraPlaceholder.style.display = "block";
+        elements.startCameraButton.hidden = false;
+        elements.startCameraButton.disabled = false;
+        elements.captureButton.hidden = true;
+        elements.stopCameraButton.hidden = true;
+      }
+
+      async function startCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          setStatus("Camera scanning is unavailable in this browser. Upload an image instead.", "error");
+          return;
+        }
+        if (!window.isSecureContext) {
+          setStatus("Camera access requires HTTPS or a localhost address. Open this page securely, then try again.", "error");
+          return;
+        }
+
+        const policy = document.permissionsPolicy || document.featurePolicy;
+        if (policy && typeof policy.allowsFeature === "function" && !policy.allowsFeature("camera")) {
+          setStatus("Camera access is blocked by this page's permissions policy. Open the OCR utility directly in a browser tab.", "error");
+          return;
+        }
+
+        stopCamera();
+        clearImage();
+        elements.startCameraButton.disabled = true;
+        setStatus("Requesting camera access...");
+
+        try {
+          try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: { ideal: "environment" } },
+              audio: false
+            });
+          } catch (preferredCameraError) {
+            if (preferredCameraError && preferredCameraError.name === "OverconstrainedError") {
+              cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            } else {
+              throw preferredCameraError;
+            }
+          }
+
+          elements.cameraVideo.srcObject = cameraStream;
+          await elements.cameraVideo.play();
+          elements.cameraVideo.style.display = "block";
+          elements.cameraPlaceholder.style.display = "none";
+          elements.startCameraButton.hidden = true;
+          elements.captureButton.hidden = false;
+          elements.stopCameraButton.hidden = false;
+          setStatus("Camera ready. Hold the text steady, then capture the image.", "success");
+        } catch (error) {
+          stopCamera();
+          const errorName = error && error.name;
+          let message = "The camera could not be started. It may be unavailable or already in use.";
+          if (errorName === "NotAllowedError") {
+            message = window.top !== window.self
+              ? "Camera access was blocked inside this embedded preview. Open the OCR utility directly in a browser tab and try again."
+              : "The browser did not grant camera access. Reset the camera permission for this address, reload, and try again.";
+          } else if (errorName === "SecurityError") {
+            message = "The browser's security policy blocked camera access. Open the OCR utility directly in a secure browser tab.";
+          } else if (errorName === "NotFoundError" || errorName === "DevicesNotFoundError") {
+            message = "No camera was found. Connect or enable a camera, then try again.";
+          } else if (errorName === "NotReadableError" || errorName === "TrackStartError") {
+            message = "The camera is already in use or could not be read. Close other camera apps and try again.";
+          }
+          setStatus(message, "error");
+        }
+      }
+
+      function captureCameraImage() {
+        if (!cameraStream || elements.cameraVideo.readyState < 2 || isRecognizing) return;
+
+        try {
+          const videoWidth = elements.cameraVideo.videoWidth;
+          const videoHeight = elements.cameraVideo.videoHeight;
+          const scale = Math.min(1, MAX_CANVAS_EDGE / Math.max(videoWidth, videoHeight));
+          elements.cameraCaptureCanvas.width = Math.max(1, Math.round(videoWidth * scale));
+          elements.cameraCaptureCanvas.height = Math.max(1, Math.round(videoHeight * scale));
+          elements.cameraCaptureCanvas.getContext("2d").drawImage(
+            elements.cameraVideo,
+            0,
+            0,
+            elements.cameraCaptureCanvas.width,
+            elements.cameraCaptureCanvas.height
+          );
+          imageReady = false;
+          elements.runButton.disabled = true;
+          elements.resetButton.disabled = false;
+          resetOutput();
+          stopCamera();
+          prepareCropEditor("camera", "Camera capture");
+          setStatus("Image captured. Adjust the crop, then select \"Use crop\".", "success");
+        } catch (_) {
+          setStatus("The camera image could not be captured. Try again with the text fully visible.", "error");
+        }
+      }
+
+      function setMode(mode, shouldFocus) {
+        if (isRecognizing || mode === activeMode) return;
+
+        stopCamera();
+        clearImage();
+        activeMode = mode;
+        const isUpload = mode === "upload";
+        elements.uploadTab.setAttribute("aria-selected", String(isUpload));
+        elements.cameraTab.setAttribute("aria-selected", String(!isUpload));
+        elements.uploadTab.tabIndex = isUpload ? 0 : -1;
+        elements.cameraTab.tabIndex = isUpload ? -1 : 0;
+        elements.uploadPanel.hidden = !isUpload;
+        elements.cameraPanel.hidden = isUpload;
+        if (shouldFocus) (isUpload ? elements.uploadTab : elements.cameraTab).focus();
       }
 
       function loadFile(file) {
@@ -1135,16 +1641,22 @@
         const image = new Image();
         image.onload = function () {
           try {
-            drawPreprocessedImage(image);
-            elements.previewImage.src = objectUrl;
-            elements.preview.style.display = "block";
+            const scale = Math.min(1, MAX_CANVAS_EDGE / Math.max(image.naturalWidth, image.naturalHeight));
+            elements.cameraCaptureCanvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+            elements.cameraCaptureCanvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+            elements.cameraCaptureCanvas.getContext("2d").drawImage(
+              image,
+              0,
+              0,
+              elements.cameraCaptureCanvas.width,
+              elements.cameraCaptureCanvas.height
+            );
             elements.dropZone.style.display = "none";
             elements.fileName.textContent = file.name || "Uploaded image";
             elements.fileSize.textContent = formatBytes(file.size);
             elements.fileMeta.hidden = false;
-            imageReady = true;
-            elements.runButton.disabled = false;
-            setStatus("Image ready. Select “Extract text” to begin.", "success");
+            prepareCropEditor("upload", file.name || "Uploaded image");
+            setStatus("Image ready. Adjust the crop, then select \"Use crop\".", "success");
           } catch (error) {
             clearImage();
             setStatus("This image is too large for your browser to process. Try a smaller image.", "error");
@@ -1176,6 +1688,8 @@
         if (!imageReady || isRecognizing) return;
 
         isRecognizing = true;
+        elements.uploadTab.disabled = true;
+        elements.cameraTab.disabled = true;
         elements.runButton.disabled = true;
         elements.resetButton.disabled = true;
         elements.fileInput.disabled = true;
@@ -1220,6 +1734,8 @@
           }
         } finally {
           isRecognizing = false;
+          elements.uploadTab.disabled = false;
+          elements.cameraTab.disabled = false;
           elements.fileInput.disabled = false;
           elements.runButton.disabled = !imageReady;
           elements.resetButton.disabled = !imageReady;
@@ -1274,11 +1790,92 @@
         loadFile(elements.fileInput.files[0]);
       });
 
+      elements.uploadTab.addEventListener("click", function () {
+        setMode("upload", false);
+      });
+      elements.cameraTab.addEventListener("click", function () {
+        setMode("camera", false);
+      });
+
+      [elements.uploadTab, elements.cameraTab].forEach(function (tab) {
+        tab.addEventListener("keydown", function (event) {
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            setMode(activeMode === "upload" ? "camera" : "upload", true);
+          }
+        });
+      });
+
+      elements.startCameraButton.addEventListener("click", startCamera);
+      elements.captureButton.addEventListener("click", captureCameraImage);
+      elements.stopCameraButton.addEventListener("click", function () {
+        stopCamera();
+        setStatus("Camera stopped.");
+      });
+      elements.cropCanvas.addEventListener("pointerdown", function (event) {
+        if (elements.cropEditor.hidden) return;
+        event.preventDefault();
+        cropDragStart = cropPointFromEvent(event);
+        cropSelection = {
+          x: cropDragStart.x,
+          y: cropDragStart.y,
+          width: 1,
+          height: 1
+        };
+        elements.cropCanvas.setPointerCapture(event.pointerId);
+        renderCropCanvas();
+      });
+      elements.cropCanvas.addEventListener("pointermove", function (event) {
+        if (!cropDragStart || !elements.cropCanvas.hasPointerCapture(event.pointerId)) return;
+        event.preventDefault();
+        const point = cropPointFromEvent(event);
+        cropSelection = {
+          x: Math.min(cropDragStart.x, point.x),
+          y: Math.min(cropDragStart.y, point.y),
+          width: Math.abs(point.x - cropDragStart.x),
+          height: Math.abs(point.y - cropDragStart.y)
+        };
+        renderCropCanvas();
+      });
+      ["pointerup", "pointercancel"].forEach(function (eventName) {
+        elements.cropCanvas.addEventListener(eventName, function (event) {
+          if (!cropDragStart) return;
+          if (elements.cropCanvas.hasPointerCapture(event.pointerId)) {
+            elements.cropCanvas.releasePointerCapture(event.pointerId);
+          }
+          cropDragStart = null;
+          if (!cropSelection || cropSelection.width < 12 || cropSelection.height < 12) {
+            setStatus("Drag across a larger area to select the text.", "error");
+          } else {
+            setStatus("Crop selected. Choose \"Use crop\" when it looks right.", "success");
+          }
+        });
+      });
+      elements.cropCanvas.addEventListener("keydown", function (event) {
+        if (!cropSelection || !event.key.startsWith("Arrow")) return;
+        event.preventDefault();
+        const step = 5;
+        if (event.shiftKey) {
+          if (event.key === "ArrowLeft") cropSelection.width = Math.max(12, cropSelection.width - step);
+          if (event.key === "ArrowRight") cropSelection.width = Math.min(elements.cropCanvas.width - cropSelection.x, cropSelection.width + step);
+          if (event.key === "ArrowUp") cropSelection.height = Math.max(12, cropSelection.height - step);
+          if (event.key === "ArrowDown") cropSelection.height = Math.min(elements.cropCanvas.height - cropSelection.y, cropSelection.height + step);
+        } else {
+          if (event.key === "ArrowLeft") cropSelection.x = Math.max(0, cropSelection.x - step);
+          if (event.key === "ArrowRight") cropSelection.x = Math.min(elements.cropCanvas.width - cropSelection.width, cropSelection.x + step);
+          if (event.key === "ArrowUp") cropSelection.y = Math.max(0, cropSelection.y - step);
+          if (event.key === "ArrowDown") cropSelection.y = Math.min(elements.cropCanvas.height - cropSelection.height, cropSelection.y + step);
+        }
+        renderCropCanvas();
+      });
+      elements.applyCropButton.addEventListener("click", applyCrop);
+      elements.retakeButton.addEventListener("click", restartCropSource);
       elements.runButton.addEventListener("click", runOcr);
       elements.resetButton.addEventListener("click", clearImage);
       elements.copyButton.addEventListener("click", copyOutput);
 
       window.addEventListener("pagehide", function () {
+        stopCamera();
         if (objectUrl) URL.revokeObjectURL(objectUrl);
         if (worker) worker.terminate();
       });
