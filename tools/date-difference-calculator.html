@@ -7,14 +7,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>Date Difference Calculator: Days &amp; Business Days</title>
+  <title>Date Difference Calculator: Business Days &amp; Dates</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Free date difference calculator — find the exact years, months and days (or total days, hours, minutes) between two dates, count business days excluding holidays, plan deadlines with buffer days, and list recurring dates. No sign-up required." />
+        content="Date difference calculator: business days, exact calendar spans, holidays, deadlines, and recurring schedules. Print or export results." />
 
   <!-- Open Graph -->
-  <meta property="og:title"       content="Date Difference Calculator — MonkeyTactics" />
-  <meta property="og:description" content="Find the exact difference between two dates, count business days, plan deadlines, and list recurring dates. Free and private." />
+  <meta property="og:title"       content="Date Difference Calculator: Business Days — MonkeyTactics" />
+  <meta property="og:description" content="Count business days between dates with weekends and holidays excluded, calculate exact date spans, plan deadlines, and export recurring schedules." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/date-difference-calculator" />
 
@@ -29,7 +29,7 @@
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",       "item": "https://monkeytactics.com/" },
       { "@type": "ListItem", "position": 2, "name": "Utilities",  "item": "https://monkeytactics.com/tools/utilities.html" },
-      { "@type": "ListItem", "position": 3, "name": "Date Difference Calculator", "item": "https://monkeytactics.com/tools/date-difference-calculator.html" }
+      { "@type": "ListItem", "position": 3, "name": "Date Difference & Business Days Calculator", "item": "https://monkeytactics.com/tools/date-difference-calculator.html" }
     ]
   }
   </script>
@@ -43,27 +43,37 @@
       {
         "@type": "Question",
         "name": "How do I calculate the exact number of years, months, and days between two dates?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Enter a start date and end date, then choose the 'Exact (years, months, days)' precision mode. The calculator subtracts the dates using calendar-aware logic, borrowing from months and years the same way you would count by hand, so the result matches how people naturally describe age or duration." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Choose Date Difference, enter the start and end dates, select Exact (years, months, days), and calculate. This calendar-aware result is useful for ages, anniversaries, contracts, and other spans normally described in years, months, and days." }
       },
       {
         "@type": "Question",
-        "name": "How are business days calculated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Business day mode counts every day between the two dates, skips Saturdays and Sundays, and also skips any date in your chosen holiday calendar (US, EU, or a custom list). What remains is the number of working days available for the task." }
+        "name": "What is the difference between calendar days and business days?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Calendar days include every date in the elapsed span. Business days include eligible weekdays and exclude Saturdays, Sundays, and holidays from the selected calendar. Business-day totals include eligible start and end dates." }
       },
       {
         "@type": "Question",
-        "name": "What holidays does the calculator include?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The US calendar includes New Year's Day, Memorial Day, Independence Day, Labor Day, Thanksgiving, and Christmas. The EU calendar includes New Year's Day, Labour Day (May 1), Christmas, and St. Stephen's Day (December 26). You can also switch to a custom list and enter your own holiday dates." }
+        "name": "Are the start and end dates included?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Exact, total-day, hour, and minute results measure elapsed time between the dates. Business Day and Work Planning modes count both the start and end dates when they are eligible workdays. Recurring Dates includes the start date as occurrence number one." }
       },
       {
         "@type": "Question",
-        "name": "What are buffer days in work planning mode?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Buffer days are extra working days added after your target end date as a safety margin for delays. The calculator adds them as business days, skipping weekends and holidays, and shows the resulting buffered deadline alongside the original one." }
+        "name": "Can I exclude holidays or upload a custom holiday list?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select the United States or European Union calendar, choose None to skip weekends only, or use Custom List. You can type dates or import a TXT or CSV file containing up to 40 unique, valid dates in YYYY-MM-DD format." }
       },
       {
         "@type": "Question",
-        "name": "How does the recurring date calculator work?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Enter a start date and an interval in days, and the calculator lists the next set of occurrences by repeatedly adding that interval, showing each resulting date and day of the week. It's useful for recurring bills, checkups, maintenance schedules, or any fixed-interval reminder." }
+        "name": "What does Work Planning mode calculate?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Work Planning counts business days through a target date, adds an optional business-day buffer, estimates the buffered deadline, and displays a timeline that distinguishes workdays, weekends, holidays, and buffer time." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I print or download recurring dates?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Generate the recurring schedule, then print the Upcoming Occurrences table or download it as CSV or aligned plain text. Each export includes the occurrence number, ISO date, weekday, and days from the start." }
+      },
+      {
+        "@type": "Question",
+        "name": "Are my dates private, and can I share a calculation?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Calculations and file imports are processed in your browser. The calculator does not require an account. If you use Copy bookmarkable link, the current settings are placed in the URL so you can save or share that configuration." }
       }
     ]
   }
@@ -175,6 +185,265 @@
     }
 
     .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ── Precision mode radio cards ── */
+    .precision-fieldset {
+      min-width: 0;
+      margin: 0 0 1.25rem;
+      padding: 0;
+      border: 0;
+    }
+    .precision-fieldset > legend {
+      margin-bottom: 0.5rem;
+      padding: 0;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .precision-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+    }
+    .precision-option {
+      position: relative;
+      display: block;
+      cursor: pointer;
+    }
+    .precision-option input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .precision-card-ui {
+      display: grid;
+      grid-template-columns: 1.25rem 2rem minmax(0, 1fr);
+      gap: 0.75rem;
+      align-items: start;
+      height: 100%;
+      padding: 0.9rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid transparent;
+      border-radius: 0.625rem;
+      box-sizing: border-box;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .precision-option:hover .precision-card-ui {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(148,163,184,0.35);
+    }
+    .precision-option input:checked + .precision-card-ui {
+      background: var(--accent-soft);
+      border-color: rgba(34,197,94,0.55);
+    }
+    .precision-option input:focus-visible + .precision-card-ui {
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+    }
+    .precision-radio {
+      width: 1rem;
+      height: 1rem;
+      margin-top: 0.15rem;
+      border: 2px solid #64748b;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 3px transparent;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .precision-option input:checked + .precision-card-ui .precision-radio {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 3px #10251a;
+    }
+    .precision-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      background: rgba(148,163,184,0.1);
+      border-radius: 0.5rem;
+      color: var(--muted);
+    }
+    .precision-icon svg { width: 1.1rem; height: 1.1rem; }
+    .precision-option input:checked + .precision-card-ui .precision-icon {
+      background: rgba(34,197,94,0.15);
+      color: var(--accent);
+    }
+    .precision-copy { min-width: 0; }
+    .precision-title {
+      display: block;
+      margin-bottom: 0.2rem;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-weight: 650;
+      line-height: 1.3;
+    }
+    .precision-description {
+      display: block;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    /* ── Holiday calendar radio cards ── */
+    .holiday-fieldset {
+      min-width: 0;
+      margin: 0 0 1.1rem;
+      padding: 0;
+      border: 0;
+    }
+    .holiday-fieldset > legend {
+      margin-bottom: 0.5rem;
+      padding: 0;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .holiday-options {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.65rem;
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+    }
+    .holiday-option {
+      position: relative;
+      display: block;
+      cursor: pointer;
+    }
+    .holiday-option input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .holiday-card-ui {
+      display: grid;
+      grid-template-columns: 1rem 1.75rem minmax(0, 1fr);
+      gap: 0.55rem;
+      align-items: start;
+      height: 100%;
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid transparent;
+      border-radius: 0.625rem;
+      box-sizing: border-box;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .holiday-option:hover .holiday-card-ui {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(148,163,184,0.35);
+    }
+    .holiday-option input:checked + .holiday-card-ui {
+      background: var(--accent-soft);
+      border-color: rgba(34,197,94,0.55);
+    }
+    .holiday-option input:focus-visible + .holiday-card-ui {
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+    }
+    .holiday-radio {
+      width: 0.875rem;
+      height: 0.875rem;
+      margin-top: 0.15rem;
+      border: 2px solid #64748b;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 3px transparent;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .holiday-option input:checked + .holiday-card-ui .holiday-radio {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 2px #10251a;
+    }
+    .holiday-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: rgba(148,163,184,0.1);
+      border-radius: 0.45rem;
+      color: var(--muted);
+    }
+    .holiday-icon svg { width: 1rem; height: 1rem; }
+    .holiday-option input:checked + .holiday-card-ui .holiday-icon {
+      background: rgba(34,197,94,0.15);
+      color: var(--accent);
+    }
+    .holiday-title {
+      display: block;
+      margin-bottom: 0.15rem;
+      color: var(--text);
+      font-size: 0.8rem;
+      font-weight: 650;
+      line-height: 1.3;
+    }
+    .holiday-description {
+      display: block;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+    .holiday-upload {
+      margin-bottom: 0.75rem;
+      padding: 0.8rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px dashed rgba(148,163,184,0.35);
+      border-radius: 0.625rem;
+    }
+    .holiday-upload input[type="file"] {
+      display: block;
+      width: 100%;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.78rem;
+    }
+    .holiday-upload input[type="file"]::file-selector-button {
+      margin-right: 0.65rem;
+      padding: 0.45rem 0.75rem;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.35);
+      border-radius: 0.45rem;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .holiday-upload input[type="file"]:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+    .file-upload-status {
+      min-height: 1.1em;
+      margin: 0.45rem 0 0;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+    .file-upload-status.success { color: #86efac; }
+    .file-upload-status.error { color: #fca5a5; }
+    .custom-holiday-validation {
+      min-height: 1.1em;
+      margin: 0.35rem 0 0;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+    .custom-holiday-validation.success { color: #86efac; }
+    .custom-holiday-validation.error { color: #fca5a5; }
+    .input-group textarea[aria-invalid="true"] {
+      border-color: #f87171;
+      box-shadow: 0 0 0 3px rgba(248,113,113,0.12);
+    }
 
     /* ── Calculate button ── */
     .btn-calculate {
@@ -333,11 +602,90 @@
     .recur-table td:first-child { color: var(--text); font-weight: 500; }
     .recur-table tr:last-child td { border-bottom: none; }
     .recur-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .recur-summary {
+      margin: -0.35rem 0 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .recur-actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .btn-recur-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.8rem;
+      background: rgba(255,255,255,0.035);
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .btn-recur-action:hover {
+      background: rgba(34,197,94,0.08);
+      border-color: rgba(34,197,94,0.4);
+      color: var(--accent);
+    }
+    .btn-recur-action:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .btn-recur-action svg { width: 1rem; height: 1rem; }
+
+    @media print {
+      body.print-recurring {
+        background: #fff !important;
+        color: #111 !important;
+      }
+      body.print-recurring * { visibility: hidden !important; }
+      body.print-recurring #recurResults,
+      body.print-recurring #recurResults * { visibility: visible !important; }
+      body.print-recurring #recurResults {
+        position: absolute;
+        inset: 0;
+        display: block !important;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        color: #111;
+      }
+      body.print-recurring #recurResults h3 { color: #111; font-size: 18pt; }
+      body.print-recurring .recur-summary { color: #444; }
+      body.print-recurring .recur-actions { display: none !important; }
+      body.print-recurring .recur-wrap {
+        overflow: visible;
+        border-color: #aaa;
+      }
+      body.print-recurring .recur-table { min-width: 0; color: #111; }
+      body.print-recurring .recur-table th {
+        background: #eee !important;
+        color: #111;
+        border-color: #aaa;
+      }
+      body.print-recurring .recur-table td {
+        color: #222;
+        border-color: #ddd;
+      }
+    }
 
     /* ── SEO / content ── */
     .seo-section          { max-width: 740px; margin-top: 2rem; }
     .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
+    .seo-section h3       { font-size: 0.95rem; margin: 1.1rem 0 0.35rem; }
     .seo-section p        { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
+    .seo-section ul,
+    .seo-section ol       { color: var(--muted); line-height: 1.7; margin: 0.5rem 0 0.75rem; padding-left: 1.25rem; }
+    .seo-section li       { margin-bottom: 0.35rem; }
+    .seo-section strong   { color: var(--text); }
     .seo-section p:last-child { margin-bottom: 0; }
 
     .formula-block {
@@ -396,8 +744,13 @@
       .hero--inner h1 { font-size: 1.5rem; }
       .tool-widget  { padding: 1.25rem; }
       .input-row    { grid-template-columns: 1fr; }
+      .precision-options { grid-template-columns: 1fr; }
+      .holiday-options { grid-template-columns: 1fr; }
       .result-card.primary { grid-column: span 1; }
       .result-card.primary .result-value { font-size: 1.75rem; }
+    }
+    @media (min-width: 601px) and (max-width: 900px) {
+      .holiday-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
   <script src="/assets/js/ads.js" defer></script>
@@ -412,9 +765,9 @@
     {
       "@type": "WebApplication",
       "@id": "https://monkeytactics.com/tools/date-difference-calculator.html#app",
-      "name": "Date Difference Calculator",
+      "name": "Date Difference Calculator: Business Days",
       "url": "https://monkeytactics.com/tools/date-difference-calculator.html",
-      "description": "Calculate the difference between two dates.",
+      "description": "Calculate exact date differences, calendar days, business days with holiday exclusions, buffered deadlines, and recurring date schedules with print and export options.",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Any",
       "isAccessibleForFree": true,
@@ -470,12 +823,10 @@
         <span class="sep" aria-hidden="true">›</span>
         <a href="/tools/utilities">Utilities</a>
         <span class="sep" aria-hidden="true">›</span>
-        <span aria-current="page">Date Difference Calculator</span>
+        <span aria-current="page">Date Difference &amp; Business Days Calculator</span>
       </nav>
-      <h1 id="tool-heading">Date Difference Calculator</h1>
-      <p>Find the exact time between two dates, count business days for work planning, calculate
-         a deadline's risk level, or list recurring dates at a fixed interval. Everything runs
-         privately in your browser.</p>
+      <h1 id="tool-heading">Date Difference Calculator – Days, Business Days & Deadlines</h1>
+      <p>Calculate the exact number of days between two dates, including business days, weekends, and holidays. Plan work timelines, assess deadline risk levels, or generate recurring dates at fixed intervals — all processed privately in your browser.</p>
     </section>
 
     <!-- TOP AD -->
@@ -484,7 +835,7 @@
     <!-- CALCULATOR WIDGET -->
     <section aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Date Difference Calculator</h2>
+        <h2 id="calc-heading">Date Difference &amp; Business Days Calculator</h2>
 
         <!-- MODE TABS -->
         <div class="mode-tabs" role="tablist" aria-label="Calculator mode">
@@ -507,32 +858,123 @@
             </div>
           </div>
 
-          <div class="input-group">
-            <label for="diffPrecision">Precision Mode</label>
-            <select id="diffPrecision" aria-label="Precision mode">
-              <option value="exact">Exact (years, months, days)</option>
-              <option value="days">Total days</option>
-              <option value="hours">Total hours</option>
-              <option value="minutes">Total minutes</option>
-              <option value="business">Business days only (excl. weekends + holidays)</option>
-            </select>
-            <p class="input-hint" id="diffPrecisionHint">Choose how the difference should be broken down.</p>
-          </div>
+          <fieldset class="precision-fieldset" id="diffPrecision">
+            <legend>Precision Mode</legend>
+            <div class="precision-options">
+              <label class="precision-option">
+                <input type="radio" name="diffPrecision" value="exact" checked />
+                <span class="precision-card-ui">
+                  <span class="precision-radio" aria-hidden="true"></span>
+                  <span class="precision-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+                  </span>
+                  <span class="precision-copy">
+                    <span class="precision-title">Exact (years, months, days)</span>
+                    <span class="precision-description">A calendar-aware breakdown for ages and date spans.</span>
+                  </span>
+                </span>
+              </label>
+              <label class="precision-option">
+                <input type="radio" name="diffPrecision" value="days" />
+                <span class="precision-card-ui">
+                  <span class="precision-radio" aria-hidden="true"></span>
+                  <span class="precision-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  </span>
+                  <span class="precision-copy">
+                    <span class="precision-title">Total calendar days</span>
+                    <span class="precision-description">Count every elapsed day between the two dates.</span>
+                  </span>
+                </span>
+              </label>
+              <label class="precision-option">
+                <input type="radio" name="diffPrecision" value="business" />
+                <span class="precision-card-ui">
+                  <span class="precision-radio" aria-hidden="true"></span>
+                  <span class="precision-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg>
+                  </span>
+                  <span class="precision-copy">
+                    <span class="precision-title">Business days</span>
+                    <span class="precision-description">Skip weekends and holidays from your selected calendar.</span>
+                  </span>
+                </span>
+              </label>
+              <label class="precision-option">
+                <input type="radio" name="diffPrecision" value="hours" />
+                <span class="precision-card-ui">
+                  <span class="precision-radio" aria-hidden="true"></span>
+                  <span class="precision-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+                  </span>
+                  <span class="precision-copy">
+                    <span class="precision-title">Hours / minutes</span>
+                    <span class="precision-description">See the full elapsed duration in smaller time units.</span>
+                  </span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
 
-          <div class="input-group" id="diffHolidayGroup" style="display:none;">
-            <label for="diffHolidayRegion">Holiday Calendar</label>
-            <select id="diffHolidayRegion" aria-label="Holiday calendar">
-              <option value="none">None</option>
-              <option value="us">United States</option>
-              <option value="eu">European Union</option>
-              <option value="custom">Custom list</option>
-            </select>
+          <div id="diffHolidayGroup" style="display:none;">
+            <fieldset class="holiday-fieldset" id="diffHolidayRegion">
+              <legend>Holiday Calendar</legend>
+              <div class="holiday-options">
+                <label class="holiday-option">
+                  <input type="radio" name="diffHolidayRegion" value="none" checked />
+                  <span class="holiday-card-ui">
+                    <span class="holiday-radio" aria-hidden="true"></span>
+                    <span class="holiday-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/></svg>
+                    </span>
+                    <span><span class="holiday-title">None</span><span class="holiday-description">Skip weekends only.</span></span>
+                  </span>
+                </label>
+                <label class="holiday-option">
+                  <input type="radio" name="diffHolidayRegion" value="us" />
+                  <span class="holiday-card-ui">
+                    <span class="holiday-radio" aria-hidden="true"></span>
+                    <span class="holiday-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 21V4M5 5h11l-2 4 2 4H5"/><path d="M8 8h5M8 10h4"/></svg>
+                    </span>
+                    <span><span class="holiday-title">United States</span><span class="holiday-description">Common U.S. federal holidays.</span></span>
+                  </span>
+                </label>
+                <label class="holiday-option">
+                  <input type="radio" name="diffHolidayRegion" value="eu" />
+                  <span class="holiday-card-ui">
+                    <span class="holiday-radio" aria-hidden="true"></span>
+                    <span class="holiday-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9S14.5 18.5 12 21M12 3C9.5 5.5 8.5 8.5 8.5 12S9.5 18.5 12 21"/></svg>
+                    </span>
+                    <span><span class="holiday-title">European Union</span><span class="holiday-description">Common EU public holidays.</span></span>
+                  </span>
+                </label>
+                <label class="holiday-option">
+                  <input type="radio" name="diffHolidayRegion" value="custom" />
+                  <span class="holiday-card-ui">
+                    <span class="holiday-radio" aria-hidden="true"></span>
+                    <span class="holiday-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h8"/><path d="m17 16 2 2 3-4"/></svg>
+                    </span>
+                    <span><span class="holiday-title">Custom list</span><span class="holiday-description">Enter your own holiday dates.</span></span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
           </div>
 
           <div class="input-group" id="diffCustomHolidayGroup" style="display:none;">
             <label for="diffCustomHolidays">Custom Holiday Dates</label>
-            <textarea id="diffCustomHolidays" placeholder="2026-01-01, 2026-07-04, 2026-12-25"></textarea>
-            <p class="input-hint">Comma or newline-separated dates in YYYY-MM-DD format.</p>
+            <div class="holiday-upload">
+              <label for="diffHolidayFile">Upload a holiday file</label>
+              <input type="file" id="diffHolidayFile" accept=".txt,.csv,text/plain,text/csv" aria-describedby="diffHolidayFileHint diffHolidayFileStatus" />
+              <p class="input-hint" id="diffHolidayFileHint">Choose a .txt or .csv file up to 32 KB. Dates can be comma-separated or one per line.</p>
+              <p class="file-upload-status" id="diffHolidayFileStatus" role="status" aria-live="polite"></p>
+            </div>
+            <textarea id="diffCustomHolidays" placeholder="2026-01-01, 2026-07-04, 2026-12-25" aria-describedby="diffCustomHolidayHint diffCustomHolidayValidation"></textarea>
+            <p class="input-hint" id="diffCustomHolidayHint">Enter up to 40 holidays in YYYY-MM-DD format.</p>
+            <p class="custom-holiday-validation" id="diffCustomHolidayValidation" role="status" aria-live="polite">0 / 40 holidays</p>
           </div>
 
           <div class="calc-error" id="diffError" role="alert">
@@ -573,27 +1015,69 @@
             </div>
           </div>
 
-          <div class="input-row">
-            <div class="input-group">
-              <label for="workHolidayRegion">Holiday Calendar</label>
-              <select id="workHolidayRegion" aria-label="Holiday calendar">
-                <option value="none">None</option>
-                <option value="us" selected>United States</option>
-                <option value="eu">European Union</option>
-                <option value="custom">Custom list</option>
-              </select>
+          <fieldset class="holiday-fieldset" id="workHolidayRegion">
+            <legend>Holiday Calendar</legend>
+            <div class="holiday-options">
+              <label class="holiday-option">
+                <input type="radio" name="workHolidayRegion" value="none" />
+                <span class="holiday-card-ui">
+                  <span class="holiday-radio" aria-hidden="true"></span>
+                  <span class="holiday-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/></svg>
+                  </span>
+                  <span><span class="holiday-title">None</span><span class="holiday-description">Skip weekends only.</span></span>
+                </span>
+              </label>
+              <label class="holiday-option">
+                <input type="radio" name="workHolidayRegion" value="us" checked />
+                <span class="holiday-card-ui">
+                  <span class="holiday-radio" aria-hidden="true"></span>
+                  <span class="holiday-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 21V4M5 5h11l-2 4 2 4H5"/><path d="M8 8h5M8 10h4"/></svg>
+                  </span>
+                  <span><span class="holiday-title">United States</span><span class="holiday-description">Common U.S. federal holidays.</span></span>
+                </span>
+              </label>
+              <label class="holiday-option">
+                <input type="radio" name="workHolidayRegion" value="eu" />
+                <span class="holiday-card-ui">
+                  <span class="holiday-radio" aria-hidden="true"></span>
+                  <span class="holiday-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9S14.5 18.5 12 21M12 3C9.5 5.5 8.5 8.5 8.5 12S9.5 18.5 12 21"/></svg>
+                  </span>
+                  <span><span class="holiday-title">European Union</span><span class="holiday-description">Common EU public holidays.</span></span>
+                </span>
+              </label>
+              <label class="holiday-option">
+                <input type="radio" name="workHolidayRegion" value="custom" />
+                <span class="holiday-card-ui">
+                  <span class="holiday-radio" aria-hidden="true"></span>
+                  <span class="holiday-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h8"/><path d="m17 16 2 2 3-4"/></svg>
+                  </span>
+                  <span><span class="holiday-title">Custom list</span><span class="holiday-description">Enter your own holiday dates.</span></span>
+                </span>
+              </label>
             </div>
-            <div class="input-group">
-              <label for="workBuffer">Buffer Days (business days)</label>
-              <input type="number" id="workBuffer" min="0" max="90" step="1" value="3" aria-label="Buffer days" />
-              <p class="input-hint">Extra working days added after the target date as a safety margin.</p>
-            </div>
+          </fieldset>
+
+          <div class="input-group">
+            <label for="workBuffer">Buffer Days (business days)</label>
+            <input type="number" id="workBuffer" min="0" max="90" step="1" value="3" aria-label="Buffer days" />
+            <p class="input-hint">Extra working days added after the target date as a safety margin.</p>
           </div>
 
           <div class="input-group" id="workCustomHolidayGroup" style="display:none;">
             <label for="workCustomHolidays">Custom Holiday Dates</label>
-            <textarea id="workCustomHolidays" placeholder="2026-01-01, 2026-07-04, 2026-12-25"></textarea>
-            <p class="input-hint">Comma or newline-separated dates in YYYY-MM-DD format.</p>
+            <div class="holiday-upload">
+              <label for="workHolidayFile">Upload a holiday file</label>
+              <input type="file" id="workHolidayFile" accept=".txt,.csv,text/plain,text/csv" aria-describedby="workHolidayFileHint workHolidayFileStatus" />
+              <p class="input-hint" id="workHolidayFileHint">Choose a .txt or .csv file up to 32 KB. Dates can be comma-separated or one per line.</p>
+              <p class="file-upload-status" id="workHolidayFileStatus" role="status" aria-live="polite"></p>
+            </div>
+            <textarea id="workCustomHolidays" placeholder="2026-01-01, 2026-07-04, 2026-12-25" aria-describedby="workCustomHolidayHint workCustomHolidayValidation"></textarea>
+            <p class="input-hint" id="workCustomHolidayHint">Enter up to 40 holidays in YYYY-MM-DD format.</p>
+            <p class="custom-holiday-validation" id="workCustomHolidayValidation" role="status" aria-live="polite">0 / 40 holidays</p>
           </div>
 
           <div class="calc-error" id="workError" role="alert">
@@ -657,6 +1141,21 @@
 
           <div class="results-panel" id="recurResults" role="region" aria-label="Recurring dates results" aria-live="polite">
             <h3>Upcoming Occurrences</h3>
+            <p class="recur-summary" id="recurSummary"></p>
+            <div class="recur-actions" aria-label="Upcoming occurrences actions">
+              <button class="btn-recur-action" id="recurPrintBtn" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>
+                Print
+              </button>
+              <a class="btn-recur-action" id="recurCsvLink" download>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+                Download CSV
+              </a>
+              <a class="btn-recur-action" id="recurTxtLink" download>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+                Download TXT
+              </a>
+            </div>
             <div class="recur-wrap">
               <table class="recur-table" aria-label="Recurring dates">
                 <thead>
@@ -679,82 +1178,153 @@
 
     <!-- HOW TO USE -->
     <div class="seo-section">
-      <h2>How to use the Date Difference Calculator</h2>
-      <p>Pick a mode at the top of the tool. <strong>Date Difference</strong> gives you the gap
-         between two dates in whichever unit you need — an exact years/months/days breakdown,
-         a single total (days, hours, or minutes), or business days only. <strong>Work Planning</strong>
-         is built for scheduling: it counts business days between a start and target date, lets you
-         choose a holiday calendar, adds buffer days as a safety margin, and draws a mini timeline of
-         the whole span. <strong>Recurring Dates</strong> lists every occurrence of a fixed interval
-         starting from a given date — handy for billing cycles, checkups, or maintenance schedules.</p>
-      <p>Every result updates the page URL, so you can copy the bookmarkable link to save or share
-         a calculation exactly as you configured it.</p>
+      <h2>Date difference calculator: business days and calendar dates</h2>
+      <p>This free date difference calculator handles more than a basic day count. Use it to find
+         an exact calendar difference, count elapsed calendar days, calculate business days with
+         holiday exclusions, plan a buffered deadline, or generate a recurring date schedule.</p>
+      <ol>
+        <li>Choose <strong>Date Difference</strong>, <strong>Work Planning</strong>, or
+            <strong>Recurring Dates</strong>.</li>
+        <li>Enter the dates and select the calculation options that match your situation.</li>
+        <li>Calculate the result, then copy its bookmarkable link or use the available print and
+            download tools.</li>
+      </ol>
     </div>
 
-    <!-- FORMULA -->
+    <!-- PRECISION MODES -->
     <div class="seo-section">
-      <h2>How are business days calculated?</h2>
-      <p>Business day mode walks through every calendar day between the start and end date and
-         keeps a running count, skipping two kinds of days:</p>
+      <h2>Choose the right date-difference precision</h2>
+
+      <h3>Exact years, months, and days</h3>
+      <p>Exact mode gives a calendar-aware breakdown instead of treating every month or year as a
+         fixed number of days. It is useful for calculating age, time since an event, contract
+         length, anniversaries, and other spans normally described in years, months, and days.</p>
+
+      <h3>Total calendar days</h3>
+      <p>Total calendar days measures the elapsed number of days from one date to the other,
+         including weekdays, weekends, and holidays. If the dates are entered in reverse order,
+         the calculator still returns the size of the interval and identifies that the end date
+         comes before the start date. A deadline indicator also compares the later date with
+         today and labels it as past, high, medium, or low risk.</p>
+
+      <h3>Business days</h3>
+      <p>Business-day mode counts eligible workdays and skips Saturdays and Sundays. You can also
+         exclude holidays by selecting the United States or European Union calendar, or by using
+         a custom holiday list. Eligible start and end dates are included in the business-day
+         total.</p>
+
+      <h3>Hours and minutes</h3>
+      <p>Use the hours/minutes option when a smaller unit is more useful than a calendar
+         breakdown. The result includes total hours, total minutes, and the equivalent total days.</p>
+    </div>
+
+    <!-- BUSINESS DAYS -->
+    <div class="seo-section">
+      <h2>Count working days with weekends and holidays excluded</h2>
+      <p>The business-day calculator evaluates each date in the selected range and keeps only
+         dates that qualify as workdays:</p>
       <div class="formula-block" role="img" aria-label="Business day exclusion rule">
-        Business Days = Total Days − Weekend Days − Holiday Days (within range)
+        Business Days = Eligible Weekdays − Selected Holidays
       </div>
-      <p>Weekends are any Saturday or Sunday. Holidays come from the calendar you select — a
-         built-in US or EU list of common public holidays, or your own custom list of dates.
-         The same logic is used to add buffer days: the calculator steps forward one day at a
-         time, only counting days that are not a weekend or holiday, until it has added the
-         requested number of buffer days.</p>
+      <p>Choose <strong>None</strong> to skip weekends only. The built-in US calendar includes
+         common federal holidays, while the EU option includes a common set of European public
+         holidays. Holiday observance can vary by country, state, employer, or organization, so
+         use <strong>Custom List</strong> when an exact local schedule matters.</p>
+      <p>Custom holidays may be typed directly or imported from a TXT or CSV file. Enter one date
+         per line or separate dates with commas. The tool accepts up to 40 unique dates, requires
+         the <strong>YYYY-MM-DD</strong> format, rejects impossible calendar dates, and reports
+         duplicates before the calculation runs.</p>
+    </div>
+
+    <!-- WORK PLANNING -->
+    <div class="seo-section">
+      <h2>Plan project deadlines with business-day buffers</h2>
+      <p>Work Planning mode combines a working-day count with deadline forecasting. Enter a
+         project start date and target end date, choose the appropriate holiday calendar, and add
+         optional buffer days for reviews, approvals, shipping delays, or other schedule risk.</p>
+      <p>Buffer days are added as business days, so weekends and selected holidays do not consume
+         the buffer. Results show the business-day total, total calendar days, and buffered
+         deadline. A mini timeline separates workdays, weekends, holidays, and buffer time, while
+         making the full schedule easier to scan.</p>
+    </div>
+
+    <!-- RECURRING DATES -->
+    <div class="seo-section">
+      <h2>Generate, print, and export recurring dates</h2>
+      <p>Recurring Dates mode builds a schedule by repeatedly adding a fixed interval to a start
+         date. The start date is occurrence number one. Choose an interval in days and generate
+         up to 200 occurrences for billing cycles, maintenance plans, medication reminders,
+         inspections, appointments, or follow-up schedules.</p>
+      <p>The Upcoming Occurrences table includes the sequence number, formatted date, weekday,
+         and number of days from the start. Print a clean copy or download the schedule as CSV
+         for spreadsheet use or as an aligned TXT file for notes and plain-text records.</p>
+    </div>
+
+    <!-- PRIVACY AND SHARING -->
+    <div class="seo-section">
+      <h2>Private calculations and bookmarkable results</h2>
+      <p>Calculations, custom holiday validation, and file imports run in your browser; no account
+         or sign-up is required. The tool updates the page URL with the current configuration so
+         you can use <strong>Copy bookmarkable link</strong> to save or share a calculation.
+         Because that URL contains the selected settings, review it before sharing dates or a
+         custom holiday list.</p>
     </div>
 
     <!-- FAQ -->
     <section class="faq-section" aria-labelledby="faq-heading">
       <details open>
-        <summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Frequently Asked Questions</h2></summary>
+        <summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Date Difference Calculator FAQs</h2></summary>
         <div class="faq-content">
           <ul class="faq-list">
 
         <li class="faq-item">
           <h3>How do I calculate the exact number of years, months, and days between two dates?</h3>
-          <p>Enter a start date and end date, then choose the "Exact (years, months, days)"
-             precision mode. The calculator subtracts the dates using calendar-aware logic,
-             borrowing from months and years the same way you would count by hand, so the result
-             matches how people naturally describe age or duration.</p>
+          <p>Choose Date Difference, enter the start and end dates, select
+             <strong>Exact (years, months, days)</strong>, and calculate. This calendar-aware
+             result is useful for ages, anniversaries, contracts, and other spans normally
+             described in years, months, and days.</p>
         </li>
 
         <li class="faq-item">
-          <h3>How are business days calculated?</h3>
-          <p>Business day mode counts every day between the two dates, skips Saturdays and
-             Sundays, and also skips any date in your chosen holiday calendar (US, EU, or a
-             custom list). What remains is the number of working days available for the task.</p>
+          <h3>What is the difference between calendar days and business days?</h3>
+          <p>Calendar days include every date in the elapsed span. Business days include eligible
+             weekdays and exclude Saturdays, Sundays, and holidays from the selected calendar.
+             Business-day totals include eligible start and end dates.</p>
         </li>
 
         <li class="faq-item">
-          <h3>What holidays does the calculator include?</h3>
-          <p>The US calendar includes New Year's Day, Memorial Day, Independence Day, Labor Day,
-             Thanksgiving, and Christmas. The EU calendar includes New Year's Day, Labour Day
-             (May 1), Christmas, and St. Stephen's Day (December 26). You can also switch to a
-             custom list and enter your own holiday dates.</p>
+          <h3>Are the start and end dates included?</h3>
+          <p>Exact, total-day, hour, and minute results measure elapsed time between the dates.
+             Business Day and Work Planning modes count both the start and end dates when they
+             are eligible workdays. Recurring Dates includes the start date as occurrence number one.</p>
         </li>
 
         <li class="faq-item">
-          <h3>What are buffer days in work planning mode?</h3>
-          <p>Buffer days are extra working days added after your target end date as a safety
-             margin for delays. The calculator adds them as business days, skipping weekends and
-             holidays, and shows the resulting buffered deadline alongside the original one.</p>
+          <h3>Can I exclude holidays or upload a custom holiday list?</h3>
+          <p>Yes. Select the United States or European Union calendar, choose None to skip weekends
+             only, or use Custom List. You can type dates or import a TXT or CSV file containing
+             up to 40 unique, valid dates in YYYY-MM-DD format.</p>
         </li>
 
         <li class="faq-item">
-          <h3>How does the recurring date calculator work?</h3>
-          <p>Enter a start date and an interval in days, and the calculator lists the next set of
-             occurrences by repeatedly adding that interval, showing each resulting date and day
-             of the week. It's useful for recurring bills, checkups, maintenance schedules, or
-             any fixed-interval reminder.</p>
+          <h3>What does Work Planning mode calculate?</h3>
+          <p>Work Planning counts business days through a target date, adds an optional
+             business-day buffer, estimates the buffered deadline, and displays a timeline that
+             distinguishes workdays, weekends, holidays, and buffer time.</p>
         </li>
 
         <li class="faq-item">
-          <h3>Is my data private?</h3>
-          <p>Yes — all calculations run entirely in your browser using JavaScript. No dates
-             you enter are transmitted to any server or stored anywhere. See our
+          <h3>Can I print or download recurring dates?</h3>
+          <p>Yes. Generate the recurring schedule, then print the Upcoming Occurrences table or
+             download it as CSV or aligned plain text. Each export includes the occurrence
+             number, ISO date, weekday, and days from the start.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Are my dates private, and can I share a calculation?</h3>
+          <p>Calculations and file imports are processed in your browser. The calculator does not
+             require an account. If you use Copy bookmarkable link, the current settings are
+             placed in the URL so you can save or share that configuration. See our
              <a href="/privacy" style="color:var(--accent)">Privacy Policy</a> for details.</p>
         </li>
 
@@ -812,15 +1382,18 @@
      DATE HELPERS
   ══════════════════════════════════════════════════ */
   const DAY_MS = 86400000;
+  const MAX_CUSTOM_HOLIDAYS = 40;
 
   function parseDateInput(str) {
     if (!str) return null;
-    const parts = str.split('-');
-    if (parts.length !== 3) return null;
-    const y = parseInt(parts[0], 10), m = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
-    if (isNaN(y) || isNaN(m) || isNaN(d)) return null;
-    const dt = new Date(y, m - 1, d);
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
+    if (!match) return null;
+    const y = Number(match[1]), m = Number(match[2]), d = Number(match[3]);
+    if (y < 1 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+    const dt = new Date(0);
     dt.setHours(0, 0, 0, 0);
+    dt.setFullYear(y, m - 1, d);
+    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
     return dt;
   }
 
@@ -869,16 +1442,82 @@
   /* ══════════════════════════════════════════════════
      HOLIDAYS
   ══════════════════════════════════════════════════ */
+  function parseCustomHolidayDates(customText) {
+    const tokens = String(customText || '')
+      .split(/[,\n]/)
+      .map(value => value.trim())
+      .filter(Boolean);
+    const dates = [];
+    const invalid = [];
+    const seen = new Set();
+    let duplicateCount = 0;
+
+    tokens.forEach(value => {
+      const parsed = parseDateInput(value);
+      if (!parsed) {
+        invalid.push(value);
+        return;
+      }
+      const normalized = dateStr(parsed);
+      if (seen.has(normalized)) {
+        duplicateCount++;
+        return;
+      }
+      seen.add(normalized);
+      dates.push(normalized);
+    });
+
+    return {
+      dates,
+      invalid,
+      duplicateCount,
+      isValid: invalid.length === 0 && dates.length <= MAX_CUSTOM_HOLIDAYS
+    };
+  }
+
+  function updateCustomHolidayValidation(textarea, status) {
+    const result = parseCustomHolidayDates(textarea.value);
+    let message = result.dates.length + ' / ' + MAX_CUSTOM_HOLIDAYS + ' holiday' + (result.dates.length === 1 ? '' : 's');
+    let type = '';
+
+    if (result.invalid.length) {
+      const examples = result.invalid.slice(0, 3).join(', ');
+      message = 'Invalid date' + (result.invalid.length === 1 ? '' : 's') + ': ' + examples +
+        (result.invalid.length > 3 ? ' and ' + (result.invalid.length - 3) + ' more' : '') +
+        '. Use YYYY-MM-DD and real calendar dates.';
+      type = 'error';
+    } else if (result.dates.length > MAX_CUSTOM_HOLIDAYS) {
+      message = 'Maximum 40 holidays. Remove ' + (result.dates.length - MAX_CUSTOM_HOLIDAYS) + ' date' +
+        (result.dates.length - MAX_CUSTOM_HOLIDAYS === 1 ? '' : 's') + '.';
+      type = 'error';
+    } else if (result.dates.length) {
+      message += ' valid';
+      if (result.duplicateCount) {
+        message += ' (' + result.duplicateCount + ' duplicate' + (result.duplicateCount === 1 ? '' : 's') + ' ignored)';
+      }
+      type = 'success';
+    }
+
+    textarea.setAttribute('aria-invalid', result.isValid ? 'false' : 'true');
+    status.textContent = message;
+    status.className = 'custom-holiday-validation' + (type ? ' ' + type : '');
+    return result;
+  }
+
+  function wireCustomHolidayValidation(textarea, statusId) {
+    const status = document.getElementById(statusId);
+    textarea.addEventListener('input', function () {
+      updateCustomHolidayValidation(textarea, status);
+    });
+    updateCustomHolidayValidation(textarea, status);
+  }
+
   function buildHolidaySet(region, startDate, endDate, customText) {
     const set = new Set();
     if (region === 'none') return set;
 
     if (region === 'custom') {
-      if (!customText) return set;
-      customText.split(/[,\n]/).map(s => s.trim()).filter(Boolean).forEach(s => {
-        const d = parseDateInput(s);
-        if (d) set.add(dateStr(d));
-      });
+      parseCustomHolidayDates(customText).dates.forEach(value => set.add(value));
       return set;
     }
 
@@ -898,6 +1537,56 @@
       }
     }
     return set;
+  }
+
+  function wireHolidayFileUpload(inputId, textarea, statusId) {
+    const input = document.getElementById(inputId);
+    const status = document.getElementById(statusId);
+    const maxBytes = 32 * 1024;
+
+    function showStatus(message, type) {
+      status.textContent = message;
+      status.className = 'file-upload-status' + (type ? ' ' + type : '');
+    }
+
+    input.addEventListener('change', function () {
+      const file = this.files && this.files[0];
+      if (!file) {
+        showStatus('', '');
+        return;
+      }
+
+      if (!/\.(txt|csv)$/i.test(file.name)) {
+        showStatus('Please choose a .txt or .csv file.', 'error');
+        this.value = '';
+        return;
+      }
+      if (file.size > maxBytes) {
+        showStatus('That file is larger than 32 KB. Choose a smaller holiday list.', 'error');
+        this.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function () {
+        const content = String(reader.result || '').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').trim();
+        textarea.value = content;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        const parsed = parseCustomHolidayDates(content);
+
+        if (parsed.isValid && parsed.dates.length) {
+          showStatus(file.name + ' loaded — ' + parsed.dates.length + ' valid holiday date' + (parsed.dates.length === 1 ? '' : 's') + ' found.', 'success');
+        } else if (!parsed.dates.length && !parsed.invalid.length) {
+          showStatus(file.name + ' is empty. Add dates in YYYY-MM-DD format.', 'error');
+        } else {
+          showStatus(file.name + ' loaded for review. Fix the validation errors below.', 'error');
+        }
+      };
+      reader.onerror = function () {
+        showStatus('The file could not be read. Please try another file.', 'error');
+      };
+      reader.readAsText(file);
+    });
   }
 
   function countBusinessDays(start, end, holidaySet) {
@@ -990,13 +1679,46 @@
   const riskText            = document.getElementById('riskText');
   const diffShareLine       = document.getElementById('diffShareLine');
 
-  diffPrecision.addEventListener('change', function () {
-    const isBusiness = this.value === 'business';
+  wireCustomHolidayValidation(diffCustomHolidays, 'diffCustomHolidayValidation');
+  wireHolidayFileUpload('diffHolidayFile', diffCustomHolidays, 'diffHolidayFileStatus');
+
+  function getDiffPrecision() {
+    const selected = diffPrecision.querySelector('input[name="diffPrecision"]:checked');
+    return selected ? selected.value : 'exact';
+  }
+
+  function setDiffPrecision(value) {
+    // Older bookmarks used a separate minutes mode; the combined option shows both units.
+    const normalized = value === 'minutes' ? 'hours' : value;
+    const option = diffPrecision.querySelector('input[name="diffPrecision"][value="' + normalized + '"]');
+    if (option) option.checked = true;
+  }
+
+  function getRadioGroupValue(group, fallback) {
+    const selected = group.querySelector('input[type="radio"]:checked');
+    return selected ? selected.value : fallback;
+  }
+
+  function setRadioGroupValue(group, value) {
+    const option = group.querySelector('input[type="radio"][value="' + value + '"]');
+    if (option) option.checked = true;
+  }
+
+  function getDiffHolidayRegion() {
+    return getRadioGroupValue(diffHolidayRegion, 'none');
+  }
+
+  function updatePrecisionDependencies() {
+    const isBusiness = getDiffPrecision() === 'business';
     diffHolidayGroup.style.display = isBusiness ? 'block' : 'none';
-    diffCustomGroup.style.display = (isBusiness && diffHolidayRegion.value === 'custom') ? 'block' : 'none';
+    diffCustomGroup.style.display = (isBusiness && getDiffHolidayRegion() === 'custom') ? 'block' : 'none';
+  }
+
+  diffPrecision.addEventListener('change', function () {
+    updatePrecisionDependencies();
   });
   diffHolidayRegion.addEventListener('change', function () {
-    diffCustomGroup.style.display = this.value === 'custom' ? 'block' : 'none';
+    diffCustomGroup.style.display = getDiffHolidayRegion() === 'custom' ? 'block' : 'none';
   });
 
   function resultCardHTML(label, value, sub, primary) {
@@ -1030,6 +1752,7 @@
     diffError.style.display = 'none';
     diffResults.style.display = 'none';
     riskBanner.style.display = 'none';
+    diffError.textContent = '⚠️ Please enter a valid start date and end date.';
 
     const s = parseDateInput(diffStart.value);
     const e = parseDateInput(diffEnd.value);
@@ -1038,7 +1761,20 @@
       return;
     }
 
-    const mode = diffPrecision.value;
+    const mode = getDiffPrecision();
+    if (mode === 'business' && getDiffHolidayRegion() === 'custom') {
+      const customValidation = updateCustomHolidayValidation(
+        diffCustomHolidays,
+        document.getElementById('diffCustomHolidayValidation')
+      );
+      if (!customValidation.isValid) {
+        diffError.textContent = '⚠️ Fix the custom holiday list before calculating.';
+        diffError.style.display = 'block';
+        diffCustomHolidays.focus();
+        return;
+      }
+    }
+
     const swapped = e < s;
     const a = swapped ? e : s;
     const b = swapped ? s : e;
@@ -1066,7 +1802,7 @@
       html += resultCardHTML('Total Hours', Math.round(totalMinutes / 60).toLocaleString());
       html += resultCardHTML('Total Days', totalDays.toLocaleString());
     } else if (mode === 'business') {
-      const holidaySet = buildHolidaySet(diffHolidayRegion.value, a, b, diffCustomHolidays.value);
+      const holidaySet = buildHolidaySet(getDiffHolidayRegion(), a, b, diffCustomHolidays.value);
       const bDays = countBusinessDays(a, b, holidaySet);
       const weekendDays = totalDays + 1 - bDays - Array.from(holidaySet).filter(h => { const d = parseDateInput(h); return d >= a && d <= b && !isWeekend(d); }).length;
       html += resultCardHTML('Business Days', bDays.toLocaleString(), swapped ? 'end date is before start date' : '', true);
@@ -1105,13 +1841,20 @@
   const ganttStartLabel    = document.getElementById('ganttStartLabel');
   const ganttEndLabel      = document.getElementById('ganttEndLabel');
 
+  wireCustomHolidayValidation(workCustomHolidays, 'workCustomHolidayValidation');
+  wireHolidayFileUpload('workHolidayFile', workCustomHolidays, 'workHolidayFileStatus');
+
+  function getWorkHolidayRegion() {
+    return getRadioGroupValue(workHolidayRegion, 'us');
+  }
+
   workHolidayRegion.addEventListener('change', function () {
-    workCustomGroup.style.display = this.value === 'custom' ? 'block' : 'none';
+    workCustomGroup.style.display = getWorkHolidayRegion() === 'custom' ? 'block' : 'none';
   });
 
   function renderGantt(start, end, bufferEnd) {
     ganttBar.innerHTML = '';
-    const holidaySet = buildHolidaySet(workHolidayRegion.value, start, bufferEnd, workCustomHolidays.value);
+    const holidaySet = buildHolidaySet(getWorkHolidayRegion(), start, bufferEnd, workCustomHolidays.value);
 
     const days = [];
     let d = new Date(start);
@@ -1155,6 +1898,7 @@
   function runWorkCalculation() {
     workError.style.display = 'none';
     workResults.style.display = 'none';
+    workError.textContent = '⚠️ Please enter a valid start date and a target end date on or after the start date.';
 
     const s = parseDateInput(workStart.value);
     const e = parseDateInput(workEnd.value);
@@ -1165,7 +1909,20 @@
       return;
     }
 
-    const holidaySet = buildHolidaySet(workHolidayRegion.value, s, addDays(e, Math.max(buffer, 1) * 3 + 30), workCustomHolidays.value);
+    if (getWorkHolidayRegion() === 'custom') {
+      const customValidation = updateCustomHolidayValidation(
+        workCustomHolidays,
+        document.getElementById('workCustomHolidayValidation')
+      );
+      if (!customValidation.isValid) {
+        workError.textContent = '⚠️ Fix the custom holiday list before planning the schedule.';
+        workError.style.display = 'block';
+        workCustomHolidays.focus();
+        return;
+      }
+    }
+
+    const holidaySet = buildHolidaySet(getWorkHolidayRegion(), s, addDays(e, Math.max(buffer, 1) * 3 + 30), workCustomHolidays.value);
     const businessDays = countBusinessDays(s, e, holidaySet);
     const totalCalendarDays = Math.round((e - s) / DAY_MS) + 1;
     const bufferedEnd = buffer > 0 ? addBusinessDays(e, buffer, holidaySet) : e;
@@ -1197,13 +1954,92 @@
   const recurBtn      = document.getElementById('recurBtn');
   const recurResults  = document.getElementById('recurResults');
   const recurBody     = document.getElementById('recurBody');
+  const recurSummary  = document.getElementById('recurSummary');
+  const recurPrintBtn = document.getElementById('recurPrintBtn');
+  const recurCsvLink  = document.getElementById('recurCsvLink');
+  const recurTxtLink  = document.getElementById('recurTxtLink');
   const recurShareLine = document.getElementById('recurShareLine');
 
   const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  let recurringOccurrences = [];
+  let recurringDownloadUrls = [];
+
+  function escapeCsv(value) {
+    return '"' + String(value).replace(/"/g, '""') + '"';
+  }
+
+  function buildRecurringCsv() {
+    const lines = [['Occurrence', 'Date', 'Day of Week', 'Days From Start'].map(escapeCsv).join(',')];
+    recurringOccurrences.forEach(item => {
+      lines.push([item.number, item.date, item.weekday, item.daysFromStart].map(escapeCsv).join(','));
+    });
+    return '\uFEFF' + lines.join('\r\n');
+  }
+
+  function buildRecurringTxt() {
+    const headers = ['#', 'Date', 'Day of Week', 'Days From Start'];
+    const dataRows = recurringOccurrences.map(item => [
+      String(item.number),
+      item.date,
+      item.weekday,
+      String(item.daysFromStart)
+    ]);
+    const columnWidths = headers.map((header, index) => {
+      return Math.max(header.length, ...dataRows.map(row => row[index].length));
+    });
+    const formatRow = values => values
+      .map((value, index) => String(value).padEnd(columnWidths[index]))
+      .join('  ')
+      .trimEnd();
+    const divider = columnWidths.map(width => '-'.repeat(width)).join('  ');
+
+    const lines = [
+      'Upcoming Occurrences',
+      'Start Date: ' + recurStart.value,
+      'Interval: ' + recurInterval.value + ' day' + (recurInterval.value === '1' ? '' : 's'),
+      'Occurrences: ' + recurringOccurrences.length,
+      '',
+      formatRow(headers),
+      divider
+    ];
+    dataRows.forEach(row => lines.push(formatRow(row)));
+    return lines.join('\r\n');
+  }
+
+  function clearRecurringDownloads() {
+    recurringDownloadUrls.forEach(url => URL.revokeObjectURL(url));
+    recurringDownloadUrls = [];
+    recurCsvLink.removeAttribute('href');
+    recurTxtLink.removeAttribute('href');
+  }
+
+  function prepareRecurringDownloads() {
+    clearRecurringDownloads();
+    const baseFilename = 'recurring-dates-' + (recurStart.value || 'schedule');
+    const csvUrl = URL.createObjectURL(new Blob([buildRecurringCsv()], { type: 'text/csv;charset=utf-8' }));
+    const txtUrl = URL.createObjectURL(new Blob([buildRecurringTxt()], { type: 'text/plain;charset=utf-8' }));
+    recurringDownloadUrls = [csvUrl, txtUrl];
+    recurCsvLink.href = csvUrl;
+    recurCsvLink.download = baseFilename + '.csv';
+    recurTxtLink.href = txtUrl;
+    recurTxtLink.download = baseFilename + '.txt';
+  }
+
+  function printRecurringOccurrences() {
+    if (!recurringOccurrences.length) return;
+    const cleanup = function () {
+      document.body.classList.remove('print-recurring');
+    };
+    document.body.classList.add('print-recurring');
+    window.addEventListener('afterprint', cleanup, { once: true });
+    window.print();
+  }
 
   function runRecurCalculation() {
     recurError.style.display = 'none';
     recurResults.style.display = 'none';
+    recurringOccurrences = [];
+    clearRecurringDownloads();
 
     const s = parseDateInput(recurStart.value);
     const interval = parseInt(recurInterval.value, 10);
@@ -1217,11 +2053,21 @@
     let rows = '';
     let d = new Date(s);
     for (let i = 0; i < count; i++) {
-      rows += '<tr><td>' + (i + 1) + '</td><td>' + fmtDateLong(d) + '</td><td>' + WEEKDAY_NAMES[d.getDay()] + '</td><td>' + (i * interval) + '</td></tr>';
+      const occurrence = {
+        number: i + 1,
+        date: dateStr(d),
+        displayDate: fmtDateLong(d),
+        weekday: WEEKDAY_NAMES[d.getDay()],
+        daysFromStart: i * interval
+      };
+      recurringOccurrences.push(occurrence);
+      rows += '<tr><td>' + occurrence.number + '</td><td>' + occurrence.displayDate + '</td><td>' + occurrence.weekday + '</td><td>' + occurrence.daysFromStart + '</td></tr>';
       d = addDays(d, interval);
     }
 
     recurBody.innerHTML = rows;
+    recurSummary.textContent = count + ' occurrence' + (count === 1 ? '' : 's') + ' every ' + interval + ' day' + (interval === 1 ? '' : 's') + ', starting ' + fmtDateLong(s) + '.';
+    prepareRecurringDownloads();
     recurResults.style.display = 'block';
     recurShareLine.style.display = 'flex';
 
@@ -1230,6 +2076,7 @@
   }
 
   recurBtn.addEventListener('click', runRecurCalculation);
+  recurPrintBtn.addEventListener('click', printRecurringOccurrences);
 
   /* ══════════════════════════════════════════════════
      URL PARAMS — READ on page load
@@ -1242,8 +2089,11 @@
 
     if (params.has('start')) diffStart.value = workStart.value = params.get('start');
     if (params.has('end'))   diffEnd.value   = workEnd.value   = params.get('end');
-    if (params.has('precision')) diffPrecision.value = params.get('precision');
-    if (params.has('region')) { diffHolidayRegion.value = params.get('region'); workHolidayRegion.value = params.get('region'); }
+    if (params.has('precision')) setDiffPrecision(params.get('precision'));
+    if (params.has('region')) {
+      setRadioGroupValue(diffHolidayRegion, params.get('region'));
+      setRadioGroupValue(workHolidayRegion, params.get('region'));
+    }
     if (params.has('custom')) { diffCustomHolidays.value = params.get('custom'); workCustomHolidays.value = params.get('custom'); }
     if (params.has('buffer')) workBuffer.value = params.get('buffer');
 
@@ -1251,9 +2101,11 @@
     if (params.has('rinterval')) recurInterval.value = params.get('rinterval');
     if (params.has('rcount'))    recurCount.value     = params.get('rcount');
 
-    diffPrecision.dispatchEvent(new Event('change'));
-    diffHolidayRegion.dispatchEvent(new Event('change'));
-    workHolidayRegion.dispatchEvent(new Event('change'));
+    updatePrecisionDependencies();
+    diffCustomGroup.style.display = (getDiffPrecision() === 'business' && getDiffHolidayRegion() === 'custom') ? 'block' : 'none';
+    workCustomGroup.style.display = getWorkHolidayRegion() === 'custom' ? 'block' : 'none';
+    updateCustomHolidayValidation(diffCustomHolidays, document.getElementById('diffCustomHolidayValidation'));
+    updateCustomHolidayValidation(workCustomHolidays, document.getElementById('workCustomHolidayValidation'));
 
     setActiveTab(mode, true);
 
@@ -1275,16 +2127,16 @@
       params.set('end', (activeMode === 'diff' ? diffEnd : workEnd).value);
     }
     if (activeMode === 'diff') {
-      params.set('precision', diffPrecision.value);
-      if (diffPrecision.value === 'business') {
-        params.set('region', diffHolidayRegion.value);
-        if (diffHolidayRegion.value === 'custom' && diffCustomHolidays.value.trim()) params.set('custom', diffCustomHolidays.value.trim());
+      params.set('precision', getDiffPrecision());
+      if (getDiffPrecision() === 'business') {
+        params.set('region', getDiffHolidayRegion());
+        if (getDiffHolidayRegion() === 'custom' && diffCustomHolidays.value.trim()) params.set('custom', diffCustomHolidays.value.trim());
       }
     }
     if (activeMode === 'work') {
-      params.set('region', workHolidayRegion.value);
+      params.set('region', getWorkHolidayRegion());
       params.set('buffer', workBuffer.value);
-      if (workHolidayRegion.value === 'custom' && workCustomHolidays.value.trim()) params.set('custom', workCustomHolidays.value.trim());
+      if (getWorkHolidayRegion() === 'custom' && workCustomHolidays.value.trim()) params.set('custom', workCustomHolidays.value.trim());
     }
     if (activeMode === 'recur') {
       params.set('rstart', recurStart.value);

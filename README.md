@@ -15,7 +15,7 @@
 
 MonkeyTactics.com is a growing collection of free online calculators, converters, and utility tools built with lightweight HTML, CSS, and JavaScript. The site is designed for people who want quick answers without sign-ups, account creation, or unnecessary clutter.
 
-Whether you need a percentage calculator, BMI calculator, unit converter, loan calculator, date difference calculator, password generator, browser-based OCR, QR code generator, QR code decoder, word counter, or word unscrambler, MonkeyTactics helps users solve everyday problems in seconds directly from the browser.
+Whether you need a percentage calculator, BMI calculator, unit converter, loan calculator, date difference and business days calculator, password generator, browser-based OCR, QR code generator, QR code decoder, word counter, or word unscrambler, MonkeyTactics helps users solve everyday problems in seconds directly from the browser.
 
 This project is especially useful for students, professionals, developers, small business owners, and anyone searching for simple, ad-light tools that work well on desktop and mobile.
 
@@ -38,7 +38,7 @@ The site currently features 23 tools across five main categories:
 
 - Finance: [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator), [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator), [Percentage Calculator](https://monkeytactics.com/tools/percentage-calculator)
 - Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Calorie Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
-- Utilities: [Date Difference Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator), [QR Code Decoder](https://monkeytactics.com/tools/qr-code-decoder), [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler)
+- Utilities: [Date Difference & Business Days Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator), [QR Code Decoder](https://monkeytactics.com/tools/qr-code-decoder), [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler)
 - Productivity: [Password Generator](https://monkeytactics.com/tools/password-generator), [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter), [OCR Utility](https://monkeytactics.com/tools/ocr-utility)
 - Construction: [Concrete Calculator](https://monkeytactics.com/tools/concrete-calculator), [Drywall Calculator](https://monkeytactics.com/tools/drywall-calculator), [Paint Calculator](https://monkeytactics.com/tools/paint-calculator), [Tile Calculator](https://monkeytactics.com/tools/tile-calculator), [Roofing Shingle Calculator](https://monkeytactics.com/tools/roofing-shingle-calculator), [Lumber Board Foot Calculator](https://monkeytactics.com/tools/lumber-board-foot-calculator), [Insulation Calculator](https://monkeytactics.com/tools/insulation-calculator)
 
@@ -50,7 +50,7 @@ The site currently features 23 tools across five main categories:
 |---|---|---:|
 | **Finance** | Loan & Mortgage, Compound Interest, Percentage | 3 |
 | **Health & Body** | BMI, Calorie, Age | 3 |
-| **Everyday Utilities** | Date Difference, Unit Converter, Tip, Time Zone, QR Generator, QR Decoder, Word Unscrambler | 7 |
+| **Everyday Utilities** | Date Difference & Business Days, Unit Converter, Tip, Time Zone, QR Generator, QR Decoder, Word Unscrambler | 7 |
 | **Productivity** | Password Generator, Word & Character Counter, OCR Utility | 3 |
 | **Construction** | Concrete, Drywall, Paint, Tile, Roofing Shingles, Lumber Board Feet, Insulation | 7 |
 
@@ -76,7 +76,7 @@ This project is built around terms such as:
 - loan calculator
 - mortgage calculator
 - unit converter
-- date difference calculator
+- date difference calculator business days
 - password generator
 - OCR utility
 - image to text
