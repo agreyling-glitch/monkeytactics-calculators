@@ -1,20 +1,18 @@
-.hero--inner {
-  padding: 1.75rem 2rem;
-}
+/* Calorie-specific components and scoped overrides for shared calculator classes. */
 
-.hero--inner h1 {
+.calorie-calculator-page .hero--inner h1 {
   margin-bottom: 0.35rem;
   font-size: 2rem;
 }
 
-.hero--inner .hero-tagline {
+.calorie-calculator-page .hero--inner .hero-tagline {
   margin: 0 0 1rem;
   max-width: 54rem;
   font-size: 1rem;
   line-height: 1.65;
 }
 
-.breadcrumb {
+.calorie-calculator-page .breadcrumb {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -24,17 +22,17 @@
   font-size: 0.8rem;
 }
 
-.breadcrumb a {
+.calorie-calculator-page .breadcrumb a {
   padding: 0;
   color: var(--muted);
 }
 
-.breadcrumb a:hover {
+.calorie-calculator-page .breadcrumb a:hover {
   background: transparent;
   color: var(--accent);
 }
 
-.breadcrumb .sep {
+.calorie-calculator-page .breadcrumb .sep {
   opacity: 0.45;
 }
 
@@ -55,16 +53,6 @@
   width: 1rem;
   height: 1rem;
   fill: var(--accent);
-}
-
-.tool-widget {
-  margin-top: 1.5rem;
-  padding: 1.75rem;
-  overflow: visible;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  box-shadow: var(--shadow-card);
 }
 
 .section-heading {
@@ -133,9 +121,8 @@
 }
 
 .segmented-control {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  max-width: 30rem;
+  display: inline-grid;
+  grid-template-columns: repeat(2, auto);
   padding: 0.25rem;
   border: 1px solid #334155;
   border-radius: 0.7rem;
@@ -157,12 +144,13 @@
   font-size: 0.83rem;
   font-weight: 700;
   text-align: center;
+  white-space: nowrap;
 }
 
 .segmented-control label span {
-  display: block;
-  margin-top: 0.08rem;
-  font-size: 0.68rem;
+  display: inline;
+  margin-left: 0.3rem;
+  font-size: 0.72rem;
   font-weight: 500;
 }
 
@@ -177,22 +165,42 @@
   outline-offset: 2px;
 }
 
-.input-row {
+.calorie-calculator-page .input-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
-.input-group {
+.calorie-calculator-page .input-row.input-row--measurements {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.calorie-calculator-page .input-group {
   min-width: 0;
-  margin-bottom: 1.1rem;
+}
+
+.input-group--fieldset {
+  padding: 0;
+  border: 0;
+}
+
+.activity-options {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.activity-divider {
+  height: 1px;
+  margin: 1rem 0;
+  background: rgba(148, 163, 184, 0.14);
 }
 
 .input-group--last {
   margin-bottom: 0;
 }
 
-.input-group label {
+.calorie-calculator-page .input-group label {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
@@ -212,14 +220,83 @@
   font-weight: 650;
 }
 
-.input-group .unit {
+.calorie-calculator-page .input-group .unit {
   color: var(--muted);
   font-size: 0.73rem;
   font-weight: 400;
 }
 
-.input-group input,
-.input-group select {
+.calorie-calculator-page .input-group .radio-group {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: 2.75rem;
+}
+
+.calorie-calculator-page .input-group .radio-group label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.calorie-calculator-page .input-group .radio-group input[type="radio"] {
+  width: 1rem;
+  min-height: 1rem;
+  padding: 0;
+  margin: 0 0.4rem 0 0;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  accent-color: var(--accent);
+}
+
+.calorie-calculator-page .input-group .radio-group input[type="radio"]:focus-visible {
+  outline: 2px solid rgba(134, 239, 172, 0.75);
+  outline-offset: 2px;
+}
+
+.range-control input[type="range"] {
+  width: 100%;
+  min-height: 1.5rem;
+  padding: 0;
+  margin: 0.35rem 0 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.range-control input[type="range"]:focus-visible {
+  outline: 2px solid rgba(134, 239, 172, 0.75);
+  outline-offset: 3px;
+}
+
+.range-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.calorie-calculator-page .input-group .radio-group--activity {
+  flex-wrap: wrap;
+  row-gap: 0.75rem;
+}
+
+.radio-group--activity label {
+  cursor: help;
+}
+
+.calorie-calculator-page .input-group input:not([type="radio"]):not([type="range"]),
+.calorie-calculator-page .input-group select {
   width: 100%;
   min-height: 2.75rem;
   padding: 0.65rem 0.85rem;
@@ -233,22 +310,33 @@
   transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
-.input-group input:hover,
-.input-group select:hover {
+.calorie-calculator-page .input-group input:not([type="radio"]):not([type="range"]):hover,
+.calorie-calculator-page .input-group select:hover {
   border-color: #475569;
 }
 
-.input-group input:focus,
-.input-group select:focus {
+.calorie-calculator-page .input-group input:not([type="radio"]):not([type="range"]):focus,
+.calorie-calculator-page .input-group select:focus {
   border-color: var(--accent);
   background: rgba(2, 6, 23, 0.8);
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
 }
 
-.input-group input[aria-invalid="true"],
-.input-group select[aria-invalid="true"] {
+.calorie-calculator-page .input-group input:not([type="radio"]):not([type="range"])[aria-invalid="true"],
+.calorie-calculator-page .input-group select[aria-invalid="true"] {
   border-color: #fb7185;
   box-shadow: 0 0 0 3px rgba(251, 113, 133, 0.1);
+}
+
+.calorie-calculator-page .input-group[data-unit-panel="metric"],
+.calorie-calculator-page .input-group[data-unit-panel="imperial"] {
+  max-width: 16rem;
+}
+
+.calorie-calculator-page .input-group[data-unit-panel="metric"] input:not([type="radio"]):not([type="range"]),
+.calorie-calculator-page .input-group[data-unit-panel="imperial"] input:not([type="radio"]):not([type="range"]) {
+  min-height: 2.4rem;
+  padding-block: 0.5rem;
 }
 
 .compound-input {
@@ -295,12 +383,6 @@
 
 .field-error:empty {
   display: none;
-}
-
-.input-hint {
-  margin: 0.35rem 0 0;
-  color: var(--muted);
-  font-size: 0.76rem;
 }
 
 .activity-heading {
@@ -404,11 +486,12 @@
   font-size: 0.8rem;
 }
 
-.results-panel {
+.calorie-calculator-page .results-panel {
+  display: block;
   scroll-margin-top: 1rem;
 }
 
-.results-panel[hidden] {
+.calorie-calculator-page .results-panel[hidden] {
   display: none;
 }
 
@@ -418,13 +501,12 @@
   background: linear-gradient(90deg, transparent, #334155 12%, #334155 88%, transparent);
 }
 
-.results-grid {
+.calorie-calculator-page .results-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
 }
 
-.result-card {
+.calorie-calculator-page .result-card {
   position: relative;
   min-width: 0;
   padding: 1.35rem;
@@ -434,7 +516,7 @@
   border-radius: 0.9rem;
 }
 
-.result-card::before {
+.calorie-calculator-page .result-card::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -453,7 +535,7 @@
   background: var(--accent);
 }
 
-.result-label {
+.calorie-calculator-page .result-label {
   color: #cbd5e1;
   font-size: 0.76rem;
   font-weight: 700;
@@ -461,7 +543,7 @@
   text-transform: uppercase;
 }
 
-.result-value {
+.calorie-calculator-page .result-value {
   margin: 0.45rem 0 0.3rem;
   color: #7dd3fc;
   font-size: clamp(2rem, 5vw, 2.65rem);
@@ -473,13 +555,13 @@
   color: #4ade80;
 }
 
-.result-value small {
+.calorie-calculator-page .result-value small {
   color: var(--muted);
   font-size: 0.75rem;
   font-weight: 600;
 }
 
-.result-card p {
+.calorie-calculator-page .result-card p {
   margin: 0;
   color: var(--muted);
   font-size: 0.8rem;
@@ -487,7 +569,8 @@
 }
 
 .breakdown,
-.how-it-works details {
+.how-it-works details,
+.how-it-works--static .info-panel {
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.02);
@@ -626,10 +709,16 @@
   margin: 0;
 }
 
-.how-it-works summary {
+.how-it-works--static {
+  margin-top: 1.5rem;
+}
+
+.how-it-works summary,
+.how-it-works--static .info-summary {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.8rem;
   padding: 1rem 3rem 1rem 1rem;
 }
@@ -648,17 +737,21 @@
 }
 
 .how-it-works summary h2,
-.how-it-works summary small {
+.how-it-works summary small,
+.how-it-works--static .info-summary h2,
+.how-it-works--static .info-summary small {
   display: block;
 }
 
-.how-it-works summary h2 {
+.how-it-works summary h2,
+.how-it-works--static .info-summary h2 {
   margin: 0;
   color: var(--text);
   font-size: 0.98rem;
 }
 
-.how-it-works summary small {
+.how-it-works summary small,
+.how-it-works--static .info-summary small {
   margin-top: 0.2rem;
   color: var(--muted);
   font-size: 0.75rem;
@@ -679,6 +772,19 @@
   color: var(--muted);
   font-size: 0.84rem;
   line-height: 1.6;
+}
+
+.how-content .section-intro {
+  margin-top: 1rem;
+  color: #cbd5e1;
+}
+
+.how-content p + p {
+  margin-top: 0.7rem;
+}
+
+.how-content p strong {
+  color: #cbd5e1;
 }
 
 .how-content a {
@@ -721,13 +827,15 @@
   line-height: 1.55;
 }
 
-.faq-section {
-  margin-top: 1.25rem;
-  padding-top: 0.25rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
+.calorie-calculator-page .faq-section {
+  padding-bottom: 1.25rem;
 }
 
-.faq-section h4 {
+.faq-disclosure {
+  margin-top: 1rem;
+}
+
+.calorie-calculator-page .faq-section h3 {
   margin: 0.9rem 0 0.25rem;
   color: #dbeafe;
   font-size: 0.84rem;
@@ -744,7 +852,7 @@
   line-height: 1.55;
 }
 
-.related-tools {
+.calorie-calculator-page .related-tools {
   margin-top: 1.5rem;
   padding: 1.4rem;
   border: 1px solid var(--border);
@@ -752,12 +860,12 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
-.related-tools h2 {
+.calorie-calculator-page .related-tools h2 {
   margin: 0;
   font-size: 1.05rem;
 }
 
-.related-tools > p {
+.calorie-calculator-page .related-tools > p {
   margin: 0.35rem 0 1rem;
   color: var(--muted);
   font-size: 0.8rem;
@@ -805,15 +913,26 @@
 }
 
 @media (max-width: 700px) {
-  .hero--inner {
+  .calorie-calculator-page .hero--inner {
     padding: 1.25rem;
   }
 
-  .hero--inner h1 {
+  .segmented-control {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .segmented-control label {
+    padding-inline: 0.5rem;
+    white-space: normal;
+  }
+
+  .calorie-calculator-page .hero--inner h1 {
     font-size: 1.6rem;
   }
 
-  .tool-widget {
+  .calorie-calculator-page .tool-widget {
     padding: 1.15rem;
   }
 
@@ -821,13 +940,12 @@
     padding: 1rem;
   }
 
-  .input-row,
-  .results-grid {
+  .calorie-calculator-page .results-grid {
     grid-template-columns: 1fr;
     gap: 0;
   }
 
-  .results-grid {
+  .calorie-calculator-page .results-grid {
     gap: 0.8rem;
   }
 
@@ -867,6 +985,42 @@
 
   .ad-container--bottom {
     margin-top: 3.5rem;
+  }
+}
+
+@media (max-width: 519px) {
+  .calorie-calculator-page .input-row.input-row--measurements {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .input-row--measurements .compound-input {
+    gap: 0.35rem;
+  }
+
+  .input-row--measurements .compound-input input {
+    padding-right: 1.5rem;
+    padding-left: 0.55rem;
+  }
+
+  .input-row--measurements .compound-input > div > span {
+    right: 0.45rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .input-row--measurements .compound-input input {
+    padding-inline: 0.35rem;
+    font-size: 0.82rem;
+  }
+
+  .input-row--measurements .compound-input > div > span {
+    display: none;
+  }
+
+  .calorie-calculator-page .input-row--measurements #weightLb {
+    padding-inline: 0.55rem;
+    font-size: 0.82rem;
   }
 }
 

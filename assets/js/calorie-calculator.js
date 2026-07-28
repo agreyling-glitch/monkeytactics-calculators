@@ -17,13 +17,13 @@
 
   const fields = {
     age: document.getElementById('age'),
-    sex: document.getElementById('sex'),
+    sexes: Array.from(form.elements.sex),
     heightCm: document.getElementById('heightCm'),
     weightKg: document.getElementById('weightKg'),
     heightFt: document.getElementById('heightFt'),
     heightIn: document.getElementById('heightIn'),
     weightLb: document.getElementById('weightLb'),
-    activity: document.getElementById('activityLevel'),
+    activities: Array.from(form.elements.activityLevel),
     unitSystems: Array.from(form.elements.unitSystem)
   };
 
@@ -51,13 +51,27 @@
 
   const unitPanels = Array.from(document.querySelectorAll('[data-unit-panel]'));
   const activityMeter = document.getElementById('activityMeterFill');
+  const ageValue = document.getElementById('ageValue');
   const copyLinkButton = document.getElementById('copyLinkBtn');
   const copyConfirmation = document.getElementById('copyConfirm');
   let convertedMeasurements = null;
   let copyConfirmationTimer;
 
   function getUnitSystem() {
-    return fields.unitSystems.find((radio) => radio.checked)?.value || 'metric';
+    return fields.unitSystems.find((radio) => radio.checked)?.value || 'imperial';
+  }
+
+  function getSex() {
+    return fields.sexes.find((radio) => radio.checked)?.value || '';
+  }
+
+  function getActivity() {
+    return fields.activities.find((radio) => radio.checked);
+  }
+
+  function updateAgeDisplay() {
+    ageValue.textContent = fields.age.value;
+    fields.age.setAttribute('aria-valuetext', `${fields.age.value} years`);
   }
 
   function parseNumber(field) {
@@ -91,8 +105,8 @@
   }
 
   function validateSex() {
-    const valid = VALID_SEXES.includes(fields.sex.value);
-    setError('sex', [fields.sex], valid ? '' : 'Select the sex used by the formula.');
+    const valid = VALID_SEXES.includes(getSex());
+    setError('sex', fields.sexes, valid ? '' : 'Select the sex used by the formula.');
     return valid;
   }
 
@@ -192,14 +206,14 @@
     }
 
     const age = Number(fields.age.value);
-    const sex = fields.sex.value;
+    const sex = getSex();
     const measurements = getMetricMeasurements();
-    const selectedActivity = fields.activity.options[fields.activity.selectedIndex];
+    const selectedActivity = getActivity();
     const activityFactor = Number(selectedActivity.dataset.factor);
     const bmr = calculateBmr({ age, sex, ...measurements });
     const tdee = calculateTdee(bmr, activityFactor);
     const sexAdjustment = sex === 'male' ? 5 : -161;
-    const activityName = selectedActivity.text.split(' — ')[0];
+    const activityName = selectedActivity.dataset.label;
 
     output.bmr.textContent = formatCalories(bmr);
     output.tdee.textContent = formatCalories(tdee);
@@ -273,8 +287,8 @@
   }
 
   function updateActivityMeter() {
-    const option = fields.activity.options[fields.activity.selectedIndex];
-    activityMeter.style.width = `${Number(option.dataset.level) * 20}%`;
+    const selectedActivity = getActivity();
+    activityMeter.style.width = `${Number(selectedActivity.dataset.level) * 20}%`;
   }
 
   /* URL state: readable values make shared links easy to inspect and edit.
@@ -289,7 +303,8 @@
 
     params.set('unit', unitSystem);
     if (age !== null) params.set('age', formatUrlNumber(age));
-    if (VALID_SEXES.includes(fields.sex.value)) params.set('sex', fields.sex.value);
+    const sex = getSex();
+    if (VALID_SEXES.includes(sex)) params.set('sex', sex);
 
     if (unitSystem === 'metric') {
       const height = parseNumber(fields.heightCm);
@@ -303,7 +318,7 @@
     }
 
     if (weight !== null) params.set('weight', formatUrlNumber(weight));
-    params.set('activity', fields.activity.value);
+    params.set('activity', getActivity().value);
 
     const query = params.toString();
     const newUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
@@ -322,7 +337,7 @@
     const params = new URLSearchParams(window.location.search);
     if (![...params.keys()].length) return false;
 
-    const unit = VALID_UNITS.includes(params.get('unit')) ? params.get('unit') : 'metric';
+    const unit = VALID_UNITS.includes(params.get('unit')) ? params.get('unit') : 'imperial';
     const age = Number(params.get('age'));
     const sex = params.get('sex');
     const activity = params.get('activity');
@@ -333,8 +348,15 @@
     convertedMeasurements = null;
 
     if (params.has('age') && Number.isFinite(age)) fields.age.value = age;
-    if (VALID_SEXES.includes(sex)) fields.sex.value = sex;
-    if (VALID_ACTIVITIES.includes(activity)) fields.activity.value = activity;
+    updateAgeDisplay();
+    if (VALID_SEXES.includes(sex)) {
+      const sexRadio = fields.sexes.find((radio) => radio.value === sex);
+      if (sexRadio) sexRadio.checked = true;
+    }
+    if (VALID_ACTIVITIES.includes(activity)) {
+      const activityRadio = fields.activities.find((radio) => radio.value === activity);
+      if (activityRadio) activityRadio.checked = true;
+    }
 
     if (unit === 'metric') {
       const heightCm = Number(height);
@@ -384,8 +406,9 @@
   form.addEventListener('reset', () => {
     convertedMeasurements = null;
     window.setTimeout(() => {
-      showUnitSystem('metric', false);
+      showUnitSystem('imperial', false);
       updateActivityMeter();
+      updateAgeDisplay();
       Object.values(errors).forEach((error) => { error.textContent = ''; });
       form.querySelectorAll('[aria-invalid]').forEach((field) => {
         field.setAttribute('aria-invalid', 'false');
@@ -412,13 +435,17 @@
       });
     });
 
-  fields.age.addEventListener('input', updateCalculator);
-  fields.sex.addEventListener('change', updateCalculator);
-  fields.activity.addEventListener('change', updateCalculator);
+  fields.age.addEventListener('input', () => {
+    updateAgeDisplay();
+    updateCalculator();
+  });
+  fields.sexes.forEach((radio) => radio.addEventListener('change', updateCalculator));
+  fields.activities.forEach((radio) => radio.addEventListener('change', updateCalculator));
   copyLinkButton.addEventListener('click', copyBookmarkableLink);
 
-  showUnitSystem('metric', false);
+  showUnitSystem('imperial', false);
   updateActivityMeter();
+  updateAgeDisplay();
   const hasUrlState = readUrlParams();
   updateActivityMeter();
 
