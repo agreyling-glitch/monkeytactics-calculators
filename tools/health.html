@@ -41,6 +41,21 @@
     .seo-section p { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
     .seo-section p:last-child { margin-bottom: 0; }
 
+    .calculator-overview {
+      margin-top: 2rem;
+      padding: 1.4rem;
+      border: 1px solid rgba(251, 146, 60, 0.28);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(249, 115, 22, 0.08), rgba(255, 255, 255, 0.02));
+    }
+    .calculator-overview h2 { margin: 0; font-size: 1.15rem; }
+    .calculator-overview > p { max-width: 740px; margin: 0.5rem 0 0; color: var(--muted); line-height: 1.7; }
+    .calorie-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+    .calorie-feature { padding: 0.85rem; border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px); background: rgba(2, 6, 23, 0.28); }
+    .calorie-feature h3 { margin: 0; color: var(--text); font-size: 0.9rem; }
+    .calorie-feature p { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.82rem; line-height: 1.55; }
+    .calculator-overview .overview-action { display: inline-block; margin-top: 1rem; }
+
     /* BMI reference table */
     .bmi-table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; font-size: 0.875rem; max-width: 500px; }
     .bmi-table th, .bmi-table td { text-align: left; padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--border); }
@@ -71,11 +86,12 @@
     @media (max-width: 600px) {
       .hero--inner { padding: 1.25rem; }
       .hero--inner h1 { font-size: 1.5rem; }
+      .calorie-features { grid-template-columns: 1fr; }
     }
   </style>
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-22" />
+  <meta name="date" content="2026-07-28" />
   <script src="/assets/js/web-vitals-rum.js" defer></script>
 
   <script type="application/ld+json">
@@ -104,7 +120,8 @@
           {
             "@type": "ListItem",
             "position": 2,
-            "url": "https://monkeytactics.com/tools/calorie-calculator.html"
+            "name": "Calorie Calculator",
+            "url": "https://monkeytactics.com/tools/calorie-calculator"
           },
           {
             "@type": "ListItem",
@@ -144,10 +161,10 @@
 
     <section class="hero hero--inner" aria-labelledby="health-heading">
       <h1 id="health-heading">Free Health &amp; Body Calculators</h1>
-      <p>Quick, private health and body calculations — your inputs stay on your device and are never shared.</p>
+      <p>Estimate daily calorie needs, calculate BMI and healthy weight ranges, or find an exact age. Every calculation runs privately on your device.</p>
       <div class="hero-actions">
-        <a href="/tools/bmi-calculator" class="btn-primary">⚖️ Try BMI Calculator</a>
-        <a href="/tools/" class="btn-ghost">Browse all tools</a>
+        <a href="/tools/calorie-calculator" class="btn-primary">🔥 Try Calorie Calculator</a>
+        <a href="/tools/bmi-calculator" class="btn-ghost">Try BMI Calculator</a>
       </div>
     </section>
 
@@ -197,6 +214,36 @@
       </div>
     </section>
 
+    <!-- CALORIE CALCULATOR OVERVIEW -->
+    <section class="calculator-overview" aria-labelledby="calorie-overview-heading">
+      <h2 id="calorie-overview-heading">Calorie Calculator: Estimate BMR, TDEE and Maintenance Calories</h2>
+      <p>
+        The free Calorie Calculator estimates how much energy your body uses at rest and
+        across a typical day. Enter your age, sex, height, weight, and usual activity level
+        in US or international units to receive input-based starting estimates.
+      </p>
+      <div class="calorie-features">
+        <article class="calorie-feature">
+          <h3>Basal Metabolic Rate (BMR)</h3>
+          <p>Estimate the calories your body uses at complete rest for essential functions such as breathing and circulation.</p>
+        </article>
+        <article class="calorie-feature">
+          <h3>Daily Calorie Needs (TDEE)</h3>
+          <p>Apply an activity factor to BMR to estimate total daily energy expenditure and maintenance calories.</p>
+        </article>
+        <article class="calorie-feature">
+          <h3>Weight Goal Starting Points</h3>
+          <p>Compare example calorie targets for weight loss, weight maintenance, and gradual weight gain.</p>
+        </article>
+      </div>
+      <p>
+        The calculator uses the Mifflin–St Jeor equation and includes five activity levels,
+        from sedentary through extra active. Results are estimates for general planning,
+        not medical advice or a substitute for individualized nutrition guidance.
+      </p>
+      <a href="/tools/calorie-calculator" class="btn-primary overview-action">Calculate Your Daily Calorie Needs</a>
+    </section>
+
     <!-- BMI REFERENCE -->
     <div class="seo-section">
       <h2>BMI Reference Ranges</h2>
@@ -238,6 +285,18 @@
     <section aria-labelledby="faq-heading" style="margin-top:2rem;">
       <h2 id="faq-heading">Frequently Asked Questions</h2>
       <ul class="faq-list">
+        <li class="faq-item">
+          <h3>What does the Calorie Calculator estimate?</h3>
+          <p>It estimates basal metabolic rate (BMR), total daily energy expenditure (TDEE),
+             maintenance calories, and example daily targets for losing, maintaining, or
+             gaining weight. The result is a starting estimate rather than a precise prescription.</p>
+        </li>
+        <li class="faq-item">
+          <h3>How should I choose a Calorie Calculator activity level?</h3>
+          <p>Consider your complete weekly routine, including your job, walking, household
+             movement, and structured exercise. If you are between two activity descriptions,
+             begin with the lower one and compare the estimate with your real-world trend.</p>
+        </li>
         <li class="faq-item">
           <h3>Is BMI an accurate measure of health?</h3>
           <p>BMI is a useful screening tool but has known limitations — it does not distinguish between fat and
