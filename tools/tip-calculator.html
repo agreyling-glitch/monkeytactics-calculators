@@ -29,7 +29,7 @@
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",      "item": "https://monkeytactics.com/" },
       { "@type": "ListItem", "position": 2, "name": "Utilities", "item": "https://monkeytactics.com/tools/utilities.html" },
-      { "@type": "ListItem", "position": 3, "name": "Tip Calculator", "item": "https://monkeytactics.com/tools/tip-calculator.html" }
+      { "@type": "ListItem", "position": 3, "name": "Tip Calculator", "item": "https://monkeytactics.com/tools/tip-calculator" }
     ]
   }
   </script>
@@ -48,7 +48,7 @@
       {
         "@type": "Question",
         "name": "What is the standard tip percentage?",
-        "acceptedAnswer": { "@type": "Answer", "text": "In the United States, the customary tip at a sit-down restaurant is 15–20% of the pre-tax bill. For excellent service, 20–25% is common. For counter service or takeout, 10% or a small flat amount is typical. Tipping customs vary widely by country — in much of Europe and Asia a service charge is already included." }
+        "acceptedAnswer": { "@type": "Answer", "text": "In the United States, the customary tip at a sit‑down restaurant is 15–20% of the pre‑tax bill, with 20–25% common for excellent service. For counter service or takeout, 10% or a small flat amount is typical. Tipping customs vary significantly around the world — many European and Asian countries include a service charge in the bill, and some cultures (like Japan) do not tip at all. To make this easier, the calculator includes a Country / Region Tipping Customs dropdown that displays the typical restaurant tipping practice for each location. Select a country to see its standard tipping norms before choosing your tip percentage." }
       },
       {
         "@type": "Question",
@@ -159,6 +159,23 @@
 
     .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
 
+    /* ── Reusable tipping customs component ── */
+    .tipping-customs-select option {
+      background: #0f172a;
+      color: var(--text);
+    }
+    .tipping-customs-suggestion {
+      margin: 0.45rem 0 0;
+      padding: 0.55rem 0.7rem;
+      background: rgba(34,197,94,0.08);
+      border-left: 3px solid var(--accent);
+      border-radius: 0.35rem;
+      color: var(--text);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+    .tipping-customs-suggestion strong { color: var(--accent); }
+
     /* ── Tip preset chips ── */
     .tip-presets {
       display: flex;
@@ -190,9 +207,50 @@
       color: var(--accent);
     }
 
+    /* Advanced options */
+    .advanced-options {
+      margin: 0.25rem 0 1.1rem;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    .advanced-options summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .advanced-options summary::-webkit-details-marker { display: none; }
+    .advanced-options summary::after {
+      content: '+';
+      flex: 0 0 auto;
+      color: var(--accent);
+      font-size: 1.25rem;
+      font-weight: 400;
+      line-height: 1;
+    }
+    .advanced-options[open] summary {
+      border-bottom: 1px solid var(--border);
+    }
+    .advanced-options[open] summary::after { content: '−'; }
+    .advanced-options summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -3px;
+      border-radius: 0.75rem;
+    }
+    .advanced-options-content { padding: 0.9rem; }
+
     /* Smart rounding adjustments */
     .smart-adjustments {
-      margin-top: 0.25rem;
+      margin-top: 0.9rem;
       padding: 0.9rem;
       background: rgba(255,255,255,0.025);
       border: 1px solid var(--border);
@@ -254,6 +312,7 @@
       background: rgba(255,255,255,0.025);
       border: 1px solid var(--border);
       border-radius: 0.75rem;
+      margin-bottom: 0;
     }
     .tax-summary {
       display: flex;
@@ -266,25 +325,6 @@
       font-size: 0.8rem;
     }
     .tax-summary strong { color: var(--accent); }
-
-    /* ── Calculate button ── */
-    .btn-calculate {
-      width: 100%;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: #022c22;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 999px;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(34,197,94,0.35);
-      transition: opacity 0.15s, transform 0.15s;
-      margin-top: 1rem;
-    }
-    .btn-calculate:hover  { opacity: 0.9; transform: translateY(-1px); }
-    .btn-calculate:active { transform: translateY(0); }
 
     /* ── Results panel ── */
     .results-col {
@@ -356,6 +396,40 @@
     .dot-bill { background: var(--accent); }
     .dot-tip  { background: #f87171; }
 
+    /* ── Bookmarkable link ── */
+    .share-line {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.4rem;
+    }
+    .copy-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 999px;
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .copy-link-btn:hover { background: rgba(34,197,94,0.14); }
+    .copy-link-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .copy-confirm {
+      display: none;
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
     /* ── Error ── */
     .calc-error {
       display: none;
@@ -418,6 +492,7 @@
     .faq-item:last-child  { border-bottom: none; }
     .faq-item h3          { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
     .faq-item p           { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
+    .faq-item p + p       { margin-top: 0.75rem; }
 
     /* ── Related tools ── */
     .related-grid {
@@ -462,9 +537,9 @@
   "@graph": [
     {
       "@type": "WebApplication",
-      "@id": "https://monkeytactics.com/tools/tip-calculator.html#app",
+      "@id": "https://monkeytactics.com/tools/tip-calculator#app",
       "name": "Tip Calculator",
-      "url": "https://monkeytactics.com/tools/tip-calculator.html",
+      "url": "https://monkeytactics.com/tools/tip-calculator",
       "description": "Calculate tips and split bills.",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Any",
@@ -483,7 +558,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-07-22"
+      "dateModified": "2026-07-29"
     }
   ]
 }
@@ -523,9 +598,8 @@
         <span class="sep" aria-hidden="true">›</span>
         <span aria-current="page">Tip Calculator</span>
       </nav>
-      <h1 id="tool-heading">Tip Calculator</h1>
-      <p>Enter your bill, choose a tip percentage, and split the total evenly between any number of people.
-         Everything runs privately in your browser — no sign-up required.</p>
+      <h1 id="tool-heading">Smart Tip Calculator – Calculate Tips, Split Bills & Adjust Totals Instantly</h1>
+      <p>Enter your bill, select a tip percentage, and instantly split the total across any number of people — with accurate pre‑tax/post‑tax tipping, smart rounding options, and real‑time calculations that run entirely in your browser for maximum privacy. No sign‑up, no tracking, just a fast and precise tip calculator built for modern dining.</p>
     </section>
 
     <!-- TOP AD -->
@@ -556,31 +630,19 @@
               <p class="input-hint">The amount on the check before adding your tip.</p>
             </div>
 
-            <!-- Tax-aware tipping -->
-            <div class="input-group tax-panel">
-              <label for="taxRate">
-                Local sales tax rate (%)
-                <span class="live-val" id="taxRateVal">0%</span>
+            <!-- Split between -->
+            <div class="input-group">
+              <label for="splitCount">
+                Split Between
+                <span class="live-val" id="splitCountVal">1 person</span>
               </label>
-              <input type="range" id="taxRateSlider"
-                     min="0" max="20" step="0.1" value="0"
-                     aria-label="Tax rate slider" />
-              <input type="number" id="taxRate"
-                     min="0" max="100" step="0.01" value="0"
-                     aria-label="Tax rate percentage" />
-
-              <p class="tax-summary" aria-live="polite">
-                <span>Pre-tax subtotal</span>
-                <strong id="preTaxSubtotal">$50.00</strong>
-              </p>
-
-              <div class="adjustment-row">
-                <span class="adjustment-label" id="tip-basis-label">Calculate tip on</span>
-                <div class="round-toggle tip-basis-toggle" role="group" aria-labelledby="tip-basis-label">
-                  <button type="button" class="round-option active" data-basis="pre" aria-pressed="true">Pre-tax</button>
-                  <button type="button" class="round-option" data-basis="post" aria-pressed="false">Post-tax</button>
-                </div>
-              </div>
+              <input type="range" id="splitCountSlider"
+                     min="1" max="20" step="1" value="1"
+                     aria-label="Number of people slider" />
+              <input type="number" id="splitCount"
+                     min="1" max="999" step="1" value="1"
+                     aria-label="Number of people sharing the bill" />
+              <p class="input-hint">Number of people sharing the bill.</p>
             </div>
 
             <!-- Tip Percentage -->
@@ -605,62 +667,107 @@
               <p class="input-hint">15–20% is standard for sit-down service in the US.</p>
             </div>
 
-            <!-- Split between -->
-            <div class="input-group">
-              <label for="splitCount">
-                Split Between
-                <span class="live-val" id="splitCountVal">1 person</span>
-              </label>
-              <input type="range" id="splitCountSlider"
-                     min="1" max="20" step="1" value="1"
-                     aria-label="Number of people slider" />
-              <input type="number" id="splitCount"
-                     min="1" max="999" step="1" value="1"
-                     aria-label="Number of people sharing the bill" />
-              <p class="input-hint">Number of people sharing the bill.</p>
+            <!-- Country / Region Tipping Customs -->
+            <div class="input-group tipping-customs" data-tipping-customs>
+              <label for="tippingCountry">Country / Region Tipping Customs</label>
+              <select class="tipping-customs-select"
+                      id="tippingCountry"
+                      aria-describedby="tippingCustomsSuggestion">
+                <option value="">Select country/region…</option>
+                <option value="United States">United States</option>
+                <option value="Canada">Canada</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="France">France</option>
+                <option value="Germany">Germany</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="Spain">Spain</option>
+                <option value="Italy">Italy</option>
+                <option value="Australia">Australia</option>
+                <option value="New Zealand">New Zealand</option>
+                <option value="Japan">Japan</option>
+                <option value="China">China</option>
+                <option value="Mexico">Mexico</option>
+                <option value="South Africa">South Africa</option>
+              </select>
+              <p class="tipping-customs-suggestion"
+                 id="tippingCustomsSuggestion"
+                 role="status"
+                 aria-live="polite"
+                 hidden>
+                Recommended restaurant tip:
+                <strong data-tipping-customs-value></strong>
+              </p>
             </div>
 
-            <div class="smart-adjustments" aria-labelledby="adjustments-heading">
-              <h3 id="adjustments-heading">Smart Adjustments</h3>
-              <p>Optionally round to whole currency units. Adjustments run from top to bottom.</p>
+            <details class="advanced-options">
+              <summary>Advanced Options</summary>
+              <div class="advanced-options-content">
+                <!-- Tax-aware tipping -->
+                <div class="input-group tax-panel">
+                  <label for="taxRate">
+                    Local sales tax rate (%)
+                    <span class="live-val" id="taxRateVal">0%</span>
+                  </label>
+                  <input type="range" id="taxRateSlider"
+                         min="0" max="20" step="0.1" value="0"
+                         aria-label="Tax rate slider" />
+                  <input type="number" id="taxRate"
+                         min="0" max="100" step="0.01" value="0"
+                         aria-label="Tax rate percentage" />
 
-              <div class="adjustment-row">
-                <span class="adjustment-label" id="round-tip-label">Round tip amount</span>
-                <div class="round-toggle" role="group" aria-labelledby="round-tip-label" data-adjustment="tip">
-                  <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
-                  <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
-                  <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
+                  <p class="tax-summary" aria-live="polite">
+                    <span>Pre-tax subtotal</span>
+                    <strong id="preTaxSubtotal">$50.00</strong>
+                  </p>
+
+                  <div class="adjustment-row">
+                    <span class="adjustment-label" id="tip-basis-label">Calculate tip on</span>
+                    <div class="round-toggle tip-basis-toggle" role="group" aria-labelledby="tip-basis-label">
+                      <button type="button" class="round-option active" data-basis="pre" aria-pressed="true">Pre-tax</button>
+                      <button type="button" class="round-option" data-basis="post" aria-pressed="false">Post-tax</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="smart-adjustments" aria-labelledby="adjustments-heading">
+                  <h3 id="adjustments-heading">Smart Adjustments</h3>
+                  <p>Optionally round to whole currency units. Adjustments run from top to bottom.</p>
+
+                  <div class="adjustment-row">
+                    <span class="adjustment-label" id="round-tip-label">Round tip amount</span>
+                    <div class="round-toggle" role="group" aria-labelledby="round-tip-label" data-adjustment="tip">
+                      <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
+                      <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
+                      <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
+                    </div>
+                  </div>
+
+                  <div class="adjustment-row">
+                    <span class="adjustment-label" id="round-total-label">Round total bill</span>
+                    <div class="round-toggle" role="group" aria-labelledby="round-total-label" data-adjustment="total">
+                      <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
+                      <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
+                      <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
+                    </div>
+                  </div>
+
+                  <div class="adjustment-row">
+                    <span class="adjustment-label" id="round-split-label">Round per-person split</span>
+                    <div class="round-toggle" role="group" aria-labelledby="round-split-label" data-adjustment="split">
+                      <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
+                      <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
+                      <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
+                    </div>
+                  </div>
                 </div>
               </div>
-
-              <div class="adjustment-row">
-                <span class="adjustment-label" id="round-total-label">Round total bill</span>
-                <div class="round-toggle" role="group" aria-labelledby="round-total-label" data-adjustment="total">
-                  <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
-                  <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
-                  <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
-                </div>
-              </div>
-
-              <div class="adjustment-row">
-                <span class="adjustment-label" id="round-split-label">Round per-person split</span>
-                <div class="round-toggle" role="group" aria-labelledby="round-split-label" data-adjustment="split">
-                  <button type="button" class="round-option active" data-direction="off" aria-pressed="true">Off</button>
-                  <button type="button" class="round-option" data-direction="down" aria-pressed="false">Down</button>
-                  <button type="button" class="round-option" data-direction="up" aria-pressed="false">Up</button>
-                </div>
-              </div>
-            </div>
+            </details>
 
             <!-- Error -->
             <div class="calc-error" id="calcError" role="alert">
               ⚠️ Please enter valid values — the bill must be 0 or more, tax and tip must be between
               0% and 100%, and at least 1 person must be sharing.
             </div>
-
-            <button class="btn-calculate" id="calcBtn" type="button">
-              Calculate Tip
-            </button>
 
           </div><!-- /inputs-col -->
 
@@ -670,8 +777,8 @@
             <!-- Empty state -->
             <div class="results-empty" id="resultsEmpty">
               <span class="empty-icon" aria-hidden="true">🍽️</span>
-              <strong>Your results will appear here</strong>
-              <p>Enter your bill details and click Calculate.</p>
+              <strong>Enter valid bill details</strong>
+              <p>Your results update automatically as you change the options.</p>
             </div>
 
             <!-- Results (hidden until calculated) -->
@@ -709,6 +816,15 @@
 
             </div><!-- /resultsCards -->
 
+            <div class="share-line" id="shareLine">
+              <button class="copy-link-btn" id="copyLinkBtn" type="button">
+                🔗 Copy bookmarkable link
+              </button>
+              <span class="copy-confirm" id="copyConfirm" role="status" aria-live="polite">
+                ✅ Link copied!
+              </span>
+            </div>
+
           </div><!-- /results-col -->
 
         </div><!-- /calc-layout -->
@@ -722,10 +838,15 @@
          <strong>tip percentage</strong> you want to leave, and the <strong>number of people</strong>
          splitting the bill. The calculator derives the pre-tax subtotal automatically. Choose
          <strong>Pre-tax</strong> or <strong>Post-tax</strong> to control which amount the tip uses.</p>
-      <p>Click <strong>Calculate Tip</strong> to instantly see how much each person pays, the grand total
-         including tip, and the tip amount on its own. The breakdown bar shows how much of the total is
-         the bill versus the tip. Smart Adjustments can round the tip, total, or per-person amount up or
-         down to a whole currency unit; when several are selected, they are applied from top to bottom.</p>
+      <p>Your results update automatically as you change any option, showing how much each person pays,
+         the grand total including tip, and the tip amount on its own. The breakdown bar shows how much
+         of the total is the bill versus the tip. Smart Adjustments can round the tip, total, or
+         per-person amount up or down to a whole currency unit; when several are selected, they are
+         applied from top to bottom.</p>
+      <p>Select <strong>Copy bookmarkable link</strong> to save or share the calculator with your current
+         settings. The link preserves your bill, split, tip percentage, local sales tax rate, pre-tax or
+         post-tax tip basis, and Smart Adjustment rounding preferences, so you can return to the same
+         setup without entering everything again.</p>
     </div>
 
     <!-- FORMULA -->
@@ -752,10 +873,17 @@
 
         <li class="faq-item">
           <h3>What is the standard tip percentage?</h3>
-          <p>In the United States, the customary tip at a sit-down restaurant is 15–20% of the pre-tax
-             bill. For excellent service, 20–25% is common. For counter service or takeout, 10% or a
-             small flat amount is typical. Tipping customs vary widely by country — in much of Europe
-             and Asia a service charge is already included in the bill.</p>
+          <p>In the United States, the customary tip at a sit‑down restaurant is
+             <strong>15–20% of the pre‑tax bill</strong>, with <strong>20–25%</strong> common for
+             excellent service. For counter service or takeout, <strong>10%</strong> or a small flat
+             amount is typical.</p>
+          <p>Tipping customs vary significantly around the world — many European and Asian countries
+             include a <strong>service charge</strong> in the bill, and some cultures (like Japan) do
+             <strong>not tip at all</strong>.</p>
+          <p>To make this easier, the calculator includes a
+             <strong>Country / Region Tipping Customs</strong> dropdown that displays the typical
+             restaurant tipping practice for each location. Select a country to see its standard
+             tipping norms before choosing your tip percentage.</p>
         </li>
 
         <li class="faq-item">
@@ -860,7 +988,6 @@
   const splitCountVal      = document.getElementById('splitCountVal');
   const tipPresets         = document.querySelectorAll('.tip-preset');
   const roundToggles       = document.querySelectorAll('.round-toggle[data-adjustment]');
-  const calcBtn            = document.getElementById('calcBtn');
   const calcError          = document.getElementById('calcError');
   const resultsEmpty       = document.getElementById('resultsEmpty');
   const resultsCards       = document.getElementById('resultsCards');
@@ -874,6 +1001,51 @@
   const barTip             = document.getElementById('barTip');
   const pctBill            = document.getElementById('pctBill');
   const pctTip             = document.getElementById('pctTip');
+  const shareLine          = document.getElementById('shareLine');
+  const copyLinkBtn        = document.getElementById('copyLinkBtn');
+  const copyConfirm        = document.getElementById('copyConfirm');
+
+  /* ── Reusable tipping customs component ── */
+  const tippingCustoms = {
+    'United States': '15–20%',
+    'Canada': '15–20%',
+    'United Kingdom': '10–12.5% if no service charge',
+    'France': '5–10% or rounding up',
+    'Germany': '5–10% or rounding up',
+    'Netherlands': 'Service included; rounding up',
+    'Spain': 'Rounding up; 5–10% for great service',
+    'Italy': 'Service included; small rounding',
+    'Australia': 'Tipping optional',
+    'New Zealand': 'Tipping optional',
+    'Japan': 'No tipping (can be considered rude)',
+    'China': 'No tipping',
+    'Mexico': '10–15%',
+    'South Africa': '10–15%'
+  };
+
+  function initTippingCustoms(container, customs) {
+    const select = container.querySelector('.tipping-customs-select');
+    const suggestion = container.querySelector('.tipping-customs-suggestion');
+    const suggestionValue = container.querySelector('[data-tipping-customs-value]');
+
+    select.addEventListener('change', function () {
+      const custom = customs[select.value];
+      if (!custom) {
+        suggestion.hidden = true;
+        suggestionValue.textContent = '';
+        return;
+      }
+
+      suggestionValue.textContent = custom.indexOf('No tipping') === 0
+        ? 'No tipping expected.'
+        : custom;
+      suggestion.hidden = false;
+    });
+  }
+
+  document.querySelectorAll('[data-tipping-customs]').forEach(function (container) {
+    initTippingCustoms(container, tippingCustoms);
+  });
 
   /* ── Formatters ── */
   function fmtCurrency(n) {
@@ -1016,32 +1188,29 @@
 
     updateTaxPreview();
 
-    // Auto-calculate if bill is present (the primary driver)
-    if (params.has('bill')) {
-      runCalculation();
-    }
   }
 
   /* ══════════════════════════════════════════════════
-     URL PARAMS — WRITE on calculate
+     BOOKMARK URL — BUILD only when requested
   ══════════════════════════════════════════════════ */
-  function writeURLParams() {
-    const params = new URLSearchParams();
-    params.set('bill',  billAmountInput.value);
-    params.set('tax',   taxRateInput.value);
-    params.set('pct',   tipPctInput.value);
-    params.set('split', splitCountInput.value);
-    params.set('tipOn', getTipBasis());
+  function buildBookmarkURL() {
+    const bookmarkURL = new URL(window.location.href);
+    bookmarkURL.search = '';
+    bookmarkURL.hash = '';
+    bookmarkURL.searchParams.set('bill',  billAmountInput.value);
+    bookmarkURL.searchParams.set('tax',   taxRateInput.value);
+    bookmarkURL.searchParams.set('pct',   tipPctInput.value);
+    bookmarkURL.searchParams.set('split', splitCountInput.value);
+    bookmarkURL.searchParams.set('tipOn', getTipBasis());
     roundToggles.forEach(function (toggle) {
       const direction = getAdjustment(toggle.dataset.adjustment);
       if (direction !== 'off') {
-        params.set('round' + toggle.dataset.adjustment.charAt(0).toUpperCase() +
+        bookmarkURL.searchParams.set(
+          'round' + toggle.dataset.adjustment.charAt(0).toUpperCase() +
           toggle.dataset.adjustment.slice(1), direction);
       }
     });
-
-    const newURL = window.location.pathname + '?' + params.toString();
-    history.replaceState(null, '', newURL);
+    return bookmarkURL.toString();
   }
 
   /* ══════════════════════════════════════════════════
@@ -1135,6 +1304,7 @@
       calcError.style.display    = 'block';
       resultsEmpty.style.display = 'flex';
       resultsCards.style.display = 'none';
+      shareLine.style.display    = 'none';
       return;
     }
 
@@ -1167,21 +1337,29 @@
     pctTip.textContent  = pctTipVal.toFixed(1);
 
     resultsCards.style.display = 'flex';
+    shareLine.style.display    = 'flex';
 
-    /* ── Update URL with current params ── */
-    writeURLParams();
-
-    resultsCards.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  /* ── Button listeners ── */
-  calcBtn.addEventListener('click', runCalculation);
+  /* ── Live calculation listeners ── */
+  [
+    billAmountInput, billAmountSlider,
+    taxRateInput, taxRateSlider,
+    tipPctInput, tipPctSlider,
+    splitCountInput, splitCountSlider
+  ].forEach(function (control) {
+    control.addEventListener('input', runCalculation);
+  });
+
+  tipPresets.forEach(function (button) {
+    button.addEventListener('click', runCalculation);
+  });
 
   tipBasisToggle.addEventListener('click', function (event) {
     const option = event.target.closest('.round-option');
     if (!option) return;
     setTipBasis(option.dataset.basis);
-    if (resultsCards.style.display !== 'none') runCalculation();
+    runCalculation();
   });
 
   roundToggles.forEach(function (toggle) {
@@ -1189,14 +1367,15 @@
       const option = event.target.closest('.round-option');
       if (!option) return;
       setAdjustment(toggle.dataset.adjustment, option.dataset.direction);
-      if (resultsCards.style.display !== 'none') runCalculation();
+      runCalculation();
     });
   });
 
-  /* Enter key in any input triggers calculate */
-  [billAmountInput, taxRateInput, tipPctInput, splitCountInput].forEach(function (el) {
-    el.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); runCalculation(); }
+  /* ── Copy bookmarkable link ── */
+  copyLinkBtn.addEventListener('click', function () {
+    navigator.clipboard.writeText(buildBookmarkURL()).then(function () {
+      copyConfirm.style.display = 'inline';
+      setTimeout(function () { copyConfirm.style.display = 'none'; }, 2500);
     });
   });
 
@@ -1204,6 +1383,7 @@
      INIT — read URL params on page load
   ══════════════════════════════════════════════════ */
   readURLParams();
+  runCalculation();
 
   })();
   </script>
