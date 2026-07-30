@@ -28,8 +28,8 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",      "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Utilities", "item": "https://monkeytactics.com/tools/utilities.html" },
-      { "@type": "ListItem", "position": 3, "name": "Unit Converter", "item": "https://monkeytactics.com/tools/unit-converter/" }
+      { "@type": "ListItem", "position": 2, "name": "Utilities", "item": "https://monkeytactics.com/tools/utilities" },
+      { "@type": "ListItem", "position": 3, "name": "Unit Converter", "item": "https://monkeytactics.com/tools/unit-converter" }
     ]
   }
   </script>
@@ -58,7 +58,7 @@
       {
         "@type": "Question",
         "name": "Can I share a specific conversion with a link?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every conversion is saved into the page URL, so you can copy and share the address bar link — anyone who opens it will see the exact same conversion. You can also use the Copy bookmarkable link button." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Use the Copy bookmarkable link button to create a URL containing the current category, units, and value. Anyone who opens it will see the same conversion." }
       }
     ]
   }
@@ -333,7 +333,6 @@
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
-  <script src="/assets/js/web-vitals-rum.js" defer></script>
 
   <script type="application/ld+json">
 {
@@ -362,7 +361,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-07-22"
+      "dateModified": "2026-07-30"
     }
   ]
 }
@@ -555,9 +554,8 @@
 
         <li class="faq-item">
           <h3>Can I share a specific conversion?</h3>
-          <p>Yes — every conversion is saved into the page URL, so copying the address bar (or
-             clicking <strong>Copy bookmarkable link</strong>) gives someone else the exact same
-             view.</p>
+          <p>Yes — click <strong>Copy bookmarkable link</strong> to create a URL containing the
+             current category, units, and value so someone else can open the same view.</p>
         </li>
 
         <li class="faq-item">
@@ -699,8 +697,6 @@
       resReverse.textContent = `${fmtNum(result)} ${toLabel} → ${fmtNum(reverse)} ${fromLabel}`;
       resReverseSub.textContent = `Converted back to verify accuracy.`;
       shareLine.style.display = "flex";
-
-      writeURLParams();
     }
 
     /* ── Swap units (keeps the value in the From box as the same number) ── */
@@ -724,9 +720,9 @@
         if (CATEGORIES[v]) categorySel.value = v;
       }
 
-      // Populate dropdowns first if category came from URL
+      // Populate the unit dropdowns for the selected or bookmarked category.
+      populateUnits();
       const cat = CATEGORIES[categorySel.value];
-      const opts = Object.keys(cat.units);
       if (params.has("from")) {
         const v = params.get("from");
         if (cat.units[v]) fromUnitSel.value = v;
@@ -742,17 +738,19 @@
     }
 
     /* ══════════════════════════════════════════════════
-       URL PARAMS — WRITE on conversion
+       BOOKMARKABLE URL — BUILD ONLY WHEN REQUESTED
     ══════════════════════════════════════════════════ */
-    function writeURLParams() {
+    function buildBookmarkableURL() {
       const params = new URLSearchParams();
       params.set("cat", categorySel.value);
       params.set("from", fromUnitSel.value);
       params.set("to", toUnitSel.value);
       if (fromValue.value !== "") params.set("value", fromValue.value);
 
-      const newURL = window.location.pathname + "?" + params.toString();
-      history.replaceState(null, "", newURL);
+      const bookmarkableURL = new URL(window.location.href);
+      bookmarkableURL.search = params.toString();
+      bookmarkableURL.hash = "";
+      return bookmarkableURL.toString();
     }
 
     /* ── Listeners ── */
@@ -766,14 +764,13 @@
     swapBtn.addEventListener("click", swapUnits);
 
     copyLinkBtn.addEventListener("click", () => {
-      navigator.clipboard.writeText(window.location.href).then(() => {
+      navigator.clipboard.writeText(buildBookmarkableURL()).then(() => {
         copyConfirm.style.display = "inline";
         setTimeout(() => { copyConfirm.style.display = "none"; }, 2500);
       });
     });
 
     /* ── Init ── */
-    populateUnits();
     readURLParams();
     runConversion();
   </script>

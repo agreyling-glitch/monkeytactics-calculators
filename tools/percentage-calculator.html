@@ -28,8 +28,8 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",      "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance.html" },
-      { "@type": "ListItem", "position": 3, "name": "Percentage Calculator", "item": "https://monkeytactics.com/tools/percentage-calculator.html" }
+      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance" },
+      { "@type": "ListItem", "position": 3, "name": "Percentage Calculator", "item": "https://monkeytactics.com/tools/percentage-calculator" }
     ]
   }
   </script>
@@ -205,12 +205,13 @@
 
     .btn-calculate {
       display: inline-block;
+      width: fit-content;
       background: linear-gradient(135deg, #22c55e, #16a34a);
       color: #022c22;
       font-family: inherit;
       font-size: 1rem;
       font-weight: 700;
-      padding: 0.75rem 2rem;
+      padding: 0.75rem 1.5rem;
       border: none;
       border-radius: 999px;
       cursor: pointer;
@@ -376,7 +377,6 @@
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
-  <script src="/assets/js/web-vitals-rum.js" defer></script>
 
   <script type="application/ld+json">
 {
@@ -405,7 +405,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-07-22"
+      "dateModified": "2026-07-30"
     }
   ]
 }
@@ -759,7 +759,6 @@
       ofValue.textContent = fmtNumber(result);
       ofResults.style.display = 'block';
       ofShare.style.display   = 'flex';
-      writeURLParams('of', { x: x, y: y });
       ofResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
@@ -793,7 +792,6 @@
       isValue.textContent = fmtNumber(result) + '%';
       isResults.style.display = 'block';
       isShare.style.display   = 'flex';
-      writeURLParams('is', { x: x, y: y });
       isResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
@@ -833,21 +831,32 @@
 
       chResults.style.display = 'block';
       chShare.style.display   = 'flex';
-      writeURLParams('change', { old: oldVal, newv: newVal });
       chResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     document.getElementById('chBtn').addEventListener('click', calcChange);
 
     /* ══════════════════════════════════════════════════
-       URL PARAMS — read & write for shareable links
+       BOOKMARKABLE URL — BUILD ONLY WHEN REQUESTED
     ══════════════════════════════════════════════════ */
-    function writeURLParams(mode, values) {
+    function buildBookmarkableURL(mode) {
       const params = new URLSearchParams();
       params.set('mode', mode);
-      Object.keys(values).forEach(function (k) { params.set(k, values[k]); });
-      const newURL = window.location.pathname + '?' + params.toString();
-      history.replaceState(null, '', newURL);
+      if (mode === 'of') {
+        params.set('x', ofX.value);
+        params.set('y', ofY.value);
+      } else if (mode === 'is') {
+        params.set('x', isX.value);
+        params.set('y', isY.value);
+      } else if (mode === 'change') {
+        params.set('old', chOld.value);
+        params.set('newv', chNew.value);
+      }
+
+      const bookmarkableURL = new URL(window.location.href);
+      bookmarkableURL.search = params.toString();
+      bookmarkableURL.hash = '';
+      return bookmarkableURL.toString();
     }
 
     function readURLParams() {
@@ -878,7 +887,7 @@
     ══════════════════════════════════════════════════ */
     document.querySelectorAll('.btn-copy-link').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        navigator.clipboard.writeText(window.location.href).then(function () {
+        navigator.clipboard.writeText(buildBookmarkableURL(btn.dataset.copy)).then(function () {
           const confirmEl = btn.parentElement.querySelector('.copy-confirm');
           confirmEl.style.display = 'inline';
           setTimeout(function () { confirmEl.style.display = 'none'; }, 2500);

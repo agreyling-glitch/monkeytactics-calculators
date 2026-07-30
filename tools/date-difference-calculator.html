@@ -448,7 +448,7 @@
     /* ── Calculate button ── */
     .btn-calculate {
       display: inline-block;
-      width: 100%;
+      width: fit-content;
       background: linear-gradient(135deg, #22c55e, #16a34a);
       color: #022c22;
       font-family: inherit;
@@ -756,7 +756,6 @@
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
-  <script src="/assets/js/web-vitals-rum.js" defer></script>
 
   <script type="application/ld+json">
 {
@@ -1264,8 +1263,8 @@
     <div class="seo-section">
       <h2>Private calculations and bookmarkable results</h2>
       <p>Calculations, custom holiday validation, and file imports run in your browser; no account
-         or sign-up is required. The tool updates the page URL with the current configuration so
-         you can use <strong>Copy bookmarkable link</strong> to save or share a calculation.
+         or sign-up is required. <strong>Copy bookmarkable link</strong> creates a URL containing
+         the current configuration so you can save or share a calculation.
          Because that URL contains the selected settings, review it before sharing dates or a
          custom holiday list.</p>
     </div>
@@ -1637,14 +1636,13 @@
     recur: document.getElementById('panel-recur')
   };
 
-  function setActiveTab(mode, skipUrl) {
+  function setActiveTab(mode) {
     tabs.forEach(t => {
       const active = t.dataset.mode === mode;
       t.classList.toggle('active', active);
       t.setAttribute('aria-selected', active ? 'true' : 'false');
     });
     Object.keys(panels).forEach(k => panels[k].classList.toggle('active', k === mode));
-    if (!skipUrl) writeURLParams();
   }
 
   tabs.forEach(t => t.addEventListener('click', function () { setActiveTab(this.dataset.mode); }));
@@ -1817,7 +1815,6 @@
     // Deadline risk indicator uses the later of the two dates
     updateDeadlineRisk(b);
 
-    writeURLParams();
     diffResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -1938,7 +1935,6 @@
 
     renderGantt(s, e, bufferedEnd);
 
-    writeURLParams();
     workResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -2071,7 +2067,6 @@
     recurResults.style.display = 'block';
     recurShareLine.style.display = 'flex';
 
-    writeURLParams();
     recurResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -2107,7 +2102,7 @@
     updateCustomHolidayValidation(diffCustomHolidays, document.getElementById('diffCustomHolidayValidation'));
     updateCustomHolidayValidation(workCustomHolidays, document.getElementById('workCustomHolidayValidation'));
 
-    setActiveTab(mode, true);
+    setActiveTab(mode);
 
     if (mode === 'diff' && params.has('start') && params.has('end')) runDiffCalculation();
     if (mode === 'work' && params.has('start') && params.has('end')) runWorkCalculation();
@@ -2115,9 +2110,9 @@
   }
 
   /* ══════════════════════════════════════════════════
-     URL PARAMS — WRITE on calculate / tab switch
+     BOOKMARKABLE URL — BUILD ONLY WHEN REQUESTED
   ══════════════════════════════════════════════════ */
-  function writeURLParams() {
+  function buildBookmarkableURL() {
     const activeMode = document.querySelector('.mode-tab.active').dataset.mode;
     const params = new URLSearchParams();
     params.set('mode', activeMode);
@@ -2144,8 +2139,10 @@
       params.set('rcount', recurCount.value);
     }
 
-    const newURL = window.location.pathname + '?' + params.toString();
-    history.replaceState(null, '', newURL);
+    const bookmarkableURL = new URL(window.location.href);
+    bookmarkableURL.search = params.toString();
+    bookmarkableURL.hash = '';
+    return bookmarkableURL.toString();
   }
 
   /* ══════════════════════════════════════════════════
@@ -2153,7 +2150,7 @@
   ══════════════════════════════════════════════════ */
   function wireCopyButton(btnId, confirmId) {
     document.getElementById(btnId).addEventListener('click', function () {
-      navigator.clipboard.writeText(window.location.href).then(function () {
+      navigator.clipboard.writeText(buildBookmarkableURL()).then(function () {
         const confirmEl = document.getElementById(confirmId);
         confirmEl.style.display = 'inline';
         setTimeout(function () { confirmEl.style.display = 'none'; }, 2500);

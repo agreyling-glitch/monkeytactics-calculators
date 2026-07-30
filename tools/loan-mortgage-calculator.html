@@ -27,8 +27,8 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",    "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance.html" },
-      { "@type": "ListItem", "position": 3, "name": "Loan & Mortgage Calculator", "item": "https://monkeytactics.com/tools/loan-mortgage-calculator.html" }
+      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance" },
+      { "@type": "ListItem", "position": 3, "name": "Loan & Mortgage Calculator", "item": "https://monkeytactics.com/tools/loan-mortgage-calculator" }
     ]
   }
   </script>
@@ -160,7 +160,7 @@
 
     /* ── Calculate button ── */
     .btn-calculate {
-      width: 100%;
+      width: fit-content;
       background: linear-gradient(135deg, #22c55e, #16a34a);
       color: #022c22;
       font-family: inherit;
@@ -301,6 +301,43 @@
       outline: none;
     }
 
+    .amort-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .btn-amort-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.5rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 0.55rem;
+      background: var(--card-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .btn-amort-action:hover {
+      border-color: var(--accent);
+      background: rgba(34,197,94,0.08);
+      color: var(--accent);
+    }
+    .btn-amort-action:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .btn-amort-action svg {
+      width: 1rem;
+      height: 1rem;
+      flex: 0 0 auto;
+    }
+
     .amort-wrap {
       overflow-x: auto;
       border-radius: var(--radius);
@@ -372,6 +409,45 @@
     .amort-pagination button:hover   { border-color: var(--accent); color: var(--accent); }
     .amort-pagination button:disabled { opacity: 0.3; cursor: default; }
 
+    @media print {
+      body.print-amortization {
+        background: #ffffff;
+        color: #111111;
+      }
+      body.print-amortization main > * { display: none !important; }
+      body.print-amortization main > #amortSection { display: block !important; }
+      body.print-amortization footer,
+      body.print-amortization .amort-controls,
+      body.print-amortization .amort-actions,
+      body.print-amortization .amort-pagination {
+        display: none !important;
+      }
+      body.print-amortization #amortSection {
+        margin: 0;
+        color: #111111;
+      }
+      body.print-amortization #amortSection h2 { color: #111111; }
+      body.print-amortization .amort-wrap {
+        overflow: visible;
+        border-color: #aaaaaa;
+      }
+      body.print-amortization .amort-table {
+        min-width: 0;
+        color: #111111;
+      }
+      body.print-amortization .amort-table thead { display: table-header-group; }
+      body.print-amortization .amort-table th {
+        background: #eeeeee !important;
+        color: #111111;
+        border-color: #aaaaaa;
+      }
+      body.print-amortization .amort-table td {
+        background: #ffffff !important;
+        color: #222222;
+        border-color: #dddddd;
+      }
+    }
+
     /* ── SEO / content ── */
     .seo-section          { max-width: 740px; margin-top: 2rem; }
     .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
@@ -441,7 +517,6 @@
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
-  <script src="/assets/js/web-vitals-rum.js" defer></script>
 
   <script type="application/ld+json">
 {
@@ -470,7 +545,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-07-22"
+      "dateModified": "2026-07-30"
     }
   ]
 }
@@ -682,6 +757,21 @@
         <span id="amortInfo" style="margin-left:auto;"></span>
       </div>
 
+      <div class="amort-actions" aria-label="Amortization schedule actions">
+        <button class="btn-amort-action" id="amortPrintBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>
+          Print
+        </button>
+        <button class="btn-amort-action" id="amortCsvBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Download CSV
+        </button>
+        <button class="btn-amort-action" id="amortTxtBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Download TXT
+        </button>
+      </div>
+
       <div class="amort-wrap">
         <table class="amort-table" aria-label="Amortization schedule">
           <thead id="amortHead">
@@ -714,7 +804,8 @@
       <p>Click <strong>Calculate Payment</strong> to instantly see your monthly payment, total
          amount repaid over the life of the loan, and how much of that total is interest.
          Scroll down to the amortization schedule to see a month-by-month or year-by-year
-         breakdown of every payment.</p>
+         breakdown of every payment. Use the schedule actions to print the complete selected view
+         or download it as CSV or aligned plain text.</p>
     </div>
 
     <!-- FORMULA -->
@@ -875,6 +966,9 @@
   const amortView          = document.getElementById('amortView');
   const amortBody          = document.getElementById('amortBody');
   const amortInfo          = document.getElementById('amortInfo');
+  const amortPrintBtn      = document.getElementById('amortPrintBtn');
+  const amortCsvBtn        = document.getElementById('amortCsvBtn');
+  const amortTxtBtn        = document.getElementById('amortTxtBtn');
   const btnPrev            = document.getElementById('btnPrev');
   const btnNext            = document.getElementById('btnNext');
   const pageInfo           = document.getElementById('pageInfo');
@@ -991,17 +1085,19 @@
   }
 
   /* ══════════════════════════════════════════════════
-     URL PARAMS — WRITE on calculate
+     BOOKMARKABLE URL — BUILD only when requested
   ══════════════════════════════════════════════════ */
-  function writeURLParams() {
+  function buildBookmarkableURL() {
     const params = new URLSearchParams();
     params.set('amount', loanAmountInput.value);
     params.set('rate',   interestRateInput.value);
     params.set('term',   loanTermInput.value);
     params.set('type',   loanTypeSelect.value);
 
-    const newURL = window.location.pathname + '?' + params.toString();
-    history.replaceState(null, '', newURL);
+    const bookmarkableURL = new URL(window.location.href);
+    bookmarkableURL.search = params.toString();
+    bookmarkableURL.hash = '';
+    return bookmarkableURL.toString();
   }
 
   /* ══════════════════════════════════════════════════
@@ -1040,37 +1136,48 @@
     return { monthly, total: monthly * n, totalInterest, schedule: sched };
   }
 
+  function getAnnualSchedule() {
+    const years = Math.ceil(schedule.length / 12);
+    const annualRows = [];
+    for (let year = 1; year <= years; year++) {
+      const rows = schedule.slice((year - 1) * 12, year * 12);
+      annualRows.push({
+        period: 'Year ' + year,
+        payment: rows.reduce(function(sum, row) { return sum + row.payment; }, 0),
+        principal: rows.reduce(function(sum, row) { return sum + row.principal; }, 0),
+        interest: rows.reduce(function(sum, row) { return sum + row.interest; }, 0),
+        balance: rows[rows.length - 1].balance
+      });
+    }
+    return annualRows;
+  }
+
   /* ── Amortization table render ── */
-  function renderAmortTable() {
+  function renderAmortTable(showAllMonthlyRows) {
     const isAnnual = amortView.value === 'annual';
     amortBody.innerHTML = '';
 
     if (isAnnual) {
-      const years = Math.ceil(schedule.length / 12);
-      for (let y = 1; y <= years; y++) {
-        const rows = schedule.slice((y - 1) * 12, y * 12);
-        const totP = rows.reduce(function(s, r) { return s + r.principal; }, 0);
-        const totI = rows.reduce(function(s, r) { return s + r.interest; }, 0);
-        const totPay = rows.reduce(function(s, r) { return s + r.payment; }, 0);
-        const endBal = rows[rows.length - 1].balance;
+      const annualRows = getAnnualSchedule();
+      annualRows.forEach(function(row) {
         const tr = document.createElement('tr');
         tr.className = 'year-summary';
         tr.innerHTML =
-          '<td>Year ' + y + '</td>' +
-          '<td>' + fmtCurrency(totPay) + '</td>' +
-          '<td class="td-principal">' + fmtCurrency(totP) + '</td>' +
-          '<td class="td-interest">' + fmtCurrency(totI) + '</td>' +
-          '<td>' + fmtCurrency(endBal) + '</td>';
+          '<td>' + row.period + '</td>' +
+          '<td>' + fmtCurrency(row.payment) + '</td>' +
+          '<td class="td-principal">' + fmtCurrency(row.principal) + '</td>' +
+          '<td class="td-interest">' + fmtCurrency(row.interest) + '</td>' +
+          '<td>' + fmtCurrency(row.balance) + '</td>';
         amortBody.appendChild(tr);
-      }
+      });
       btnPrev.style.display  = 'none';
       btnNext.style.display  = 'none';
       pageInfo.style.display = 'none';
-      amortInfo.textContent  = years + ' years shown';
+      amortInfo.textContent  = annualRows.length + ' years shown';
     } else {
       const totalPages = Math.ceil(schedule.length / ROWS_PER_PAGE);
-      const start = (currentPage - 1) * ROWS_PER_PAGE;
-      const end   = Math.min(start + ROWS_PER_PAGE, schedule.length);
+      const start = showAllMonthlyRows ? 0 : (currentPage - 1) * ROWS_PER_PAGE;
+      const end   = showAllMonthlyRows ? schedule.length : Math.min(start + ROWS_PER_PAGE, schedule.length);
       const rows  = schedule.slice(start, end);
 
       rows.forEach(function(row) {
@@ -1092,6 +1199,85 @@
       pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
       amortInfo.textContent = 'Months ' + (start + 1) + '–' + end + ' of ' + schedule.length;
     }
+  }
+
+  function getAmortizationExportRows() {
+    if (amortView.value === 'annual') return getAnnualSchedule();
+    return schedule.map(function(row) {
+      return {
+        period: 'Month ' + row.month,
+        payment: row.payment,
+        principal: row.principal,
+        interest: row.interest,
+        balance: row.balance
+      };
+    });
+  }
+
+  function escapeCsv(value) {
+    return '"' + String(value).replace(/"/g, '""') + '"';
+  }
+
+  function buildAmortizationCsv() {
+    const rows = getAmortizationExportRows();
+    const lines = [['Period', 'Payment', 'Principal', 'Interest', 'Balance']];
+    rows.forEach(function(row) {
+      lines.push([
+        row.period,
+        row.payment.toFixed(2),
+        row.principal.toFixed(2),
+        row.interest.toFixed(2),
+        row.balance.toFixed(2)
+      ]);
+    });
+    return lines.map(function(row) { return row.map(escapeCsv).join(','); }).join('\r\n');
+  }
+
+  function buildAmortizationTxt() {
+    const rows = getAmortizationExportRows();
+    const table = [['Period', 'Payment', 'Principal', 'Interest', 'Balance']];
+    rows.forEach(function(row) {
+      table.push([
+        row.period,
+        fmtCurrency(row.payment),
+        fmtCurrency(row.principal),
+        fmtCurrency(row.interest),
+        fmtCurrency(row.balance)
+      ]);
+    });
+    const widths = table[0].map(function(_, column) {
+      return Math.max.apply(null, table.map(function(row) { return row[column].length; }));
+    });
+    return table.map(function(row) {
+      return row.map(function(value, column) {
+        return column === 0 ? value.padEnd(widths[column]) : value.padStart(widths[column]);
+      }).join('  ');
+    }).join('\r\n');
+  }
+
+  function downloadAmortizationFile(content, extension, mimeType) {
+    if (!schedule.length) return;
+    const blobUrl = URL.createObjectURL(new Blob([content], { type: mimeType + ';charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = 'loan-amortization-' + amortView.value + '.' + extension;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 0);
+  }
+
+  function printAmortizationSchedule() {
+    if (!schedule.length) return;
+    const cleanup = function() {
+      document.body.classList.remove('print-amortization');
+      renderAmortTable();
+    };
+    renderAmortTable(true);
+    document.body.classList.add('print-amortization');
+    window.addEventListener('afterprint', cleanup, { once: true });
+    window.print();
   }
 
   /* ── Main calculate function ── */
@@ -1134,9 +1320,6 @@
 
     renderAmortTable();
 
-    /* ── Update URL with current params ── */
-    writeURLParams();
-
     resultsCards.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -1157,11 +1340,19 @@
     if (currentPage < totalPages) { currentPage++; renderAmortTable(); }
   });
 
+  amortPrintBtn.addEventListener('click', printAmortizationSchedule);
+  amortCsvBtn.addEventListener('click', function () {
+    downloadAmortizationFile(buildAmortizationCsv(), 'csv', 'text/csv');
+  });
+  amortTxtBtn.addEventListener('click', function () {
+    downloadAmortizationFile(buildAmortizationTxt(), 'txt', 'text/plain');
+  });
+
   /* ══════════════════════════════════════════════════
      COPY LINK button
   ══════════════════════════════════════════════════ */
   copyLinkBtn.addEventListener('click', function () {
-    navigator.clipboard.writeText(window.location.href).then(function () {
+    navigator.clipboard.writeText(buildBookmarkableURL()).then(function () {
       copyConfirm.style.display = 'inline';
       setTimeout(function () { copyConfirm.style.display = 'none'; }, 2500);
     });

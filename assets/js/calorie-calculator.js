@@ -291,9 +291,9 @@
     activityMeter.style.width = `${Number(selectedActivity.dataset.level) * 20}%`;
   }
 
-  /* URL state: readable values make shared links easy to inspect and edit.
+  /* Bookmarkable URL state: readable values make shared links easy to inspect and edit.
      Imperial height is encoded as feet-inches, for example height=5-7. */
-  function writeUrlParams() {
+  function buildBookmarkableUrl() {
     const params = new URLSearchParams();
     const unitSystem = getUnitSystem();
     const age = parseNumber(fields.age);
@@ -320,9 +320,9 @@
     if (weight !== null) params.set('weight', formatUrlNumber(weight));
     params.set('activity', getActivity().value);
 
-    const query = params.toString();
-    const newUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
-    window.history.replaceState(null, '', newUrl);
+    const bookmarkableUrl = new URL(window.location.href);
+    bookmarkableUrl.search = params.toString();
+    return bookmarkableUrl.toString();
   }
 
   function parseImperialHeight(value) {
@@ -377,7 +377,6 @@
   function updateCalculator() {
     updateActivityMeter();
     calculate();
-    writeUrlParams();
   }
 
   function showCopyMessage(message, duration = 2500) {
@@ -389,9 +388,8 @@
   }
 
   async function copyBookmarkableLink() {
-    writeUrlParams();
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(buildBookmarkableUrl());
       showCopyMessage('✅ Link copied!');
     } catch (error) {
       showCopyMessage('Copy failed—copy the URL from your address bar.', 4000);
@@ -415,7 +413,6 @@
       });
       output.panel.hidden = true;
       output.announcement.textContent = 'Calculator reset.';
-      writeUrlParams();
       fields.age.focus();
     });
   });
@@ -446,11 +443,7 @@
   showUnitSystem('imperial', false);
   updateActivityMeter();
   updateAgeDisplay();
-  const hasUrlState = readUrlParams();
+  readUrlParams();
   updateActivityMeter();
-
-  if (hasUrlState) {
-    calculate();
-    writeUrlParams();
-  }
+  calculate();
 })();

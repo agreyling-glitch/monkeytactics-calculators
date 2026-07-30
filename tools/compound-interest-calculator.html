@@ -24,8 +24,8 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",    "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance.html" },
-      { "@type": "ListItem", "position": 3, "name": "Compound Interest Calculator", "item": "https://monkeytactics.com/tools/compound-interest-calculator.html" }
+      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance" },
+      { "@type": "ListItem", "position": 3, "name": "Compound Interest Calculator", "item": "https://monkeytactics.com/tools/compound-interest-calculator" }
     ]
   }
   </script>
@@ -106,7 +106,7 @@
 
     /* Button */
     .btn-calculate {
-      width: 100%; background: linear-gradient(135deg, #22c55e, #16a34a); color: #022c22;
+      width: fit-content; background: linear-gradient(135deg, #22c55e, #16a34a); color: #022c22;
       font-family: inherit; font-size: 1rem; font-weight: 700; padding: 0.8rem 1.5rem;
       border: none; border-radius: 999px; cursor: pointer;
       box-shadow: 0 8px 24px rgba(34,197,94,0.35); transition: opacity 0.15s, transform 0.15s; margin-top: 1rem;
@@ -170,6 +170,18 @@
     .growth-controls select { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 0.4rem; color: var(--text); font-family: inherit; font-size: 0.85rem; padding: 0.3rem 0.65rem; outline: none; }
     .growth-controls select option { background: #0f1a12; color: #e2e8f0; }
 
+    .growth-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 0.85rem; }
+    .btn-growth-action {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.5rem 0.85rem; border: 1px solid var(--border); border-radius: 0.55rem;
+      background: var(--card-bg); color: var(--text); font-family: inherit;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .btn-growth-action:hover { border-color: var(--accent); background: rgba(34,197,94,0.08); color: var(--accent); }
+    .btn-growth-action:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .btn-growth-action svg { width: 1rem; height: 1rem; flex: 0 0 auto; }
+
     .growth-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
     .growth-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; min-width: 640px; }
     .growth-table th { background: rgba(255,255,255,0.04); color: var(--text); font-weight: 600; padding: 0.65rem 0.85rem; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -214,6 +226,26 @@
     .related-card strong { font-size: 0.9rem; }
     .related-card span   { color: var(--muted); font-size: 0.8rem; }
 
+    @media print {
+      body.print-growth { background: #ffffff; color: #111111; }
+      body.print-growth main > * { display: none !important; }
+      body.print-growth main > #growthSection { display: block !important; }
+      body.print-growth footer,
+      body.print-growth .growth-controls,
+      body.print-growth .growth-actions { display: none !important; }
+      body.print-growth #growthSection { margin: 0; color: #111111; }
+      body.print-growth #growthSection h2 { color: #111111; }
+      body.print-growth .growth-wrap { overflow: visible; border-color: #aaaaaa; }
+      body.print-growth .growth-table { min-width: 0; color: #111111; }
+      body.print-growth .growth-table thead { display: table-header-group; }
+      body.print-growth .growth-table th {
+        background: #eeeeee !important; color: #111111; border-color: #aaaaaa;
+      }
+      body.print-growth .growth-table td {
+        background: #ffffff !important; color: #222222; border-color: #dddddd;
+      }
+    }
+
     @media (max-width: 860px) { .calc-layout { grid-template-columns: 1fr; } }
     @media (max-width: 600px) {
       .hero--inner { padding: 1.25rem; }
@@ -227,7 +259,6 @@
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
-  <script src="/assets/js/web-vitals-rum.js" defer></script>
 
   <script type="application/ld+json">
 {
@@ -256,7 +287,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-07-22"
+      "dateModified": "2026-07-30"
     }
   ]
 }
@@ -469,6 +500,20 @@
           <option value="both">Both</option>
         </select>
       </div>
+      <div class="growth-actions" aria-label="Growth schedule actions">
+        <button class="btn-growth-action" id="growthPrintBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>
+          Print
+        </button>
+        <button class="btn-growth-action" id="growthCsvBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Download CSV
+        </button>
+        <button class="btn-growth-action" id="growthTxtBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+          Download TXT
+        </button>
+      </div>
       <div class="growth-wrap">
         <table class="growth-table" aria-label="Year-by-year growth schedule">
           <thead id="growthHead"></thead>
@@ -487,7 +532,8 @@
          interest before it continues compounding) and an <strong>inflation rate</strong>
          (used to convert the nominal balance into today's purchasing power equivalent).
          The results and growth table update to show all four views: gross, after-tax,
-         real, and real after-tax.</p>
+         real, and real after-tax. Use the growth schedule actions to print the selected view
+         or download its complete year-by-year data as CSV or aligned plain text.</p>
     </div>
 
     <!-- FORMULA -->
@@ -662,6 +708,9 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
     const growthHead = $('growthHead');
     const growthBody = $('growthBody');
     const tableView  = $('tableView');
+    const growthPrintBtn = $('growthPrintBtn');
+    const growthCsvBtn = $('growthCsvBtn');
+    const growthTxtBtn = $('growthTxtBtn');
 
     /* ── State ── */
     let yearlyData = [];
@@ -778,18 +827,94 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
     }
 
     /* ══════════════════════════════════════════
-       URL PARAMS
+       BOOKMARKABLE URL — BUILD ONLY WHEN REQUESTED
     ══════════════════════════════════════════ */
-    function writeURL(P, rate, T, n, contrib, tax, inflation) {
+    function buildBookmarkableURL() {
       var params = new URLSearchParams();
-      params.set('principal', P);
-      params.set('rate', rate);
-      params.set('years', T);
-      params.set('compound', n);
-      params.set('contrib', contrib);
-      params.set('tax', tax);
-      params.set('inflation', inflation);
-      history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+      params.set('principal', principalInput.value);
+      params.set('rate', annualRateInput.value);
+      params.set('years', yearsInput.value);
+      params.set('compound', compoundFreqSelect.value);
+      params.set('contrib', monthlyContribInput.value);
+      params.set('tax', taxRateInput.value);
+      params.set('inflation', inflationRateInput.value);
+
+      var bookmarkableURL = new URL(window.location.href);
+      bookmarkableURL.search = params.toString();
+      bookmarkableURL.hash = '';
+      return bookmarkableURL.toString();
+    }
+
+    function getGrowthExportColumns() {
+      var columns = [
+        { key: 'year', label: 'Year' },
+        { key: 'grossInterest', label: 'Gross Interest' },
+        { key: 'taxPaid', label: 'Tax Paid' },
+        { key: 'netInterest', label: 'Net Interest' },
+        { key: 'contributions', label: 'Contributions' }
+      ];
+      if (tableView.value === 'nominal' || tableView.value === 'both') {
+        columns.push({ key: 'balance', label: 'Balance' });
+      }
+      if (tableView.value === 'real' || tableView.value === 'both') {
+        columns.push({ key: 'realBalance', label: 'Real Balance' });
+      }
+      return columns;
+    }
+
+    function escapeCsv(value) {
+      return '"' + String(value).replace(/"/g, '""') + '"';
+    }
+
+    function buildGrowthCsv() {
+      var columns = getGrowthExportColumns();
+      var lines = [columns.map(function(column) { return column.label; })];
+      yearlyData.forEach(function(row) {
+        lines.push(columns.map(function(column) {
+          return column.key === 'year' ? row.year : row[column.key].toFixed(2);
+        }));
+      });
+      return lines.map(function(row) { return row.map(escapeCsv).join(','); }).join('\r\n');
+    }
+
+    function buildGrowthTxt() {
+      var columns = getGrowthExportColumns();
+      var table = [columns.map(function(column) { return column.label; })];
+      yearlyData.forEach(function(row) {
+        table.push(columns.map(function(column) {
+          return column.key === 'year' ? 'Year ' + row.year : fmtD(row[column.key]);
+        }));
+      });
+      var widths = table[0].map(function(_, column) {
+        return Math.max.apply(null, table.map(function(row) { return row[column].length; }));
+      });
+      return table.map(function(row) {
+        return row.map(function(value, column) {
+          return column === 0 ? value.padEnd(widths[column]) : value.padStart(widths[column]);
+        }).join('  ');
+      }).join('\r\n');
+    }
+
+    function downloadGrowthFile(content, extension, mimeType) {
+      if (!yearlyData.length) return;
+      var blobUrl = URL.createObjectURL(new Blob([content], { type: mimeType + ';charset=utf-8' }));
+      var link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'compound-interest-growth-' + tableView.value + '.' + extension;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 0);
+    }
+
+    function printGrowthSchedule() {
+      if (!yearlyData.length) return;
+      document.body.classList.add('print-growth');
+      window.addEventListener('afterprint', function() {
+        document.body.classList.remove('print-growth');
+      }, { once: true });
+      window.print();
     }
 
     function readURL() {
@@ -876,16 +1001,22 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
       shareLine.style.display     = 'flex';
 
       renderTable(tableView.value);
-      writeURL(P, rate, T, n, contrib, taxRate, inflation);
       resultsCards.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     calcBtn.addEventListener('click', runCalc);
     tableView.addEventListener('change', function() { renderTable(tableView.value); });
+    growthPrintBtn.addEventListener('click', printGrowthSchedule);
+    growthCsvBtn.addEventListener('click', function() {
+      downloadGrowthFile(buildGrowthCsv(), 'csv', 'text/csv');
+    });
+    growthTxtBtn.addEventListener('click', function() {
+      downloadGrowthFile(buildGrowthTxt(), 'txt', 'text/plain');
+    });
 
     /* Copy link */
     copyLinkBtn.addEventListener('click', function() {
-      navigator.clipboard.writeText(window.location.href).then(function() {
+      navigator.clipboard.writeText(buildBookmarkableURL()).then(function() {
         copyConfirm.style.display = 'inline';
         setTimeout(function() { copyConfirm.style.display = 'none'; }, 2500);
       });

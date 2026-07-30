@@ -28,8 +28,8 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",   "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Health", "item": "https://monkeytactics.com/tools/health.html" },
-      { "@type": "ListItem", "position": 3, "name": "Age Calculator", "item": "https://monkeytactics.com/tools/age-calculator.html" }
+      { "@type": "ListItem", "position": 2, "name": "Health", "item": "https://monkeytactics.com/tools/health" },
+      { "@type": "ListItem", "position": 3, "name": "Age Calculator", "item": "https://monkeytactics.com/tools/age-calculator" }
     ]
   }
   </script>
@@ -161,7 +161,7 @@
     .leap-note .leap-icon { font-size: 1.1rem; flex-shrink: 0; }
 
     .btn-calculate {
-      width: 100%;
+      width: fit-content;
       background: linear-gradient(135deg, #22c55e, #16a34a);
       color: #022c22;
       font-family: inherit;
@@ -356,7 +356,6 @@
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
-  <script src="/assets/js/web-vitals-rum.js" defer></script>
 
   <script type="application/ld+json">
 {
@@ -385,7 +384,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-07-22"
+      "dateModified": "2026-07-30"
     }
   ]
 }
@@ -804,12 +803,15 @@
     if (hasDob) runCalculation();
   }
 
-  function writeURLParams() {
+  function buildBookmarkableURL() {
     const params = new URLSearchParams();
     params.set('dob', dobInput.value);
     params.set('retire', retireAgeInput.value);
-    const newURL = window.location.pathname + '?' + params.toString();
-    history.replaceState(null, '', newURL);
+
+    const bookmarkableURL = new URL(window.location.href);
+    bookmarkableURL.search = params.toString();
+    bookmarkableURL.hash = '';
+    return bookmarkableURL.toString();
   }
 
   /* ── Live leap-day note toggle ── */
@@ -909,15 +911,13 @@
     resultsPanel.style.display = 'block';
     shareLine.style.display    = 'flex';
 
-    writeURLParams();
-
     resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   calcBtn.addEventListener('click', runCalculation);
 
   copyLinkBtn.addEventListener('click', function () {
-    navigator.clipboard.writeText(window.location.href).then(function () {
+    navigator.clipboard.writeText(buildBookmarkableURL()).then(function () {
       copyConfirm.style.display = 'inline';
       setTimeout(function () { copyConfirm.style.display = 'none'; }, 2500);
     });
