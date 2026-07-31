@@ -8,25 +8,25 @@
   <link rel="manifest" href="../site.webmanifest">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Word Unscrambler &amp; Anagram Solver | MonkeyTactics</title>
-  <meta name="description" content="Unscramble letters into words with our free anagram solver. Find Scrabble words by length, see tile scores, and check definitions. Fast and private.">
+  <title>Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics</title>
+  <meta name="description" content="Unscramble letters with ENABLE or SOWPODS. Filter by length, pattern, score, hooks, vowels, and required letters, then sort by Scrabble score.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-07-25">
+  <meta name="date" content="2026-07-30">
   <meta name="theme-color" content="#0f172a">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/word-unscrambler">
 
-  <meta property="og:title" content="Word Unscrambler &amp; Anagram Solver | MonkeyTactics">
-  <meta property="og:description" content="Find words from scrambled letters, grouped by length with Scrabble scores and dictionary links. Free and private.">
+  <meta property="og:title" content="Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics">
+  <meta property="og:description" content="Find playable words with ENABLE or SOWPODS, advanced board filters, Scrabble scores, bingo candidates, and dictionary-aware hooks.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://monkeytactics.com/tools/word-unscrambler">
   <meta property="og:site_name" content="MonkeyTactics">
   <meta property="og:locale" content="en_US">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Word Unscrambler &amp; Anagram Solver">
-  <meta name="twitter:description" content="Find words from scrambled letters by length, Scrabble score, and definition.">
+  <meta name="twitter:title" content="Word Unscrambler &amp; Scrabble Word Finder">
+  <meta name="twitter:description" content="Unscramble letters, filter for board positions, and rank playable words by score, length, high-value tiles, bingos, or hooks.">
 
   <script type="application/ld+json">
   {
@@ -44,9 +44,9 @@
       {
         "@type": "WebApplication",
         "@id": "https://monkeytactics.com/tools/word-unscrambler#app",
-        "name": "Word Unscrambler & Anagram Solver",
+        "name": "Word Unscrambler & Scrabble Word Finder",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "description": "A free browser-based word unscrambler that finds anagrams and shorter words, groups results by length, calculates Scrabble scores, and links to definitions.",
+        "description": "A free browser-based word unscrambler and Scrabble word finder with ENABLE and SOWPODS selection, board-pattern filters, score sorting, bingo candidates, and hook detection.",
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Word Game Utility",
         "operatingSystem": "Any",
@@ -55,6 +55,13 @@
         "inLanguage": "en-US",
         "featureList": [
           "Find words made from some or all supplied letters",
+          "Search ENABLE, SOWPODS, or both dictionaries",
+          "Filter by exact word length, starting letters, or ending letters",
+          "Match visible letter patterns with question-mark wildcards",
+          "Require or exclude specific letters",
+          "Filter by high-value tiles, vowels, consonants, score ranges, and hooks",
+          "Detect front hooks, back hooks, S-hooks, and multiple hooks",
+          "Sort globally by score, alphabet, length, rack use, high-value tiles, bingos, hooks, or pattern strength",
           "Respect repeated-letter frequency",
           "Group results by word length",
           "Calculate English Scrabble tile scores",
@@ -68,19 +75,19 @@
         },
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
-        "dateModified": "2026-07-25"
+        "dateModified": "2026-07-30"
       },
       {
         "@type": "WebPage",
         "@id": "https://monkeytactics.com/tools/word-unscrambler#webpage",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "name": "Word Unscrambler & Anagram Solver",
-        "description": "Find words and anagrams from scrambled letters, organized by length with Scrabble scores and dictionary definitions.",
+        "name": "Word Unscrambler & Scrabble Word Finder",
+        "description": "Unscramble letters into playable words with dictionary selection, board filters, Scrabble scores, bingo candidates, hooks, and flexible sorting.",
         "inLanguage": "en-US",
         "isPartOf": { "@id": "https://monkeytactics.com/#website" },
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/word-unscrambler#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/word-unscrambler#app" },
-        "dateModified": "2026-07-25"
+        "dateModified": "2026-07-30"
       }
     ]
   }
@@ -94,7 +101,7 @@
       {
         "@type": "Question",
         "name": "What words can I make with these letters?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Enter your letters and select Unscramble. The tool returns words that use some or all of those letters without using any letter more often than it appears, organized from longest to shortest." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter your letters and select Unscramble. The tool returns words that use some or all of those letters without using any letter more often than it appears. Results use the selected dictionary, filters, and sorting method." }
       },
       {
         "@type": "Question",
@@ -104,12 +111,12 @@
       {
         "@type": "Question",
         "name": "Can I use this as a Scrabble word finder?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The tool can help with word-game searches and shows standard English tile scores. It is not an official game dictionary, and word acceptance can vary by dictionary, edition, region, and ruleset." }
+        "acceptedAnswer": { "@type": "Answer", "text": "The tool can help with word-game searches and shows standard English tile scores, high-value tiles, bingo candidates, and hooks. It is not an official game dictionary, and word acceptance can vary by dictionary, edition, region, and ruleset." }
       },
       {
         "@type": "Question",
         "name": "Which dictionary does the Word Unscrambler use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The word list is a deduplicated merge of the public-domain ENABLE list and the ISC-declared potch/sowpods 1.1.0 package. It may contain uncommon, historical, regional, or offensive terms." }
+        "acceptedAnswer": { "@type": "Answer", "text": "You can search the public-domain ENABLE list, the ISC-declared potch/sowpods 1.1.0 package, or their deduplicated union. These lists may contain uncommon, historical, regional, or offensive terms." }
       },
       {
         "@type": "Question",
@@ -119,7 +126,22 @@
       {
         "@type": "Question",
         "name": "How are Scrabble scores calculated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The score is the sum of the standard English Scrabble value for every letter in a word. Premium squares, bingo bonuses, and blank tiles are not included." }
+        "acceptedAnswer": { "@type": "Answer", "text": "The displayed score is the sum of the standard English Scrabble value for every letter. Premium squares and blank tiles are not included. Seven-letter words receive a separate Bingo +50 candidate badge." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do wildcard patterns work?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter letters for fixed positions and a question mark for each unknown letter, such as ??A?E or A??ING. Results must match every position and still be buildable from the supplied letters." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I find the highest-scoring Scrabble word?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Open Advanced Filters and choose Scrabble score: highest first under Sort Results. The tool ranks all matching words globally by base tile score." }
+      },
+      {
+        "@type": "Question",
+        "name": "What are front hooks, back hooks, and S-hooks?",
+        "acceptedAnswer": { "@type": "Answer", "text": "A hook is a letter added to the front or back of a word to make another valid word in the selected dictionary. An S-hook specifically adds S to the end. Hook searches identify these extensions and can filter or sort by them." }
       },
       {
         "@type": "Question",
@@ -131,7 +153,7 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260725-9">
+  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260730-17">
   <script src="../assets/js/ads.js" defer></script>
 </head>
 
@@ -169,9 +191,9 @@
         <span class="sep" aria-hidden="true">›</span>
         <span aria-current="page">Word Unscrambler</span>
       </nav>
-      <h1 id="tool-heading">Word Unscrambler &amp; Anagram Solver</h1>
-      <p>Unscramble letters into anagrams and shorter words for Scrabble and other word games.
-         Results are grouped by length with tile scores and dictionary definitions.</p>
+      <h1 id="tool-heading">Word Unscrambler &amp; Scrabble Word Finder</h1>
+      <p>Turn scrambled letters into playable words with ENABLE or SOWPODS. Filter for rack and
+         board positions, compare tile scores, spot bingo candidates, and find useful hooks.</p>
     </section>
 
     <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
@@ -182,6 +204,26 @@
 
         <div class="calc-layout">
           <form class="inputs-col" id="unscramble-form" novalidate>
+            <fieldset class="dictionary-selector">
+              <legend>Dictionary</legend>
+              <div class="segmented-control">
+                <label>
+                  <input type="radio" name="dictionary" value="enable">
+                  <span>ENABLE</span>
+                </label>
+                <label>
+                  <input type="radio" name="dictionary" value="sowpods">
+                  <span>SOWPODS</span>
+                </label>
+                <label>
+                  <input type="radio" name="dictionary" value="both" checked>
+                  <span>Both</span>
+                </label>
+              </div>
+              <p class="input-hint">Choose the word list used for this search. Note: ENABLE =
+                North American Scrabble; SOWPODS = International Scrabble.</p>
+            </fieldset>
+
             <div class="input-group">
               <label for="letters">Letters to Unscramble</label>
               <input
@@ -199,6 +241,229 @@
               >
               <p class="input-hint" id="input-hint">Letters only — repeated letters are counted.</p>
             </div>
+
+            <div class="search-options-grid">
+              <div class="input-group">
+                <label for="word-length">Word Length</label>
+                <select id="word-length" name="word-length">
+                  <option value="">Any length</option>
+                  <option value="2">2 letters</option>
+                  <option value="3">3 letters</option>
+                  <option value="4">4 letters</option>
+                  <option value="5">5 letters</option>
+                  <option value="6">6 letters</option>
+                  <option value="7">7 letters</option>
+                  <option value="8">8 letters</option>
+                  <option value="9">9 letters</option>
+                  <option value="10">10 letters</option>
+                  <option value="11">11 letters</option>
+                  <option value="12">12 letters</option>
+                  <option value="13">13 letters</option>
+                  <option value="14">14 letters</option>
+                  <option value="15">15 letters</option>
+                  <option value="16">16 letters</option>
+                  <option value="17">17 letters</option>
+                  <option value="18">18 letters</option>
+                  <option value="19">19 letters</option>
+                  <option value="20">20 letters</option>
+                  <option value="21">21 letters</option>
+                  <option value="22">22 letters</option>
+                  <option value="23">23 letters</option>
+                  <option value="24">24 letters</option>
+                  <option value="25">25 letters</option>
+                  <option value="26">26 letters</option>
+                  <option value="27">27 letters</option>
+                  <option value="28">28 letters</option>
+                  <option value="29">29 letters</option>
+                  <option value="30">30 letters</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label for="starts-with">Starts With</label>
+                <input
+                  id="starts-with"
+                  name="starts-with"
+                  type="text"
+                  inputmode="text"
+                  autocomplete="off"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  placeholder="e.g. un"
+                  maxlength="30"
+                >
+              </div>
+
+              <div class="input-group">
+                <label for="ends-with">Ends With</label>
+                <input
+                  id="ends-with"
+                  name="ends-with"
+                  type="text"
+                  inputmode="text"
+                  autocomplete="off"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  placeholder="e.g. ing"
+                  maxlength="30"
+                >
+              </div>
+
+              <div class="input-group">
+                <div class="field-label-row">
+                  <label for="pattern">Pattern Search</label>
+                  <button class="field-reset" id="reset-pattern" type="button">Reset</button>
+                </div>
+                <input
+                  id="pattern"
+                  name="pattern"
+                  type="text"
+                  inputmode="text"
+                  autocomplete="off"
+                  autocapitalize="characters"
+                  spellcheck="false"
+                  placeholder="e.g. ??A?E or A??ING"
+                  aria-describedby="pattern-hint"
+                  maxlength="30"
+                >
+                <p class="input-hint" id="pattern-hint">Use ? for any letter.</p>
+              </div>
+
+              <div class="input-group">
+                <label for="must-include">Must Include Letter(s)</label>
+                <input
+                  id="must-include"
+                  name="must-include"
+                  type="text"
+                  inputmode="text"
+                  autocomplete="off"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  placeholder="e.g. ae"
+                  aria-describedby="must-include-hint"
+                  maxlength="30"
+                >
+                <p class="input-hint" id="must-include-hint">Repeated letters are counted.</p>
+              </div>
+            </div>
+
+            <details class="advanced-filters">
+              <summary>Advanced Filters</summary>
+              <div class="advanced-filters-grid">
+                <div class="input-group">
+                  <label for="exclude-letters">Exclude Letters</label>
+                  <input
+                    id="exclude-letters"
+                    name="exclude-letters"
+                    type="text"
+                    inputmode="text"
+                    autocomplete="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    placeholder="e.g. qxz"
+                    maxlength="26"
+                  >
+                </div>
+
+                <div class="input-group">
+                  <span class="control-label">High-Value Letters</span>
+                  <label class="toggle-option" for="high-value-only">
+                    <input id="high-value-only" name="high-value-only" type="checkbox">
+                    <span>Require J, Q, X, or Z</span>
+                  </label>
+                </div>
+
+                <div class="input-group">
+                  <label for="minimum-vowels">Minimum Vowels</label>
+                  <select id="minimum-vowels" name="minimum-vowels">
+                    <option value="0">Any</option>
+                    <option value="1">1 or more</option>
+                    <option value="2">2 or more</option>
+                    <option value="3">3 or more</option>
+                    <option value="4">4 or more</option>
+                    <option value="5">5 or more</option>
+                  </select>
+                </div>
+
+                <div class="input-group">
+                  <label for="minimum-consonants">Minimum Consonants</label>
+                  <select id="minimum-consonants" name="minimum-consonants">
+                    <option value="0">Any</option>
+                    <option value="1">1 or more</option>
+                    <option value="2">2 or more</option>
+                    <option value="3">3 or more</option>
+                    <option value="4">4 or more</option>
+                    <option value="5">5 or more</option>
+                    <option value="6">6 or more</option>
+                    <option value="7">7 or more</option>
+                  </select>
+                </div>
+
+                <div class="input-group">
+                  <label for="minimum-score">Minimum Score</label>
+                  <input
+                    id="minimum-score"
+                    name="minimum-score"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    max="999"
+                    placeholder="No minimum"
+                  >
+                </div>
+
+                <div class="input-group">
+                  <label for="maximum-score">Maximum Score</label>
+                  <input
+                    id="maximum-score"
+                    name="maximum-score"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    max="999"
+                    placeholder="No maximum"
+                  >
+                  <p class="input-hint">Base tile score; bingo bonus is shown separately.</p>
+                </div>
+
+                <div class="input-group">
+                  <label for="hook-filter">Hooks</label>
+                  <select id="hook-filter" name="hook-filter">
+                    <option value="">Any word</option>
+                    <option value="any">Has any hook</option>
+                    <option value="s">Has an S-hook</option>
+                    <option value="front">Has a front hook</option>
+                    <option value="back">Has a back hook</option>
+                    <option value="multiple">Has multiple hooks</option>
+                  </select>
+                  <p class="input-hint">Hook searches load the complete selected dictionary.</p>
+                </div>
+
+                <div class="input-group advanced-sort">
+                  <label for="sort-results">Sort Results</label>
+                  <select id="sort-results" name="sort-results">
+                    <option value="length-desc">Word length: longest first</option>
+                    <option value="score-desc">Scrabble score: highest first</option>
+                    <option value="alpha">Alphabetical: A–Z</option>
+                    <option value="length-asc">Word length: shortest first</option>
+                    <option value="uses-most">Uses most letters</option>
+                    <option value="high-value">Contains high-value letters</option>
+                    <option value="bingo">Bingo candidates first</option>
+                    <option value="hooks-total">Hooks: most first</option>
+                    <option value="hooks-s">S-hooks first</option>
+                    <option value="hooks-front">Front hooks first</option>
+                    <option value="hooks-back">Back hooks first</option>
+                    <option value="pattern-strength">Pattern match strength</option>
+                  </select>
+                </div>
+
+                <div class="advanced-reset-row">
+                  <button class="btn-reset-filters" id="reset-all-filters" type="button">
+                    Reset All Filters
+                  </button>
+                </div>
+              </div>
+            </details>
 
             <p class="calc-error" id="form-message" role="alert" hidden></p>
 
@@ -236,32 +501,81 @@
       </div>
     </section>
 
-    <div class="seo-section">
+    <section class="seo-section">
       <h2>How to use the word unscrambler</h2>
-      <p>Type or paste your scrambled letters into the input box, then click
-         <strong>Unscramble</strong>. The tool checks the browser-based dictionary and displays
-         every word that can be made from some or all of those letters. Pressing Enter works too.</p>
+      <ol class="feature-list">
+        <li><strong>Choose a dictionary:</strong> use ENABLE for North American play, SOWPODS
+            for international play, or Both for the combined word list.</li>
+        <li><strong>Enter your letters:</strong> repeated tiles are counted, so enter each copy
+            available in your rack or letter set.</li>
+        <li><strong>Describe the board:</strong> optionally select a word length, starting or
+            ending letters, a <code>?</code> wildcard pattern, and letters every result must use.</li>
+        <li><strong>Refine the search:</strong> open Advanced Filters to exclude tiles, require
+            high-value letters, set vowel or consonant minimums, limit scores, or find hooks.</li>
+        <li><strong>Rank the plays:</strong> sort by score, alphabet, length, rack use, J/Q/X/Z,
+            bingo potential, hooks, or pattern strength, then select <strong>Unscramble</strong>.</li>
+      </ol>
       <p>Letter frequency still matters: a result cannot use any letter more often than it appears
-         in your input. Spaces, numbers, and punctuation are not accepted. The merged
-         <strong>ENABLE + SOWPODS</strong> dictionary is compressed and loaded in small chunks
-         only when a search needs them.</p>
-    </div>
+         in your input. Spaces, numbers, and punctuation are not accepted. The selected
+         <strong>ENABLE and/or SOWPODS</strong> word data is compressed and loaded in small
+         chunks only when a search needs them.</p>
+    </section>
 
-    <div class="seo-section">
+    <section class="seo-section">
       <h2>Free anagram solver and Scrabble word finder</h2>
-      <p>Use this word finder when you need to solve an anagram, explore possible words from a
-         letter rack, or check a difficult combination in a word game. Results are grouped from
-         the longest words to the shortest, making high-value plays easier to spot.</p>
+      <p>Use this word finder to solve an anagram, explore possible words from a letter rack, or
+         check a difficult board position. Length sorting keeps words grouped from longest to
+         shortest or shortest to longest; gameplay sorts create one global ranking so the
+         strongest matching play appears first.</p>
       <ul class="feature-list">
         <li><strong>Flexible matching:</strong> find words that use some or all of your letters.</li>
+        <li><strong>Board-state controls:</strong> combine exact length, starting or ending
+            letters, wildcard patterns, and required letters.</li>
+        <li><strong>Advanced filters:</strong> constrain tile types, vowels, consonants, scores,
+            and dictionary-aware hooks.</li>
+        <li><strong>Gameplay sorting:</strong> rank words globally by score, alphabet, length,
+            high-value tiles, bingo potential, hook utility, or pattern strength.</li>
         <li><strong>Accurate repeats:</strong> a letter is never used more times than you entered it.</li>
         <li><strong>Scrabble scores:</strong> compare standard tile values before board bonuses.</li>
         <li><strong>Definition links:</strong> open any result in Merriam-Webster for a meaning check.</li>
-        <li><strong>Word-game lexicon:</strong> search a deduplicated ENABLE and SOWPODS word list.</li>
+        <li><strong>Dictionary choice:</strong> search ENABLE, SOWPODS, or their deduplicated union.</li>
       </ul>
-    </div>
+    </section>
 
-    <div class="seo-section">
+    <section class="seo-section">
+      <h2>Find the highest-scoring Scrabble words</h2>
+      <p>Select <strong>Scrabble score: highest first</strong> to compare every match in one
+         score-ranked list instead of scanning separate length groups. Scores use standard
+         English tile values before premium squares or blank-tile adjustments.</p>
+      <p>The high-value filter and sort prioritize words containing <strong>J, Q, X, or Z</strong>.
+         Seven-letter results carry a <strong>Bingo +50</strong> candidate badge, and the bingo
+         sort moves those rack-clearing plays to the top.</p>
+    </section>
+
+    <section class="seo-section">
+      <h2>Filter words for a rack or board position</h2>
+      <p>Use <strong>Starts With</strong> and <strong>Ends With</strong> for known edge letters.
+         Pattern Search treats each <code>?</code> as one unknown position, so
+         <code>??A?E</code> finds five-letter matches with A in the third position and E at the
+         end. Fixed pattern letters and required letters still must fit the supplied tile set.</p>
+      <p>Advanced Filters can remove words containing excluded tiles, require at least one
+         high-value tile, set minimum vowel or consonant counts, and constrain the base tile
+         score. <strong>Reset All Filters</strong> restores these options without clearing the
+         entered letters or primary dictionary choice.</p>
+    </section>
+
+    <section class="seo-section">
+      <h2>Find front hooks, back hooks, and S-hooks</h2>
+      <p>A <strong>front hook</strong> adds one letter before a word to create another valid word;
+         a <strong>back hook</strong> adds one after it. An <strong>S-hook</strong> is the common
+         back-hook case where adding S makes a valid word. Hook badges show front and back counts,
+         identify S-hooks, and reveal the exact hook letters on hover.</p>
+      <p>Hook detection respects the selected ENABLE or SOWPODS dictionary. Because a front hook
+         may begin with any letter, hook filtering and sorting load the complete selected index
+         on demand; ordinary unscramble searches continue loading only relevant chunks.</p>
+    </section>
+
+    <section class="seo-section">
       <h2>How are matching words found?</h2>
       <p>Each dictionary word is reduced to a canonical signature by sorting its letters.
          The tool groups those signatures by word length, then checks which groups can be built
@@ -269,19 +583,19 @@
       <div class="formula-block" role="img" aria-label="Example word signature">
         listen → eilnst &nbsp;&nbsp; silent → eilnst
       </div>
-      <p>Words with a matching or shorter compatible signature are returned, with the longest
-         results displayed first.</p>
-    </div>
+      <p>Compatible words are checked against every active constraint and then ordered by the
+         selected sorting method. All matching and filtering happens locally in the browser.</p>
+    </section>
 
-    <div class="seo-section" id="dictionary-sources">
+    <section class="seo-section" id="dictionary-sources">
       <h2>Dictionary sources and usage notes</h2>
-      <p>The results come from a deduplicated merge of
+      <p>The dictionary selector supports separate searches of
          <a href="https://www.norvig.com/ngrams/enable1.txt" rel="external">ENABLE</a>,
-         a public-domain word list, and the ISC-declared
+         a public-domain North American word list, and the ISC-declared
          <a href="https://github.com/potch/sowpods" rel="external">potch/sowpods 1.1.0</a>
-         package. This word-game lexicon may include uncommon, historical, regional, or
-         offensive terms. A word appearing here does not guarantee that it will be accepted
-         by every dictionary, edition, region, tournament, or ruleset.</p>
+         international package, plus a deduplicated union under Both. These word-game lists may
+         include uncommon, historical, regional, offensive, or general-dictionary-absent terms.
+         A result is not a guarantee of acceptance by every edition, region, tournament, or ruleset.</p>
       <aside class="third-party-callout" aria-labelledby="third-party-heading">
         <div class="third-party-callout-copy">
           <h3 id="third-party-heading">Licensing and attribution</h3>
@@ -293,7 +607,7 @@
           View third-party notices <span aria-hidden="true">→</span>
         </a>
       </aside>
-    </div>
+    </section>
 
     <section class="faq-section" aria-labelledby="faq-heading">
       <details open>
@@ -306,8 +620,8 @@
             <li class="faq-item">
               <h3>What words can I make with these letters?</h3>
               <p>Enter your letters and select <strong>Unscramble</strong>. The tool returns every
-                 matching word it can build without using any letter too many times, organized
-                 from the longest words to the shortest.</p>
+                 matching word it can build without using any letter too many times. Results use
+                 your selected dictionary, filters, and sorting method.</p>
             </li>
             <li class="faq-item">
               <h3>Does the Word Unscrambler have to use every letter?</h3>
@@ -319,12 +633,13 @@
               <p>The tool can help with word-game searches, and every result includes its standard
                  English tile score. It is not an official game dictionary, and word acceptance can
                  vary by dictionary, edition, region, and ruleset. Board multipliers, blank tiles,
-                 and the seven-tile bingo bonus are not included.</p>
+                 and premium squares are not included; seven-letter words receive a separate
+                 <strong>Bingo +50</strong> candidate badge.</p>
             </li>
             <li class="faq-item">
               <h3>Which dictionary does the Word Unscrambler use?</h3>
-              <p>The tool uses a deduplicated merge of the public-domain ENABLE list and the
-                 ISC-declared potch/sowpods 1.1.0 package. The combined lexicon may contain
+              <p>You can search the public-domain ENABLE list, the ISC-declared potch/sowpods
+                 1.1.0 package, or their deduplicated union. These word-game lexicons may contain
                  uncommon, historical, regional, offensive, or general-dictionary-absent terms.</p>
             </li>
             <li class="faq-item">
@@ -336,8 +651,27 @@
             <li class="faq-item">
               <h3>How are Scrabble scores calculated?</h3>
               <p>The displayed score adds the standard English tile value of each letter in the
-                 word. It does not include double- or triple-letter squares, word multipliers,
-                 bingo bonuses, or zero-point blank tiles.</p>
+                 word. It does not include double- or triple-letter squares, word multipliers, or
+                 zero-point blank tiles. Seven-letter words receive a separate
+                 <strong>Bingo +50</strong> candidate badge.</p>
+            </li>
+            <li class="faq-item">
+              <h3>How do wildcard patterns work?</h3>
+              <p>Enter letters for fixed positions and a <code>?</code> for each unknown letter.
+                 For example, <code>??A?E</code> requires a five-letter word with A in the third
+                 position and E at the end. The result must still be buildable from your letters.</p>
+            </li>
+            <li class="faq-item">
+              <h3>How do I find the highest-scoring Scrabble word?</h3>
+              <p>Open <strong>Advanced Filters</strong> and choose
+                 <strong>Scrabble score: highest first</strong> under Sort Results. Matches are
+                 ranked globally by base tile score, with the highest-scoring word first.</p>
+            </li>
+            <li class="faq-item">
+              <h3>What are front hooks, back hooks, and S-hooks?</h3>
+              <p>A hook adds one letter before or after a word to create another valid word in the
+                 selected dictionary. An S-hook specifically adds S to the end. Hook filters and
+                 sorts can prioritize words with front, back, S, or multiple hooks.</p>
             </li>
             <li class="faq-item">
               <h3>Are my searches private?</h3>
@@ -382,6 +716,6 @@
     </nav>
   </footer>
 
-  <script src="../assets/js/word-unscrambler.js?v=20260725-7" defer></script>
+  <script src="../assets/js/word-unscrambler.js?v=20260730-15" defer></script>
 </body>
 </html>

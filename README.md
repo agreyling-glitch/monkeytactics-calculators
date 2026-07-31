@@ -60,7 +60,7 @@ The site currently features 23 tools across five main categories:
 
 MonkeyTactics is a static, front-end-only site with no server-side application or build step. Each tool uses lightweight HTML, CSS, and JavaScript, with selected browser libraries loaded from a CDN or embedded directly when a specialized capability is required.
 
-The Word Unscrambler uses a deduplicated merge of the ENABLE and SOWPODS word lists. Its static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser loads only the chunks relevant to the submitted letters, decompresses them with the native `DecompressionStream` API, and caches the indexed words for later searches.
+The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source membership, allowing searches against either dictionary or their deduplicated union. Its static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser loads only the chunks relevant to the submitted letters, decompresses them with the native `DecompressionStream` API, and caches the indexed words for later searches. Exact word length, starting and ending letters, wildcard patterns, required/excluded letters, vowel and consonant minimums, score ranges, sorting, and dictionary-aware hooks are applied in the browser. Hook searches load the complete index on demand.
 
 The OCR Utility uses Tesseract.js v5 and WebAssembly to recognize English text entirely in the browser. Uploaded PNG and JPG images are preprocessed with canvas grayscale and contrast enhancement, then passed to a dedicated OCR worker. Images and extracted text are never uploaded to MonkeyTactics.
 
