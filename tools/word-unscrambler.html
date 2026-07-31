@@ -9,7 +9,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics</title>
-  <meta name="description" content="Unscramble letters with ENABLE or SOWPODS. Filter by length, pattern, score, hooks, vowels, and required letters, then sort by Scrabble score.">
+  <meta name="description" content="Unscramble letters into words with ENABLE or SOWPODS. Use wildcards, inline patterns, advanced filters, Scrabble scores, hooks, and rack-analysis charts.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
   <meta name="date" content="2026-07-31">
@@ -18,7 +18,7 @@
   <link rel="canonical" href="https://monkeytactics.com/tools/word-unscrambler">
 
   <meta property="og:title" content="Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics">
-  <meta property="og:description" content="Find playable words with ENABLE or SOWPODS, advanced board filters, Scrabble scores, bingo candidates, and dictionary-aware hooks.">
+  <meta property="og:description" content="Find playable words with smart pattern input, ENABLE or SOWPODS dictionaries, advanced filters, Scrabble scores, hooks, and rack-analysis charts.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://monkeytactics.com/tools/word-unscrambler">
   <meta property="og:site_name" content="MonkeyTactics">
@@ -26,7 +26,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Word Unscrambler &amp; Scrabble Word Finder">
-  <meta name="twitter:description" content="Unscramble letters, filter for board positions, and rank playable words by score, length, high-value tiles, bingos, or hooks.">
+  <meta name="twitter:description" content="Unscramble letters with inline patterns, advanced filters, Scrabble scoring, hooks, and an expandable Word Breakdown.">
 
   <script type="application/ld+json">
   {
@@ -46,7 +46,7 @@
         "@id": "https://monkeytactics.com/tools/word-unscrambler#app",
         "name": "Word Unscrambler & Scrabble Word Finder",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "description": "A free browser-based word unscrambler and Scrabble word finder with ENABLE and SOWPODS selection, board-pattern filters, score sorting, bingo candidates, and hook detection.",
+        "description": "A free browser-based word unscrambler and Scrabble word finder with smart pattern input, ENABLE and SOWPODS selection, board filters, score sorting, hooks, and rack-analysis charts.",
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Word Game Utility",
         "operatingSystem": "Any",
@@ -56,12 +56,16 @@
         "featureList": [
           "Find words made from some or all supplied letters",
           "Search ENABLE, SOWPODS, or both dictionaries",
+          "Combine rack letters, wildcard tiles, and a positional pattern in one smart input",
           "Filter by exact word length, starting letters, or ending letters",
           "Match visible letter patterns with question-mark wildcards",
           "Require or exclude specific letters",
-          "Filter by high-value tiles, vowels, consonants, score ranges, and hooks",
+          "Adjust word length, minimum vowels, and minimum consonants with numeric controls",
+          "Filter by high-value tiles, score ranges, and hooks",
           "Detect front hooks, back hooks, S-hooks, and multiple hooks",
           "Sort globally by score, alphabet, length, rack use, high-value tiles, bingos, hooks, or pattern strength",
+          "Open Word Breakdown charts for rack balance, tile values, entropy, word patterns, lengths, scores, and gameplay estimates",
+          "Use Ctrl+Enter to search and Ctrl+B to open Word Breakdown",
           "Respect repeated-letter frequency",
           "Group results by word length",
           "Calculate English Scrabble tile scores",
@@ -82,7 +86,7 @@
         "@id": "https://monkeytactics.com/tools/word-unscrambler#webpage",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
         "name": "Word Unscrambler & Scrabble Word Finder",
-        "description": "Unscramble letters into playable words with dictionary selection, board filters, Scrabble scores, bingo candidates, hooks, and flexible sorting.",
+        "description": "Unscramble letters into playable words with smart pattern input, dictionary selection, advanced filters, Scrabble scores, hooks, charts, and keyboard shortcuts.",
         "inLanguage": "en-US",
         "isPartOf": { "@id": "https://monkeytactics.com/#website" },
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/word-unscrambler#breadcrumb" },
@@ -130,8 +134,8 @@
       },
       {
         "@type": "Question",
-        "name": "How do wildcard patterns work?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Enter letters for fixed positions and a question mark for each unknown letter, such as ??A?E or A??ING. Results must match every position and still be buildable from the supplied letters." }
+        "name": "How does the smart letter and pattern input work?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter rack letters before a slash and an optional positional pattern after it, such as ABCDE?? / A??E. Question marks before the slash are wildcard tiles, while question marks after it match unknown pattern positions. Spaces, numbers, and punctuation stay visible but are ignored during matching." }
       },
       {
         "@type": "Question",
@@ -145,6 +149,21 @@
       },
       {
         "@type": "Question",
+        "name": "What does Word Breakdown show?",
+        "acceptedAnswer": { "@type": "Answer", "text": "After a search returns results, expand Word Breakdown to see vowel and consonant balance, tile value distribution, rack entropy, a word-pattern heatmap, word-length and score distributions, plus estimated board-fit, premium-square, leave-value, and bingo figures. Charts are created only while the panel is expanded." }
+      },
+      {
+        "@type": "Question",
+        "name": "Are the Word Breakdown gameplay figures exact?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Rack and result summaries are calculated from the entered letters and matching words. Board-fit, premium-square, leave-value, and bingo figures are estimates because no board grid or tile-bag state is provided." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does the Word Unscrambler have keyboard shortcuts?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+Enter, or Command+Enter on a Mac, to unscramble the current input. After results appear, press Ctrl+B, or Command+B on a Mac, to expand and jump to Word Breakdown." }
+      },
+      {
+        "@type": "Question",
         "name": "Are my searches private?",
         "acceptedAnswer": { "@type": "Answer", "text": "Yes. The dictionary and matching logic run entirely in your browser, so your searches are not uploaded or stored." }
       }
@@ -153,7 +172,7 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260731-2">
+  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260731-14">
   <link rel="stylesheet" href="../assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/ads.js" defer></script>
   <!-- TrustBox script -->
@@ -211,76 +230,99 @@
             <fieldset class="dictionary-selector">
               <legend>Dictionary</legend>
               <div class="segmented-control">
-                <label>
-                  <input type="radio" name="dictionary" value="enable">
-                  <span>ENABLE</span>
+                <label data-tooltip="A broad, public-domain English word list used for North American word-game searches.">
+                  <input
+                    type="radio"
+                    name="dictionary"
+                    value="enable"
+                    aria-describedby="dictionary-enable-description"
+                  >
+                  <span class="dictionary-option">
+                    <span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span>
+                    <span>ENABLE</span>
+                  </span>
                 </label>
-                <label>
-                  <input type="radio" name="dictionary" value="sowpods">
-                  <span>SOWPODS</span>
+                <label data-tooltip="An international English word list containing British and North American word-game vocabulary.">
+                  <input
+                    type="radio"
+                    name="dictionary"
+                    value="sowpods"
+                    aria-describedby="dictionary-sowpods-description"
+                  >
+                  <span class="dictionary-option">
+                    <span class="dictionary-icon dictionary-icon--sowpods" aria-hidden="true"></span>
+                    <span>SOWPODS</span>
+                  </span>
                 </label>
-                <label>
-                  <input type="radio" name="dictionary" value="both" checked>
-                  <span>Both</span>
+                <label data-tooltip="Search the combined ENABLE and SOWPODS lists with duplicate words removed.">
+                  <input
+                    type="radio"
+                    name="dictionary"
+                    value="both"
+                    aria-describedby="dictionary-both-description"
+                    checked
+                  >
+                  <span class="dictionary-option">
+                    <span class="dictionary-icon dictionary-icon--both" aria-hidden="true"></span>
+                    <span>Both</span>
+                  </span>
                 </label>
               </div>
-              <p class="input-hint">Choose the word list used for this search. Note: ENABLE =
-                North American Scrabble; SOWPODS = International Scrabble.</p>
+              <span class="visually-hidden" id="dictionary-enable-description">A broad, public-domain English word list used for North American word-game searches.</span>
+              <span class="visually-hidden" id="dictionary-sowpods-description">An international English word list containing British and North American word-game vocabulary.</span>
+              <span class="visually-hidden" id="dictionary-both-description">Search the combined ENABLE and SOWPODS lists with duplicate words removed.</span>
+              <p class="input-hint">Choose the word list used for this search.</p>
             </fieldset>
 
-            <div class="input-group">
+            <div class="input-group primary-letter-group">
               <label for="letters">Letters to Unscramble</label>
-              <input
-                id="letters"
-                name="letters"
-                type="text"
-                inputmode="text"
-                autocomplete="off"
-                autocapitalize="none"
-                spellcheck="false"
-                placeholder="e.g. example"
-                aria-describedby="input-hint form-message"
-                maxlength="30"
-                required
-              >
-              <p class="input-hint" id="input-hint">Letters only — repeated letters are counted.</p>
+              <div class="primary-search-row">
+                <input
+                  id="letters"
+                  name="letters"
+                  type="text"
+                  inputmode="text"
+                  autocomplete="off"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  placeholder="e.g. ABCDE?? / a??e"
+                  aria-describedby="input-hint form-message"
+                  maxlength="65"
+                  required
+                >
+                <button
+                  class="btn-calculate"
+                  id="unscramble-button"
+                  type="submit"
+                  aria-keyshortcuts="Control+Enter Meta+Enter"
+                  title="Unscramble (Ctrl+Enter)"
+                  disabled
+                >
+                  <span class="button-icon" aria-hidden="true">⇄</span>
+                  <span class="button-label">Loading word index…</span>
+                  <span class="button-shortcut" aria-hidden="true">
+                    <kbd>Ctrl</kbd><span>+</span><kbd>↵</kbd>
+                  </span>
+                </button>
+              </div>
+              <p class="input-hint" id="input-hint">Enter rack letters, then optionally / and a pattern: ABCDE?? / a??e. Other characters are ignored.</p>
             </div>
 
             <div class="search-options-grid">
               <div class="input-group">
                 <label for="word-length">Word Length</label>
-                <select id="word-length" name="word-length">
-                  <option value="">Any length</option>
-                  <option value="2">2 letters</option>
-                  <option value="3">3 letters</option>
-                  <option value="4">4 letters</option>
-                  <option value="5">5 letters</option>
-                  <option value="6">6 letters</option>
-                  <option value="7">7 letters</option>
-                  <option value="8">8 letters</option>
-                  <option value="9">9 letters</option>
-                  <option value="10">10 letters</option>
-                  <option value="11">11 letters</option>
-                  <option value="12">12 letters</option>
-                  <option value="13">13 letters</option>
-                  <option value="14">14 letters</option>
-                  <option value="15">15 letters</option>
-                  <option value="16">16 letters</option>
-                  <option value="17">17 letters</option>
-                  <option value="18">18 letters</option>
-                  <option value="19">19 letters</option>
-                  <option value="20">20 letters</option>
-                  <option value="21">21 letters</option>
-                  <option value="22">22 letters</option>
-                  <option value="23">23 letters</option>
-                  <option value="24">24 letters</option>
-                  <option value="25">25 letters</option>
-                  <option value="26">26 letters</option>
-                  <option value="27">27 letters</option>
-                  <option value="28">28 letters</option>
-                  <option value="29">29 letters</option>
-                  <option value="30">30 letters</option>
-                </select>
+                <input
+                  id="word-length"
+                  name="word-length"
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  max="30"
+                  step="1"
+                  value="0"
+                  aria-describedby="word-length-hint"
+                >
+                <p class="input-hint" id="word-length-hint">0 allows any word length.</p>
               </div>
 
               <div class="input-group">
@@ -314,26 +356,6 @@
               </div>
 
               <div class="input-group">
-                <div class="field-label-row">
-                  <label for="pattern">Pattern Search</label>
-                  <button class="field-reset" id="reset-pattern" type="button">Reset</button>
-                </div>
-                <input
-                  id="pattern"
-                  name="pattern"
-                  type="text"
-                  inputmode="text"
-                  autocomplete="off"
-                  autocapitalize="characters"
-                  spellcheck="false"
-                  placeholder="e.g. ??A?E or A??ING"
-                  aria-describedby="pattern-hint"
-                  maxlength="30"
-                >
-                <p class="input-hint" id="pattern-hint">Use ? for any letter.</p>
-              </div>
-
-              <div class="input-group">
                 <label for="must-include">Must Include Letter(s)</label>
                 <input
                   id="must-include"
@@ -349,26 +371,31 @@
                 >
                 <p class="input-hint" id="must-include-hint">Repeated letters are counted.</p>
               </div>
+
+              <div class="input-group">
+                <label for="exclude-letters">Exclude Letters</label>
+                <input
+                  id="exclude-letters"
+                  name="exclude-letters"
+                  type="text"
+                  inputmode="text"
+                  autocomplete="off"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  placeholder="e.g. qxz"
+                  maxlength="26"
+                >
+              </div>
             </div>
 
             <details class="advanced-filters">
-              <summary>Advanced Filters</summary>
+              <summary>
+                <span class="heading-with-icon">
+                  <span class="heading-icon heading-icon--filters" aria-hidden="true"></span>
+                  Advanced Filters
+                </span>
+              </summary>
               <div class="advanced-filters-grid">
-                <div class="input-group">
-                  <label for="exclude-letters">Exclude Letters</label>
-                  <input
-                    id="exclude-letters"
-                    name="exclude-letters"
-                    type="text"
-                    inputmode="text"
-                    autocomplete="off"
-                    autocapitalize="none"
-                    spellcheck="false"
-                    placeholder="e.g. qxz"
-                    maxlength="26"
-                  >
-                </div>
-
                 <div class="input-group">
                   <span class="control-label">High-Value Letters</span>
                   <label class="toggle-option" for="high-value-only">
@@ -379,28 +406,30 @@
 
                 <div class="input-group">
                   <label for="minimum-vowels">Minimum Vowels</label>
-                  <select id="minimum-vowels" name="minimum-vowels">
-                    <option value="0">Any</option>
-                    <option value="1">1 or more</option>
-                    <option value="2">2 or more</option>
-                    <option value="3">3 or more</option>
-                    <option value="4">4 or more</option>
-                    <option value="5">5 or more</option>
-                  </select>
+                  <input
+                    id="minimum-vowels"
+                    name="minimum-vowels"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    max="30"
+                    step="1"
+                    value="0"
+                  >
                 </div>
 
                 <div class="input-group">
                   <label for="minimum-consonants">Minimum Consonants</label>
-                  <select id="minimum-consonants" name="minimum-consonants">
-                    <option value="0">Any</option>
-                    <option value="1">1 or more</option>
-                    <option value="2">2 or more</option>
-                    <option value="3">3 or more</option>
-                    <option value="4">4 or more</option>
-                    <option value="5">5 or more</option>
-                    <option value="6">6 or more</option>
-                    <option value="7">7 or more</option>
-                  </select>
+                  <input
+                    id="minimum-consonants"
+                    name="minimum-consonants"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    max="30"
+                    step="1"
+                    value="0"
+                  >
                 </div>
 
                 <div class="input-group">
@@ -471,9 +500,6 @@
 
             <p class="calc-error" id="form-message" role="alert" hidden></p>
 
-            <button class="btn-calculate" id="unscramble-button" type="submit" disabled>
-              <span class="button-label">Loading word index…</span>
-            </button>
           </form>
 
           <div class="results-col">
@@ -486,7 +512,10 @@
             >
               <div class="results-heading-row">
                 <div>
-                  <p class="result-label">Results</p>
+                  <p class="result-label heading-with-icon">
+                    <span class="heading-icon heading-icon--results" aria-hidden="true"></span>
+                    Results
+                  </p>
                   <h3 id="results-heading">Ready when you are</h3>
                 </div>
                 <span class="match-count" id="match-count" hidden></span>
@@ -499,6 +528,32 @@
               </div>
 
               <div class="word-list" id="word-list" aria-label="Matching words"></div>
+
+              <details class="word-breakdown" id="word-breakdown" hidden>
+                <summary
+                  aria-keyshortcuts="Control+B Meta+B"
+                  title="Open Word Breakdown (Ctrl+B)"
+                >
+                  <span class="heading-with-icon">
+                    <span class="heading-icon heading-icon--breakdown" aria-hidden="true"></span>
+                    Word Breakdown
+                  </span>
+                  <span class="breakdown-summary-meta">
+                    <span class="breakdown-summary-hint">Rack and result insights</span>
+                    <span class="breakdown-shortcut" aria-hidden="true">
+                      <kbd>Ctrl</kbd><span>+</span><kbd>B</kbd>
+                    </span>
+                  </span>
+                </summary>
+                <div class="breakdown-intro">
+                  Charts are calculated from your entered letters and current results.
+                </div>
+                <div
+                  class="breakdown-content"
+                  id="breakdown-charts"
+                  aria-live="polite"
+                ></div>
+              </details>
             </section>
           </div>
         </div>
@@ -508,21 +563,27 @@
     <section class="seo-section">
       <h2>How to use the word unscrambler</h2>
       <ol class="feature-list">
-        <li><strong>Choose a dictionary:</strong> use ENABLE for North American play, SOWPODS
-            for international play, or Both for the combined word list.</li>
-        <li><strong>Enter your letters:</strong> repeated tiles are counted, so enter each copy
-            available in your rack or letter set.</li>
-        <li><strong>Describe the board:</strong> optionally select a word length, starting or
-            ending letters, a <code>?</code> wildcard pattern, and letters every result must use.</li>
-        <li><strong>Refine the search:</strong> open Advanced Filters to exclude tiles, require
-            high-value letters, set vowel or consonant minimums, limit scores, or find hooks.</li>
-        <li><strong>Rank the plays:</strong> sort by score, alphabet, length, rack use, J/Q/X/Z,
-            bingo potential, hooks, or pattern strength, then select <strong>Unscramble</strong>.</li>
+        <li><strong>Choose a dictionary:</strong> select ENABLE, SOWPODS, or Both. Hover over or
+            focus a dictionary option for a short explanation of the word list.</li>
+        <li><strong>Enter rack letters and a pattern:</strong> type repeated tiles exactly as they
+            appear. Use <code>?</code> for a wildcard tile and add an optional pattern after
+            <code>/</code>, such as <code>ABCDE?? / A??E</code>.</li>
+        <li><strong>Set the main word filters:</strong> use the Word Length stepper, Starts With,
+            Ends With, Must Include Letters, and Exclude Letters controls to describe the match.</li>
+        <li><strong>Refine the results:</strong> open Advanced Filters to require J, Q, X, or Z;
+            adjust minimum vowels and consonants with numeric steppers; set a score range; find
+            hooks; or choose a sorting method.</li>
+        <li><strong>Unscramble the letters:</strong> select <strong>Unscramble</strong> beside the
+            smart input, or press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>. On a Mac, use
+            <kbd>Command</kbd>+<kbd>Enter</kbd>.</li>
+        <li><strong>Analyze the matches:</strong> when results exist, expand
+            <strong>Word Breakdown</strong> beneath the word list or press
+            <kbd>Ctrl</kbd>+<kbd>B</kbd> to jump to it.</li>
       </ol>
       <p>Letter frequency still matters: a result cannot use any letter more often than it appears
-         in your input. Spaces, numbers, and punctuation are not accepted. The selected
-         <strong>ENABLE and/or SOWPODS</strong> word data is compressed and loaded in small
-         chunks only when a search needs them.</p>
+         in your input. Spaces, numbers, and punctuation remain unchanged in the text box but are
+         ignored during matching. The selected <strong>ENABLE and/or SOWPODS</strong> word data is
+         compressed and loaded in small chunks only when a search needs them.</p>
     </section>
 
     <section class="seo-section">
@@ -534,13 +595,17 @@
       <ul class="feature-list">
         <li><strong>Flexible matching:</strong> find words that use some or all of your letters.</li>
         <li><strong>Board-state controls:</strong> combine exact length, starting or ending
-            letters, wildcard patterns, and required letters.</li>
+            letters, and required letters with an inline pattern after <code>/</code>.</li>
         <li><strong>Advanced filters:</strong> constrain tile types, vowels, consonants, scores,
             and dictionary-aware hooks.</li>
         <li><strong>Gameplay sorting:</strong> rank words globally by score, alphabet, length,
             high-value tiles, bingo potential, hook utility, or pattern strength.</li>
         <li><strong>Accurate repeats:</strong> a letter is never used more times than you entered it.</li>
         <li><strong>Scrabble scores:</strong> compare standard tile values before board bonuses.</li>
+        <li><strong>Word Breakdown:</strong> explore rack balance, tile values, entropy, pattern,
+            length, and score charts after the search returns matches.</li>
+        <li><strong>Keyboard shortcuts:</strong> search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd> and
+            open the analysis panel with <kbd>Ctrl</kbd>+<kbd>B</kbd>.</li>
         <li><strong>Definition links:</strong> open any result in Merriam-Webster for a meaning check.</li>
         <li><strong>Dictionary choice:</strong> search ENABLE, SOWPODS, or their deduplicated union.</li>
       </ul>
@@ -559,13 +624,24 @@
     <section class="seo-section">
       <h2>Filter words for a rack or board position</h2>
       <p>Use <strong>Starts With</strong> and <strong>Ends With</strong> for known edge letters.
-         Pattern Search treats each <code>?</code> as one unknown position, so
-         <code>??A?E</code> finds five-letter matches with A in the third position and E at the
-         end. Fixed pattern letters and required letters still must fit the supplied tile set.</p>
-      <p>Advanced Filters can remove words containing excluded tiles, require at least one
-         high-value tile, set minimum vowel or consonant counts, and constrain the base tile
-         score. <strong>Reset All Filters</strong> restores these options without clearing the
-         entered letters or primary dictionary choice.</p>
+         In <strong>Letters to Unscramble</strong>, place the rack before <code>/</code> and an
+         optional pattern after it. For example, <code>ABCDE?? / A??E</code> searches the supplied
+         rack for four-letter matches with A first and E last.</p>
+      <p>Use <strong>Exclude Letters</strong> to remove words containing unwanted tiles. Advanced
+         Filters can require at least one high-value tile, set minimum vowel or consonant counts,
+         and constrain the base tile score. <strong>Reset All Filters</strong> restores these
+         options without clearing the entered letters or primary dictionary choice.</p>
+    </section>
+
+    <section class="seo-section">
+      <h2>Understand your rack with Word Breakdown charts</h2>
+      <p>Word Breakdown appears directly below the result list after a successful search. Expand
+         it to compare the rack's vowel-to-consonant ratio, tile value distribution, and entropy;
+         review a word-pattern heatmap; and see the matching word-length and score distributions.
+         The charts are generated only while the panel is open.</p>
+      <p>The final row estimates board fit, premium-square opportunities, leave value, and bingo
+         potential. These figures are directional rather than exact because the tool does not
+         receive a board grid or current tile-bag state.</p>
     </section>
 
     <section class="seo-section">
@@ -660,10 +736,13 @@
                  <strong>Bingo +50</strong> candidate badge.</p>
             </li>
             <li class="faq-item">
-              <h3>How do wildcard patterns work?</h3>
-              <p>Enter letters for fixed positions and a <code>?</code> for each unknown letter.
-                 For example, <code>??A?E</code> requires a five-letter word with A in the third
-                 position and E at the end. The result must still be buildable from your letters.</p>
+              <h3>How does the smart letter and pattern input work?</h3>
+              <p>Enter rack letters before <code>/</code> and an optional positional pattern after
+                 it. For example, <code>ABCDE?? / A??E</code> uses ABCDE plus two wildcard tiles to
+                 find four-letter words beginning with A and ending with E. Question marks before
+                 the slash are wildcard tiles; question marks after it match unknown pattern
+                 positions. Spaces, numbers, and punctuation stay visible but are ignored during
+                 matching.</p>
             </li>
             <li class="faq-item">
               <h3>How do I find the highest-scoring Scrabble word?</h3>
@@ -676,6 +755,27 @@
               <p>A hook adds one letter before or after a word to create another valid word in the
                  selected dictionary. An S-hook specifically adds S to the end. Hook filters and
                  sorts can prioritize words with front, back, S, or multiple hooks.</p>
+            </li>
+            <li class="faq-item">
+              <h3>What does Word Breakdown show?</h3>
+              <p>After a search returns results, expand <strong>Word Breakdown</strong> beneath the
+                 word list to see vowel and consonant balance, tile value distribution, rack
+                 entropy, a word-pattern heatmap, and word-length and score distributions. It also
+                 includes estimated board-fit, premium-square, leave-value, and bingo figures. The
+                 charts are created only while the panel is expanded.</p>
+            </li>
+            <li class="faq-item">
+              <h3>Are the Word Breakdown gameplay figures exact?</h3>
+              <p>Rack and result summaries are calculated from your entered letters and matching
+                 words. Board-fit, premium-square, leave-value, and bingo figures are estimates
+                 because no board grid or tile-bag state is provided.</p>
+            </li>
+            <li class="faq-item">
+              <h3>Does the Word Unscrambler have keyboard shortcuts?</h3>
+              <p>Yes. Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, or
+                 <kbd>Command</kbd>+<kbd>Enter</kbd> on a Mac, to unscramble the current input.
+                 After results appear, press <kbd>Ctrl</kbd>+<kbd>B</kbd>, or
+                 <kbd>Command</kbd>+<kbd>B</kbd> on a Mac, to expand and jump to Word Breakdown.</p>
             </li>
             <li class="faq-item">
               <h3>Are my searches private?</h3>
@@ -740,6 +840,6 @@
     </nav>
   </footer>
 
-  <script src="../assets/js/word-unscrambler.js?v=20260730-15" defer></script>
+  <script src="../assets/js/word-unscrambler.js?v=20260731-25" defer></script>
 </body>
 </html>
