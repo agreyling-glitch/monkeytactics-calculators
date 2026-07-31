@@ -6,8 +6,6 @@ const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
 const wordLengthInput = document.querySelector("#word-length");
 const startsWithInput = document.querySelector("#starts-with");
 const endsWithInput = document.querySelector("#ends-with");
-const patternInput = document.querySelector("#pattern");
-const resetPatternButton = document.querySelector("#reset-pattern");
 const mustIncludeInput = document.querySelector("#must-include");
 const excludeLettersInput = document.querySelector("#exclude-letters");
 const highValueOnlyInput = document.querySelector("#high-value-only");
@@ -26,6 +24,9 @@ const resultsHeading = document.querySelector("#results-heading");
 const matchCount = document.querySelector("#match-count");
 const emptyState = document.querySelector("#empty-state");
 const wordList = document.querySelector("#word-list");
+const wordBreakdown = document.querySelector("#word-breakdown");
+const breakdownCharts = document.querySelector("#breakdown-charts");
+const breakdownSummary = wordBreakdown.querySelector("summary");
 
 const MANIFEST_URL =
   "../assets/data/words/manifest.enable-sowpods-v2.json?v=enable-sowpods-v2";
@@ -64,10 +65,22 @@ const hookCache = new Map();
 const loadedChunks = new Set();
 const chunkPromises = new Map();
 let manifest = null;
+let breakdownState = null;
 
 const getSignature = (word) => [...word].sort().join("");
 const getScrabbleScore = (word) =>
-  [...word].reduce((score, letter) => score + SCRABBLE_VALUES[letter], 0);
+  [...word].reduce((score, letter) => score + (SCRABBLE_VALUES[letter] ?? 0), 0);
+
+function parseSmartInput(value) {
+  const slashIndex = value.indexOf("/");
+  const rackSource = slashIndex === -1 ? value : value.slice(0, slashIndex);
+  const patternSource = slashIndex === -1 ? "" : value.slice(slashIndex + 1);
+
+  return {
+    rack: rackSource.toLowerCase().replace(/[^a-z?]/g, ""),
+    pattern: patternSource.toLowerCase().replace(/[^a-z?]/g, "")
+  };
+}
 
 function showMessage(text) {
   message.textContent = text;
@@ -96,6 +109,9 @@ function setEmptyState(title, text) {
 
 function clearResults() {
   wordList.replaceChildren();
+  breakdownCharts.replaceChildren();
+  breakdownState = null;
+  wordBreakdown.hidden = true;
   setEmptyState("Your words will appear here", "Enter your letters and click Unscramble.");
   emptyState.hidden = false;
   matchCount.hidden = true;
@@ -235,6 +251,655 @@ function renderMatches(letters, matches, options) {
   }
 
   wordList.append(fragment);
+  breakdownState = { letters, matches: [...matches], options };
+  wordBreakdown.hidden = false;
+
+  if (wordBreakdown.open) {
+    renderWordBreakdown();
+  }
+}
+
+function clamp(value, minimum, maximum) {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+function createBreakdownCard(title, description) {
+  const card = document.createElement("section");
+  const heading = document.createElement("h4");
+  const copy = document.createElement("p");
+
+  card.className = "breakdown-card";
+  heading.textContent = title;
+  copy.className = "breakdown-card-description";
+  copy.textContent = description;
+  card.append(heading, copy);
+  return card;
+}
+
+function createLegendRow(label, value, color) {
+  const row = document.createElement("div");
+  const dot = document.createElement("span");
+  const labelElement = document.createElement("span");
+  const valueElement = document.createElement("strong");
+
+  row.className = "legend-row";
+  dot.className = "legend-dot";
+  dot.style.setProperty("--legend-color", color);
+  labelElement.textContent = label;
+  valueElement.textContent = value;
+  row.append(dot, labelElement, valueElement);
+  return row;
+}
+
+function createMetricBarRow(label, value, maximum, displayValue, color = "#60a5fa") {
+  const row = document.createElement("div");
+  const labelElement = document.createElement("span");
+  const track = document.createElement("div");
+  const fill = document.createElement("div");
+  const valueElement = document.createElement("span");
+  const width = maximum > 0 ? clamp((value / maximum) * 100, value > 0 ? 2 : 0, 100) : 0;
+
+  row.className = "metric-bar-row";
+  labelElement.textContent = label;
+  track.className = "metric-bar-track";
+  fill.className = "metric-bar-fill";
+  fill.style.width = `${width}%`;
+  fill.style.setProperty("--bar-color", color);
+  valueElement.className = "metric-bar-value";
+  valueElement.textContent = displayValue;
+  track.append(fill);
+  row.append(labelElement, track, valueElement);
+  return row;
+}
+
+function createMetricTile(value, label) {
+  const tile = document.createElement("div");
+  const valueElement = document.createElement("strong");
+  const labelElement = document.createElement("span");
+
+  tile.className = "metric-tile";
+  valueElement.textContent = value;
+  labelElement.textContent = label;
+  tile.append(valueElement, labelElement);
+  return tile;
+}
+
+function createVowelBalanceChart(letters) {
+  const card = createBreakdownCard(
+    "Vowel/Consonant Ratio",
+    "Shows the balance of playable letters in the entered rack."
+  );
+  const vowels = getVowelCount(letters);
+  const wildcards = [...letters].filter((letter) => letter === "?").length;
+  const consonants = letters.length - vowels - wildcards;
+  const vowelPercentage = Math.round((vowels / letters.length) * 100);
+  const consonantPercentage = Math.round((consonants / letters.length) * 100);
+  const layout = document.createElement("div");
+  const donut = document.createElement("div");
+  const legend = document.createElement("div");
+  const ratio = document.createElement("div");
+
+  layout.className = "donut-layout";
+  donut.className = "chart-donut";
+  donut.style.background =
+    `conic-gradient(#38bdf8 0 ${vowelPercentage}%, ` +
+    `#a78bfa ${vowelPercentage}% ${vowelPercentage + consonantPercentage}%, ` +
+    `#f59e0b ${vowelPercentage + consonantPercentage}% 100%)`;
+  donut.setAttribute("role", "img");
+  donut.setAttribute(
+    "aria-label",
+    `${vowels} vowels, ${consonants} consonants, and ${wildcards} unknown positions; ` +
+    `ratio ${vowels} to ${consonants}`
+  );
+  legend.className = "chart-legend";
+  legend.append(
+    createLegendRow("Vowels", String(vowels), "#38bdf8"),
+    createLegendRow("Consonants", String(consonants), "#a78bfa")
+  );
+
+  if (wildcards > 0) {
+    legend.append(createLegendRow("Unknown", String(wildcards), "#f59e0b"));
+  }
+  ratio.className = "chart-ratio";
+  ratio.textContent = `Ratio ${vowels}:${consonants}`;
+  legend.append(ratio);
+  layout.append(donut, legend);
+  card.append(layout);
+  return card;
+}
+
+function createTileValueChart(letters) {
+  const card = createBreakdownCard(
+    "Tile Value Distribution",
+    "Counts rack tiles by standard English Scrabble point value; unknown positions appear at 0."
+  );
+  const pointValues = [0, 1, 2, 3, 4, 5, 8, 10];
+  const counts = new Map(pointValues.map((points) => [points, 0]));
+  const histogram = document.createElement("div");
+  const total = document.createElement("div");
+
+  for (const letter of letters) {
+    const points = SCRABBLE_VALUES[letter] ?? 0;
+    counts.set(points, counts.get(points) + 1);
+  }
+
+  const maximumCount = Math.max(1, ...counts.values());
+  histogram.className = "tile-histogram";
+  histogram.setAttribute("role", "img");
+  histogram.setAttribute(
+    "aria-label",
+    pointValues.map((points) => `${counts.get(points)} tiles worth ${points} points`).join(", ")
+  );
+
+  pointValues.forEach((points) => {
+    const column = document.createElement("div");
+    const track = document.createElement("div");
+    const fill = document.createElement("div");
+    const count = document.createElement("strong");
+    const label = document.createElement("span");
+
+    column.className = "tile-column";
+    track.className = "tile-column-track";
+    fill.className = "tile-column-fill";
+    fill.style.height = `${(counts.get(points) / maximumCount) * 100}%`;
+    count.textContent = String(counts.get(points));
+    label.textContent = `${points} pt`;
+    track.append(fill);
+    column.append(track, count, label);
+    histogram.append(column);
+  });
+
+  total.className = "chart-total";
+  total.textContent = `Total rack value: ${getScrabbleScore(letters)} points`;
+  card.append(histogram, total);
+  return card;
+}
+
+function getLeaveLetters(letters, word) {
+  const remaining = [...letters];
+
+  for (const letter of word) {
+    let index = remaining.indexOf(letter);
+
+    if (index === -1) {
+      index = remaining.indexOf("?");
+    }
+
+    if (index !== -1) {
+      remaining.splice(index, 1);
+    }
+  }
+
+  return remaining;
+}
+
+function getLeaveQuality(leave) {
+  if (leave.length === 0) {
+    return 50;
+  }
+
+  const counts = new Uint8Array(26);
+  const vowels = leave.filter((letter) => VOWELS.includes(letter)).length;
+  const wildcards = leave.filter((letter) => letter === "?").length;
+  const consonants = leave.length - vowels - wildcards;
+  let score = 50 - Math.abs(vowels - consonants) * 6;
+
+  leave.forEach((letter) => {
+    if (letter === "?") {
+      score += 12;
+      return;
+    }
+
+    counts[letter.charCodeAt(0) - 97] += 1;
+    score += "aeinrstl".includes(letter) ? 3 : 0;
+    score -= HIGH_VALUE_LETTERS.includes(letter) ? 5 : 0;
+  });
+
+  counts.forEach((count) => {
+    score -= Math.max(0, count - 2) * 5;
+  });
+
+  if (leave.includes("q") && !leave.includes("u")) {
+    score -= 20;
+  }
+
+  score += (new Set(leave).size / leave.length) * 12;
+  return Math.round(clamp(score, 0, 100));
+}
+
+function createLeaveValueChart(letters, matches) {
+  const card = createBreakdownCard(
+    "Leave Value",
+    "A 0–100 heuristic for the tiles kept after each result; balance, flexibility, duplicates, and difficult tiles affect the estimate."
+  );
+  const leaves = matches.map((word) => ({
+    word,
+    value: getLeaveQuality(getLeaveLetters(letters, word))
+  }));
+  const average = Math.round(
+    leaves.reduce((sum, leave) => sum + leave.value, 0) / leaves.length
+  );
+  const best = leaves.reduce((current, leave) =>
+    leave.value > current.value ? leave : current
+  );
+  const worst = leaves.reduce((current, leave) =>
+    leave.value < current.value ? leave : current
+  );
+  const bars = document.createElement("div");
+
+  bars.className = "metric-bars";
+  bars.append(
+    createMetricBarRow("Average leave", average, 100, `${average}/100`, "#60a5fa"),
+    createMetricBarRow("Best leave", best.value, 100, `${best.value}/100`, "#22c55e"),
+    createMetricBarRow("Worst leave", worst.value, 100, `${worst.value}/100`, "#f97316")
+  );
+  bars.setAttribute(
+    "aria-label",
+    `Average leave ${average}; best ${best.value} after ${best.word}; worst ${worst.value} after ${worst.word}`
+  );
+  card.append(bars);
+  return card;
+}
+
+function createBingoChart(matches) {
+  const card = createBreakdownCard(
+    "Bingo Opportunity",
+    "An opportunity estimate derived from matching 7- and 8-letter words; it is not a tile-bag probability."
+  );
+  const sevenLetterWords = matches.filter((word) => word.length === 7).length;
+  const eightLetterWords = matches.filter((word) => word.length === 8).length;
+  const weightedCount = sevenLetterWords + eightLetterWords * 1.5;
+  const opportunityScore = Math.round(
+    clamp(Math.log2(weightedCount + 1) * 18, 0, 100)
+  );
+  const metrics = document.createElement("div");
+  const gauge = document.createElement("div");
+  const gaugeFill = document.createElement("div");
+  const gaugeLabel = document.createElement("div");
+
+  metrics.className = "metric-grid";
+  metrics.append(
+    createMetricTile(String(sevenLetterWords), "7-letter words"),
+    createMetricTile(String(eightLetterWords), "8-letter words"),
+    createMetricTile(String(sevenLetterWords + eightLetterWords), "Bingo-length")
+  );
+  gauge.className = "chart-gauge";
+  gaugeFill.className = "chart-gauge-fill";
+  gaugeFill.style.width = `${opportunityScore}%`;
+  gauge.append(gaugeFill);
+  gaugeLabel.className = "chart-gauge-label";
+  gaugeLabel.textContent = `Opportunity estimate: ${opportunityScore}/100`;
+  card.append(metrics, gauge, gaugeLabel);
+  return card;
+}
+
+function createPatternHeatmap(matches) {
+  const card = createBreakdownCard(
+    "Word Pattern Heatmap",
+    "Vowel frequency by position across current matches; blue is vowel-heavy and purple is consonant-heavy."
+  );
+  const heatmap = document.createElement("div");
+
+  heatmap.className = "pattern-heatmap";
+
+  for (let index = 0; index < 7; index += 1) {
+    const positionLetters = matches
+      .filter((word) => word.length > index)
+      .map((word) => word[index]);
+    const cell = document.createElement("div");
+    const position = document.createElement("strong");
+    const percentage = document.createElement("span");
+
+    cell.className = "heat-cell";
+    position.textContent = `P${index + 1}`;
+
+    if (positionLetters.length === 0) {
+      percentage.textContent = "No data";
+      cell.setAttribute("aria-disabled", "true");
+      cell.setAttribute("aria-label", `Position ${index + 1}, no matching words`);
+    } else {
+      const vowelCount = positionLetters.filter((letter) => VOWELS.includes(letter)).length;
+      const vowelPercentage = Math.round((vowelCount / positionLetters.length) * 100);
+
+      percentage.textContent = `${vowelPercentage}% V`;
+      cell.style.background =
+        `linear-gradient(to top, rgba(56, 189, 248, 0.78) 0 ${vowelPercentage}%, ` +
+        `rgba(139, 92, 246, 0.72) ${vowelPercentage}% 100%)`;
+      cell.setAttribute(
+        "aria-label",
+        `Position ${index + 1}, ${vowelPercentage}% vowels and ${100 - vowelPercentage}% consonants`
+      );
+    }
+
+    cell.append(position, percentage);
+    heatmap.append(cell);
+  }
+
+  card.append(heatmap);
+  return card;
+}
+
+function createDistributionChart(title, description, entries, color) {
+  const card = createBreakdownCard(title, description);
+  const histogram = document.createElement("div");
+  const maximumCount = Math.max(1, ...entries.map((entry) => entry.count));
+
+  histogram.className = "distribution-histogram";
+  histogram.setAttribute("role", "img");
+  histogram.setAttribute(
+    "aria-label",
+    entries.map((entry) => `${entry.ariaLabel}: ${entry.count} words`).join(", ")
+  );
+
+  entries.forEach((entry) => {
+    const column = document.createElement("div");
+    const track = document.createElement("div");
+    const fill = document.createElement("div");
+    const count = document.createElement("strong");
+    const label = document.createElement("span");
+
+    column.className = "distribution-column";
+    track.className = "distribution-column-track";
+    fill.className = "distribution-column-fill";
+    fill.style.height = `${(entry.count / maximumCount) * 100}%`;
+    fill.style.setProperty("--distribution-color", color);
+    count.textContent = String(entry.count);
+    label.textContent = entry.label;
+    track.append(fill);
+    column.append(track, count, label);
+    histogram.append(column);
+  });
+
+  card.append(histogram);
+  return card;
+}
+
+function createWordLengthDistributionChart(matches) {
+  const counts = new Map();
+
+  matches.forEach((word) => {
+    counts.set(word.length, (counts.get(word.length) ?? 0) + 1);
+  });
+
+  const entries = [...counts.entries()]
+    .sort(([firstLength], [secondLength]) => firstLength - secondLength)
+    .map(([length, count]) => ({
+      label: `${length}L`,
+      ariaLabel: `${length}-letter words`,
+      count
+    }));
+
+  return createDistributionChart(
+    "Word Length Distribution",
+    "Shows how current matches are distributed by number of letters.",
+    entries,
+    "linear-gradient(180deg, #34d399, #059669)"
+  );
+}
+
+function createScoreDistributionChart(matches) {
+  const scores = matches.map(getScrabbleScore);
+  const minimumScore = scores.reduce((minimum, score) => Math.min(minimum, score), Infinity);
+  const maximumScore = scores.reduce((maximum, score) => Math.max(maximum, score), 0);
+  const bucketSize = maximumScore <= 30 ? 5 : maximumScore <= 80 ? 10 : 25;
+  const firstBucket = Math.floor(minimumScore / bucketSize) * bucketSize;
+  const bucketCounts = new Map();
+
+  for (let start = firstBucket; start <= maximumScore; start += bucketSize) {
+    bucketCounts.set(start, 0);
+  }
+
+  scores.forEach((score) => {
+    const bucket = Math.floor(score / bucketSize) * bucketSize;
+    bucketCounts.set(bucket, (bucketCounts.get(bucket) ?? 0) + 1);
+  });
+
+  const entries = [...bucketCounts.entries()].map(([start, count]) => {
+    const end = start + bucketSize - 1;
+
+    return {
+      label: `${start}–${end}`,
+      ariaLabel: `${start} through ${end} points`,
+      count
+    };
+  });
+
+  return createDistributionChart(
+    "Score Distribution",
+    "Groups current matches by standard English Scrabble tile score.",
+    entries,
+    "linear-gradient(180deg, #fbbf24, #d97706)"
+  );
+}
+
+function createPremiumPotentialChart(letters, matches) {
+  const card = createBreakdownCard(
+    "Premium Square Potential",
+    "Theoretical multiplier potential only; exact premium hits require board-square positions."
+  );
+  const highValueCandidates = matches.filter((word) => getHighValueLetters(word)).length;
+  const highestTileValue = Math.max(
+    ...[...letters].map((letter) => SCRABBLE_VALUES[letter] ?? 0)
+  );
+  const averageWordScore = Math.round(
+    matches.reduce((sum, word) => sum + getScrabbleScore(word), 0) / matches.length
+  );
+  const highestWordScore = matches.reduce(
+    (highest, word) => Math.max(highest, getScrabbleScore(word)),
+    0
+  );
+  const bars = document.createElement("div");
+
+  bars.className = "metric-bars";
+  bars.append(
+    createMetricBarRow(
+      "High-value plays",
+      highValueCandidates,
+      matches.length,
+      String(highValueCandidates),
+      "#c084fc"
+    ),
+    createMetricBarRow(
+      "Best TL boost",
+      highestTileValue * 2,
+      20,
+      `+${highestTileValue * 2}`,
+      "#f59e0b"
+    ),
+    createMetricBarRow(
+      "Est. DW boost",
+      averageWordScore,
+      highestWordScore,
+      `+${averageWordScore}`,
+      "#ef4444"
+    )
+  );
+  card.append(bars);
+  return card;
+}
+
+function getBoardFitAnalysis(letters, options) {
+  const availableCounts = new Uint8Array(26);
+  const wildcardCount = [...letters].filter((letter) => letter === "?").length;
+  const patternExpression = options.pattern
+    ? new RegExp(`^${options.pattern.replaceAll("?", "[a-z]")}$`)
+    : null;
+  let candidates = 0;
+  let fitting = 0;
+
+  for (const letter of letters) {
+    if (letter === "?") {
+      continue;
+    }
+
+    availableCounts[letter.charCodeAt(0) - 97] += 1;
+  }
+
+  for (let length = MIN_WORD_LENGTH; length <= letters.length; length += 1) {
+    const signatures = signaturesByLength.get(length) ?? [];
+
+    signatures.forEach((signature) => {
+      if (!canBuildFromLetters(signature, availableCounts, wildcardCount)) {
+        return;
+      }
+
+      signatureMap.get(signature).forEach((word) => {
+        const membership = wordMembership.get(word) ?? 0;
+
+        if ((membership & options.dictionaryBit) === 0) {
+          return;
+        }
+
+        candidates += 1;
+
+        if (options.wordLength && word.length !== options.wordLength) {
+          return;
+        }
+
+        if (patternExpression && !patternExpression.test(word)) {
+          return;
+        }
+
+        if (options.startsWith && !word.startsWith(options.startsWith)) {
+          return;
+        }
+
+        if (options.endsWith && !word.endsWith(options.endsWith)) {
+          return;
+        }
+
+        fitting += 1;
+      });
+    });
+  }
+
+  return { candidates, fitting, excluded: candidates - fitting };
+}
+
+function createBoardFitChart(letters, options) {
+  const card = createBreakdownCard(
+    "Board Fit Analysis",
+    "Compares rack-buildable words with words fitting the active length, pattern, start, and end constraints."
+  );
+  const analysis = getBoardFitAnalysis(letters, options);
+  const fitPercentage = analysis.candidates > 0
+    ? Math.round((analysis.fitting / analysis.candidates) * 100)
+    : 0;
+  const layout = document.createElement("div");
+  const donut = document.createElement("div");
+  const legend = document.createElement("div");
+
+  layout.className = "donut-layout";
+  donut.className = "chart-donut";
+  donut.style.background =
+    `conic-gradient(#22c55e 0 ${fitPercentage}%, #ef4444 ${fitPercentage}% 100%)`;
+  donut.setAttribute("role", "img");
+  donut.setAttribute(
+    "aria-label",
+    `${analysis.fitting} words fit current board constraints and ${analysis.excluded} do not`
+  );
+  legend.className = "chart-legend";
+  legend.append(
+    createLegendRow("Fits constraints", String(analysis.fitting), "#22c55e"),
+    createLegendRow("Does not fit", String(analysis.excluded), "#ef4444")
+  );
+  layout.append(donut, legend);
+  card.append(layout);
+  return card;
+}
+
+function createEntropyChart(letters) {
+  const card = createBreakdownCard(
+    "Rack Entropy",
+    "A normalized Shannon-entropy score for letter variety; repeated letters reduce flexibility."
+  );
+  const counts = new Map();
+
+  for (const letter of letters) {
+    counts.set(letter, (counts.get(letter) ?? 0) + 1);
+  }
+
+  const entropy = [...counts.values()].reduce((sum, count) => {
+    const probability = count / letters.length;
+    return sum - probability * Math.log2(probability);
+  }, 0);
+  const maximumEntropy = letters.length > 1 ? Math.log2(Math.min(26, letters.length)) : 1;
+  const wildcardBonus = letters.includes("?") ? 8 : 0;
+  const entropyScore = Math.round(
+    clamp((entropy / maximumEntropy) * 100 + wildcardBonus, 0, 100)
+  );
+  const rating = entropyScore >= 75
+    ? "High flexibility"
+    : entropyScore >= 45
+      ? "Moderate flexibility"
+      : "Low flexibility";
+  const scoreRow = document.createElement("div");
+  const score = document.createElement("strong");
+  const ratingElement = document.createElement("span");
+  const gauge = document.createElement("div");
+  const gaugeFill = document.createElement("div");
+
+  scoreRow.className = "entropy-score";
+  score.textContent = `${entropyScore}/100`;
+  ratingElement.textContent = rating;
+  scoreRow.append(score, ratingElement);
+  gauge.className = "chart-gauge";
+  gaugeFill.className = "chart-gauge-fill";
+  gaugeFill.style.width = `${entropyScore}%`;
+  gauge.append(gaugeFill);
+  card.append(scoreRow, gauge);
+  return card;
+}
+
+function renderWordBreakdown() {
+  breakdownCharts.replaceChildren();
+
+  if (!wordBreakdown.open || !breakdownState || breakdownState.matches.length === 0) {
+    return;
+  }
+
+  const { letters, matches, options } = breakdownState;
+  const fragment = document.createDocumentFragment();
+  const primaryCharts = document.createElement("div");
+  const patternCharts = document.createElement("div");
+  const distributionCharts = document.createElement("div");
+  const estimateSeparator = document.createElement("div");
+  const estimateDisclaimer = document.createElement("p");
+  const estimateCharts = document.createElement("div");
+
+  primaryCharts.className = "breakdown-grid breakdown-grid--primary";
+  primaryCharts.append(
+    createVowelBalanceChart(letters),
+    createTileValueChart(letters),
+    createEntropyChart(letters)
+  );
+  patternCharts.className = "breakdown-grid breakdown-grid--pattern";
+  patternCharts.append(createPatternHeatmap(matches));
+  distributionCharts.className = "breakdown-grid breakdown-grid--distributions";
+  distributionCharts.append(
+    createWordLengthDistributionChart(matches),
+    createScoreDistributionChart(matches)
+  );
+  estimateSeparator.className = "breakdown-estimate-separator";
+  estimateSeparator.setAttribute("role", "note");
+  estimateDisclaimer.textContent =
+    "Board-fit, premium-square, leave-value, and bingo figures are estimates because no board grid or tile-bag state is provided.";
+  estimateSeparator.append(estimateDisclaimer);
+  estimateCharts.className = "breakdown-grid breakdown-grid--estimates";
+  estimateCharts.append(
+    createBoardFitChart(letters, options),
+    createPremiumPotentialChart(letters, matches),
+    createLeaveValueChart(letters, matches),
+    createBingoChart(matches)
+  );
+  fragment.append(
+    primaryCharts,
+    patternCharts,
+    distributionCharts,
+    estimateSeparator,
+    estimateCharts
+  );
+  breakdownCharts.append(fragment);
 }
 
 function indexWords(records) {
@@ -337,9 +1002,10 @@ async function loadAllChunks() {
   await Promise.all(Object.keys(manifest.chunks).map(loadChunk));
 }
 
-function canBuildFromLetters(signature, availableCounts) {
+function canBuildFromLetters(signature, availableCounts, wildcardCount = 0) {
   let currentIndex = -1;
   let usedCount = 0;
+  let missingCount = 0;
 
   for (const letter of signature) {
     const index = letter.charCodeAt(0) - 97;
@@ -352,6 +1018,10 @@ function canBuildFromLetters(signature, availableCounts) {
     }
 
     if (usedCount > availableCounts[index]) {
+      missingCount += 1;
+    }
+
+    if (missingCount > wildcardCount) {
       return false;
     }
   }
@@ -539,11 +1209,16 @@ function sortMatches(matches, options) {
 
 function findMatches(letters, options) {
   const availableCounts = new Uint8Array(26);
+  const wildcardCount = [...letters].filter((letter) => letter === "?").length;
   const patternExpression = options.pattern
     ? new RegExp(`^${options.pattern.replaceAll("?", "[a-z]")}$`)
     : null;
 
   for (const letter of letters) {
+    if (letter === "?") {
+      continue;
+    }
+
     availableCounts[letter.charCodeAt(0) - 97] += 1;
   }
 
@@ -567,7 +1242,7 @@ function findMatches(letters, options) {
     const signatures = signaturesByLength.get(length) ?? [];
 
     signatures.forEach((signature) => {
-      if (canBuildFromLetters(signature, availableCounts)) {
+      if (canBuildFromLetters(signature, availableCounts, wildcardCount)) {
         signatureMap.get(signature).forEach((word) => {
           const membership = wordMembership.get(word) ?? 0;
 
@@ -635,16 +1310,15 @@ async function handleSubmit(event) {
   clearMessage();
   clearResults();
 
-  const letters = input.value.trim().toLowerCase();
+  const { rack: letters, pattern } = parseSmartInput(input.value);
   const startsWith = startsWithInput.value.trim().toLowerCase();
   const endsWith = endsWithInput.value.trim().toLowerCase();
-  const pattern = patternInput.value.trim().toLowerCase();
   const mustInclude = mustIncludeInput.value.trim().toLowerCase();
   const excludeLetters = excludeLettersInput.value.trim().toLowerCase();
   const dictionary = [...dictionaryInputs].find((option) => option.checked)?.value ?? "both";
-  const wordLength = Number.parseInt(wordLengthInput.value, 10) || 0;
-  const minimumVowels = Number.parseInt(minimumVowelsInput.value, 10) || 0;
-  const minimumConsonants = Number.parseInt(minimumConsonantsInput.value, 10) || 0;
+  const wordLength = Number(wordLengthInput.value);
+  const minimumVowels = Number(minimumVowelsInput.value);
+  const minimumConsonants = Number(minimumConsonantsInput.value);
   const minimumScore = minimumScoreInput.value === ""
     ? null
     : Number.parseInt(minimumScoreInput.value, 10);
@@ -653,10 +1327,8 @@ async function handleSubmit(event) {
     : Number.parseInt(maximumScoreInput.value, 10);
   const hookFilter = hookFilterInput.value;
   const sortBy = sortResultsInput.value;
-  input.value = letters;
   startsWithInput.value = startsWith;
   endsWithInput.value = endsWith;
-  patternInput.value = pattern.toUpperCase();
   mustIncludeInput.value = mustInclude;
   excludeLettersInput.value = excludeLetters;
 
@@ -665,22 +1337,6 @@ async function handleSubmit(event) {
     setEmptyState("Enter some letters", "Add scrambled letters to search the dictionary.");
     showMessage("Please enter at least one letter.");
     input.focus();
-    return;
-  }
-
-  if (!/^[a-z]+$/.test(letters)) {
-    resultsHeading.textContent = "Ready when you are";
-    setEmptyState("Letters only", "Remove spaces, numbers, and punctuation, then try again.");
-    showMessage("Please use letters only.");
-    input.focus();
-    return;
-  }
-
-  if (pattern && !/^[a-z?]+$/.test(pattern)) {
-    resultsHeading.textContent = "Ready when you are";
-    setEmptyState("Check the pattern", "Use letters and ? wildcard characters only.");
-    showMessage("Pattern Search accepts letters and ? wildcard characters only.");
-    patternInput.focus();
     return;
   }
 
@@ -716,6 +1372,43 @@ async function handleSubmit(event) {
     return;
   }
 
+  if (letters.length > 30 || pattern.length > 30) {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState("Input is too long", "Use no more than 30 rack positions and 30 pattern positions.");
+    showMessage("Rack letters and the inline pattern can each contain up to 30 positions.");
+    input.focus();
+    return;
+  }
+
+  if (!Number.isInteger(wordLength) || wordLength < 0 || wordLength > 30) {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState("Check word length", "Use a whole number from 0 through 30.");
+    showMessage("Word Length must be a whole number from 0 through 30.");
+    wordLengthInput.focus();
+    return;
+  }
+
+  if (
+    !Number.isInteger(minimumVowels) ||
+    minimumVowels < 0 ||
+    minimumVowels > 30 ||
+    !Number.isInteger(minimumConsonants) ||
+    minimumConsonants < 0 ||
+    minimumConsonants > 30
+  ) {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState("Check letter minimums", "Use whole numbers from 0 through 30.");
+    showMessage("Minimum Vowels and Minimum Consonants must be whole numbers from 0 through 30.");
+
+    if (!Number.isInteger(minimumVowels) || minimumVowels < 0 || minimumVowels > 30) {
+      minimumVowelsInput.focus();
+    } else {
+      minimumConsonantsInput.focus();
+    }
+
+    return;
+  }
+
   if (
     (minimumScore !== null && (!Number.isInteger(minimumScore) || minimumScore < 0)) ||
     (maximumScore !== null && (!Number.isInteger(maximumScore) || maximumScore < 0))
@@ -737,9 +1430,9 @@ async function handleSubmit(event) {
 
   if (sortBy === "pattern-strength" && !pattern) {
     resultsHeading.textContent = "Ready when you are";
-    setEmptyState("Add a pattern", "Pattern Match Strength sorting needs a wildcard pattern.");
-    showMessage("Enter a Pattern Search before sorting by Pattern Match Strength.");
-    patternInput.focus();
+    setEmptyState("Add a pattern", "Pattern Match Strength sorting needs an inline pattern after /.");
+    showMessage("Add an inline pattern after / before sorting by Pattern Match Strength.");
+    input.focus();
     return;
   }
 
@@ -766,7 +1459,12 @@ async function handleSubmit(event) {
   buttonLabel.textContent = "Loading words…";
 
   try {
-    await loadRelevantChunks(letters);
+    if (letters.includes("?")) {
+      buttonLabel.textContent = "Loading wildcards…";
+      await loadAllChunks();
+    } else {
+      await loadRelevantChunks(letters);
+    }
 
     if (options.showHooks) {
       buttonLabel.textContent = "Loading hooks…";
@@ -811,15 +1509,48 @@ async function loadManifest() {
 }
 
 form.addEventListener("submit", handleSubmit);
-resetPatternButton.addEventListener("click", () => {
-  patternInput.value = "";
-  patternInput.focus();
+wordBreakdown.addEventListener("toggle", () => {
+  if (wordBreakdown.open) {
+    renderWordBreakdown();
+  } else {
+    breakdownCharts.replaceChildren();
+  }
+});
+form.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || (!event.ctrlKey && !event.metaKey) || button.disabled) {
+    return;
+  }
+
+  event.preventDefault();
+  form.requestSubmit(button);
+});
+document.addEventListener("keydown", (event) => {
+  if (
+    event.repeat ||
+    event.key.toLowerCase() !== "b" ||
+    (!event.ctrlKey && !event.metaKey) ||
+    wordBreakdown.hidden
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  const wasOpen = wordBreakdown.open;
+  wordBreakdown.open = true;
+
+  if (wasOpen) {
+    renderWordBreakdown();
+  }
+
+  requestAnimationFrame(() => {
+    breakdownSummary.focus({ preventScroll: true });
+    wordBreakdown.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 });
 resetAllFiltersButton.addEventListener("click", () => {
-  wordLengthInput.value = "";
+  wordLengthInput.value = "0";
   startsWithInput.value = "";
   endsWithInput.value = "";
-  patternInput.value = "";
   mustIncludeInput.value = "";
   excludeLettersInput.value = "";
   highValueOnlyInput.checked = false;
