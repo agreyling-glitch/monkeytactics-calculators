@@ -9,16 +9,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics</title>
-  <meta name="description" content="Unscramble letters into words with ENABLE or SOWPODS. Use wildcards, inline patterns, advanced filters, Scrabble scores, hooks, and rack-analysis charts.">
+  <meta name="description" content="Free word unscrambler and Scrabble word finder with ? and * patterns, ENABLE or SOWPODS, no-hook filters, scored hook lookups, and strategic sorting.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-07-31">
+  <meta name="date" content="2026-08-01">
   <meta name="theme-color" content="#0f172a">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/word-unscrambler">
 
   <meta property="og:title" content="Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics">
-  <meta property="og:description" content="Find playable words with smart pattern input, ENABLE or SOWPODS dictionaries, advanced filters, Scrabble scores, hooks, and rack-analysis charts.">
+  <meta property="og:description" content="Find playable words with wildcard patterns, ENABLE or SOWPODS, advanced filters, no-hook searches, scored hook lookups, and strategic sorting.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://monkeytactics.com/tools/word-unscrambler">
   <meta property="og:site_name" content="MonkeyTactics">
@@ -26,7 +26,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Word Unscrambler &amp; Scrabble Word Finder">
-  <meta name="twitter:description" content="Unscramble letters with inline patterns, advanced filters, Scrabble scoring, hooks, and an expandable Word Breakdown.">
+  <meta name="twitter:description" content="Unscramble letters with wildcard patterns, no-hook filters, scored hook lookups, strategic sorting, and Word Breakdown charts.">
 
   <script type="application/ld+json">
   {
@@ -46,7 +46,7 @@
         "@id": "https://monkeytactics.com/tools/word-unscrambler#app",
         "name": "Word Unscrambler & Scrabble Word Finder",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "description": "A free browser-based word unscrambler and Scrabble word finder with smart pattern input, ENABLE and SOWPODS selection, board filters, score sorting, hooks, and rack-analysis charts.",
+        "description": "A free browser-based word unscrambler and Scrabble word finder with variable-length patterns, ENABLE and SOWPODS selection, no-hook filters, scored hook lookups, grouped strategic sorting, and rack-analysis charts.",
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Word Game Utility",
         "operatingSystem": "Any",
@@ -58,18 +58,20 @@
           "Search ENABLE, SOWPODS, or both dictionaries",
           "Combine rack letters, wildcard tiles, and a positional pattern in one smart input",
           "Filter by exact word length, starting letters, or ending letters",
-          "Match visible letter patterns with question-mark wildcards",
+          "Match visible letter patterns with question-mark and variable-length asterisk wildcards",
           "Require or exclude specific letters",
           "Adjust word length, minimum vowels, and minimum consonants with numeric controls",
-          "Filter by high-value tiles, score ranges, and hooks",
-          "Detect front hooks, back hooks, S-hooks, and multiple hooks",
-          "Sort globally by score, alphabet, length, rack use, high-value tiles, bingos, hooks, or pattern strength",
+          "Filter by high-value tiles, score ranges, and front, back, S, multiple, or no hooks",
+          "Detect front hooks, back hooks, S-hooks, multiple hooks, and words with no hooks",
+          "Open an on-demand Hook Lookup with complete front and back hook words and inline Scrabble scores",
+          "Use a compact sort menu or grouped Basic, Strategic, and Hook sorting options",
+          "Automatically rerun the current search when a new sorting method is selected",
           "Open Word Breakdown charts for rack balance, tile values, entropy, word patterns, lengths, scores, and gameplay estimates",
-          "Use Ctrl+Enter to search and Ctrl+B to open Word Breakdown",
+          "Use Ctrl+Enter to search, Ctrl+R to reset filters, and Ctrl+B to open Word Breakdown",
           "Respect repeated-letter frequency",
           "Group results by word length",
           "Calculate English Scrabble tile scores",
-          "Link each result to a dictionary definition",
+          "Open Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge links from each result",
           "Run privately in the browser"
         ],
         "offers": {
@@ -79,19 +81,21 @@
         },
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
-        "dateModified": "2026-07-31"
+        "datePublished": "2026-07-31",
+        "dateModified": "2026-08-01"
       },
       {
         "@type": "WebPage",
         "@id": "https://monkeytactics.com/tools/word-unscrambler#webpage",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
         "name": "Word Unscrambler & Scrabble Word Finder",
-        "description": "Unscramble letters into playable words with smart pattern input, dictionary selection, advanced filters, Scrabble scores, hooks, charts, and keyboard shortcuts.",
+        "description": "Unscramble letters into playable words with variable-length patterns, dictionary selection, no-hook filters, scored hook lookups, strategic sorts, charts, and keyboard shortcuts.",
         "inLanguage": "en-US",
         "isPartOf": { "@id": "https://monkeytactics.com/#website" },
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/word-unscrambler#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/word-unscrambler#app" },
-        "dateModified": "2026-07-31"
+        "datePublished": "2026-07-31",
+        "dateModified": "2026-08-01"
       }
     ]
   }
@@ -130,22 +134,32 @@
       {
         "@type": "Question",
         "name": "How are Scrabble scores calculated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The displayed score is the sum of the standard English Scrabble value for every letter. Premium squares and blank tiles are not included. Seven-letter words receive a separate Bingo +50 candidate badge." }
+        "acceptedAnswer": { "@type": "Answer", "text": "The displayed score is the sum of the standard English Scrabble value for every letter. Premium squares and blank tiles are not included. Seven-letter words receive a separate Bingo +50 candidate badge, and Hook Lookup shows the base score beside each complete hook word." }
       },
       {
         "@type": "Question",
         "name": "How does the smart letter and pattern input work?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Enter rack letters before a slash and an optional positional pattern after it, such as ABCDE?? / A??E. Question marks before the slash are wildcard tiles, while question marks after it match unknown pattern positions. Spaces, numbers, and punctuation stay visible but are ignored during matching." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter rack letters before a slash and an optional pattern after it. In the pattern, ? matches exactly one letter and * matches any number of letters, including zero. Question marks before the slash remain wildcard rack tiles. Spaces, numbers, and other punctuation stay visible but are ignored during matching." }
       },
       {
         "@type": "Question",
         "name": "How do I find the highest-scoring Scrabble word?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Open Advanced Filters and choose Scrabble score: highest first under Sort Results. The tool ranks all matching words globally by base tile score." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Open Advanced Filters and choose Score: highest first in the compact Sort Results menu. The tool automatically reruns the current search and ranks all matching words globally by base tile score." }
       },
       {
         "@type": "Question",
         "name": "What are front hooks, back hooks, and S-hooks?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A hook is a letter added to the front or back of a word to make another valid word in the selected dictionary. An S-hook specifically adds S to the end. Hook searches identify these extensions and can filter or sort by them." }
+        "acceptedAnswer": { "@type": "Answer", "text": "A hook is a letter added to the front or back of a word to make another valid word in the selected dictionary. An S-hook specifically adds S to the end. Use the Hooks pills to find S, Front, Back, Multi, or No Hook results. Expand Hook Lookup for a result to see complete hook words and their base Scrabble scores." }
+      },
+      {
+        "@type": "Question",
+        "name": "What sorting options are available?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The compact Sort Results menu includes score, longest-first, shortest-first, and alphabetical sorting. More options opens grouped Basic, Strategic, and Hook sorts for rack use, high-value letters, bingos, patterns, and hook utility. Selecting a sort automatically reruns the current search." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I look up definitions and hooks for a result word?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Hover over, focus, or select a result word to open links for Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge. Expand Hook Lookup in the same popup to load complete front and back hook words with inline Scrabble scores." }
       },
       {
         "@type": "Question",
@@ -160,7 +174,7 @@
       {
         "@type": "Question",
         "name": "Does the Word Unscrambler have keyboard shortcuts?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+Enter, or Command+Enter on a Mac, to unscramble the current input. After results appear, press Ctrl+B, or Command+B on a Mac, to expand and jump to Word Breakdown." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+Enter, or Command+Enter on a Mac, to unscramble the current input. Press Ctrl+R to reset filters and sorting without clearing the rack or dictionary; focus returns to the rack input. After results appear, press Ctrl+B, or Command+B on a Mac, to expand and jump to Word Breakdown." }
       },
       {
         "@type": "Question",
@@ -172,7 +186,7 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260731-14">
+  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260801-34">
   <link rel="stylesheet" href="../assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/ads.js" defer></script>
   <!-- TrustBox script -->
@@ -215,22 +229,21 @@
         <span aria-current="page">Word Unscrambler</span>
       </nav>
       <h1 id="tool-heading">Word Unscrambler &amp; Scrabble Word Finder</h1>
-      <p>Turn scrambled letters into playable words with ENABLE or SOWPODS. Filter for rack and
-         board positions, compare tile scores, spot bingo candidates, and find useful hooks.</p>
+      <p>Turn scrambled letters into playable words with ENABLE or SOWPODS. Use flexible patterns,
+         find words with or without hooks, compare tile scores, and apply strategic sorts.</p>
     </section>
 
     <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
 
     <section aria-labelledby="unscrambler-heading">
       <div class="tool-widget">
-        <h2 id="unscrambler-heading">Unscramble Letters Into Words</h2>
-
-        <div class="calc-layout">
-          <form class="inputs-col" id="unscramble-form" novalidate>
+        <form id="unscramble-form" novalidate>
+          <div class="tool-heading-row">
+            <h2 id="unscrambler-heading">Unscramble Letters Into Words</h2>
             <fieldset class="dictionary-selector">
-              <legend>Dictionary</legend>
+              <legend class="visually-hidden">Dictionary</legend>
               <div class="segmented-control">
-                <label data-tooltip="A broad, public-domain English word list used for North American word-game searches.">
+                <label data-tooltip="Choose ENABLE for this search: a broad, public-domain English word list used for North American word-game searches.">
                   <input
                     type="radio"
                     name="dictionary"
@@ -242,7 +255,7 @@
                     <span>ENABLE</span>
                   </span>
                 </label>
-                <label data-tooltip="An international English word list containing British and North American word-game vocabulary.">
+                <label data-tooltip="Choose SOWPODS for this search: an international English word list containing British and North American word-game vocabulary.">
                   <input
                     type="radio"
                     name="dictionary"
@@ -254,7 +267,7 @@
                     <span>SOWPODS</span>
                   </span>
                 </label>
-                <label data-tooltip="Search the combined ENABLE and SOWPODS lists with duplicate words removed.">
+                <label data-tooltip="Choose Both for this search to combine the ENABLE and SOWPODS lists with duplicate words removed.">
                   <input
                     type="radio"
                     name="dictionary"
@@ -271,41 +284,62 @@
               <span class="visually-hidden" id="dictionary-enable-description">A broad, public-domain English word list used for North American word-game searches.</span>
               <span class="visually-hidden" id="dictionary-sowpods-description">An international English word list containing British and North American word-game vocabulary.</span>
               <span class="visually-hidden" id="dictionary-both-description">Search the combined ENABLE and SOWPODS lists with duplicate words removed.</span>
-              <p class="input-hint">Choose the word list used for this search.</p>
             </fieldset>
+          </div>
+
+          <div class="calc-layout">
+            <div class="inputs-col">
 
             <div class="input-group primary-letter-group">
-              <label for="letters">Letters to Unscramble</label>
+              <label class="visually-hidden" for="letters">Letters to Unscramble</label>
               <div class="primary-search-row">
-                <input
-                  id="letters"
-                  name="letters"
-                  type="text"
-                  inputmode="text"
-                  autocomplete="off"
-                  autocapitalize="none"
-                  spellcheck="false"
-                  placeholder="e.g. ABCDE?? / a??e"
-                  aria-describedby="input-hint form-message"
-                  maxlength="65"
-                  required
-                >
-                <button
-                  class="btn-calculate"
-                  id="unscramble-button"
-                  type="submit"
-                  aria-keyshortcuts="Control+Enter Meta+Enter"
-                  title="Unscramble (Ctrl+Enter)"
-                  disabled
-                >
+                <div class="primary-search-input">
+                  <input
+                    id="letters"
+                    name="letters"
+                    type="text"
+                    inputmode="text"
+                    autocomplete="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    placeholder="e.g. ABCDE?? / a*e"
+                    title="After /, use ? for one letter or * for any number of letters: ABCDE?? / a*e."
+                    aria-describedby="input-hint form-message"
+                    maxlength="65"
+                    required
+                  >
+                  <span class="visually-hidden" id="input-hint">After /, use ? for one letter or * for any number of letters: ABCDE?? / a*e.</span>
+                </div>
+                <div class="primary-search-actions">
+                  <button
+                    class="btn-calculate"
+                    id="unscramble-button"
+                    type="submit"
+                    aria-keyshortcuts="Control+Enter Meta+Enter"
+                    title="Unscramble (Ctrl+Enter)"
+                    disabled
+                  >
                   <span class="button-icon" aria-hidden="true">⇄</span>
                   <span class="button-label">Loading word index…</span>
                   <span class="button-shortcut" aria-hidden="true">
                     <kbd>Ctrl</kbd><span>+</span><kbd>↵</kbd>
                   </span>
-                </button>
+                  </button>
+                  <button
+                    class="btn-reset-filters"
+                    id="reset-all-filters"
+                    type="button"
+                    aria-keyshortcuts="Control+R"
+                    title="Reset all filters (Ctrl+R)"
+                  >
+                    <span class="reset-filter-icon" aria-hidden="true">&#8634;</span>
+                    <span>Reset All</span>
+                    <span class="reset-filter-shortcut" aria-hidden="true">
+                      <kbd>Ctrl</kbd><span>+</span><kbd>R</kbd>
+                    </span>
+                  </button>
+                </div>
               </div>
-              <p class="input-hint" id="input-hint">Enter rack letters, then optionally / and a pattern: ABCDE?? / a??e. Other characters are ignored.</p>
             </div>
 
             <div class="search-options-grid">
@@ -320,9 +354,10 @@
                   max="30"
                   step="1"
                   value="0"
+                  title="0 allows any word length."
                   aria-describedby="word-length-hint"
                 >
-                <p class="input-hint" id="word-length-hint">0 allows any word length.</p>
+                <span class="visually-hidden" id="word-length-hint">0 allows any word length.</span>
               </div>
 
               <div class="input-group">
@@ -366,10 +401,11 @@
                   autocapitalize="none"
                   spellcheck="false"
                   placeholder="e.g. ae"
+                  title="Repeated letters are counted."
                   aria-describedby="must-include-hint"
                   maxlength="30"
                 >
-                <p class="input-hint" id="must-include-hint">Repeated letters are counted.</p>
+                <span class="visually-hidden" id="must-include-hint">Repeated letters are counted.</span>
               </div>
 
               <div class="input-group">
@@ -404,12 +440,44 @@
                   </label>
                 </div>
 
+                <div class="input-group hook-filter-group">
+                  <span class="control-label" id="hook-filter-label" title="Hook searches load the complete selected dictionary.">Hooks</span>
+                  <div class="hook-filter-pills" role="radiogroup" aria-labelledby="hook-filter-label" aria-describedby="hook-filter-hint">
+                    <label>
+                      <input name="hook-filter" type="radio" value="" checked>
+                      <span>Any Word</span>
+                    </label>
+                    <label>
+                      <input name="hook-filter" type="radio" value="none">
+                      <span>No Hook</span>
+                    </label>
+                    <label>
+                      <input name="hook-filter" type="radio" value="s">
+                      <span>S</span>
+                    </label>
+                    <label>
+                      <input name="hook-filter" type="radio" value="front">
+                      <span>Front</span>
+                    </label>
+                    <label>
+                      <input name="hook-filter" type="radio" value="back">
+                      <span>Back</span>
+                    </label>
+                    <label>
+                      <input name="hook-filter" type="radio" value="multiple">
+                      <span>Multi</span>
+                    </label>
+                  </div>
+                  <span class="visually-hidden" id="hook-filter-hint">Hook searches load the complete selected dictionary.</span>
+                </div>
+
                 <div class="input-group">
-                  <label for="minimum-vowels">Minimum Vowels</label>
+                  <label for="minimum-vowels">Min Vowels</label>
                   <input
                     id="minimum-vowels"
                     name="minimum-vowels"
                     type="number"
+                    aria-label="Minimum Vowels"
                     inputmode="numeric"
                     min="0"
                     max="30"
@@ -419,11 +487,12 @@
                 </div>
 
                 <div class="input-group">
-                  <label for="minimum-consonants">Minimum Consonants</label>
+                  <label for="minimum-consonants">Min Consonants</label>
                   <input
                     id="minimum-consonants"
                     name="minimum-consonants"
                     type="number"
+                    aria-label="Minimum Consonants"
                     inputmode="numeric"
                     min="0"
                     max="30"
@@ -433,11 +502,12 @@
                 </div>
 
                 <div class="input-group">
-                  <label for="minimum-score">Minimum Score</label>
+                  <label for="minimum-score">Min Score</label>
                   <input
                     id="minimum-score"
                     name="minimum-score"
                     type="number"
+                    aria-label="Minimum Score"
                     inputmode="numeric"
                     min="0"
                     max="999"
@@ -446,37 +516,79 @@
                 </div>
 
                 <div class="input-group">
-                  <label for="maximum-score">Maximum Score</label>
+                  <label for="maximum-score" title="Base tile score; bingo bonus is shown separately.">Max Score</label>
                   <input
                     id="maximum-score"
                     name="maximum-score"
                     type="number"
+                    aria-label="Maximum Score"
+                    aria-describedby="maximum-score-hint"
                     inputmode="numeric"
                     min="0"
                     max="999"
                     placeholder="No maximum"
+                    title="Base tile score; bingo bonus is shown separately."
                   >
-                  <p class="input-hint">Base tile score; bingo bonus is shown separately.</p>
-                </div>
-
-                <div class="input-group">
-                  <label for="hook-filter">Hooks</label>
-                  <select id="hook-filter" name="hook-filter">
-                    <option value="">Any word</option>
-                    <option value="any">Has any hook</option>
-                    <option value="s">Has an S-hook</option>
-                    <option value="front">Has a front hook</option>
-                    <option value="back">Has a back hook</option>
-                    <option value="multiple">Has multiple hooks</option>
-                  </select>
-                  <p class="input-hint">Hook searches load the complete selected dictionary.</p>
+                  <span class="visually-hidden" id="maximum-score-hint">Base tile score; bingo bonus is shown separately.</span>
                 </div>
 
                 <div class="input-group advanced-sort">
-                  <label for="sort-results">Sort Results</label>
-                  <select id="sort-results" name="sort-results">
+                  <span class="control-label" id="sort-results-label">Sort Results</span>
+                  <div class="sort-picker" id="sort-picker">
+                    <button
+                      class="sort-picker-trigger"
+                      id="sort-picker-trigger"
+                      type="button"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                      aria-controls="sort-picker-menu"
+                      aria-labelledby="sort-results-label sort-picker-value"
+                    >
+                      <span class="sort-picker-icon" id="sort-picker-icon" aria-hidden="true">↕</span>
+                      <span id="sort-picker-value">Word length: longest first</span>
+                      <span class="sort-picker-chevron" aria-hidden="true">▾</span>
+                    </button>
+
+                    <div
+                      class="sort-picker-menu"
+                      id="sort-picker-menu"
+                      role="listbox"
+                      aria-labelledby="sort-results-label"
+                      hidden
+                    >
+                      <div class="sort-picker-compact" id="sort-picker-compact">
+                        <button type="button" role="option" data-sort-value="score-desc" data-sort-icon="⭐">⭐ <span>Score: highest first</span></button>
+                        <button type="button" role="option" data-sort-value="length-desc" data-sort-icon="↕">↕ <span>Word length: longest first</span></button>
+                        <button type="button" role="option" data-sort-value="length-asc" data-sort-icon="↕">↕ <span>Word length: shortest first</span></button>
+                        <button type="button" role="option" data-sort-value="alpha" data-sort-icon="🔠">🔠 <span>Alphabetical (A–Z)</span></button>
+                        <button class="sort-picker-more" id="sort-picker-more" type="button" role="option" aria-selected="false">More options… <span aria-hidden="true">→</span></button>
+                      </div>
+
+                      <div class="sort-picker-expanded" id="sort-picker-expanded" hidden>
+                        <div class="sort-picker-group-label">Basic Sorts</div>
+                        <button type="button" role="option" data-sort-value="score-desc" data-sort-icon="⭐">⭐ <span>Score: highest first</span></button>
+                        <button type="button" role="option" data-sort-value="length-desc" data-sort-icon="↕">↕ <span>Word length: longest first</span></button>
+                        <button type="button" role="option" data-sort-value="length-asc" data-sort-icon="↕">↕ <span>Word length: shortest first</span></button>
+                        <button type="button" role="option" data-sort-value="alpha" data-sort-icon="🔠">🔠 <span>Alphabetical (A–Z)</span></button>
+
+                        <div class="sort-picker-group-label">Strategic Sorts</div>
+                        <button type="button" role="option" data-sort-value="uses-most" data-sort-icon="🎯">🎯 <span>Uses most letters</span></button>
+                        <button type="button" role="option" data-sort-value="high-value" data-sort-icon="🎯">🎯 <span>Contains high-value letters</span></button>
+                        <button type="button" role="option" data-sort-value="bingo" data-sort-icon="🎯">🎯 <span>Bingo candidates first</span></button>
+                        <button type="button" role="option" data-sort-value="pattern-strength" data-sort-icon="🎯">🎯 <span>Pattern match strength</span></button>
+
+                        <div class="sort-picker-group-label">Hook Sorts</div>
+                        <button type="button" role="option" data-sort-value="hooks-total" data-sort-icon="➕">➕ <span>Hooks: most first</span></button>
+                        <button type="button" role="option" data-sort-value="hooks-s" data-sort-icon="➕">➕ <span>S-hooks first</span></button>
+                        <button type="button" role="option" data-sort-value="hooks-front" data-sort-icon="➕">➕ <span>Front hooks first</span></button>
+                        <button type="button" role="option" data-sort-value="hooks-back" data-sort-icon="➕">➕ <span>Back hooks first</span></button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <select id="sort-results" name="sort-results" hidden aria-hidden="true" tabindex="-1">
                     <option value="length-desc">Word length: longest first</option>
-                    <option value="score-desc">Scrabble score: highest first</option>
+                    <option value="score-desc">Score: highest first</option>
                     <option value="alpha">Alphabetical: A–Z</option>
                     <option value="length-asc">Word length: shortest first</option>
                     <option value="uses-most">Uses most letters</option>
@@ -490,17 +602,12 @@
                   </select>
                 </div>
 
-                <div class="advanced-reset-row">
-                  <button class="btn-reset-filters" id="reset-all-filters" type="button">
-                    Reset All Filters
-                  </button>
-                </div>
               </div>
             </details>
 
             <p class="calc-error" id="form-message" role="alert" hidden></p>
 
-          </form>
+            </div>
 
           <div class="results-col">
             <section
@@ -556,26 +663,34 @@
               </details>
             </section>
           </div>
-        </div>
+          </div>
+        </form>
       </div>
     </section>
 
-    <section class="seo-section">
-      <h2>How to use the word unscrambler</h2>
+    <section class="seo-section" id="how-to-word-unscrambler" aria-labelledby="how-to-heading">
+      <h2 id="how-to-heading">How to use the word unscrambler</h2>
       <ol class="feature-list">
         <li><strong>Choose a dictionary:</strong> select ENABLE, SOWPODS, or Both. Hover over or
             focus a dictionary option for a short explanation of the word list.</li>
         <li><strong>Enter rack letters and a pattern:</strong> type repeated tiles exactly as they
-            appear. Use <code>?</code> for a wildcard tile and add an optional pattern after
-            <code>/</code>, such as <code>ABCDE?? / A??E</code>.</li>
+            appear. Use <code>?</code> for a wildcard rack tile and add an optional pattern after
+            <code>/</code>. In the pattern, <code>?</code> matches one letter and <code>*</code>
+            matches any number of letters, including zero.</li>
         <li><strong>Set the main word filters:</strong> use the Word Length stepper, Starts With,
             Ends With, Must Include Letters, and Exclude Letters controls to describe the match.</li>
         <li><strong>Refine the results:</strong> open Advanced Filters to require J, Q, X, or Z;
-            adjust minimum vowels and consonants with numeric steppers; set a score range; find
-            hooks; or choose a sorting method.</li>
+            set minimum vowels, minimum consonants, and a score range; or select Any Word, No Hook,
+            S, Front, Back, or Multi from the Hooks filter.</li>
+        <li><strong>Choose a sorting method:</strong> use the compact Sort Results menu for score,
+            length, or alphabetical order. Select <strong>More options…</strong> for grouped
+            Strategic and Hook sorts. Choosing an option automatically reruns the current search.</li>
         <li><strong>Unscramble the letters:</strong> select <strong>Unscramble</strong> beside the
             smart input, or press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>. On a Mac, use
             <kbd>Command</kbd>+<kbd>Enter</kbd>.</li>
+        <li><strong>Inspect a word:</strong> hover over, focus, or select a result word to open its
+            dictionary links. Expand <strong>Hook Lookup</strong> only when needed to load complete
+            front and back hook words with inline Scrabble point values.</li>
         <li><strong>Analyze the matches:</strong> when results exist, expand
             <strong>Word Breakdown</strong> beneath the word list or press
             <kbd>Ctrl</kbd>+<kbd>B</kbd> to jump to it.</li>
@@ -584,6 +699,8 @@
          in your input. Spaces, numbers, and punctuation remain unchanged in the text box but are
          ignored during matching. The selected <strong>ENABLE and/or SOWPODS</strong> word data is
          compressed and loaded in small chunks only when a search needs them.</p>
+      <p><strong>Reset All</strong>, or <kbd>Ctrl</kbd>+<kbd>R</kbd>, restores the filters and sort
+         without clearing the rack or dictionary selection, then returns focus to the rack input.</p>
     </section>
 
     <section class="seo-section">
@@ -599,23 +716,27 @@
         <li><strong>Advanced filters:</strong> constrain tile types, vowels, consonants, scores,
             and dictionary-aware hooks.</li>
         <li><strong>Gameplay sorting:</strong> rank words globally by score, alphabet, length,
-            high-value tiles, bingo potential, hook utility, or pattern strength.</li>
+            rack use, high-value tiles, bingo potential, hook utility, or pattern strength. The
+            compact menu keeps common sorts visible, while More options reveals grouped choices.</li>
         <li><strong>Accurate repeats:</strong> a letter is never used more times than you entered it.</li>
         <li><strong>Scrabble scores:</strong> compare standard tile values before board bonuses.</li>
         <li><strong>Word Breakdown:</strong> explore rack balance, tile values, entropy, pattern,
             length, and score charts after the search returns matches.</li>
         <li><strong>Keyboard shortcuts:</strong> search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd> and
             open the analysis panel with <kbd>Ctrl</kbd>+<kbd>B</kbd>.</li>
-        <li><strong>Definition links:</strong> open any result in Merriam-Webster for a meaning check.</li>
+        <li><strong>Definition and hook lookup:</strong> hover over or focus a result word to open links for
+            Merriam-Webster, Collins, Wiktionary, Wordnik, Lexico's Dictionary.com successor,
+            and Cambridge, then expand Hook Lookup for scored front and back hook words.</li>
         <li><strong>Dictionary choice:</strong> search ENABLE, SOWPODS, or their deduplicated union.</li>
       </ul>
     </section>
 
     <section class="seo-section">
       <h2>Find the highest-scoring Scrabble words</h2>
-      <p>Select <strong>Scrabble score: highest first</strong> to compare every match in one
-         score-ranked list instead of scanning separate length groups. Scores use standard
-         English tile values before premium squares or blank-tile adjustments.</p>
+      <p>Select <strong>Score: highest first</strong> in the compact Sort Results menu to compare
+         every match in one score-ranked list instead of scanning separate length groups. Changing
+         the sort automatically reruns the current search. Scores use standard English tile values
+         before premium squares or blank-tile adjustments.</p>
       <p>The high-value filter and sort prioritize words containing <strong>J, Q, X, or Z</strong>.
          Seven-letter results carry a <strong>Bingo +50</strong> candidate badge, and the bingo
          sort moves those rack-clearing plays to the top.</p>
@@ -625,11 +746,11 @@
       <h2>Filter words for a rack or board position</h2>
       <p>Use <strong>Starts With</strong> and <strong>Ends With</strong> for known edge letters.
          In <strong>Letters to Unscramble</strong>, place the rack before <code>/</code> and an
-         optional pattern after it. For example, <code>ABCDE?? / A??E</code> searches the supplied
-         rack for four-letter matches with A first and E last.</p>
+         optional pattern after it. For example, <code>ABCDE?? / A*E</code> searches the supplied
+         rack for words beginning with A and ending with E, with any number of letters between.</p>
       <p>Use <strong>Exclude Letters</strong> to remove words containing unwanted tiles. Advanced
          Filters can require at least one high-value tile, set minimum vowel or consonant counts,
-         and constrain the base tile score. <strong>Reset All Filters</strong> restores these
+         and constrain the base tile score. <strong>Reset All</strong> restores these
          options without clearing the entered letters or primary dictionary choice.</p>
     </section>
 
@@ -648,8 +769,14 @@
       <h2>Find front hooks, back hooks, and S-hooks</h2>
       <p>A <strong>front hook</strong> adds one letter before a word to create another valid word;
          a <strong>back hook</strong> adds one after it. An <strong>S-hook</strong> is the common
-         back-hook case where adding S makes a valid word. Hook badges show front and back counts,
-         identify S-hooks, and reveal the exact hook letters on hover.</p>
+         back-hook case where adding S makes a valid word. The Hooks filter can find S-hooks,
+         front hooks, back hooks, multiple hooks, or any hookable word.</p>
+      <p>Select <strong>No Hook</strong> to find words that cannot be extended by one letter at
+         either the front or back in the selected dictionary.</p>
+      <p>Hover over, focus, or select a result word, then expand <strong>Hook Lookup</strong> in the
+         definition popup to see complete front and back hook words. Each hook is shown with its
+         base Scrabble score, such as <code>PANE (+6)</code>. The complete dictionary index loads
+         only when Hook Lookup is expanded.</p>
       <p>Hook detection respects the selected ENABLE or SOWPODS dictionary. Because a front hook
          may begin with any letter, hook filtering and sorting load the complete selected index
          on demand; ordinary unscramble searches continue loading only relevant chunks.</p>
@@ -689,7 +816,7 @@
       </aside>
     </section>
 
-    <section class="faq-section" aria-labelledby="faq-heading">
+    <section class="faq-section" id="word-unscrambler-faq" aria-labelledby="faq-heading">
       <details open>
         <summary>
           <span class="faq-info-icon" aria-hidden="true">?</span>
@@ -733,28 +860,45 @@
               <p>The displayed score adds the standard English tile value of each letter in the
                  word. It does not include double- or triple-letter squares, word multipliers, or
                  zero-point blank tiles. Seven-letter words receive a separate
-                 <strong>Bingo +50</strong> candidate badge.</p>
+                 <strong>Bingo +50</strong> candidate badge. Hook Lookup also shows the base score
+                 beside each complete hook word.</p>
             </li>
             <li class="faq-item">
               <h3>How does the smart letter and pattern input work?</h3>
               <p>Enter rack letters before <code>/</code> and an optional positional pattern after
-                 it. For example, <code>ABCDE?? / A??E</code> uses ABCDE plus two wildcard tiles to
-                 find four-letter words beginning with A and ending with E. Question marks before
-                 the slash are wildcard tiles; question marks after it match unknown pattern
-                 positions. Spaces, numbers, and punctuation stay visible but are ignored during
-                 matching.</p>
+                 it. Question marks before the slash are wildcard rack tiles. After the slash,
+                 <code>?</code> matches exactly one letter and <code>*</code> matches any number of
+                 letters, including zero. For example, <code>ABCDE?? / A*E</code> finds rack-buildable
+                 words beginning with A and ending with E. Spaces, numbers, and other punctuation
+                 stay visible but are ignored during matching.</p>
             </li>
             <li class="faq-item">
               <h3>How do I find the highest-scoring Scrabble word?</h3>
               <p>Open <strong>Advanced Filters</strong> and choose
-                 <strong>Scrabble score: highest first</strong> under Sort Results. Matches are
-                 ranked globally by base tile score, with the highest-scoring word first.</p>
+                 <strong>Score: highest first</strong> in the compact Sort Results menu. The tool
+                 automatically reruns the current search and ranks matches globally by base tile
+                 score, with the highest-scoring word first.</p>
             </li>
             <li class="faq-item">
               <h3>What are front hooks, back hooks, and S-hooks?</h3>
               <p>A hook adds one letter before or after a word to create another valid word in the
-                 selected dictionary. An S-hook specifically adds S to the end. Hook filters and
-                 sorts can prioritize words with front, back, S, or multiple hooks.</p>
+                 selected dictionary. An S-hook specifically adds S to the end. Use the Hooks pills
+                 to find S, Front, Back, Multi, or <strong>No Hook</strong> results. Expand Hook
+                 Lookup for a result to see complete hook words and their base Scrabble scores.</p>
+            </li>
+            <li class="faq-item">
+              <h3>What sorting options are available?</h3>
+              <p>The compact Sort Results menu includes score, longest-first, shortest-first, and
+                 alphabetical sorting. Select <strong>More options…</strong> to open grouped Basic,
+                 Strategic, and Hook sorts for rack use, high-value letters, bingos, patterns, and
+                 hook utility. Selecting a sort automatically reruns the current search.</p>
+            </li>
+            <li class="faq-item">
+              <h3>How do I look up definitions and hooks for a result word?</h3>
+              <p>Hover over, focus, or select a result word to open links for Merriam-Webster,
+                 Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge. Expand
+                 <strong>Hook Lookup</strong> in the same popup to load complete front and back hook
+                 words with inline Scrabble scores.</p>
             </li>
             <li class="faq-item">
               <h3>What does Word Breakdown show?</h3>
@@ -774,6 +918,8 @@
               <h3>Does the Word Unscrambler have keyboard shortcuts?</h3>
               <p>Yes. Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, or
                  <kbd>Command</kbd>+<kbd>Enter</kbd> on a Mac, to unscramble the current input.
+                 Press <kbd>Ctrl</kbd>+<kbd>R</kbd> to reset filters and sorting without clearing the
+                 rack or dictionary; focus returns to the rack input.
                  After results appear, press <kbd>Ctrl</kbd>+<kbd>B</kbd>, or
                  <kbd>Command</kbd>+<kbd>B</kbd> on a Mac, to expand and jump to Word Breakdown.</p>
             </li>
@@ -840,6 +986,6 @@
     </nav>
   </footer>
 
-  <script src="../assets/js/word-unscrambler.js?v=20260731-25" defer></script>
+  <script src="../assets/js/word-unscrambler.js?v=20260801-35" defer></script>
 </body>
 </html>

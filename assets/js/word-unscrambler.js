@@ -13,8 +13,17 @@ const minimumVowelsInput = document.querySelector("#minimum-vowels");
 const minimumConsonantsInput = document.querySelector("#minimum-consonants");
 const minimumScoreInput = document.querySelector("#minimum-score");
 const maximumScoreInput = document.querySelector("#maximum-score");
-const hookFilterInput = document.querySelector("#hook-filter");
+const hookFilterInputs = form.querySelectorAll('input[name="hook-filter"]');
 const sortResultsInput = document.querySelector("#sort-results");
+const sortPicker = document.querySelector("#sort-picker");
+const sortPickerTrigger = document.querySelector("#sort-picker-trigger");
+const sortPickerValue = document.querySelector("#sort-picker-value");
+const sortPickerIcon = document.querySelector("#sort-picker-icon");
+const sortPickerMenu = document.querySelector("#sort-picker-menu");
+const sortPickerCompact = document.querySelector("#sort-picker-compact");
+const sortPickerExpanded = document.querySelector("#sort-picker-expanded");
+const sortPickerMore = document.querySelector("#sort-picker-more");
+const sortOptionButtons = sortPicker.querySelectorAll("[data-sort-value]");
 const resetAllFiltersButton = document.querySelector("#reset-all-filters");
 const button = document.querySelector("#unscramble-button");
 const buttonLabel = button.querySelector(".button-label");
@@ -35,6 +44,40 @@ const MIN_WORD_LENGTH = 2;
 const VOWELS = "aeiou";
 const HIGH_VALUE_LETTERS = "jqxz";
 const LENGTH_GROUP_SORTS = new Set(["length-desc", "length-asc", "uses-most"]);
+const DICTIONARY_LINKS = Object.freeze([
+  {
+    abbreviation: "MW",
+    name: "Merriam-Webster",
+    getUrl: (word) => `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`
+  },
+  {
+    abbreviation: "CO",
+    name: "Collins",
+    getUrl: (word) =>
+      `https://www.collinsdictionary.com/dictionary/english/${encodeURIComponent(word)}`
+  },
+  {
+    abbreviation: "Wik",
+    name: "Wiktionary",
+    getUrl: (word) => `https://en.wiktionary.org/wiki/${encodeURIComponent(word)}`
+  },
+  {
+    abbreviation: "WN",
+    name: "Wordnik",
+    getUrl: (word) => `https://www.wordnik.com/words/${encodeURIComponent(word)}`
+  },
+  {
+    abbreviation: "LX",
+    name: "Lexico (now Dictionary.com)",
+    getUrl: (word) => `https://www.dictionary.com/browse/${encodeURIComponent(word)}`
+  },
+  {
+    abbreviation: "Cam",
+    name: "Cambridge",
+    getUrl: (word) =>
+      `https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(word)}`
+  }
+]);
 const SORT_LABELS = Object.freeze({
   "score-desc": "Words sorted by Scrabble score",
   alpha: "Words sorted alphabetically",
@@ -71,6 +114,135 @@ const getSignature = (word) => [...word].sort().join("");
 const getScrabbleScore = (word) =>
   [...word].reduce((score, letter) => score + (SCRABBLE_VALUES[letter] ?? 0), 0);
 
+function getSortOption(value, container = sortPicker) {
+  return [...container.querySelectorAll("[data-sort-value]")]
+    .find((option) => option.dataset.sortValue === value);
+}
+
+function syncSortPicker() {
+  const selectedOption = getSortOption(sortResultsInput.value);
+
+  if (!selectedOption) {
+    return;
+  }
+
+  sortPickerValue.textContent = selectedOption.querySelector("span").textContent;
+  sortPickerIcon.textContent = selectedOption.dataset.sortIcon;
+  sortOptionButtons.forEach((option) => {
+    option.setAttribute(
+      "aria-selected",
+      String(option.dataset.sortValue === sortResultsInput.value)
+    );
+  });
+}
+
+function setSortPickerMode(expanded) {
+  sortPickerCompact.hidden = expanded;
+  sortPickerExpanded.hidden = !expanded;
+}
+
+function getVisibleSortControls() {
+  const activePanel = sortPickerExpanded.hidden ? sortPickerCompact : sortPickerExpanded;
+  return [...activePanel.querySelectorAll("button")];
+}
+
+function openSortPicker(focusDirection = "selected") {
+  const compactHasSelection = Boolean(getSortOption(sortResultsInput.value, sortPickerCompact));
+  setSortPickerMode(!compactHasSelection);
+  sortPickerMenu.hidden = false;
+  sortPickerTrigger.setAttribute("aria-expanded", "true");
+
+  const controls = getVisibleSortControls();
+  const selected = controls.find(
+    (control) => control.dataset.sortValue === sortResultsInput.value
+  );
+  const focusTarget = focusDirection === "last"
+    ? controls.at(-1)
+    : selected ?? controls[0];
+  focusTarget?.focus();
+}
+
+function closeSortPicker(restoreFocus = false) {
+  sortPickerMenu.hidden = true;
+  sortPickerTrigger.setAttribute("aria-expanded", "false");
+  setSortPickerMode(false);
+
+  if (restoreFocus) {
+    sortPickerTrigger.focus();
+  }
+}
+
+sortPickerTrigger.addEventListener("click", () => {
+  if (sortPickerMenu.hidden) {
+    openSortPicker();
+  } else {
+    closeSortPicker();
+  }
+});
+
+sortPickerTrigger.addEventListener("keydown", (event) => {
+  if (!sortPickerMenu.hidden || !["ArrowDown", "ArrowUp"].includes(event.key)) {
+    return;
+  }
+
+  event.preventDefault();
+  openSortPicker(event.key === "ArrowUp" ? "last" : "selected");
+});
+
+sortOptionButtons.forEach((option) => {
+  option.addEventListener("click", () => {
+    sortResultsInput.value = option.dataset.sortValue;
+    syncSortPicker();
+    closeSortPicker(true);
+
+    if (input.value.trim() && !button.disabled) {
+      form.requestSubmit();
+    }
+  });
+});
+
+sortPickerMore.addEventListener("click", () => {
+  setSortPickerMode(true);
+  const selected = getSortOption(sortResultsInput.value, sortPickerExpanded);
+  (selected ?? getVisibleSortControls()[0])?.focus();
+});
+
+sortPickerMenu.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeSortPicker(true);
+    return;
+  }
+
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+    return;
+  }
+
+  event.preventDefault();
+  const controls = getVisibleSortControls();
+  const currentIndex = controls.indexOf(document.activeElement);
+  let nextIndex;
+
+  if (event.key === "Home") {
+    nextIndex = 0;
+  } else if (event.key === "End") {
+    nextIndex = controls.length - 1;
+  } else {
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    nextIndex = (currentIndex + direction + controls.length) % controls.length;
+  }
+
+  controls[nextIndex]?.focus();
+});
+
+document.addEventListener("click", (event) => {
+  if (!sortPickerMenu.hidden && !sortPicker.contains(event.target)) {
+    closeSortPicker();
+  }
+});
+
+syncSortPicker();
+
 function parseSmartInput(value) {
   const slashIndex = value.indexOf("/");
   const rackSource = slashIndex === -1 ? value : value.slice(0, slashIndex);
@@ -78,8 +250,34 @@ function parseSmartInput(value) {
 
   return {
     rack: rackSource.toLowerCase().replace(/[^a-z?]/g, ""),
-    pattern: patternSource.toLowerCase().replace(/[^a-z?]/g, "")
+    pattern: patternSource.toLowerCase().replace(/[^a-z?*]/g, "")
   };
+}
+
+function createPatternExpression(pattern) {
+  if (!pattern) {
+    return null;
+  }
+
+  const source = [...pattern]
+    .map((character) => {
+      if (character === "?") {
+        return "[a-z]";
+      }
+
+      if (character === "*") {
+        return "[a-z]*";
+      }
+
+      return character;
+    })
+    .join("");
+
+  return new RegExp(`^${source}$`);
+}
+
+function getPatternMinimumLength(pattern) {
+  return pattern.replaceAll("*", "").length;
 }
 
 function showMessage(text) {
@@ -119,21 +317,25 @@ function clearResults() {
 
 function createWordItem(word, options) {
   const item = document.createElement("li");
-  const link = document.createElement("a");
-  const wordLabel = document.createElement("span");
+  const content = document.createElement("div");
+  const wordLookup = document.createElement("div");
+  const wordLabel = document.createElement("button");
   const linkMeta = document.createElement("span");
   const score = document.createElement("span");
-  const dictionaryArrow = document.createElement("span");
+  const dictionaryLinks = document.createElement("div");
+  const dictionaryPopoverTitle = document.createElement("span");
   const points = getScrabbleScore(word);
   const highValueLetters = getHighValueLetters(word);
-  const ariaDetails = [`Scrabble score ${points} points`];
 
-  link.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
+  item.className = "word-card";
+  content.className = "word-card-content";
+  wordLookup.className = "word-lookup";
 
   wordLabel.className = "word-label";
+  wordLabel.type = "button";
   wordLabel.textContent = word;
+  wordLabel.title = `Show dictionary links for ${word}`;
+  wordLabel.setAttribute("aria-haspopup", "dialog");
 
   linkMeta.className = "word-link-meta";
 
@@ -145,7 +347,6 @@ function createWordItem(word, options) {
     const bingoBadge = document.createElement("span");
     bingoBadge.className = "result-badge result-badge--bingo";
     bingoBadge.textContent = "Bingo +50";
-    ariaDetails.push("seven-letter bingo candidate");
     linkMeta.append(bingoBadge);
   }
 
@@ -153,7 +354,6 @@ function createWordItem(word, options) {
     const highValueBadge = document.createElement("span");
     highValueBadge.className = "result-badge result-badge--high-value";
     highValueBadge.textContent = highValueLetters.toUpperCase();
-    ariaDetails.push(`contains high-value ${highValueLetters.toUpperCase()}`);
     linkMeta.append(highValueBadge);
   }
 
@@ -166,25 +366,99 @@ function createWordItem(word, options) {
     hookBadge.title =
       `Front hooks: ${hooks.front.join(", ").toUpperCase() || "none"}; ` +
       `back hooks: ${hooks.back.join(", ").toUpperCase() || "none"}`;
-    ariaDetails.push(
-      `${hooks.front.length} front hooks; ${hooks.back.length} back hooks` +
-      (hooks.hasSHook ? "; includes an S-hook" : "")
-    );
     linkMeta.append(hookBadge);
   }
 
-  dictionaryArrow.className = "dictionary-arrow";
-  dictionaryArrow.setAttribute("aria-hidden", "true");
-  dictionaryArrow.textContent = "↗";
+  dictionaryLinks.className = "dictionary-popover";
+  dictionaryLinks.setAttribute("role", "dialog");
+  dictionaryLinks.setAttribute("aria-label", `Dictionary links for ${word}`);
+  dictionaryPopoverTitle.className = "dictionary-popover-title";
+  dictionaryPopoverTitle.textContent = `Look up ${word}`;
+  dictionaryLinks.append(dictionaryPopoverTitle);
 
-  link.setAttribute(
-    "aria-label",
-    `Look up the definition of ${word}; ${ariaDetails.join("; ")}`
-  );
+  const dictionaryLinkRow = document.createElement("div");
+  dictionaryLinkRow.className = "dictionary-links";
 
-  linkMeta.append(dictionaryArrow);
-  link.append(wordLabel, linkMeta);
-  item.append(link);
+  DICTIONARY_LINKS.forEach((dictionary, index) => {
+    if (index > 0) {
+      const separator = document.createElement("span");
+      separator.className = "dictionary-link-separator";
+      separator.setAttribute("aria-hidden", "true");
+      separator.textContent = "–";
+      dictionaryLinkRow.append(separator);
+    }
+
+    const dictionaryLink = document.createElement("a");
+    const hoverText = `Look up ${word} on ${dictionary.name}`;
+    dictionaryLink.href = dictionary.getUrl(word);
+    dictionaryLink.target = "_blank";
+    dictionaryLink.rel = "noopener noreferrer";
+    dictionaryLink.textContent = dictionary.abbreviation;
+    dictionaryLink.title = hoverText;
+    dictionaryLink.setAttribute("aria-label", hoverText);
+    dictionaryLinkRow.append(dictionaryLink);
+  });
+
+  dictionaryLinks.append(dictionaryLinkRow);
+
+  const hookLookup = document.createElement("details");
+  const hookLookupSummary = document.createElement("summary");
+  const hookLookupResult = document.createElement("div");
+  let hookLookupLoaded = false;
+  let hookLookupLoading = false;
+
+  hookLookup.className = "hook-lookup";
+  hookLookupSummary.className = "hook-lookup-summary";
+  hookLookupSummary.textContent = "Hook Lookup";
+  hookLookupResult.className = "hook-lookup-result";
+  hookLookupResult.setAttribute("aria-live", "polite");
+  hookLookup.append(hookLookupSummary, hookLookupResult);
+
+  hookLookup.addEventListener("toggle", async () => {
+    if (!hookLookup.open || hookLookupLoaded || hookLookupLoading) {
+      return;
+    }
+
+    hookLookupLoading = true;
+    hookLookupResult.className = "hook-lookup-result is-loading";
+    hookLookupResult.textContent = "Loading hooks…";
+
+    try {
+      await loadAllChunks();
+      const hooks = getHookInfo(word, options.dictionaryBit);
+      const formatHookWord = (hookWord) =>
+        `${hookWord.toUpperCase()} (+${getScrabbleScore(hookWord)})`;
+      const frontHooks = hooks.front.map((letter) => formatHookWord(`${letter}${word}`));
+      const backHooks = hooks.back.map((letter) => formatHookWord(`${word}${letter}`));
+
+      hookLookupResult.className = "hook-lookup-result";
+      hookLookupResult.replaceChildren();
+
+      const frontRow = document.createElement("p");
+      const frontLabel = document.createElement("strong");
+      frontLabel.textContent = "Front: ";
+      frontRow.append(frontLabel, frontHooks.join(", ") || "None");
+
+      const backRow = document.createElement("p");
+      const backLabel = document.createElement("strong");
+      backLabel.textContent = "Back: ";
+      backRow.append(backLabel, backHooks.join(", ") || "None");
+
+      hookLookupResult.append(frontRow, backRow);
+      hookLookupLoaded = true;
+    } catch (error) {
+      console.error(`Unable to load hooks for ${word}:`, error);
+      hookLookupResult.className = "hook-lookup-result is-error";
+      hookLookupResult.textContent = "Unable to load hooks. Collapse and try again.";
+    } finally {
+      hookLookupLoading = false;
+    }
+  });
+
+  dictionaryLinks.append(hookLookup);
+  wordLookup.append(wordLabel, dictionaryLinks);
+  content.append(wordLookup, linkMeta);
+  item.append(content);
   return item;
 }
 
@@ -721,9 +995,7 @@ function createPremiumPotentialChart(letters, matches) {
 function getBoardFitAnalysis(letters, options) {
   const availableCounts = new Uint8Array(26);
   const wildcardCount = [...letters].filter((letter) => letter === "?").length;
-  const patternExpression = options.pattern
-    ? new RegExp(`^${options.pattern.replaceAll("?", "[a-z]")}$`)
-    : null;
+  const patternExpression = createPatternExpression(options.pattern);
   let candidates = 0;
   let fitting = 0;
 
@@ -1116,6 +1388,8 @@ function matchesHookFilter(word, hookFilter, dictionaryBit) {
   const hooks = getHookInfo(word, dictionaryBit);
 
   switch (hookFilter) {
+    case "none":
+      return hooks.total === 0;
     case "any":
       return hooks.total > 0;
     case "s":
@@ -1132,15 +1406,15 @@ function matchesHookFilter(word, hookFilter, dictionaryBit) {
 }
 
 function getPatternStrength(word, pattern) {
-  if (!pattern || word.length !== pattern.length) {
+  if (!pattern || !word.length) {
     return 0;
   }
 
-  return [...pattern].reduce(
-    (strength, character, index) =>
-      strength + (character !== "?" && word[index] === character ? 1 : 0),
-    0
-  );
+  const literalCount = [...pattern]
+    .filter((character) => character !== "?" && character !== "*")
+    .length;
+
+  return literalCount / word.length;
 }
 
 function sortMatches(matches, options) {
@@ -1210,9 +1484,9 @@ function sortMatches(matches, options) {
 function findMatches(letters, options) {
   const availableCounts = new Uint8Array(26);
   const wildcardCount = [...letters].filter((letter) => letter === "?").length;
-  const patternExpression = options.pattern
-    ? new RegExp(`^${options.pattern.replaceAll("?", "[a-z]")}$`)
-    : null;
+  const patternExpression = createPatternExpression(options.pattern);
+  const patternHasVariableLength = options.pattern.includes("*");
+  const patternMinimumLength = getPatternMinimumLength(options.pattern);
 
   for (const letter of letters) {
     if (letter === "?") {
@@ -1230,12 +1504,22 @@ function findMatches(letters, options) {
     return matches;
   }
 
-  if (patternExpression && options.pattern.length !== maximumLength && options.wordLength) {
+  if (
+    patternExpression &&
+    options.wordLength &&
+    (
+      options.wordLength < patternMinimumLength ||
+      (!patternHasVariableLength && options.pattern.length !== options.wordLength)
+    )
+  ) {
     return matches;
   }
 
   for (let length = maximumLength; length >= minimumLength; length -= 1) {
-    if (patternExpression && options.pattern.length !== length) {
+    if (
+      patternExpression &&
+      (length < patternMinimumLength || (!patternHasVariableLength && options.pattern.length !== length))
+    ) {
       continue;
     }
 
@@ -1325,7 +1609,7 @@ async function handleSubmit(event) {
   const maximumScore = maximumScoreInput.value === ""
     ? null
     : Number.parseInt(maximumScoreInput.value, 10);
-  const hookFilter = hookFilterInput.value;
+  const hookFilter = [...hookFilterInputs].find((option) => option.checked)?.value ?? "";
   const sortBy = sortResultsInput.value;
   startsWithInput.value = startsWith;
   endsWithInput.value = endsWith;
@@ -1374,8 +1658,8 @@ async function handleSubmit(event) {
 
   if (letters.length > 30 || pattern.length > 30) {
     resultsHeading.textContent = "Ready when you are";
-    setEmptyState("Input is too long", "Use no more than 30 rack positions and 30 pattern positions.");
-    showMessage("Rack letters and the inline pattern can each contain up to 30 positions.");
+    setEmptyState("Input is too long", "Use no more than 30 rack positions and 30 pattern characters.");
+    showMessage("Rack letters and the inline pattern can each contain up to 30 characters.");
     input.focus();
     return;
   }
@@ -1547,7 +1831,7 @@ document.addEventListener("keydown", (event) => {
     wordBreakdown.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 });
-resetAllFiltersButton.addEventListener("click", () => {
+function resetAllFilters() {
   wordLengthInput.value = "0";
   startsWithInput.value = "";
   endsWithInput.value = "";
@@ -1558,8 +1842,30 @@ resetAllFiltersButton.addEventListener("click", () => {
   minimumConsonantsInput.value = "0";
   minimumScoreInput.value = "";
   maximumScoreInput.value = "";
-  hookFilterInput.value = "";
+  hookFilterInputs.forEach((option) => {
+    option.checked = option.value === "";
+  });
   sortResultsInput.value = "length-desc";
+  syncSortPicker();
   clearMessage();
+}
+
+document.addEventListener("keydown", (event) => {
+  if (
+    event.repeat ||
+    event.key.toLowerCase() !== "r" ||
+    !event.ctrlKey ||
+    event.metaKey ||
+    event.altKey ||
+    event.shiftKey
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  resetAllFilters();
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
 });
+resetAllFiltersButton.addEventListener("click", resetAllFilters);
 window.addEventListener("DOMContentLoaded", loadManifest, { once: true });
