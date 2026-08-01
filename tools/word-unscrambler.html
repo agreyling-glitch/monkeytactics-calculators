@@ -186,7 +186,7 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260801-34">
+  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260801-35">
   <link rel="stylesheet" href="../assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/ads.js" defer></script>
   <!-- TrustBox script -->
@@ -342,8 +342,15 @@
               </div>
             </div>
 
-            <div class="search-options-grid">
-              <div class="input-group">
+            <details class="basic-filters">
+              <summary>
+                <span class="heading-with-icon">
+                  <span class="heading-icon heading-icon--filters" aria-hidden="true"></span>
+                  Basic Filters
+                </span>
+              </summary>
+              <div class="search-options-grid">
+                <div class="input-group">
                 <label for="word-length">Word Length</label>
                 <input
                   id="word-length"
@@ -358,9 +365,9 @@
                   aria-describedby="word-length-hint"
                 >
                 <span class="visually-hidden" id="word-length-hint">0 allows any word length.</span>
-              </div>
+                </div>
 
-              <div class="input-group">
+                <div class="input-group">
                 <label for="starts-with">Starts With</label>
                 <input
                   id="starts-with"
@@ -373,9 +380,9 @@
                   placeholder="e.g. un"
                   maxlength="30"
                 >
-              </div>
+                </div>
 
-              <div class="input-group">
+                <div class="input-group">
                 <label for="ends-with">Ends With</label>
                 <input
                   id="ends-with"
@@ -388,9 +395,9 @@
                   placeholder="e.g. ing"
                   maxlength="30"
                 >
-              </div>
+                </div>
 
-              <div class="input-group">
+                <div class="input-group">
                 <label for="must-include">Must Include Letter(s)</label>
                 <input
                   id="must-include"
@@ -406,9 +413,9 @@
                   maxlength="30"
                 >
                 <span class="visually-hidden" id="must-include-hint">Repeated letters are counted.</span>
-              </div>
+                </div>
 
-              <div class="input-group">
+                <div class="input-group">
                 <label for="exclude-letters">Exclude Letters</label>
                 <input
                   id="exclude-letters"
@@ -421,8 +428,9 @@
                   placeholder="e.g. qxz"
                   maxlength="26"
                 >
+                </div>
               </div>
-            </div>
+            </details>
 
             <details class="advanced-filters">
               <summary>
@@ -677,8 +685,9 @@
             appear. Use <code>?</code> for a wildcard rack tile and add an optional pattern after
             <code>/</code>. In the pattern, <code>?</code> matches one letter and <code>*</code>
             matches any number of letters, including zero.</li>
-        <li><strong>Set the main word filters:</strong> use the Word Length stepper, Starts With,
-            Ends With, Must Include Letters, and Exclude Letters controls to describe the match.</li>
+        <li><strong>Set the main word filters:</strong> open <strong>Basic Filters</strong>, then use
+            Word Length, Starts With, Ends With, Must Include Letters, and Exclude Letters to
+            describe the match.</li>
         <li><strong>Refine the results:</strong> open Advanced Filters to require J, Q, X, or Z;
             set minimum vowels, minimum consonants, and a score range; or select Any Word, No Hook,
             S, Front, Back, or Multi from the Hooks filter.</li>
@@ -744,7 +753,8 @@
 
     <section class="seo-section">
       <h2>Filter words for a rack or board position</h2>
-      <p>Use <strong>Starts With</strong> and <strong>Ends With</strong> for known edge letters.
+      <p>Open <strong>Basic Filters</strong> and use <strong>Starts With</strong> and
+         <strong>Ends With</strong> for known edge letters.
          In <strong>Letters to Unscramble</strong>, place the rack before <code>/</code> and an
          optional pattern after it. For example, <code>ABCDE?? / A*E</code> searches the supplied
          rack for words beginning with A and ending with E, with any number of letters between.</p>
@@ -986,6 +996,6 @@
     </nav>
   </footer>
 
-  <script src="../assets/js/word-unscrambler.js?v=20260801-35" defer></script>
+  <script src="../assets/js/word-unscrambler.js?v=20260801-36" defer></script>
 </body>
 </html>

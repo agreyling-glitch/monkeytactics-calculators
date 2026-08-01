@@ -114,6 +114,16 @@ const getSignature = (word) => [...word].sort().join("");
 const getScrabbleScore = (word) =>
   [...word].reduce((score, letter) => score + (SCRABBLE_VALUES[letter] ?? 0), 0);
 
+function focusFilterInput(filterInput) {
+  const filterPanel = filterInput.closest("details");
+
+  if (filterPanel) {
+    filterPanel.open = true;
+  }
+
+  filterInput.focus();
+}
+
 function getSortOption(value, container = sortPicker) {
   return [...container.querySelectorAll("[data-sort-value]")]
     .find((option) => option.dataset.sortValue === value);
@@ -1628,7 +1638,7 @@ async function handleSubmit(event) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check starting letters", "Use letters only in Starts With.");
     showMessage("Starts With accepts letters only.");
-    startsWithInput.focus();
+    focusFilterInput(startsWithInput);
     return;
   }
 
@@ -1636,7 +1646,7 @@ async function handleSubmit(event) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check ending letters", "Use letters only in Ends With.");
     showMessage("Ends With accepts letters only.");
-    endsWithInput.focus();
+    focusFilterInput(endsWithInput);
     return;
   }
 
@@ -1644,7 +1654,7 @@ async function handleSubmit(event) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check required letters", "Use letters only in Must Include Letter(s).");
     showMessage("Must Include Letter(s) accepts letters only.");
-    mustIncludeInput.focus();
+    focusFilterInput(mustIncludeInput);
     return;
   }
 
@@ -1652,7 +1662,7 @@ async function handleSubmit(event) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check excluded letters", "Use letters only in Exclude Letters.");
     showMessage("Exclude Letters accepts letters only.");
-    excludeLettersInput.focus();
+    focusFilterInput(excludeLettersInput);
     return;
   }
 
@@ -1668,7 +1678,7 @@ async function handleSubmit(event) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check word length", "Use a whole number from 0 through 30.");
     showMessage("Word Length must be a whole number from 0 through 30.");
-    wordLengthInput.focus();
+    focusFilterInput(wordLengthInput);
     return;
   }
 
@@ -1685,9 +1695,9 @@ async function handleSubmit(event) {
     showMessage("Minimum Vowels and Minimum Consonants must be whole numbers from 0 through 30.");
 
     if (!Number.isInteger(minimumVowels) || minimumVowels < 0 || minimumVowels > 30) {
-      minimumVowelsInput.focus();
+      focusFilterInput(minimumVowelsInput);
     } else {
-      minimumConsonantsInput.focus();
+      focusFilterInput(minimumConsonantsInput);
     }
 
     return;
@@ -1700,7 +1710,7 @@ async function handleSubmit(event) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check score filters", "Enter whole-number Scrabble scores of zero or more.");
     showMessage("Score filters must be whole numbers of zero or more.");
-    minimumScoreInput.focus();
+    focusFilterInput(minimumScoreInput);
     return;
   }
 
@@ -1708,7 +1718,7 @@ async function handleSubmit(event) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check score range", "Minimum Score cannot exceed Maximum Score.");
     showMessage("Minimum Score cannot be greater than Maximum Score.");
-    minimumScoreInput.focus();
+    focusFilterInput(minimumScoreInput);
     return;
   }
 
