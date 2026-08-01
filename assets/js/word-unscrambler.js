@@ -1609,7 +1609,7 @@ async function handleSubmit(event) {
   const endsWith = endsWithInput.value.trim().toLowerCase();
   const mustInclude = mustIncludeInput.value.trim().toLowerCase();
   const excludeLetters = excludeLettersInput.value.trim().toLowerCase();
-  const dictionary = [...dictionaryInputs].find((option) => option.checked)?.value ?? "both";
+  const dictionary = [...dictionaryInputs].find((option) => option.checked)?.value ?? "enable";
   const wordLength = Number(wordLengthInput.value);
   const minimumVowels = Number(minimumVowelsInput.value);
   const minimumConsonants = Number(minimumConsonantsInput.value);
@@ -1817,6 +1817,21 @@ form.addEventListener("keydown", (event) => {
 
   event.preventDefault();
   form.requestSubmit(button);
+});
+document.addEventListener("keydown", (event) => {
+  if (
+    event.repeat ||
+    event.key.toLowerCase() !== "i" ||
+    (!event.ctrlKey && !event.metaKey) ||
+    event.altKey ||
+    event.shiftKey
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
 });
 document.addEventListener("keydown", (event) => {
   if (

@@ -67,7 +67,7 @@
           "Use a compact sort menu or grouped Basic, Strategic, and Hook sorting options",
           "Automatically rerun the current search when a new sorting method is selected",
           "Open Word Breakdown charts for rack balance, tile values, entropy, word patterns, lengths, scores, and gameplay estimates",
-          "Use Ctrl+Enter to search, Ctrl+R to reset filters, and Ctrl+B to open Word Breakdown",
+          "Use Ctrl+I to focus the rack, Ctrl+Enter to search, Ctrl+R to reset filters, and Ctrl+B to open Word Breakdown",
           "Respect repeated-letter frequency",
           "Group results by word length",
           "Calculate English Scrabble tile scores",
@@ -174,7 +174,7 @@
       {
         "@type": "Question",
         "name": "Does the Word Unscrambler have keyboard shortcuts?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+Enter, or Command+Enter on a Mac, to unscramble the current input. Press Ctrl+R to reset filters and sorting without clearing the rack or dictionary; focus returns to the rack input. After results appear, press Ctrl+B, or Command+B on a Mac, to expand and jump to Word Breakdown." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+I, or Command+I on a Mac, to focus the rack input instantly. Press Ctrl+Enter, or Command+Enter on a Mac, to unscramble the current input. Press Ctrl+R to reset filters and sorting without clearing the rack or dictionary; focus returns to the rack input. After results appear, press Ctrl+B, or Command+B on a Mac, to expand and jump to Word Breakdown." }
       },
       {
         "@type": "Question",
@@ -186,7 +186,7 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260801-35">
+  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260801-37">
   <link rel="stylesheet" href="../assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/ads.js" defer></script>
   <!-- TrustBox script -->
@@ -249,6 +249,7 @@
                     name="dictionary"
                     value="enable"
                     aria-describedby="dictionary-enable-description"
+                    checked
                   >
                   <span class="dictionary-option">
                     <span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span>
@@ -273,7 +274,6 @@
                     name="dictionary"
                     value="both"
                     aria-describedby="dictionary-both-description"
-                    checked
                   >
                   <span class="dictionary-option">
                     <span class="dictionary-icon dictionary-icon--both" aria-hidden="true"></span>
@@ -303,7 +303,8 @@
                     autocapitalize="none"
                     spellcheck="false"
                     placeholder="e.g. ABCDE?? / a*e"
-                    title="After /, use ? for one letter or * for any number of letters: ABCDE?? / a*e."
+                    title="After /, use ? for one letter or * for any number of letters: ABCDE?? / a*e. Press Ctrl+I to focus this field."
+                    aria-keyshortcuts="Control+I Meta+I"
                     aria-describedby="input-hint form-message"
                     maxlength="65"
                     required
@@ -708,6 +709,8 @@
          in your input. Spaces, numbers, and punctuation remain unchanged in the text box but are
          ignored during matching. The selected <strong>ENABLE and/or SOWPODS</strong> word data is
          compressed and loaded in small chunks only when a search needs them.</p>
+      <p>Press <kbd>Ctrl</kbd>+<kbd>I</kbd>, or <kbd>Command</kbd>+<kbd>I</kbd> on a Mac, to jump
+         back to the rack input from anywhere on the page.</p>
       <p><strong>Reset All</strong>, or <kbd>Ctrl</kbd>+<kbd>R</kbd>, restores the filters and sort
          without clearing the rack or dictionary selection, then returns focus to the rack input.</p>
     </section>
@@ -731,8 +734,9 @@
         <li><strong>Scrabble scores:</strong> compare standard tile values before board bonuses.</li>
         <li><strong>Word Breakdown:</strong> explore rack balance, tile values, entropy, pattern,
             length, and score charts after the search returns matches.</li>
-        <li><strong>Keyboard shortcuts:</strong> search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd> and
-            open the analysis panel with <kbd>Ctrl</kbd>+<kbd>B</kbd>.</li>
+        <li><strong>Keyboard shortcuts:</strong> focus the rack with <kbd>Ctrl</kbd>+<kbd>I</kbd>,
+            search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, and open the analysis panel with
+            <kbd>Ctrl</kbd>+<kbd>B</kbd>.</li>
         <li><strong>Definition and hook lookup:</strong> hover over or focus a result word to open links for
             Merriam-Webster, Collins, Wiktionary, Wordnik, Lexico's Dictionary.com successor,
             and Cambridge, then expand Hook Lookup for scored front and back hook words.</li>
@@ -926,7 +930,9 @@
             </li>
             <li class="faq-item">
               <h3>Does the Word Unscrambler have keyboard shortcuts?</h3>
-              <p>Yes. Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, or
+              <p>Yes. Press <kbd>Ctrl</kbd>+<kbd>I</kbd>, or
+                 <kbd>Command</kbd>+<kbd>I</kbd> on a Mac, to focus the rack input instantly.
+                 Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, or
                  <kbd>Command</kbd>+<kbd>Enter</kbd> on a Mac, to unscramble the current input.
                  Press <kbd>Ctrl</kbd>+<kbd>R</kbd> to reset filters and sorting without clearing the
                  rack or dictionary; focus returns to the rack input.
@@ -996,6 +1002,6 @@
     </nav>
   </footer>
 
-  <script src="../assets/js/word-unscrambler.js?v=20260801-36" defer></script>
+  <script src="../assets/js/word-unscrambler.js?v=20260801-38" defer></script>
 </body>
 </html>
