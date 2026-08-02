@@ -36,6 +36,24 @@ const wordList = document.querySelector("#word-list");
 const wordBreakdown = document.querySelector("#word-breakdown");
 const breakdownCharts = document.querySelector("#breakdown-charts");
 const breakdownSummary = wordBreakdown.querySelector("summary");
+const historyDropdown = document.querySelector("#history-dropdown");
+const historyMobileTrigger = document.querySelector("#history-mobile-trigger");
+const historyPanel = document.querySelector("#history-panel");
+const historyPanelSummary = historyPanel.querySelector("summary");
+const historyCount = document.querySelector("#history-count");
+const historyPinnedOnly = document.querySelector("#history-pinned-only");
+const historySort = document.querySelector("#history-sort");
+const historyClear = document.querySelector("#history-clear");
+const historyEmpty = document.querySelector("#history-empty");
+const historyViewport = document.querySelector("#history-viewport");
+const historyVirtualList = document.querySelector("#history-virtual-list");
+const historyModalBackdrop = document.querySelector("#history-modal-backdrop");
+const historyModal = document.querySelector("#history-modal");
+const historyModalClose = document.querySelector("#history-modal-close");
+const historyModalEmpty = document.querySelector("#history-modal-empty");
+const historyModalList = document.querySelector("#history-modal-list");
+const HistoryStore = window.MonkeyTacticsHistory;
+const InputRules = window.MonkeyTacticsWordInputRules;
 
 const MANIFEST_URL =
   "../assets/data/words/manifest.enable-sowpods-v2.json?v=enable-sowpods-v2";
@@ -109,6 +127,13 @@ const loadedChunks = new Set();
 const chunkPromises = new Map();
 let manifest = null;
 let breakdownState = null;
+let historyEntries = HistoryStore.read();
+let historyDropdownIndex = -1;
+let historyPanelFocusIndex = -1;
+let historyModalIndex = -1;
+let historyModalReturnFocus = null;
+let historySwipeStartY = null;
+let pendingHistorySearch = false;
 
 const getSignature = (word) => [...word].sort().join("");
 const getScrabbleScore = (word) =>
@@ -254,14 +279,463 @@ document.addEventListener("click", (event) => {
 syncSortPicker();
 
 function parseSmartInput(value) {
-  const slashIndex = value.indexOf("/");
-  const rackSource = slashIndex === -1 ? value : value.slice(0, slashIndex);
-  const patternSource = slashIndex === -1 ? "" : value.slice(slashIndex + 1);
+  return InputRules.parseSmartInput(value);
+}
 
+function formatSmartInput(rack, pattern) {
+  return pattern ? `${rack.toUpperCase()} / ${pattern.toUpperCase()}` : rack.toUpperCase();
+}
+
+function getCurrentFilters() {
   return {
-    rack: rackSource.toLowerCase().replace(/[^a-z?]/g, ""),
-    pattern: patternSource.toLowerCase().replace(/[^a-z?*]/g, "")
+    wordLength: wordLengthInput.value,
+    startsWith: startsWithInput.value,
+    endsWith: endsWithInput.value,
+    mustInclude: mustIncludeInput.value,
+    excludeLetters: excludeLettersInput.value,
+    highValueOnly: highValueOnlyInput.checked,
+    minimumVowels: minimumVowelsInput.value,
+    minimumConsonants: minimumConsonantsInput.value,
+    minimumScore: minimumScoreInput.value,
+    maximumScore: maximumScoreInput.value,
+    hookFilter: [...hookFilterInputs].find((option) => option.checked)?.value ?? ""
   };
+}
+
+function restoreFilters(filters = {}) {
+  wordLengthInput.value = filters.wordLength ?? "0";
+  startsWithInput.value = filters.startsWith ?? "";
+  endsWithInput.value = filters.endsWith ?? "";
+  mustIncludeInput.value = filters.mustInclude ?? "";
+  excludeLettersInput.value = filters.excludeLetters ?? "";
+  highValueOnlyInput.checked = filters.highValueOnly === true;
+  minimumVowelsInput.value = filters.minimumVowels ?? "0";
+  minimumConsonantsInput.value = filters.minimumConsonants ?? "0";
+  minimumScoreInput.value = filters.minimumScore ?? "";
+  maximumScoreInput.value = filters.maximumScore ?? "";
+  hookFilterInputs.forEach((option) => {
+    option.checked = option.value === (filters.hookFilter ?? "");
+  });
+
+  if (![...hookFilterInputs].some((option) => option.checked)) {
+    hookFilterInputs[0].checked = true;
+  }
+}
+
+function getHistoryEntropy(letters) {
+  if (letters.length < 2) {
+    return 0;
+  }
+
+  const counts = new Map();
+  for (const letter of letters) {
+    counts.set(letter, (counts.get(letter) ?? 0) + 1);
+  }
+
+  const entropy = [...counts.values()].reduce((sum, count) => {
+    const probability = count / letters.length;
+    return sum - probability * Math.log2(probability);
+  }, 0);
+  const maximumEntropy = Math.log2(Math.min(26, letters.length));
+  const wildcardBonus = letters.includes("?") ? 0.08 : 0;
+  return Number(clamp(entropy / maximumEntropy + wildcardBonus, 0, 1).toFixed(2));
+}
+
+function getHistoryLeaveValue(letters, matches) {
+  if (matches.length === 0) {
+    return null;
+  }
+
+  const sample = matches.slice(0, 50);
+  return Math.round(sample.reduce((sum, word) => (
+    sum + getLeaveQuality(getLeaveLetters(letters, word))
+  ), 0) / sample.length);
+}
+
+function getVisibleHistoryEntries() {
+  const entries = historyPinnedOnly.checked
+    ? historyEntries.filter((entry) => entry.pinned)
+    : historyEntries;
+  return HistoryStore.sort(entries, historySort.value);
+}
+
+function formatHistoryTime(timestamp) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(new Date(timestamp));
+}
+
+function formatHistoryMetrics(entry) {
+  const values = [`${entry.resultCount} ${entry.resultCount === 1 ? "result" : "results"}`];
+  if (entry.entropy !== null) {
+    values.push(`entropy ${Math.round(entry.entropy * 100)}%`);
+  }
+  if (entry.leaveValue !== null) {
+    values.push(`leave ${entry.leaveValue}`);
+  }
+  return values.join(" · ");
+}
+
+function createHistoryFilterDetails(entry) {
+  const filters = HistoryStore.getActiveFilters(entry.filters);
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  const content = document.createElement("div");
+
+  details.className = "history-filter-details";
+  summary.textContent = `Filters Active: ${filters.length}`;
+  content.className = "history-filter-content";
+
+  if (filters.length === 0) {
+    const empty = document.createElement("p");
+    empty.textContent = "No filters were active for this search.";
+    content.append(empty);
+  } else {
+    const heading = document.createElement("strong");
+    const list = document.createElement("ul");
+    heading.textContent = "Filters:";
+    filters.forEach((filter) => {
+      const item = document.createElement("li");
+      item.textContent = filter;
+      list.append(item);
+    });
+    content.append(heading, list);
+  }
+
+  details.append(summary, content);
+  details.addEventListener("click", (event) => event.stopPropagation());
+  return details;
+}
+
+function createHistoryDropdownOption(entry, index) {
+  const option = document.createElement("button");
+  const rack = document.createElement("span");
+  const meta = document.createElement("span");
+  const time = document.createElement("span");
+
+  option.type = "button";
+  option.id = `history-dropdown-option-${index}`;
+  option.className = "history-dropdown-option";
+  option.setAttribute("role", "option");
+  option.setAttribute("aria-selected", String(index === historyDropdownIndex));
+  option.tabIndex = -1;
+  if (index === historyDropdownIndex) {
+    option.classList.add("is-active");
+  }
+  rack.className = "history-dropdown-rack";
+  rack.textContent = `${entry.pinned ? "★ " : ""}${formatSmartInput(entry.rack, entry.pattern)}`;
+  meta.className = "history-dropdown-meta";
+  meta.textContent = formatHistoryMetrics(entry);
+  time.className = "history-dropdown-time";
+  time.textContent = formatHistoryTime(entry.timestamp);
+  option.append(rack, meta, time);
+  option.addEventListener("pointerdown", (event) => event.preventDefault());
+  option.addEventListener("click", () => loadHistoryEntry(entry));
+  return option;
+}
+
+function renderHistoryDropdown() {
+  const entries = HistoryStore.sort(historyEntries, "newest").slice(0, 8);
+  historyDropdown.replaceChildren(...entries.map(createHistoryDropdownOption));
+
+  const activeId = historyDropdownIndex >= 0
+    ? `history-dropdown-option-${historyDropdownIndex}`
+    : null;
+  if (activeId) {
+    input.setAttribute("aria-activedescendant", activeId);
+  } else {
+    input.removeAttribute("aria-activedescendant");
+  }
+}
+
+function openHistoryDropdown() {
+  if (!window.matchMedia("(min-width: 601px)").matches || historyEntries.length === 0) {
+    return false;
+  }
+
+  historyDropdownIndex = 0;
+  historyDropdown.hidden = false;
+  input.setAttribute("aria-expanded", "true");
+  renderHistoryDropdown();
+  return true;
+}
+
+function closeHistoryDropdown() {
+  historyDropdown.hidden = true;
+  historyDropdownIndex = -1;
+  input.setAttribute("aria-expanded", "false");
+  input.removeAttribute("aria-activedescendant");
+}
+
+function createHistoryEntryElement(entry, index) {
+  const item = document.createElement("article");
+  const heading = document.createElement("div");
+  const primary = document.createElement("div");
+  const rackLine = document.createElement("div");
+  const rack = document.createElement("strong");
+  const time = document.createElement("time");
+  const topActions = document.createElement("div");
+  const pattern = document.createElement("p");
+  const metaRow = document.createElement("div");
+  const metrics = document.createElement("div");
+  const filters = createHistoryFilterDetails(entry);
+  const actions = document.createElement("div");
+  const rerun = document.createElement("button");
+  const pin = document.createElement("button");
+  const remove = document.createElement("button");
+
+  item.className = "history-entry";
+  item.dataset.historyIndex = String(index);
+  item.tabIndex = index === historyPanelFocusIndex ? 0 : -1;
+  item.setAttribute("role", "group");
+  item.setAttribute("aria-label", `Search ${formatSmartInput(entry.rack, entry.pattern)}`);
+  heading.className = "history-entry-heading";
+  rack.textContent = entry.rack;
+  if (entry.pinned) {
+    const star = document.createElement("span");
+    star.className = "history-pin-mark";
+    star.setAttribute("aria-label", "Pinned");
+    star.textContent = "★";
+    rackLine.append(star);
+  }
+  time.className = "history-entry-time";
+  time.dateTime = new Date(entry.timestamp).toISOString();
+  time.textContent = formatHistoryTime(entry.timestamp);
+  primary.className = "history-entry-primary";
+  rackLine.className = "history-entry-rack-line";
+  topActions.className = "history-entry-top-actions";
+  pattern.className = "history-entry-pattern";
+  pattern.textContent = entry.pattern ? `Pattern: ${entry.pattern}` : "Pattern: none";
+  metaRow.className = "history-entry-meta-row";
+  metrics.className = "history-entry-metrics";
+  metrics.textContent = formatHistoryMetrics(entry);
+  actions.className = "history-entry-actions";
+  [rerun, pin, remove].forEach((control) => {
+    control.type = "button";
+    control.className = "history-action";
+  });
+  rerun.textContent = "Re-run";
+  pin.textContent = entry.pinned ? "Unpin" : "Pin";
+  remove.textContent = "Delete";
+  rerun.addEventListener("click", (event) => {
+    event.stopPropagation();
+    loadHistoryEntry(entry);
+  });
+  pin.addEventListener("click", (event) => {
+    event.stopPropagation();
+    historyEntries = HistoryStore.update(entry.id, { pinned: !entry.pinned });
+    renderAllHistory();
+  });
+  remove.addEventListener("click", (event) => {
+    event.stopPropagation();
+    historyEntries = HistoryStore.remove(entry.id);
+    renderAllHistory();
+  });
+  actions.append(rerun, pin, remove);
+  rackLine.append(rack);
+  primary.append(rackLine, pattern);
+  topActions.append(time, actions);
+  heading.append(primary, topActions);
+  metaRow.append(metrics, filters);
+  item.append(heading, metaRow);
+  item.addEventListener("click", () => loadHistoryEntry(entry));
+  item.addEventListener("keydown", handleHistoryPanelKeydown);
+  return item;
+}
+
+function renderHistoryPanel() {
+  const entries = getVisibleHistoryEntries();
+  historyCount.textContent = `${historyEntries.length} ${historyEntries.length === 1 ? "search" : "searches"}`;
+  historyClear.disabled = historyEntries.length === 0;
+  historyEmpty.hidden = entries.length > 0;
+  historyViewport.hidden = entries.length === 0;
+
+  if (entries.length === 0) {
+    historyPanelFocusIndex = -1;
+    historyVirtualList.replaceChildren();
+    return;
+  }
+
+  if (historyPanelFocusIndex < 0 || historyPanelFocusIndex >= entries.length) {
+    historyPanelFocusIndex = 0;
+  }
+
+  historyVirtualList.replaceChildren(...entries.map(createHistoryEntryElement));
+}
+
+function createHistoryModalEntry(entry, index) {
+  const wrapper = document.createElement("div");
+  const item = document.createElement("button");
+  const rackLine = document.createElement("span");
+  const rack = document.createElement("strong");
+  const pattern = document.createElement("span");
+  const metaRow = document.createElement("div");
+  const metrics = document.createElement("span");
+  const time = document.createElement("time");
+  const filters = createHistoryFilterDetails(entry);
+  wrapper.setAttribute("role", "listitem");
+  wrapper.className = "history-modal-listitem";
+  item.type = "button";
+  item.id = `history-modal-option-${index}`;
+  item.className = "history-modal-entry";
+  item.setAttribute("aria-current", String(index === historyModalIndex));
+  item.tabIndex = index === historyModalIndex ? 0 : -1;
+  if (index === historyModalIndex) {
+    item.classList.add("is-active");
+  }
+  rack.textContent = entry.rack;
+  if (entry.pinned) {
+    const star = document.createElement("span");
+    star.className = "history-pin-mark";
+    star.setAttribute("aria-label", "Pinned");
+    star.textContent = "★";
+    rackLine.append(star);
+  }
+  rackLine.className = "history-modal-rack-line";
+  pattern.className = "history-modal-pattern";
+  pattern.textContent = entry.pattern ? `Pattern: ${entry.pattern}` : "Pattern: none";
+  metaRow.className = "history-modal-meta-row";
+  metrics.className = "history-modal-metrics";
+  metrics.textContent = formatHistoryMetrics(entry);
+  time.dateTime = new Date(entry.timestamp).toISOString();
+  time.textContent = formatHistoryTime(entry.timestamp);
+  rackLine.append(rack);
+  item.append(rackLine, pattern, time);
+  item.addEventListener("click", () => loadHistoryEntry(entry));
+  wrapper.addEventListener("click", (event) => {
+    if (!event.target.closest(".history-filter-details, .history-modal-entry")) {
+      loadHistoryEntry(entry);
+    }
+  });
+  metaRow.append(metrics, filters);
+  wrapper.append(item, metaRow);
+  return wrapper;
+}
+
+function renderHistoryModal() {
+  const entries = HistoryStore.sort(historyEntries, "newest");
+  historyModalEmpty.hidden = entries.length > 0;
+  if (entries.length === 0) {
+    historyModalIndex = -1;
+  } else if (historyModalIndex < 0 || historyModalIndex >= entries.length) {
+    historyModalIndex = 0;
+  }
+  historyModalList.replaceChildren(...entries.map(createHistoryModalEntry));
+}
+
+function renderAllHistory() {
+  renderHistoryDropdown();
+  renderHistoryPanel();
+  renderHistoryModal();
+}
+
+function focusHistoryPanelEntry(index) {
+  const entries = getVisibleHistoryEntries();
+  if (entries.length === 0) {
+    historyPanelSummary.focus();
+    return;
+  }
+
+  historyPanelFocusIndex = Math.max(0, Math.min(index, entries.length - 1));
+  renderHistoryPanel();
+  requestAnimationFrame(() => {
+    const target = historyVirtualList
+      .querySelector(`[data-history-index="${historyPanelFocusIndex}"]`);
+    target?.scrollIntoView({ block: "nearest" });
+    target?.focus({ preventScroll: true });
+  });
+}
+
+function handleHistoryPanelKeydown(event) {
+  if (event.target !== event.currentTarget) {
+    return;
+  }
+
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    event.currentTarget.click();
+    return;
+  }
+
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+    return;
+  }
+
+  event.preventDefault();
+  const entries = getVisibleHistoryEntries();
+  focusHistoryPanelEntry(HistoryStore.moveIndex(historyPanelFocusIndex, event.key, entries.length));
+}
+
+function openHistoryModal() {
+  closeHistoryDropdown();
+  historyModalIndex = historyEntries.length > 0 ? 0 : -1;
+  renderHistoryModal();
+  historyModalReturnFocus = document.activeElement;
+  historyModalBackdrop.hidden = false;
+  input.setAttribute("aria-expanded", "true");
+  document.body.style.overflow = "hidden";
+  requestAnimationFrame(() => (
+    historyModalList.querySelector("[aria-current=true]") ?? historyModalClose
+  ).focus());
+}
+
+function closeHistoryModal() {
+  if (historyModalBackdrop.hidden) {
+    return;
+  }
+
+  historyModalBackdrop.hidden = true;
+  historyModalIndex = -1;
+  input.setAttribute("aria-expanded", "false");
+  document.body.style.overflow = "";
+  historyModalReturnFocus?.focus();
+  historyModalReturnFocus = null;
+}
+
+function loadHistoryEntry(entry) {
+  const restored = HistoryStore.getRestoredState(entry);
+  if (!restored) {
+    return;
+  }
+
+  input.value = restored.inputValue;
+  restoreFilters(restored.filters);
+  sortResultsInput.value = getSortOption(restored.sortMode) ? restored.sortMode : "length-desc";
+  syncSortPicker();
+  closeHistoryDropdown();
+  closeHistoryModal();
+  clearMessage();
+
+  if (button.disabled) {
+    pendingHistorySearch = true;
+  } else {
+    pendingHistorySearch = false;
+    form.requestSubmit(button);
+  }
+}
+
+function runPendingHistorySearch() {
+  if (pendingHistorySearch && !button.disabled) {
+    pendingHistorySearch = false;
+    form.requestSubmit(button);
+  }
+}
+
+function saveHistoryEntry(letters, pattern, matches, filters, sortMode) {
+  historyEntries = HistoryStore.add({
+    id: "",
+    timestamp: Date.now(),
+    rack: letters,
+    pattern,
+    filters,
+    sortMode,
+    resultCount: matches.length,
+    entropy: getHistoryEntropy(letters),
+    leaveValue: getHistoryLeaveValue(letters, matches),
+    pinned: false
+  });
+  renderAllHistory();
 }
 
 function createPatternExpression(pattern) {
@@ -325,7 +799,56 @@ function clearResults() {
   matchCount.hidden = true;
 }
 
-function createWordItem(word, options) {
+function getWildcardLetterIndexes(word, letters) {
+  const availableCounts = new Uint8Array(26);
+  let wildcardCount = 0;
+
+  for (const letter of letters) {
+    if (letter === "?") {
+      wildcardCount += 1;
+    } else {
+      availableCounts[letter.charCodeAt(0) - 97] += 1;
+    }
+  }
+
+  const wildcardIndexes = new Set();
+
+  for (let index = 0; index < word.length && wildcardCount > 0; index += 1) {
+    const letterIndex = word.charCodeAt(index) - 97;
+
+    if (availableCounts[letterIndex] > 0) {
+      availableCounts[letterIndex] -= 1;
+    } else {
+      wildcardIndexes.add(index);
+      wildcardCount -= 1;
+    }
+  }
+
+  return wildcardIndexes;
+}
+
+function appendHighlightedWord(wordLabel, word, letters) {
+  const wildcardIndexes = getWildcardLetterIndexes(word, letters);
+
+  if (wildcardIndexes.size === 0) {
+    wordLabel.textContent = word;
+    return;
+  }
+
+  for (let index = 0; index < word.length; index += 1) {
+    if (wildcardIndexes.has(index)) {
+      const wildcardLetter = document.createElement("span");
+      wildcardLetter.className = "wildcard-letter";
+      wildcardLetter.title = "Letter supplied by a wildcard tile";
+      wildcardLetter.textContent = word[index];
+      wordLabel.append(wildcardLetter);
+    } else {
+      wordLabel.append(word[index]);
+    }
+  }
+}
+
+function createWordItem(word, letters, options) {
   const item = document.createElement("li");
   const content = document.createElement("div");
   const wordLookup = document.createElement("div");
@@ -343,7 +866,7 @@ function createWordItem(word, options) {
 
   wordLabel.className = "word-label";
   wordLabel.type = "button";
-  wordLabel.textContent = word;
+  appendHighlightedWord(wordLabel, word, letters);
   wordLabel.title = `Show dictionary links for ${word}`;
   wordLabel.setAttribute("aria-haspopup", "dialog");
 
@@ -472,7 +995,7 @@ function createWordItem(word, options) {
   return item;
 }
 
-function appendWordGroup(fragment, headingText, words, ariaLabel, options) {
+function appendWordGroup(fragment, headingText, words, ariaLabel, letters, options) {
   const group = document.createElement("section");
   group.className = "word-group";
 
@@ -483,7 +1006,7 @@ function appendWordGroup(fragment, headingText, words, ariaLabel, options) {
   grid.className = "word-grid";
   grid.setAttribute("aria-label", ariaLabel);
 
-  words.forEach((word) => grid.append(createWordItem(word, options)));
+  words.forEach((word) => grid.append(createWordItem(word, letters, options)));
   group.append(heading, grid);
   fragment.append(group);
 }
@@ -526,12 +1049,13 @@ function renderMatches(letters, matches, options) {
         `${length}-letter words made by unscrambling the letters ${letters.toUpperCase()}`,
         words,
         `${length}-letter words`,
+        letters,
         options
       );
     });
   } else {
     const heading = SORT_LABELS[options.sortBy] ?? "Matching words";
-    appendWordGroup(fragment, heading, matches, heading, options);
+    appendWordGroup(fragment, heading, matches, heading, letters, options);
   }
 
   wordList.append(fragment);
@@ -1634,6 +2158,33 @@ async function handleSubmit(event) {
     return;
   }
 
+  const limitViolation = InputRules.getLimitViolation(letters, pattern);
+  if (limitViolation?.type === "rack-wildcards") {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState(
+      "Too many rack wildcards",
+      `Use no more than ${InputRules.MAX_RACK_WILDCARDS} question-mark wildcard tiles.`
+    );
+    showMessage(
+      `Rack searches accept up to ${InputRules.MAX_RACK_WILDCARDS} wildcard tiles (?).`
+    );
+    input.focus();
+    return;
+  }
+
+  if (limitViolation?.type === "pattern-stars") {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState(
+      "Too many pattern stars",
+      `Use no more than ${InputRules.MAX_PATTERN_STARS} variable-length wildcards after the slash.`
+    );
+    showMessage(
+      `Inline patterns accept up to ${InputRules.MAX_PATTERN_STARS} variable-length wildcards (*).`
+    );
+    input.focus();
+    return;
+  }
+
   if (startsWith && !/^[a-z]+$/.test(startsWith)) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check starting letters", "Use letters only in Starts With.");
@@ -1747,6 +2298,7 @@ async function handleSubmit(event) {
     sortBy,
     showHooks: Boolean(hookFilter || sortBy.startsWith("hooks-"))
   };
+  const historyFilters = getCurrentFilters();
 
   results.setAttribute("aria-busy", "true");
   button.disabled = true;
@@ -1765,7 +2317,9 @@ async function handleSubmit(event) {
       await loadAllChunks();
     }
 
-    renderMatches(letters, findMatches(letters, options), options);
+    const matches = findMatches(letters, options);
+    renderMatches(letters, matches, options);
+    saveHistoryEntry(letters, pattern, matches, historyFilters, sortBy);
   } catch (error) {
     console.error("Unable to load dictionary chunks:", error);
     resultsHeading.textContent = "Dictionary unavailable";
@@ -1775,6 +2329,7 @@ async function handleSubmit(event) {
     results.setAttribute("aria-busy", "false");
     button.disabled = false;
     buttonLabel.textContent = "Unscramble";
+    runPendingHistorySearch();
   }
 }
 
@@ -1795,6 +2350,7 @@ async function loadManifest() {
     button.disabled = false;
     buttonLabel.textContent = "Unscramble";
     input.focus();
+    runPendingHistorySearch();
   } catch (error) {
     console.error("Unable to load dictionary manifest:", error);
     buttonLabel.textContent = "Dictionary unavailable";
@@ -1803,6 +2359,166 @@ async function loadManifest() {
 }
 
 form.addEventListener("submit", handleSubmit);
+input.addEventListener("input", closeHistoryDropdown);
+input.addEventListener("keydown", (event) => {
+  if (!historyModalBackdrop.hidden) {
+    return;
+  }
+
+  const isDesktop = window.matchMedia("(min-width: 601px)").matches;
+  if (!isDesktop && event.key === "ArrowDown") {
+    event.preventDefault();
+    openHistoryModal();
+    return;
+  }
+
+  if (!isDesktop) {
+    return;
+  }
+
+  const entries = HistoryStore.sort(historyEntries, "newest").slice(0, 8);
+  if (event.key === "Escape" && !historyDropdown.hidden) {
+    event.preventDefault();
+    closeHistoryDropdown();
+    return;
+  }
+
+  if (event.key === "Enter" && !historyDropdown.hidden && historyDropdownIndex >= 0) {
+    event.preventDefault();
+    loadHistoryEntry(entries[historyDropdownIndex]);
+    return;
+  }
+
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+    return;
+  }
+
+  event.preventDefault();
+  if (historyDropdown.hidden) {
+    openHistoryDropdown();
+    return;
+  }
+
+  historyDropdownIndex = HistoryStore.moveIndex(
+    historyDropdownIndex,
+    event.key,
+    entries.length
+  );
+  renderHistoryDropdown();
+  historyDropdown.querySelector(".is-active")?.scrollIntoView({ block: "nearest" });
+});
+document.addEventListener("pointerdown", (event) => {
+  if (!historyDropdown.hidden && !event.target.closest(".primary-search-input")) {
+    closeHistoryDropdown();
+  }
+});
+historyPinnedOnly.addEventListener("change", () => {
+  historyPanelFocusIndex = -1;
+  historyViewport.scrollTop = 0;
+  renderHistoryPanel();
+});
+historySort.addEventListener("change", () => {
+  historyPanelFocusIndex = -1;
+  historyViewport.scrollTop = 0;
+  renderHistoryPanel();
+});
+historyClear.addEventListener("click", () => {
+  if (historyEntries.length === 0 || !window.confirm("Clear all Word Unscrambler history?")) {
+    return;
+  }
+
+  historyEntries = HistoryStore.clear();
+  historyPanelFocusIndex = -1;
+  renderAllHistory();
+});
+historyPanel.addEventListener("toggle", () => {
+  if (historyPanel.open) {
+    renderHistoryPanel();
+  }
+});
+historyMobileTrigger.addEventListener("click", openHistoryModal);
+historyModalClose.addEventListener("click", closeHistoryModal);
+historyModalBackdrop.addEventListener("click", (event) => {
+  if (event.target === historyModalBackdrop) {
+    closeHistoryModal();
+  }
+});
+historyModal.addEventListener("pointerdown", (event) => {
+  historySwipeStartY = event.clientY;
+});
+historyModal.addEventListener("pointerup", (event) => {
+  if (historySwipeStartY !== null && event.clientY - historySwipeStartY > 80) {
+    closeHistoryModal();
+  }
+  historySwipeStartY = null;
+});
+historyModal.addEventListener("pointercancel", () => {
+  historySwipeStartY = null;
+});
+historyModal.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeHistoryModal();
+    return;
+  }
+
+  if (event.target.closest(".history-filter-details")) {
+    return;
+  }
+
+  const entries = HistoryStore.sort(historyEntries, "newest");
+
+  if (event.key === "Enter" && historyModalIndex >= 0) {
+    event.preventDefault();
+    event.stopPropagation();
+    loadHistoryEntry(entries[historyModalIndex]);
+    return;
+  }
+
+  if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+    event.preventDefault();
+    historyModalIndex = HistoryStore.moveIndex(
+      historyModalIndex,
+      event.key,
+      entries.length
+    );
+    renderHistoryModal();
+    historyModalList.querySelector("[aria-current=true]")?.focus();
+    return;
+  }
+
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  const controls = [...historyModal.querySelectorAll("button:not([disabled])")];
+  const first = controls[0];
+  const last = controls.at(-1);
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last?.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first?.focus();
+  }
+});
+const historyLongPress = HistoryStore.createLongPressController({
+  onLongPress: () => {
+    if (window.matchMedia("(max-width: 600px)").matches) {
+      openHistoryModal();
+    }
+  }
+});
+input.addEventListener("pointerdown", (event) => historyLongPress.start(event));
+input.addEventListener("pointermove", (event) => historyLongPress.move(event));
+input.addEventListener("pointerup", historyLongPress.cancel);
+input.addEventListener("pointercancel", historyLongPress.cancel);
+window.addEventListener("storage", (event) => {
+  if (event.key === HistoryStore.STORAGE_KEY) {
+    historyEntries = HistoryStore.read();
+    renderAllHistory();
+  }
+});
 wordBreakdown.addEventListener("toggle", () => {
   if (wordBreakdown.open) {
     renderWordBreakdown();
@@ -1834,6 +2550,30 @@ document.addEventListener("keydown", (event) => {
   input.setSelectionRange(input.value.length, input.value.length);
 });
 document.addEventListener("keydown", (event) => {
+  const keyMatches = event.key.toLowerCase() === "h";
+  const windowsShortcut = keyMatches && event.ctrlKey && !event.metaKey && !event.shiftKey;
+  const macShortcut = keyMatches && event.metaKey && event.shiftKey && !event.ctrlKey;
+
+  if (event.repeat || event.altKey || (!windowsShortcut && !macShortcut)) {
+    return;
+  }
+
+  event.preventDefault();
+  const shouldOpen = !historyPanel.open;
+  historyPanel.open = shouldOpen;
+
+  if (!shouldOpen) {
+    historyPanelSummary.focus({ preventScroll: true });
+    return;
+  }
+
+  renderHistoryPanel();
+  requestAnimationFrame(() => {
+    historyPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    focusHistoryPanelEntry(0);
+  });
+});
+document.addEventListener("keydown", (event) => {
   if (
     event.repeat ||
     event.key.toLowerCase() !== "b" ||
@@ -1844,13 +2584,15 @@ document.addEventListener("keydown", (event) => {
   }
 
   event.preventDefault();
-  const wasOpen = wordBreakdown.open;
-  wordBreakdown.open = true;
+  const shouldOpen = !wordBreakdown.open;
+  wordBreakdown.open = shouldOpen;
 
-  if (wasOpen) {
-    renderWordBreakdown();
+  if (!shouldOpen) {
+    breakdownSummary.focus({ preventScroll: true });
+    return;
   }
 
+  renderWordBreakdown();
   requestAnimationFrame(() => {
     breakdownSummary.focus({ preventScroll: true });
     wordBreakdown.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1893,4 +2635,5 @@ document.addEventListener("keydown", (event) => {
   input.setSelectionRange(input.value.length, input.value.length);
 });
 resetAllFiltersButton.addEventListener("click", resetAllFilters);
+renderAllHistory();
 window.addEventListener("DOMContentLoaded", loadManifest, { once: true });

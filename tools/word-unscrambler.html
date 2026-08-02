@@ -8,25 +8,25 @@
   <link rel="manifest" href="../site.webmanifest">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics</title>
-  <meta name="description" content="Free word unscrambler and Scrabble word finder with ? and * patterns, ENABLE or SOWPODS, no-hook filters, scored hook lookups, and strategic sorting.">
+  <title>Word Unscrambler with Hooks, Patterns & Tile Scores</title>
+  <meta name="description" content="Unscramble letters with smart patterns, hook detection, tile scores, and strategic Scrabble filters. Fast, accurate results with full in‑browser analysis.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-08-01">
+  <meta name="date" content="2026-08-02">
   <meta name="theme-color" content="#0f172a">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/word-unscrambler">
 
-  <meta property="og:title" content="Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics">
-  <meta property="og:description" content="Find playable words with wildcard patterns, ENABLE or SOWPODS, advanced filters, no-hook searches, scored hook lookups, and strategic sorting.">
+  <meta property="og:title" content="Word Unscrambler with Hooks, Patterns & Tile Scores">
+  <meta property="og:description" content="Unscramble letters with smart patterns, hook detection, tile scores, and strategic Scrabble filters. Fast, accurate results with full in‑browser analysis.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://monkeytactics.com/tools/word-unscrambler">
   <meta property="og:site_name" content="MonkeyTactics">
   <meta property="og:locale" content="en_US">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Word Unscrambler &amp; Scrabble Word Finder">
-  <meta name="twitter:description" content="Unscramble letters with wildcard patterns, no-hook filters, scored hook lookups, strategic sorting, and Word Breakdown charts.">
+  <meta name="twitter:title" content="Word Unscrambler with Hooks, Patterns & Tile Scores">
+  <meta name="twitter:description" content="Unscramble letters with smart patterns, hook detection, tile scores, and strategic Scrabble filters. Fast, accurate results with full in‑browser analysis.">
 
   <script type="application/ld+json">
   {
@@ -44,9 +44,9 @@
       {
         "@type": "WebApplication",
         "@id": "https://monkeytactics.com/tools/word-unscrambler#app",
-        "name": "Word Unscrambler & Scrabble Word Finder",
+        "name": "Word Unscrambler with Hooks, Patterns & Tile Scores",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "description": "A free browser-based word unscrambler and Scrabble word finder with variable-length patterns, ENABLE and SOWPODS selection, no-hook filters, scored hook lookups, grouped strategic sorting, and rack-analysis charts.",
+        "description": "A free browser-based word unscrambler and Scrabble word finder with variable-length patterns, ENABLE and SOWPODS selection, advanced filters, scored hook lookups, private recent search history, strategic sorting, and rack-analysis charts.",
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Word Game Utility",
         "operatingSystem": "Any",
@@ -66,8 +66,9 @@
           "Open an on-demand Hook Lookup with complete front and back hook words and inline Scrabble scores",
           "Use a compact sort menu or grouped Basic, Strategic, and Hook sorting options",
           "Automatically rerun the current search when a new sorting method is selected",
+          "Save, pin, sort, rerun, and delete recent searches in local browser storage",
           "Open Word Breakdown charts for rack balance, tile values, entropy, word patterns, lengths, scores, and gameplay estimates",
-          "Use Ctrl+I to focus the rack, Ctrl+Enter to search, Ctrl+R to reset filters, and Ctrl+B to open Word Breakdown",
+          "Use Ctrl+I to focus the rack, Ctrl+Enter to search, Ctrl+R to reset filters, Ctrl+B to open Word Breakdown, and Ctrl+H to open History",
           "Respect repeated-letter frequency",
           "Group results by word length",
           "Calculate English Scrabble tile scores",
@@ -82,20 +83,20 @@
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-08-01"
+        "dateModified": "2026-08-02"
       },
       {
         "@type": "WebPage",
         "@id": "https://monkeytactics.com/tools/word-unscrambler#webpage",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "name": "Word Unscrambler & Scrabble Word Finder",
-        "description": "Unscramble letters into playable words with variable-length patterns, dictionary selection, no-hook filters, scored hook lookups, strategic sorts, charts, and keyboard shortcuts.",
+        "name": "Word Unscrambler with Hooks, Patterns & Tile Scores",
+        "description": "Unscramble letters into playable words with variable-length patterns, dictionary selection, advanced filters, scored hook lookups, strategic sorts, charts, recent search history, and keyboard shortcuts.",
         "inLanguage": "en-US",
         "isPartOf": { "@id": "https://monkeytactics.com/#website" },
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/word-unscrambler#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/word-unscrambler#app" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-08-01"
+        "dateModified": "2026-08-02"
       }
     ]
   }
@@ -174,19 +175,24 @@
       {
         "@type": "Question",
         "name": "Does the Word Unscrambler have keyboard shortcuts?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+I, or Command+I on a Mac, to focus the rack input instantly. Press Ctrl+Enter, or Command+Enter on a Mac, to unscramble the current input. Press Ctrl+R to reset filters and sorting without clearing the rack or dictionary; focus returns to the rack input. After results appear, press Ctrl+B, or Command+B on a Mac, to expand and jump to Word Breakdown." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+I, or Command+I on a Mac, to focus the rack input. Press Ctrl+Enter, or Command+Enter, to search. Press Ctrl+R to reset filters and sorting. Press Ctrl+B, or Command+B, to open Word Breakdown. Press Ctrl+H, or Command+Shift+H, to open History." }
+      },
+      {
+        "@type": "Question",
+        "name": "How does recent search history work?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Each successful search saves its rack, pattern, filters, sorting method, result count, and gameplay metrics in local browser storage. Open History to rerun, pin, sort, or delete searches. Up to 50 unpinned searches are kept, while pinned searches remain until you delete them." }
       },
       {
         "@type": "Question",
         "name": "Are my searches private?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. The dictionary and matching logic run entirely in your browser, so your searches are not uploaded or stored." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Matching runs entirely in your browser. Your last searches are stored only in local browser storage for History and are never uploaded." }
       }
     ]
   }
   </script>
 
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260801-37">
+  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260802-51">
   <link rel="stylesheet" href="../assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/ads.js" defer></script>
   <!-- TrustBox script -->
@@ -229,8 +235,7 @@
         <span aria-current="page">Word Unscrambler</span>
       </nav>
       <h1 id="tool-heading">Word Unscrambler &amp; Scrabble Word Finder</h1>
-      <p>Turn scrambled letters into playable words with ENABLE or SOWPODS. Use flexible patterns,
-         find words with or without hooks, compare tile scores, and apply strategic sorts.</p>
+      <p>Unlock powerful word‑finding and Scrabble analysis with flexible letter matching, wildcard patterns, dictionary‑aware hook detection, and strategic sorting options. Build words from your rack using ENABLE, SOWPODS, or both, then dive deeper with score ranking, bingo potential, high‑value tile filters, and complete front/back hook lookup. After each search, explore Word Breakdown charts to understand rack balance, tile value distribution, entropy, pattern strength, and estimated board‑fit insights. Everything runs locally in your browser, giving you fast, accurate, privacy‑friendly word solving and gameplay strategy. </p>
     </section>
 
     <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
@@ -303,13 +308,32 @@
                     autocapitalize="none"
                     spellcheck="false"
                     placeholder="e.g. ABCDE?? / a*e"
-                    title="After /, use ? for one letter or * for any number of letters: ABCDE?? / a*e. Press Ctrl+I to focus this field."
+                    title="Use up to 2 rack ? wildcards. After /, use ? for one letter or up to 3 * wildcards for any number of letters: ABCDE?? / a*e. Press Down Arrow for recent searches."
                     aria-keyshortcuts="Control+I Meta+I"
                     aria-describedby="input-hint form-message"
+                    aria-controls="history-dropdown history-modal"
+                    aria-expanded="false"
                     maxlength="65"
                     required
                   >
-                  <span class="visually-hidden" id="input-hint">After /, use ? for one letter or * for any number of letters: ABCDE?? / a*e.</span>
+                  <button
+                    class="history-mobile-trigger"
+                    id="history-mobile-trigger"
+                    type="button"
+                    aria-label="Open search history"
+                    aria-haspopup="dialog"
+                    title="Open search history"
+                  >
+                    <span aria-hidden="true">&#128339;</span>
+                  </button>
+                  <div
+                    class="history-dropdown"
+                    id="history-dropdown"
+                    role="listbox"
+                    aria-label="Recent searches"
+                    hidden
+                  ></div>
+                  <span class="visually-hidden" id="input-hint">Use up to 2 rack question-mark wildcards. After the slash, use question mark for one letter or up to 3 stars for any number of letters: ABCDE?? / a*e. Press Down Arrow to browse recent searches.</span>
                 </div>
                 <div class="primary-search-actions">
                   <button
@@ -648,7 +672,7 @@
               <details class="word-breakdown" id="word-breakdown" hidden>
                 <summary
                   aria-keyshortcuts="Control+B Meta+B"
-                  title="Open Word Breakdown (Ctrl+B)"
+                  title="Toggle Word Breakdown (Ctrl+B)"
                 >
                   <span class="heading-with-icon">
                     <span class="heading-icon heading-icon--breakdown" aria-hidden="true"></span>
@@ -669,6 +693,47 @@
                   id="breakdown-charts"
                   aria-live="polite"
                 ></div>
+              </details>
+
+              <details class="history-panel" id="history-panel">
+                <summary
+                  aria-keyshortcuts="Control+H Meta+Shift+H"
+                  title="Toggle History (Ctrl+H; Command+Shift+H on Mac)"
+                >
+                  <span class="heading-with-icon">
+                    <span class="heading-icon heading-icon--history" aria-hidden="true"></span>
+                    History
+                  </span>
+                  <span class="history-count" id="history-count">0 searches</span>
+                </summary>
+                <div class="history-panel-content">
+                  <div class="history-toolbar">
+                    <label class="toggle-option" for="history-pinned-only">
+                      <input id="history-pinned-only" type="checkbox">
+                      <span>Show pinned only</span>
+                    </label>
+                    <label for="history-sort">
+                      <span>Sort</span>
+                      <select id="history-sort">
+                        <option value="newest">Newest first</option>
+                        <option value="oldest">Oldest first</option>
+                        <option value="rack">Alphabetical by rack</option>
+                      </select>
+                    </label>
+                    <button class="history-clear" id="history-clear" type="button">Clear all history</button>
+                  </div>
+                  <p class="history-empty" id="history-empty">Searches you run will appear here and stay only in this browser.</p>
+                  <div
+                    class="history-viewport"
+                    id="history-viewport"
+                    role="region"
+                    aria-label="Saved searches"
+                    tabindex="-1"
+                    hidden
+                  >
+                    <div id="history-virtual-list"></div>
+                  </div>
+                </div>
               </details>
             </section>
           </div>
@@ -704,6 +769,9 @@
         <li><strong>Analyze the matches:</strong> when results exist, expand
             <strong>Word Breakdown</strong> beneath the word list or press
             <kbd>Ctrl</kbd>+<kbd>B</kbd> to jump to it.</li>
+        <li><strong>Reuse a recent search:</strong> open <strong>History</strong> to restore a rack,
+            pattern, filters, and sorting method. On desktop, press Down Arrow in the rack input
+            for a compact recent-search list.</li>
       </ol>
       <p>Letter frequency still matters: a result cannot use any letter more often than it appears
          in your input. Spaces, numbers, and punctuation remain unchanged in the text box but are
@@ -713,6 +781,18 @@
          back to the rack input from anywhere on the page.</p>
       <p><strong>Reset All</strong>, or <kbd>Ctrl</kbd>+<kbd>R</kbd>, restores the filters and sort
          without clearing the rack or dictionary selection, then returns focus to the rack input.</p>
+    </section>
+
+    <section class="seo-section" id="recent-search-history">
+      <h2>Reuse recent searches with private search history</h2>
+      <p>Every successful word search is saved locally with its rack, optional pattern, active
+         filters, sorting method, result count, entropy, and estimated leave value. Select
+         <strong>Re-run</strong> to restore the same search settings and run the word finder again.
+         Pin useful searches, sort the list by date or rack, show only pinned entries, or delete
+         individual searches.</p>
+      <p>The word unscrambler keeps up to 50 unpinned recent searches. Pinned searches stay until
+         you remove them. History is stored only in this browser and is never uploaded; use
+         <strong>Clear all history</strong> whenever you want to remove the complete list.</p>
     </section>
 
     <section class="seo-section">
@@ -735,8 +815,9 @@
         <li><strong>Word Breakdown:</strong> explore rack balance, tile values, entropy, pattern,
             length, and score charts after the search returns matches.</li>
         <li><strong>Keyboard shortcuts:</strong> focus the rack with <kbd>Ctrl</kbd>+<kbd>I</kbd>,
-            search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, and open the analysis panel with
-            <kbd>Ctrl</kbd>+<kbd>B</kbd>.</li>
+            search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, open analysis with
+            <kbd>Ctrl</kbd>+<kbd>B</kbd>, and open History with <kbd>Ctrl</kbd>+<kbd>H</kbd>
+            (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> on Mac).</li>
         <li><strong>Definition and hook lookup:</strong> hover over or focus a result word to open links for
             Merriam-Webster, Collins, Wiktionary, Wordnik, Lexico's Dictionary.com successor,
             and Cambridge, then expand Hook Lookup for scored front and back hook words.</li>
@@ -937,12 +1018,22 @@
                  Press <kbd>Ctrl</kbd>+<kbd>R</kbd> to reset filters and sorting without clearing the
                  rack or dictionary; focus returns to the rack input.
                  After results appear, press <kbd>Ctrl</kbd>+<kbd>B</kbd>, or
-                 <kbd>Command</kbd>+<kbd>B</kbd> on a Mac, to expand and jump to Word Breakdown.</p>
+                 <kbd>Command</kbd>+<kbd>B</kbd> on a Mac, to expand and jump to Word Breakdown.
+                 Press <kbd>Ctrl</kbd>+<kbd>H</kbd>, or
+                 <kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> on a Mac, to open History.</p>
+            </li>
+            <li class="faq-item">
+              <h3>How does recent search history work?</h3>
+              <p>Each successful search saves its rack, pattern, filters, sorting method, result
+                 count, and gameplay metrics in this browser. Open <strong>History</strong> to
+                 rerun, pin, sort, or delete searches. The tool keeps up to 50 unpinned searches,
+                 while pinned searches remain until you delete them.</p>
             </li>
             <li class="faq-item">
               <h3>Are my searches private?</h3>
               <p>Yes. The dictionary and unscrambling logic run entirely in your browser.
-                 Your searches are never uploaded or stored.</p>
+                 History keeps recent searches only in this browser's local storage; searches are
+                 never uploaded, and you can delete individual entries or clear the list at any time.</p>
             </li>
           </ul>
         </div>
@@ -1002,6 +1093,36 @@
     </nav>
   </footer>
 
-  <script src="../assets/js/word-unscrambler.js?v=20260801-38" defer></script>
+  <div class="history-modal-backdrop" id="history-modal-backdrop" hidden>
+    <section
+      class="history-modal"
+      id="history-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="history-modal-title"
+      tabindex="-1"
+    >
+      <div class="history-modal-handle" aria-hidden="true"></div>
+      <div class="history-modal-heading">
+        <h2 id="history-modal-title">Recent searches</h2>
+        <button id="history-modal-close" type="button" aria-label="Close search history">&times;</button>
+      </div>
+      <p class="history-modal-instructions" id="history-modal-instructions">
+        Use the Up and Down Arrow keys to choose a search, then press Enter to load it.
+      </p>
+      <p class="history-modal-empty" id="history-modal-empty">No search history yet.</p>
+      <div
+        class="history-modal-list"
+        id="history-modal-list"
+        role="list"
+        aria-label="Recent searches"
+        aria-describedby="history-modal-instructions"
+      ></div>
+    </section>
+  </div>
+
+  <script src="../assets/js/word-unscrambler-input-rules.js?v=20260802-1" defer></script>
+  <script src="../assets/js/word-unscrambler-history-store.js?v=20260801-3" defer></script>
+  <script src="../assets/js/word-unscrambler.js?v=20260802-50" defer></script>
 </body>
 </html>
