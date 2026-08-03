@@ -148,3 +148,6 @@ vite.config.ts.timestamp-*
 # Codex-generated work files and deliverables
 .codex/
 outputs/
+
+# Rust build output (the browser-ready wasm-pack output under assets/ is committed)
+wasm/word-unscrambler-engine/target/

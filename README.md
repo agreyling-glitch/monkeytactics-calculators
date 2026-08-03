@@ -62,6 +62,25 @@ MonkeyTactics is a static, front-end-only site with no server-side application o
 
 The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source membership, allowing searches against either dictionary or their deduplicated union. Its static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser loads only the chunks relevant to the submitted letters, decompresses them with the native `DecompressionStream` API, and caches the indexed words for later searches. Exact word length, starting and ending letters, wildcard patterns, required/excluded letters, vowel and consonant minimums, score ranges, sorting, and dictionary-aware hooks are applied in the browser. Hook searches load the complete index on demand.
 
+### Building the Word Unscrambler WASM engine
+
+The Word Unscrambler search, filtering, sorting, scoring, hooks, and word analysis engine is implemented in Rust at `wasm/word-unscrambler-engine`. Install the `wasm32-unknown-unknown` target and `wasm-pack`, then build its browser package from the repository root:
+
+```powershell
+rustup target add wasm32-unknown-unknown
+cargo install wasm-pack
+wasm-pack build wasm/word-unscrambler-engine --target web --release --out-dir ../../assets/wasm/word-unscrambler --out-name word_unscrambler_engine
+```
+
+The checked-in bridge initializes the generated module before enabling the form:
+
+```html
+<script src="../assets/js/wasm-bridge.js" defer></script>
+<script src="../assets/js/word-unscrambler.js" defer></script>
+```
+
+Dictionary shards remain lazy-loaded by the existing UI and are passed to `init_engine` as arrays of `word\\tmembership` records. The WASM module authorizes `monkeytactics.com`, the Cloudflare Pages production and preview hosts under `monkeytactics-calculators.pages.dev`, and the local Wrangler host `127.0.0.1`.
+
 The OCR Utility uses Tesseract.js v5 and WebAssembly to recognize English text entirely in the browser. Uploaded PNG and JPG images are preprocessed with canvas grayscale and contrast enhancement, then passed to a dedicated OCR worker. Images and extracted text are never uploaded to MonkeyTactics.
 
 ---

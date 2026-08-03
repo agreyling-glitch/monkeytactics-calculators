@@ -54,11 +54,11 @@ const historyModalEmpty = document.querySelector("#history-modal-empty");
 const historyModalList = document.querySelector("#history-modal-list");
 const HistoryStore = window.MonkeyTacticsHistory;
 const InputRules = window.MonkeyTacticsWordInputRules;
+const Engine = window.MonkeyTacticsWasm;
 
 const MANIFEST_URL =
   "../assets/data/words/manifest.enable-sowpods-v2.json?v=enable-sowpods-v2";
 const CHUNK_BASE_URL = "../assets/data/words/";
-const MIN_WORD_LENGTH = 2;
 const VOWELS = "aeiou";
 const HIGH_VALUE_LETTERS = "jqxz";
 const LENGTH_GROUP_SORTS = new Set(["length-desc", "length-asc", "uses-most"]);
@@ -112,17 +112,7 @@ const DICTIONARY_BITS = Object.freeze({
   sowpods: 2,
   both: 3
 });
-const SCRABBLE_VALUES = Object.freeze({
-  a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1,
-  j: 8, k: 5, l: 1, m: 3, n: 1, o: 1, p: 3, q: 10, r: 1,
-  s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10
-});
-
 // Loaded chunks are indexed once and retained for subsequent searches.
-const signatureMap = new Map();
-const signaturesByLength = new Map();
-const wordMembership = new Map();
-const hookCache = new Map();
 const loadedChunks = new Set();
 const chunkPromises = new Map();
 let manifest = null;
@@ -135,9 +125,7 @@ let historyModalReturnFocus = null;
 let historySwipeStartY = null;
 let pendingHistorySearch = false;
 
-const getSignature = (word) => [...word].sort().join("");
-const getScrabbleScore = (word) =>
-  [...word].reduce((score, letter) => score + (SCRABBLE_VALUES[letter] ?? 0), 0);
+const getScrabbleScore = (word) => Engine.scoreWord(word);
 
 function focusFilterInput(filterInput) {
   const filterPanel = filterInput.closest("details");
@@ -326,19 +314,9 @@ function getHistoryEntropy(letters) {
   if (letters.length < 2) {
     return 0;
   }
-
-  const counts = new Map();
-  for (const letter of letters) {
-    counts.set(letter, (counts.get(letter) ?? 0) + 1);
-  }
-
-  const entropy = [...counts.values()].reduce((sum, count) => {
-    const probability = count / letters.length;
-    return sum - probability * Math.log2(probability);
-  }, 0);
-  const maximumEntropy = Math.log2(Math.min(26, letters.length));
-  const wildcardBonus = letters.includes("?") ? 0.08 : 0;
-  return Number(clamp(entropy / maximumEntropy + wildcardBonus, 0, 1).toFixed(2));
+  const analysis = Engine.analyzeWord(letters);
+  const wildcardBonus = analysis.wildcards > 0 ? 0.08 : 0;
+  return Number(clamp(analysis.normalizedEntropy + wildcardBonus, 0, 1).toFixed(2));
 }
 
 function getHistoryLeaveValue(letters, matches) {
@@ -738,32 +716,6 @@ function saveHistoryEntry(letters, pattern, matches, filters, sortMode) {
   renderAllHistory();
 }
 
-function createPatternExpression(pattern) {
-  if (!pattern) {
-    return null;
-  }
-
-  const source = [...pattern]
-    .map((character) => {
-      if (character === "?") {
-        return "[a-z]";
-      }
-
-      if (character === "*") {
-        return "[a-z]*";
-      }
-
-      return character;
-    })
-    .join("");
-
-  return new RegExp(`^${source}$`);
-}
-
-function getPatternMinimumLength(pattern) {
-  return pattern.replaceAll("*", "").length;
-}
-
 function showMessage(text) {
   message.textContent = text;
   message.hidden = false;
@@ -1137,9 +1089,10 @@ function createVowelBalanceChart(letters) {
     "Vowel/Consonant Ratio",
     "Shows the balance of playable letters in the entered rack."
   );
-  const vowels = getVowelCount(letters);
-  const wildcards = [...letters].filter((letter) => letter === "?").length;
-  const consonants = letters.length - vowels - wildcards;
+  const analysis = Engine.analyzeWord(letters);
+  const vowels = analysis.vowels;
+  const wildcards = analysis.wildcards;
+  const consonants = analysis.consonants;
   const vowelPercentage = Math.round((vowels / letters.length) * 100);
   const consonantPercentage = Math.round((consonants / letters.length) * 100);
   const layout = document.createElement("div");
@@ -1182,14 +1135,12 @@ function createTileValueChart(letters) {
     "Counts rack tiles by standard English Scrabble point value; unknown positions appear at 0."
   );
   const pointValues = [0, 1, 2, 3, 4, 5, 8, 10];
-  const counts = new Map(pointValues.map((points) => [points, 0]));
+  const analysis = Engine.analyzeWord(letters);
+  const counts = new Map(
+    pointValues.map((points) => [points, analysis.tileDistribution.get(points) ?? 0])
+  );
   const histogram = document.createElement("div");
   const total = document.createElement("div");
-
-  for (const letter of letters) {
-    const points = SCRABBLE_VALUES[letter] ?? 0;
-    counts.set(points, counts.get(points) + 1);
-  }
 
   const maximumCount = Math.max(1, ...counts.values());
   histogram.className = "tile-histogram";
@@ -1486,9 +1437,7 @@ function createPremiumPotentialChart(letters, matches) {
     "Theoretical multiplier potential only; exact premium hits require board-square positions."
   );
   const highValueCandidates = matches.filter((word) => getHighValueLetters(word)).length;
-  const highestTileValue = Math.max(
-    ...[...letters].map((letter) => SCRABBLE_VALUES[letter] ?? 0)
-  );
+  const highestTileValue = Math.max(...Engine.analyzeWord(letters).tileDistribution.keys());
   const averageWordScore = Math.round(
     matches.reduce((sum, word) => sum + getScrabbleScore(word), 0) / matches.length
   );
@@ -1527,59 +1476,7 @@ function createPremiumPotentialChart(letters, matches) {
 }
 
 function getBoardFitAnalysis(letters, options) {
-  const availableCounts = new Uint8Array(26);
-  const wildcardCount = [...letters].filter((letter) => letter === "?").length;
-  const patternExpression = createPatternExpression(options.pattern);
-  let candidates = 0;
-  let fitting = 0;
-
-  for (const letter of letters) {
-    if (letter === "?") {
-      continue;
-    }
-
-    availableCounts[letter.charCodeAt(0) - 97] += 1;
-  }
-
-  for (let length = MIN_WORD_LENGTH; length <= letters.length; length += 1) {
-    const signatures = signaturesByLength.get(length) ?? [];
-
-    signatures.forEach((signature) => {
-      if (!canBuildFromLetters(signature, availableCounts, wildcardCount)) {
-        return;
-      }
-
-      signatureMap.get(signature).forEach((word) => {
-        const membership = wordMembership.get(word) ?? 0;
-
-        if ((membership & options.dictionaryBit) === 0) {
-          return;
-        }
-
-        candidates += 1;
-
-        if (options.wordLength && word.length !== options.wordLength) {
-          return;
-        }
-
-        if (patternExpression && !patternExpression.test(word)) {
-          return;
-        }
-
-        if (options.startsWith && !word.startsWith(options.startsWith)) {
-          return;
-        }
-
-        if (options.endsWith && !word.endsWith(options.endsWith)) {
-          return;
-        }
-
-        fitting += 1;
-      });
-    });
-  }
-
-  return { candidates, fitting, excluded: candidates - fitting };
+  return Engine.boardFitAnalysis(letters, options.pattern, options);
 }
 
 function createBoardFitChart(letters, options) {
@@ -1619,21 +1516,7 @@ function createEntropyChart(letters) {
     "Rack Entropy",
     "A normalized Shannon-entropy score for letter variety; repeated letters reduce flexibility."
   );
-  const counts = new Map();
-
-  for (const letter of letters) {
-    counts.set(letter, (counts.get(letter) ?? 0) + 1);
-  }
-
-  const entropy = [...counts.values()].reduce((sum, count) => {
-    const probability = count / letters.length;
-    return sum - probability * Math.log2(probability);
-  }, 0);
-  const maximumEntropy = letters.length > 1 ? Math.log2(Math.min(26, letters.length)) : 1;
-  const wildcardBonus = letters.includes("?") ? 8 : 0;
-  const entropyScore = Math.round(
-    clamp((entropy / maximumEntropy) * 100 + wildcardBonus, 0, 100)
-  );
+  const entropyScore = Engine.analyzeWord(letters).entropyScore;
   const rating = entropyScore >= 75
     ? "High flexibility"
     : entropyScore >= 45
@@ -1708,40 +1591,6 @@ function renderWordBreakdown() {
   breakdownCharts.append(fragment);
 }
 
-function indexWords(records) {
-  records.forEach((record) => {
-    const [word, membershipValue] = record.split("\t");
-    const membership = Number.parseInt(membershipValue, 10);
-
-    if (!/^[a-z]+$/.test(word) || word.length < MIN_WORD_LENGTH) {
-      return;
-    }
-
-    if (!Number.isInteger(membership) || membership < 1 || membership > 3) {
-      return;
-    }
-
-    wordMembership.set(word, membership);
-
-    const signature = getSignature(word);
-    const matches = signatureMap.get(signature);
-
-    if (matches) {
-      matches.push(word);
-      return;
-    }
-
-    signatureMap.set(signature, [word]);
-
-    const signatures = signaturesByLength.get(word.length);
-    if (signatures) {
-      signatures.push(signature);
-    } else {
-      signaturesByLength.set(word.length, [signature]);
-    }
-  });
-}
-
 async function decodeChunk(response) {
   const bytes = new Uint8Array(await response.arrayBuffer());
   const isGzip = bytes[0] === 0x1f && bytes[1] === 0x8b;
@@ -1784,7 +1633,7 @@ async function loadChunk(letter) {
     }
 
     const text = await decodeChunk(response);
-    indexWords(text.split(/\r?\n/).filter(Boolean));
+    Engine.initEngine(text.split(/\r?\n/).filter(Boolean));
     loadedChunks.add(letter);
   })();
 
@@ -1808,319 +1657,16 @@ async function loadAllChunks() {
   await Promise.all(Object.keys(manifest.chunks).map(loadChunk));
 }
 
-function canBuildFromLetters(signature, availableCounts, wildcardCount = 0) {
-  let currentIndex = -1;
-  let usedCount = 0;
-  let missingCount = 0;
-
-  for (const letter of signature) {
-    const index = letter.charCodeAt(0) - 97;
-
-    if (index === currentIndex) {
-      usedCount += 1;
-    } else {
-      currentIndex = index;
-      usedCount = 1;
-    }
-
-    if (usedCount > availableCounts[index]) {
-      missingCount += 1;
-    }
-
-    if (missingCount > wildcardCount) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function containsRequiredLetters(word, requiredLetters) {
-  if (!requiredLetters) {
-    return true;
-  }
-
-  const wordCounts = new Uint8Array(26);
-
-  for (const letter of word) {
-    wordCounts[letter.charCodeAt(0) - 97] += 1;
-  }
-
-  for (const letter of requiredLetters) {
-    const index = letter.charCodeAt(0) - 97;
-
-    if (wordCounts[index] === 0) {
-      return false;
-    }
-
-    wordCounts[index] -= 1;
-  }
-
-  return true;
-}
-
 function getHighValueLetters(word) {
-  return [...new Set([...word].filter((letter) => HIGH_VALUE_LETTERS.includes(letter)))]
-    .sort()
-    .join("");
-}
-
-function getHighValueScore(word) {
-  return [...word].reduce(
-    (score, letter) =>
-      score + (HIGH_VALUE_LETTERS.includes(letter) ? SCRABBLE_VALUES[letter] : 0),
-    0
-  );
-}
-
-function getVowelCount(word) {
-  return [...word].filter((letter) => VOWELS.includes(letter)).length;
-}
-
-function hasDictionaryWord(word, dictionaryBit) {
-  return ((wordMembership.get(word) ?? 0) & dictionaryBit) !== 0;
+  return Engine.analyzeWord(word).highValueLetters;
 }
 
 function getHookInfo(word, dictionaryBit) {
-  const cacheKey = `${dictionaryBit}:${word}`;
-
-  if (hookCache.has(cacheKey)) {
-    return hookCache.get(cacheKey);
-  }
-
-  const front = [];
-  const back = [];
-
-  for (let code = 97; code <= 122; code += 1) {
-    const letter = String.fromCharCode(code);
-
-    if (hasDictionaryWord(`${letter}${word}`, dictionaryBit)) {
-      front.push(letter);
-    }
-
-    if (hasDictionaryWord(`${word}${letter}`, dictionaryBit)) {
-      back.push(letter);
-    }
-  }
-
-  const hooks = {
-    front,
-    back,
-    hasSHook: back.includes("s"),
-    total: front.length + back.length
-  };
-
-  hookCache.set(cacheKey, hooks);
-  return hooks;
-}
-
-function matchesHookFilter(word, hookFilter, dictionaryBit) {
-  if (!hookFilter) {
-    return true;
-  }
-
-  const hooks = getHookInfo(word, dictionaryBit);
-
-  switch (hookFilter) {
-    case "none":
-      return hooks.total === 0;
-    case "any":
-      return hooks.total > 0;
-    case "s":
-      return hooks.hasSHook;
-    case "front":
-      return hooks.front.length > 0;
-    case "back":
-      return hooks.back.length > 0;
-    case "multiple":
-      return hooks.total > 1;
-    default:
-      return true;
-  }
-}
-
-function getPatternStrength(word, pattern) {
-  if (!pattern || !word.length) {
-    return 0;
-  }
-
-  const literalCount = [...pattern]
-    .filter((character) => character !== "?" && character !== "*")
-    .length;
-
-  return literalCount / word.length;
-}
-
-function sortMatches(matches, options) {
-  const alphabetical = (a, b) => a.localeCompare(b);
-  const longestFirst = (a, b) => b.length - a.length || alphabetical(a, b);
-  let compare = longestFirst;
-
-  switch (options.sortBy) {
-    case "score-desc":
-      compare = (a, b) =>
-        getScrabbleScore(b) - getScrabbleScore(a) || longestFirst(a, b);
-      break;
-    case "alpha":
-      compare = alphabetical;
-      break;
-    case "length-asc":
-      compare = (a, b) => a.length - b.length || alphabetical(a, b);
-      break;
-    case "high-value":
-      compare = (a, b) =>
-        getHighValueScore(b) - getHighValueScore(a) ||
-        getScrabbleScore(b) - getScrabbleScore(a) ||
-        longestFirst(a, b);
-      break;
-    case "bingo":
-      compare = (a, b) =>
-        Number(b.length === 7) - Number(a.length === 7) ||
-        getScrabbleScore(b) - getScrabbleScore(a) ||
-        longestFirst(a, b);
-      break;
-    case "hooks-total":
-      compare = (a, b) =>
-        getHookInfo(b, options.dictionaryBit).total -
-          getHookInfo(a, options.dictionaryBit).total ||
-        longestFirst(a, b);
-      break;
-    case "hooks-s":
-      compare = (a, b) =>
-        Number(getHookInfo(b, options.dictionaryBit).hasSHook) -
-          Number(getHookInfo(a, options.dictionaryBit).hasSHook) ||
-        longestFirst(a, b);
-      break;
-    case "hooks-front":
-      compare = (a, b) =>
-        getHookInfo(b, options.dictionaryBit).front.length -
-          getHookInfo(a, options.dictionaryBit).front.length ||
-        longestFirst(a, b);
-      break;
-    case "hooks-back":
-      compare = (a, b) =>
-        getHookInfo(b, options.dictionaryBit).back.length -
-          getHookInfo(a, options.dictionaryBit).back.length ||
-        longestFirst(a, b);
-      break;
-    case "pattern-strength":
-      compare = (a, b) =>
-        getPatternStrength(b, options.pattern) - getPatternStrength(a, options.pattern) ||
-        longestFirst(a, b);
-      break;
-    default:
-      compare = longestFirst;
-  }
-
-  return matches.sort(compare);
+  return Engine.findHooks(word, dictionaryBit);
 }
 
 function findMatches(letters, options) {
-  const availableCounts = new Uint8Array(26);
-  const wildcardCount = [...letters].filter((letter) => letter === "?").length;
-  const patternExpression = createPatternExpression(options.pattern);
-  const patternHasVariableLength = options.pattern.includes("*");
-  const patternMinimumLength = getPatternMinimumLength(options.pattern);
-
-  for (const letter of letters) {
-    if (letter === "?") {
-      continue;
-    }
-
-    availableCounts[letter.charCodeAt(0) - 97] += 1;
-  }
-
-  const matches = [];
-  const maximumLength = options.wordLength || letters.length;
-  const minimumLength = options.wordLength || MIN_WORD_LENGTH;
-
-  if (maximumLength > letters.length) {
-    return matches;
-  }
-
-  if (
-    patternExpression &&
-    options.wordLength &&
-    (
-      options.wordLength < patternMinimumLength ||
-      (!patternHasVariableLength && options.pattern.length !== options.wordLength)
-    )
-  ) {
-    return matches;
-  }
-
-  for (let length = maximumLength; length >= minimumLength; length -= 1) {
-    if (
-      patternExpression &&
-      (length < patternMinimumLength || (!patternHasVariableLength && options.pattern.length !== length))
-    ) {
-      continue;
-    }
-
-    const signatures = signaturesByLength.get(length) ?? [];
-
-    signatures.forEach((signature) => {
-      if (canBuildFromLetters(signature, availableCounts, wildcardCount)) {
-        signatureMap.get(signature).forEach((word) => {
-          const membership = wordMembership.get(word) ?? 0;
-
-          if ((membership & options.dictionaryBit) === 0) {
-            return;
-          }
-
-          if (patternExpression && !patternExpression.test(word)) {
-            return;
-          }
-
-          if (options.startsWith && !word.startsWith(options.startsWith)) {
-            return;
-          }
-
-          if (options.endsWith && !word.endsWith(options.endsWith)) {
-            return;
-          }
-
-          if ([...options.excludeLetters].some((letter) => word.includes(letter))) {
-            return;
-          }
-
-          if (options.highValueOnly && !getHighValueLetters(word)) {
-            return;
-          }
-
-          const vowelCount = getVowelCount(word);
-
-          if (
-            vowelCount < options.minimumVowels ||
-            word.length - vowelCount < options.minimumConsonants
-          ) {
-            return;
-          }
-
-          const score = getScrabbleScore(word);
-
-          if (
-            (options.minimumScore !== null && score < options.minimumScore) ||
-            (options.maximumScore !== null && score > options.maximumScore)
-          ) {
-            return;
-          }
-
-          if (!containsRequiredLetters(word, options.mustInclude)) {
-            return;
-          }
-
-          if (!matchesHookFilter(word, options.hookFilter, options.dictionaryBit)) {
-            return;
-          }
-
-          matches.push(word);
-        });
-      }
-    });
-  }
-
-  return sortMatches(matches, options);
+  return Engine.unscramble(letters, options.pattern, options);
 }
 
 async function handleSubmit(event) {
@@ -2335,6 +1881,7 @@ async function handleSubmit(event) {
 
 async function loadManifest() {
   try {
+    await Engine.ready;
     const response = await fetch(MANIFEST_URL);
 
     if (!response.ok) {
@@ -2352,9 +1899,15 @@ async function loadManifest() {
     input.focus();
     runPendingHistorySearch();
   } catch (error) {
-    console.error("Unable to load dictionary manifest:", error);
-    buttonLabel.textContent = "Dictionary unavailable";
-    showMessage("The dictionary index could not be loaded. Please refresh the page.");
+    console.error("Unable to initialize the word engine:", error);
+    if (error.message === "Unauthorized domain") {
+      alert("Unauthorized domain");
+      buttonLabel.textContent = "Unauthorized domain";
+      showMessage("The Word Unscrambler is not authorized on this host.");
+    } else {
+      buttonLabel.textContent = "Dictionary unavailable";
+      showMessage("The dictionary index could not be loaded. Please refresh the page.");
+    }
   }
 }
 

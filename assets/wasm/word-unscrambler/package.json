@@ -1,0 +1,17 @@
+{
+  "name": "word-unscrambler-engine",
+  "type": "module",
+  "description": "Rust/WASM search engine for the MonkeyTactics Word Unscrambler",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "word_unscrambler_engine_bg.wasm",
+    "word_unscrambler_engine.js",
+    "word_unscrambler_engine.d.ts"
+  ],
+  "main": "word_unscrambler_engine.js",
+  "types": "word_unscrambler_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
