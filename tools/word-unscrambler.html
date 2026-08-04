@@ -8,25 +8,25 @@
   <link rel="manifest" href="../site.webmanifest">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Word Unscrambler with Hooks, Patterns & Tile Scores</title>
-  <meta name="description" content="Unscramble letters with smart patterns, hook detection, tile scores, and strategic Scrabble filters. Fast, accurate results with full in‑browser analysis.">
+  <title>Free Word Unscrambler &amp; Scrabble Word Finder | MonkeyTactics</title>
+  <meta name="description" content="Unscramble letters into words with wildcards, patterns, Scrabble scores, hooks, filters, private history, a Pick List, and in-browser rack analysis.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-08-02">
+  <meta name="date" content="2026-08-03">
   <meta name="theme-color" content="#0f172a">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/word-unscrambler">
 
-  <meta property="og:title" content="Word Unscrambler with Hooks, Patterns & Tile Scores">
-  <meta property="og:description" content="Unscramble letters with smart patterns, hook detection, tile scores, and strategic Scrabble filters. Fast, accurate results with full in‑browser analysis.">
+  <meta property="og:title" content="Free Word Unscrambler &amp; Scrabble Word Finder">
+  <meta property="og:description" content="Find words from rack letters with wildcards, patterns, scores, hooks, advanced filters, private History, Pick List, and rack analysis.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://monkeytactics.com/tools/word-unscrambler">
   <meta property="og:site_name" content="MonkeyTactics">
   <meta property="og:locale" content="en_US">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Word Unscrambler with Hooks, Patterns & Tile Scores">
-  <meta name="twitter:description" content="Unscramble letters with smart patterns, hook detection, tile scores, and strategic Scrabble filters. Fast, accurate results with full in‑browser analysis.">
+  <meta name="twitter:title" content="Free Word Unscrambler &amp; Scrabble Word Finder">
+  <meta name="twitter:description" content="Find words from rack letters with wildcards, patterns, scores, hooks, advanced filters, private History, Pick List, and rack analysis.">
 
   <script type="application/ld+json">
   {
@@ -44,9 +44,9 @@
       {
         "@type": "WebApplication",
         "@id": "https://monkeytactics.com/tools/word-unscrambler#app",
-        "name": "Word Unscrambler with Hooks, Patterns & Tile Scores",
+        "name": "Free Word Unscrambler and Scrabble Word Finder",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "description": "A free browser-based word unscrambler and Scrabble word finder with variable-length patterns, ENABLE and SOWPODS selection, advanced filters, scored hook lookups, private recent search history, strategic sorting, and rack-analysis charts.",
+        "description": "A free browser-based word unscrambler and Scrabble word finder with wildcard patterns, ENABLE and SOWPODS selection, advanced filters, scored hook lookups, private History, a saved Pick List, strategic sorting, and rack-analysis charts.",
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Word Game Utility",
         "operatingSystem": "Any",
@@ -63,12 +63,15 @@
           "Adjust word length, minimum vowels, and minimum consonants with numeric controls",
           "Filter by high-value tiles, score ranges, and front, back, S, multiple, or no hooks",
           "Detect front hooks, back hooks, S-hooks, multiple hooks, and words with no hooks",
-          "Open an on-demand Hook Lookup with complete front and back hook words and inline Scrabble scores",
+          "Open Available Hooks with complete front and back hook words and inline Scrabble scores",
           "Use a compact sort menu or grouped Basic, Strategic, and Hook sorting options",
           "Automatically rerun the current search when a new sorting method is selected",
           "Save, pin, sort, rerun, and delete recent searches in local browser storage",
+          "Save promising words to a private Pick List with notes, scores, rack tiles, and gameplay flags",
+          "Insert a saved Pick List word back into the rack input",
           "Open Word Breakdown charts for rack balance, tile values, entropy, word patterns, lengths, scores, and gameplay estimates",
-          "Use Ctrl+I to focus the rack, Ctrl+Enter to search, Ctrl+R to reset filters, Ctrl+B to open Word Breakdown, and Ctrl+H to open History",
+          "Use a confirmed Reset All action to clear the rack, filters, History, Pick List, and current results",
+          "Use Ctrl+I to focus the rack, Ctrl+Enter to search, Ctrl+R to open Reset All, Ctrl+B to open Word Breakdown, Ctrl+H to open History, and Alt+L to toggle Pick List",
           "Respect repeated-letter frequency",
           "Group results by word length",
           "Calculate English Scrabble tile scores",
@@ -83,20 +86,20 @@
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-08-02"
+        "dateModified": "2026-08-03"
       },
       {
         "@type": "WebPage",
         "@id": "https://monkeytactics.com/tools/word-unscrambler#webpage",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "name": "Word Unscrambler with Hooks, Patterns & Tile Scores",
-        "description": "Unscramble letters into playable words with variable-length patterns, dictionary selection, advanced filters, scored hook lookups, strategic sorts, charts, recent search history, and keyboard shortcuts.",
+        "name": "Free Word Unscrambler and Scrabble Word Finder",
+        "description": "Unscramble letters into playable words with wildcard patterns, dictionary selection, advanced filters, scored hook lookups, strategic sorts, private History, a Pick List, charts, and keyboard shortcuts.",
         "inLanguage": "en-US",
         "isPartOf": { "@id": "https://monkeytactics.com/#website" },
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/word-unscrambler#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/word-unscrambler#app" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-08-02"
+        "dateModified": "2026-08-03"
       }
     ]
   }
@@ -135,7 +138,7 @@
       {
         "@type": "Question",
         "name": "How are Scrabble scores calculated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The displayed score is the sum of the standard English Scrabble value for every letter. Premium squares and blank tiles are not included. Seven-letter words receive a separate Bingo +50 candidate badge, and Hook Lookup shows the base score beside each complete hook word." }
+        "acceptedAnswer": { "@type": "Answer", "text": "The displayed score is the sum of the standard English Scrabble value for every letter. Premium squares and blank tiles are not included. Seven-letter words receive a separate Bingo +50 candidate badge, and Available Hooks shows the base score beside each complete hook word." }
       },
       {
         "@type": "Question",
@@ -150,7 +153,7 @@
       {
         "@type": "Question",
         "name": "What are front hooks, back hooks, and S-hooks?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A hook is a letter added to the front or back of a word to make another valid word in the selected dictionary. An S-hook specifically adds S to the end. Use the Hooks pills to find S, Front, Back, Multi, or No Hook results. Expand Hook Lookup for a result to see complete hook words and their base Scrabble scores." }
+        "acceptedAnswer": { "@type": "Answer", "text": "A hook is a letter added to the front or back of a word to make another valid word in the selected dictionary. An S-hook specifically adds S to the end. Use the Hooks pills to find S, Front, Back, Multi, or No Hook results. Open a result's lookup window to see complete hook words and their base Scrabble scores." }
       },
       {
         "@type": "Question",
@@ -160,7 +163,7 @@
       {
         "@type": "Question",
         "name": "How do I look up definitions and hooks for a result word?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Hover over, focus, or select a result word to open links for Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge. Expand Hook Lookup in the same popup to load complete front and back hook words with inline Scrabble scores." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Hover over, focus, or select a result word to open links for Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge. The same popup automatically loads complete front and back hook words with inline Scrabble scores." }
       },
       {
         "@type": "Question",
@@ -175,7 +178,7 @@
       {
         "@type": "Question",
         "name": "Does the Word Unscrambler have keyboard shortcuts?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+I, or Command+I on a Mac, to focus the rack input. Press Ctrl+Enter, or Command+Enter, to search. Press Ctrl+R to reset filters and sorting. Press Ctrl+B, or Command+B, to open Word Breakdown. Press Ctrl+H, or Command+Shift+H, to open History." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+I, or Command+I on a Mac, to focus the rack input. Press Ctrl+Enter, or Command+Enter, to search. Press Ctrl+R to reset the rack, basic and advanced filters, History, and Pick List. Press Ctrl+B, or Command+B, to open Word Breakdown. Press Ctrl+H, or Command+Shift+H, to open History." }
       },
       {
         "@type": "Question",
@@ -184,15 +187,25 @@
       },
       {
         "@type": "Question",
+        "name": "What is the Word Unscrambler Pick List?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The Pick List saves words you want to compare or reuse. Each saved word can include a note and displays its tile score, length, rack tiles, and gameplay flags. Pick List data stays in local browser storage until you remove it or approve Reset All." }
+      },
+      {
+        "@type": "Question",
+        "name": "What does Reset All clear?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Reset All opens a warning before clearing anything. Select OK to clear the rack input, Basic Filters, Advanced Filters, History, Pick List, and current results. Select Cancel to keep everything unchanged. Your dictionary and sorting selections are preserved." }
+      },
+      {
+        "@type": "Question",
         "name": "Are my searches private?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Matching runs entirely in your browser. Your last searches are stored only in local browser storage for History and are never uploaded." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Matching runs entirely in your browser. History and Pick List data are stored only in local browser storage and are never uploaded." }
       }
     ]
   }
   </script>
 
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260802-51">
+  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260803-16">
   <link rel="stylesheet" href="../assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/ads.js" defer></script>
   <!-- TrustBox script -->
@@ -235,7 +248,10 @@
         <span aria-current="page">Word Unscrambler</span>
       </nav>
       <h1 id="tool-heading">Word Unscrambler &amp; Scrabble Word Finder</h1>
-      <p>Unlock powerful word‑finding and Scrabble analysis with flexible letter matching, wildcard patterns, dictionary‑aware hook detection, and strategic sorting options. Build words from your rack using ENABLE, SOWPODS, or both, then dive deeper with score ranking, bingo potential, high‑value tile filters, and complete front/back hook lookup. After each search, explore Word Breakdown charts to understand rack balance, tile value distribution, entropy, pattern strength, and estimated board‑fit insights. Everything runs locally in your browser, giving you fast, accurate, privacy‑friendly word solving and gameplay strategy. </p>
+      <p>Unscramble rack letters into words with wildcards, positional patterns, Scrabble tile
+         scores, dictionary-aware hooks, and strategic filters. Search ENABLE, SOWPODS, or both;
+         compare promising words in a private Pick List; reuse recent searches; and explore rack
+         analysis in Word Breakdown. Matching, History, and saved picks stay in your browser.</p>
     </section>
 
     <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
@@ -299,6 +315,7 @@
               <label class="visually-hidden" for="letters">Letters to Unscramble</label>
               <div class="primary-search-row">
                 <div class="primary-search-input">
+                  <div class="rack-tiles" id="rack-tiles" aria-hidden="true"></div>
                   <input
                     id="letters"
                     name="letters"
@@ -355,7 +372,7 @@
                     id="reset-all-filters"
                     type="button"
                     aria-keyshortcuts="Control+R"
-                    title="Reset all filters (Ctrl+R)"
+                    title="Reset rack, filters, History, and Pick List (Ctrl+R)"
                   >
                     <span class="reset-filter-icon" aria-hidden="true">&#8634;</span>
                     <span>Reset All</span>
@@ -367,6 +384,7 @@
               </div>
             </div>
 
+            <div class="filter-section-shell">
             <details class="basic-filters">
               <summary>
                 <span class="heading-with-icon">
@@ -456,7 +474,16 @@
                 </div>
               </div>
             </details>
+            <button
+              class="filter-section-reset"
+              id="reset-basic-filters"
+              type="button"
+              title="Reset Basic Filters"
+              hidden
+            >Reset</button>
+            </div>
 
+            <div class="filter-section-shell filter-section-shell--advanced">
             <details class="advanced-filters">
               <summary>
                 <span class="heading-with-icon">
@@ -637,6 +664,14 @@
 
               </div>
             </details>
+            <button
+              class="filter-section-reset"
+              id="reset-advanced-filters"
+              type="button"
+              title="Reset Advanced Filters"
+              hidden
+            >Reset</button>
+            </div>
 
             <p class="calc-error" id="form-message" role="alert" hidden></p>
 
@@ -735,6 +770,42 @@
                   </div>
                 </div>
               </details>
+
+              <details class="pick-list-panel" id="pick-list-panel">
+                <summary aria-keyshortcuts="Alt+L" title="Toggle Pick List (Alt+L)">
+                  <span class="heading-with-icon">
+                    <span class="heading-icon heading-icon--pick-list" aria-hidden="true"></span>
+                    Pick List
+                  </span>
+                  <span class="pick-list-count" id="pick-list-count">0 words</span>
+                </summary>
+                <div class="pick-list-panel-content">
+                  <div class="history-toolbar pick-list-toolbar">
+                    <p class="pick-list-help">Pick words from the results panel to build your shortlist.</p>
+                    <label for="pick-list-sort">
+                      <span>Sort</span>
+                      <select id="pick-list-sort">
+                        <option value="score-desc">Sort by score</option>
+                        <option value="hook-desc">Sort by hook potential</option>
+                        <option value="length-desc">Sort by length</option>
+                        <option value="density-desc">Sort by tile value density</option>
+                      </select>
+                    </label>
+                    <button class="pick-list-clear" id="pick-list-clear" type="button">Clear pick list</button>
+                  </div>
+                  <p class="pick-list-empty" id="pick-list-empty">Picked words will appear here and stay only in this browser.</p>
+                  <div
+                    class="pick-list-viewport"
+                    id="pick-list-viewport"
+                    role="region"
+                    aria-label="Picked words"
+                    tabindex="-1"
+                    hidden
+                  >
+                    <div id="pick-list-virtual-list"></div>
+                  </div>
+                </div>
+              </details>
             </section>
           </div>
           </div>
@@ -764,11 +835,14 @@
             smart input, or press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>. On a Mac, use
             <kbd>Command</kbd>+<kbd>Enter</kbd>.</li>
         <li><strong>Inspect a word:</strong> hover over, focus, or select a result word to open its
-            dictionary links. Expand <strong>Hook Lookup</strong> only when needed to load complete
-            front and back hook words with inline Scrabble point values.</li>
+            dictionary links and automatically load complete front and back hook words with inline
+            Scrabble point values.</li>
         <li><strong>Analyze the matches:</strong> when results exist, expand
             <strong>Word Breakdown</strong> beneath the word list or press
             <kbd>Ctrl</kbd>+<kbd>B</kbd> to jump to it.</li>
+        <li><strong>Save candidate words:</strong> select <strong>Pick</strong> on a result to add
+            it to the private Pick List, where you can compare scores, add notes, or insert it
+            back into the rack.</li>
         <li><strong>Reuse a recent search:</strong> open <strong>History</strong> to restore a rack,
             pattern, filters, and sorting method. On desktop, press Down Arrow in the rack input
             for a compact recent-search list.</li>
@@ -779,8 +853,9 @@
          compressed and loaded in small chunks only when a search needs them.</p>
       <p>Press <kbd>Ctrl</kbd>+<kbd>I</kbd>, or <kbd>Command</kbd>+<kbd>I</kbd> on a Mac, to jump
          back to the rack input from anywhere on the page.</p>
-      <p><strong>Reset All</strong>, or <kbd>Ctrl</kbd>+<kbd>R</kbd>, restores the filters and sort
-         without clearing the rack or dictionary selection, then returns focus to the rack input.</p>
+      <p><strong>Reset All</strong>, or <kbd>Ctrl</kbd>+<kbd>R</kbd>, clears the rack, Basic and
+         Advanced Filters, History, Pick List, and current results. A warning with
+         <strong>OK</strong> and <strong>Cancel</strong> appears before anything is removed.</p>
     </section>
 
     <section class="seo-section" id="recent-search-history">
@@ -793,6 +868,19 @@
       <p>The word unscrambler keeps up to 50 unpinned recent searches. Pinned searches stay until
          you remove them. History is stored only in this browser and is never uploaded; use
          <strong>Clear all history</strong> whenever you want to remove the complete list.</p>
+    </section>
+
+    <section class="seo-section" id="word-pick-list">
+      <h2>Build a Scrabble Pick List and compare words</h2>
+      <p>Select <strong>Pick</strong> beside any result to save that word for closer comparison.
+         The Pick List shows its word length, base Scrabble score, tile rack, and gameplay flags
+         for hook potential, rack balance, high-value letters, and anagram count. Add a private
+         note to remember a board position or planned play, then sort saved words by score, hook
+         potential, length, or tile-value density.</p>
+      <p>Use <strong>Insert</strong> to place a saved word back in the rack input, or press
+         <kbd>Alt</kbd>+<kbd>L</kbd> to toggle the Pick List from the keyboard. Saved words and
+         notes remain only in this browser until you remove them, clear the list, or approve
+         <strong>Reset All</strong>.</p>
     </section>
 
     <section class="seo-section">
@@ -814,13 +902,15 @@
         <li><strong>Scrabble scores:</strong> compare standard tile values before board bonuses.</li>
         <li><strong>Word Breakdown:</strong> explore rack balance, tile values, entropy, pattern,
             length, and score charts after the search returns matches.</li>
+        <li><strong>Private Pick List:</strong> save, annotate, sort, compare, and reinsert useful
+            words without uploading them.</li>
         <li><strong>Keyboard shortcuts:</strong> focus the rack with <kbd>Ctrl</kbd>+<kbd>I</kbd>,
             search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, open analysis with
             <kbd>Ctrl</kbd>+<kbd>B</kbd>, and open History with <kbd>Ctrl</kbd>+<kbd>H</kbd>
             (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> on Mac).</li>
         <li><strong>Definition and hook lookup:</strong> hover over or focus a result word to open links for
             Merriam-Webster, Collins, Wiktionary, Wordnik, Lexico's Dictionary.com successor,
-            and Cambridge, then expand Hook Lookup for scored front and back hook words.</li>
+            and Cambridge, along with scored front and back hook words.</li>
         <li><strong>Dictionary choice:</strong> search ENABLE, SOWPODS, or their deduplicated union.</li>
       </ul>
     </section>
@@ -845,8 +935,8 @@
          rack for words beginning with A and ending with E, with any number of letters between.</p>
       <p>Use <strong>Exclude Letters</strong> to remove words containing unwanted tiles. Advanced
          Filters can require at least one high-value tile, set minimum vowel or consonant counts,
-         and constrain the base tile score. <strong>Reset All</strong> restores these
-         options without clearing the entered letters or primary dictionary choice.</p>
+         and constrain the base tile score. <strong>Reset All</strong> clears these options along
+         with the rack, History, and Pick List without changing the primary dictionary choice.</p>
     </section>
 
     <section class="seo-section">
@@ -868,10 +958,10 @@
          front hooks, back hooks, multiple hooks, or any hookable word.</p>
       <p>Select <strong>No Hook</strong> to find words that cannot be extended by one letter at
          either the front or back in the selected dictionary.</p>
-      <p>Hover over, focus, or select a result word, then expand <strong>Hook Lookup</strong> in the
-         definition popup to see complete front and back hook words. Each hook is shown with its
+      <p>Hover over, focus, or select a result word to open <strong>Available Hooks</strong> in the
+         definition popup and see complete front and back hook words. Each hook is shown with its
          base Scrabble score, such as <code>PANE (+6)</code>. The complete dictionary index loads
-         only when Hook Lookup is expanded.</p>
+         only when the lookup window opens.</p>
       <p>Hook detection respects the selected ENABLE or SOWPODS dictionary. Because a front hook
          may begin with any letter, hook filtering and sorting load the complete selected index
          on demand; ordinary unscramble searches continue loading only relevant chunks.</p>
@@ -955,7 +1045,7 @@
               <p>The displayed score adds the standard English tile value of each letter in the
                  word. It does not include double- or triple-letter squares, word multipliers, or
                  zero-point blank tiles. Seven-letter words receive a separate
-                 <strong>Bingo +50</strong> candidate badge. Hook Lookup also shows the base score
+                 <strong>Bingo +50</strong> candidate badge. Available Hooks also shows the base score
                  beside each complete hook word.</p>
             </li>
             <li class="faq-item">
@@ -978,8 +1068,8 @@
               <h3>What are front hooks, back hooks, and S-hooks?</h3>
               <p>A hook adds one letter before or after a word to create another valid word in the
                  selected dictionary. An S-hook specifically adds S to the end. Use the Hooks pills
-                 to find S, Front, Back, Multi, or <strong>No Hook</strong> results. Expand Hook
-                 Lookup for a result to see complete hook words and their base Scrabble scores.</p>
+                 to find S, Front, Back, Multi, or <strong>No Hook</strong> results. Open a result's
+                 lookup window to see complete hook words and their base Scrabble scores.</p>
             </li>
             <li class="faq-item">
               <h3>What sorting options are available?</h3>
@@ -991,9 +1081,8 @@
             <li class="faq-item">
               <h3>How do I look up definitions and hooks for a result word?</h3>
               <p>Hover over, focus, or select a result word to open links for Merriam-Webster,
-                 Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge. Expand
-                 <strong>Hook Lookup</strong> in the same popup to load complete front and back hook
-                 words with inline Scrabble scores.</p>
+                 Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge. The same popup
+                 automatically loads complete front and back hook words with inline Scrabble scores.</p>
             </li>
             <li class="faq-item">
               <h3>What does Word Breakdown show?</h3>
@@ -1015,8 +1104,8 @@
                  <kbd>Command</kbd>+<kbd>I</kbd> on a Mac, to focus the rack input instantly.
                  Press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, or
                  <kbd>Command</kbd>+<kbd>Enter</kbd> on a Mac, to unscramble the current input.
-                 Press <kbd>Ctrl</kbd>+<kbd>R</kbd> to reset filters and sorting without clearing the
-                 rack or dictionary; focus returns to the rack input.
+                 Press <kbd>Ctrl</kbd>+<kbd>R</kbd> to reset the rack, Basic and Advanced Filters,
+                 History, and Pick List; focus returns to the rack input.
                  After results appear, press <kbd>Ctrl</kbd>+<kbd>B</kbd>, or
                  <kbd>Command</kbd>+<kbd>B</kbd> on a Mac, to expand and jump to Word Breakdown.
                  Press <kbd>Ctrl</kbd>+<kbd>H</kbd>, or
@@ -1030,10 +1119,25 @@
                  while pinned searches remain until you delete them.</p>
             </li>
             <li class="faq-item">
+              <h3>What is the Word Unscrambler Pick List?</h3>
+              <p>The Pick List saves words you want to compare or reuse. Each saved word can include
+                 a note and displays its tile score, length, rack tiles, and gameplay flags. Pick
+                 List data stays in local browser storage until you remove it or approve
+                 <strong>Reset All</strong>.</p>
+            </li>
+            <li class="faq-item">
+              <h3>What does Reset All clear?</h3>
+              <p><strong>Reset All</strong> opens a warning before clearing anything. Select
+                 <strong>OK</strong> to clear the rack input, Basic Filters, Advanced Filters,
+                 History, Pick List, and current results. Select <strong>Cancel</strong> to keep
+                 everything unchanged. Your dictionary and sorting selections are preserved.</p>
+            </li>
+            <li class="faq-item">
               <h3>Are my searches private?</h3>
               <p>Yes. The dictionary and unscrambling logic run entirely in your browser.
-                 History keeps recent searches only in this browser's local storage; searches are
-                 never uploaded, and you can delete individual entries or clear the list at any time.</p>
+                 History and Pick List data stay only in this browser's local storage and are never
+                 uploaded. You can remove individual entries, clear either list, or approve
+                 <strong>Reset All</strong> at any time.</p>
             </li>
           </ul>
         </div>
@@ -1121,9 +1225,31 @@
     </section>
   </div>
 
+  <div class="reset-confirm-backdrop" id="reset-confirm-backdrop" hidden>
+    <section
+      class="reset-confirm-modal"
+      id="reset-confirm-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reset-confirm-title"
+      aria-describedby="reset-confirm-description"
+    >
+      <div class="reset-confirm-icon" aria-hidden="true">!</div>
+      <h2 id="reset-confirm-title">Reset everything?</h2>
+      <p id="reset-confirm-description">
+        Your rack, Basic and Advanced Filters, History, and Pick List will be reset. This cannot be undone.
+      </p>
+      <div class="reset-confirm-actions">
+        <button class="reset-confirm-cancel" id="reset-confirm-cancel" type="button">Cancel</button>
+        <button class="reset-confirm-ok" id="reset-confirm-ok" type="button">OK</button>
+      </div>
+    </section>
+  </div>
+
   <script src="../assets/js/word-unscrambler-input-rules.js?v=20260802-1" defer></script>
   <script src="../assets/js/word-unscrambler-history-store.js?v=20260801-3" defer></script>
+  <script src="../assets/js/word-unscrambler-pick-list-store.js?v=20260803-3" defer></script>
   <script src="../assets/js/wasm-bridge.js?v=20260803-2" defer></script>
-  <script src="../assets/js/word-unscrambler.js?v=20260803-2" defer></script>
+  <script src="../assets/js/word-unscrambler.js?v=20260803-43" defer></script>
 </body>
 </html>

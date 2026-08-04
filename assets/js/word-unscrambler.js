@@ -24,7 +24,14 @@ const sortPickerCompact = document.querySelector("#sort-picker-compact");
 const sortPickerExpanded = document.querySelector("#sort-picker-expanded");
 const sortPickerMore = document.querySelector("#sort-picker-more");
 const sortOptionButtons = sortPicker.querySelectorAll("[data-sort-value]");
-const resetAllFiltersButton = document.querySelector("#reset-all-filters");
+const resetAllButton = document.querySelector("#reset-all-filters");
+const resetBasicFiltersButton = document.querySelector("#reset-basic-filters");
+const resetAdvancedFiltersButton = document.querySelector("#reset-advanced-filters");
+const resetConfirmBackdrop = document.querySelector("#reset-confirm-backdrop");
+const resetConfirmModal = document.querySelector("#reset-confirm-modal");
+const resetConfirmCancel = document.querySelector("#reset-confirm-cancel");
+const resetConfirmOk = document.querySelector("#reset-confirm-ok");
+const rackTiles = document.querySelector("#rack-tiles");
 const button = document.querySelector("#unscramble-button");
 const buttonLabel = button.querySelector(".button-label");
 const message = document.querySelector("#form-message");
@@ -52,7 +59,15 @@ const historyModal = document.querySelector("#history-modal");
 const historyModalClose = document.querySelector("#history-modal-close");
 const historyModalEmpty = document.querySelector("#history-modal-empty");
 const historyModalList = document.querySelector("#history-modal-list");
+const pickListPanel = document.querySelector("#pick-list-panel");
+const pickListCount = document.querySelector("#pick-list-count");
+const pickListClear = document.querySelector("#pick-list-clear");
+const pickListSort = document.querySelector("#pick-list-sort");
+const pickListEmpty = document.querySelector("#pick-list-empty");
+const pickListViewport = document.querySelector("#pick-list-viewport");
+const pickListVirtualList = document.querySelector("#pick-list-virtual-list");
 const HistoryStore = window.MonkeyTacticsHistory;
+const PickListStore = window.MonkeyTacticsPickList;
 const InputRules = window.MonkeyTacticsWordInputRules;
 const Engine = window.MonkeyTacticsWasm;
 
@@ -61,6 +76,10 @@ const MANIFEST_URL =
 const CHUNK_BASE_URL = "../assets/data/words/";
 const VOWELS = "aeiou";
 const HIGH_VALUE_LETTERS = "jqxz";
+const SCRABBLE_TILE_VALUES = Object.freeze({
+  a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1, m: 3,
+  n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10
+});
 const LENGTH_GROUP_SORTS = new Set(["length-desc", "length-asc", "uses-most"]);
 const DICTIONARY_LINKS = Object.freeze([
   {
@@ -115,6 +134,7 @@ const DICTIONARY_BITS = Object.freeze({
 // Loaded chunks are indexed once and retained for subsequent searches.
 const loadedChunks = new Set();
 const chunkPromises = new Map();
+const dictionaryPopoverPositioners = new WeakMap();
 let manifest = null;
 let breakdownState = null;
 let historyEntries = HistoryStore.read();
@@ -124,6 +144,18 @@ let historyModalIndex = -1;
 let historyModalReturnFocus = null;
 let historySwipeStartY = null;
 let pendingHistorySearch = false;
+let pickListEntries = PickListStore.read();
+let pickListHookCache = new Map();
+let pickListHookRefreshQueued = false;
+let resetConfirmReturnFocus = null;
+
+input.style.position = "relative";
+input.style.zIndex = "3";
+input.style.background = "transparent";
+input.style.color = "transparent";
+input.style.webkitTextFillColor = "transparent";
+input.style.textShadow = "0 0 0 transparent";
+input.style.caretColor = "#22c55e";
 
 const getScrabbleScore = (word) => Engine.scoreWord(word);
 
@@ -290,6 +322,28 @@ function getCurrentFilters() {
   };
 }
 
+function hasBasicFilters() {
+  return (wordLengthInput.value !== "" && wordLengthInput.value !== "0")
+    || startsWithInput.value.trim() !== ""
+    || endsWithInput.value.trim() !== ""
+    || mustIncludeInput.value.trim() !== ""
+    || excludeLettersInput.value.trim() !== "";
+}
+
+function hasAdvancedFilters() {
+  return highValueOnlyInput.checked
+    || (minimumVowelsInput.value !== "" && minimumVowelsInput.value !== "0")
+    || (minimumConsonantsInput.value !== "" && minimumConsonantsInput.value !== "0")
+    || minimumScoreInput.value !== ""
+    || maximumScoreInput.value !== ""
+    || [...hookFilterInputs].some((option) => option.checked && option.value !== "");
+}
+
+function syncSectionFilterResetButtons() {
+  resetBasicFiltersButton.hidden = !hasBasicFilters();
+  resetAdvancedFiltersButton.hidden = !hasAdvancedFilters();
+}
+
 function restoreFilters(filters = {}) {
   wordLengthInput.value = filters.wordLength ?? "0";
   startsWithInput.value = filters.startsWith ?? "";
@@ -308,6 +362,8 @@ function restoreFilters(filters = {}) {
   if (![...hookFilterInputs].some((option) => option.checked)) {
     hookFilterInputs[0].checked = true;
   }
+
+  syncSectionFilterResetButtons();
 }
 
 function getHistoryEntropy(letters) {
@@ -608,6 +664,119 @@ function renderAllHistory() {
   renderHistoryModal();
 }
 
+function createRackTile(letter, index) {
+  const tile = document.createElement("span");
+  const face = document.createElement("span");
+  const score = document.createElement("span");
+  const isWildcard = letter === "?";
+
+  tile.className = "rack-tile";
+  tile.classList.toggle("rack-tile--wildcard", isWildcard);
+  tile.style.display = "inline-flex";
+  tile.style.width = "2rem";
+  tile.style.height = "2rem";
+  tile.style.flexDirection = "column";
+  tile.style.alignItems = "flex-start";
+  tile.style.justifyContent = "space-between";
+  tile.style.padding = "0.06rem 0.08rem 0.08rem 0.12rem";
+  tile.style.border = "1px solid #d4b06d";
+  tile.style.borderBottomWidth = "2px";
+  tile.style.borderRadius = "0.2rem";
+  tile.style.background = "linear-gradient(180deg, #f8e7bf 0%, #e8c97f 100%)";
+  tile.style.boxShadow = "inset 0 1px 0 rgba(255,255,255,0.7), 0 1px 1px rgba(15,23,42,0.22)";
+  tile.style.color = "#1f2937";
+  tile.style.fontFamily = 'Georgia, "Times New Roman", serif';
+  tile.style.lineHeight = "1";
+  tile.style.background = isWildcard
+    ? "linear-gradient(180deg, #fbf2d7 0%, #f0dfad 100%)"
+    : "linear-gradient(180deg, #f8e7bf 0%, #e8c97f 100%)";
+  tile.style.overflow = "visible";
+
+  face.className = "rack-tile-letter";
+  face.style.display = "block";
+  face.style.marginLeft = "0.02rem";
+  face.style.marginTop = "0.01rem";
+  face.style.fontSize = "1.08rem";
+  face.style.fontWeight = "900";
+  face.style.letterSpacing = "-0.02em";
+  face.style.textTransform = "uppercase";
+  face.style.visibility = isWildcard ? "hidden" : "visible";
+
+  score.className = "rack-tile-score";
+  score.style.display = "block";
+  score.style.alignSelf = "flex-end";
+  score.style.marginRight = "0.01rem";
+  score.style.marginBottom = "0.01rem";
+  score.style.fontSize = "0.56rem";
+  score.style.fontWeight = "900";
+  score.style.lineHeight = "1";
+  score.style.color = "#111827";
+  score.style.background = "rgba(252, 244, 220, 0.98)";
+  score.style.padding = "0.02rem 0.14rem";
+  score.style.border = "1px solid rgba(31, 41, 55, 0.15)";
+  score.style.borderRadius = "0.22rem";
+  score.style.boxShadow = "0 1px 0 rgba(255,255,255,0.45) inset";
+  score.style.visibility = isWildcard ? "hidden" : "visible";
+
+  face.textContent = isWildcard ? "" : letter.toUpperCase();
+  score.textContent = isWildcard ? "" : String(getScrabbleTileValue(letter));
+  tile.append(face, score);
+  tile.style.setProperty("--tile-index", String(index));
+  return tile;
+}
+
+function createRackCaret() {
+  const caret = document.createElement("span");
+  caret.className = "rack-caret";
+  caret.style.display = "inline-block";
+  caret.style.width = "2px";
+  caret.style.height = "1.65rem";
+  caret.style.margin = "0 0.06rem";
+  caret.style.borderRadius = "999px";
+  caret.style.background = "#22c55e";
+  caret.style.boxShadow = "0 0 6px rgba(34,197,94,0.8)";
+  caret.style.animation = "rackCaretBlink 1s steps(2, start) infinite";
+  return caret;
+}
+
+function renderRackTiles() {
+  if (!rackTiles) {
+    return;
+  }
+
+  const raw = input.value;
+  const letters = [...raw.replace(/\s+/g, "")].slice(0, 18);
+  const caretIndex = Math.min(input.selectionStart ?? letters.length, letters.length);
+  const tiles = letters.map((letter, index) => createRackTile(letter, index));
+  tiles.splice(caretIndex, 0, createRackCaret());
+
+  rackTiles.style.position = "absolute";
+  rackTiles.style.zIndex = "2";
+  rackTiles.style.inset = "0.4rem 0.55rem 0.4rem 0.6rem";
+  rackTiles.style.display = "flex";
+  rackTiles.style.flexWrap = "wrap";
+  rackTiles.style.gap = "0.2rem";
+  rackTiles.style.alignItems = "center";
+  rackTiles.style.pointerEvents = "none";
+
+  rackTiles.replaceChildren(...tiles);
+}
+
+function renderAllPickList() {
+  renderPickList();
+  renderResultsPickButtons();
+  refreshPickListHookCache();
+}
+
+function focusPickListPanel() {
+  if (pickListEntries.length > 0) {
+    const firstEntry = pickListVirtualList.querySelector(".pick-list-entry");
+    firstEntry?.scrollIntoView({ block: "nearest" });
+  }
+
+  pickListViewport.focus({ preventScroll: true });
+}
+
 function focusHistoryPanelEntry(index) {
   const entries = getVisibleHistoryEntries();
   if (entries.length === 0) {
@@ -678,6 +847,7 @@ function loadHistoryEntry(entry) {
   }
 
   input.value = restored.inputValue;
+  renderRackTiles();
   restoreFilters(restored.filters);
   sortResultsInput.value = getSortOption(restored.sortMode) ? restored.sortMode : "length-desc";
   syncSortPicker();
@@ -751,6 +921,380 @@ function clearResults() {
   matchCount.hidden = true;
 }
 
+function isWordPicked(word) {
+  return pickListEntries.some((entry) => entry.word === word.toUpperCase());
+}
+
+function renderResultsPickButtons() {
+  wordList.querySelectorAll("[data-pick-word]").forEach((button) => {
+    const word = button.dataset.pickWord;
+    const picked = isWordPicked(word);
+    button.textContent = picked ? "Picked" : "Pick";
+    button.setAttribute("aria-pressed", String(picked));
+    button.classList.toggle("is-picked", picked);
+  });
+}
+
+function getScrabbleTileValue(letter) {
+  return SCRABBLE_TILE_VALUES[letter.toLowerCase()] ?? 0;
+}
+
+function getPickListSortKey(entry, mode) {
+  const analysis = getPickListAnalysis(entry.word);
+  const totalTileValue = [...entry.word.toLowerCase()].reduce(
+    (sum, letter) => sum + getScrabbleTileValue(letter),
+    0
+  );
+  const density = entry.word.length > 0 ? totalTileValue / entry.word.length : 0;
+
+  if (mode === "hook-desc") {
+    return [Number(analysis.hasHook), entry.score, entry.word];
+  }
+
+  if (mode === "length-desc") {
+    return [entry.length, entry.score, entry.word];
+  }
+
+  if (mode === "density-desc") {
+    return [density, entry.score, entry.word];
+  }
+
+  return [entry.score, entry.length, entry.word];
+}
+
+function comparePickListEntries(first, second) {
+  const mode = pickListSort?.value ?? "score-desc";
+  const firstKey = getPickListSortKey(first, mode);
+  const secondKey = getPickListSortKey(second, mode);
+
+  for (let index = 0; index < firstKey.length; index += 1) {
+    const a = firstKey[index];
+    const b = secondKey[index];
+    if (a === b) {
+      continue;
+    }
+
+    if (typeof a === "number" && typeof b === "number") {
+      return b - a;
+    }
+
+    return String(a).localeCompare(String(b));
+  }
+
+  return 0;
+}
+
+function getPickListAnalysis(word) {
+  const letters = word.toLowerCase();
+  const vowels = [...letters].filter((letter) => VOWELS.includes(letter)).length;
+  const consonants = [...letters].filter((letter) => /[a-z]/.test(letter) && !VOWELS.includes(letter)).length;
+  const highValueLetters = [...letters].filter((letter) => HIGH_VALUE_LETTERS.includes(letter));
+  const letterCounts = new Map();
+  [...letters].forEach((letter) => {
+    letterCounts.set(letter, (letterCounts.get(letter) ?? 0) + 1);
+  });
+
+  const factorial = (n) => {
+    let result = 1;
+    for (let i = 2; i <= n; i += 1) {
+      result *= i;
+    }
+    return result;
+  };
+
+  const anagramCount = [...letterCounts.values()].reduce(
+    (total, count) => total / factorial(count),
+    factorial(letters.length)
+  );
+
+  return {
+    hasHook: pickListHookCache.get(word.toUpperCase()) ?? !word.endsWith("s"),
+    hasHighValueLetters: Boolean(highValueLetters),
+    balanceLabel: vowels === consonants
+      ? "Balanced"
+      : vowels > consonants
+        ? "Vowel-heavy"
+        : "Consonant-heavy",
+    isBingoFriendly: word.length === 7,
+    anagramCount,
+    highValueLetters
+  };
+}
+
+function refreshPickListHookCache() {
+  if (pickListHookRefreshQueued || !pickListEntries.length) {
+    return;
+  }
+
+  pickListHookRefreshQueued = true;
+
+  queueMicrotask(async () => {
+    try {
+      await Engine.ready;
+      await loadAllChunks();
+
+      const nextCache = new Map();
+      pickListEntries.forEach((entry) => {
+        nextCache.set(
+          entry.word.toUpperCase(),
+          getHookInfo(entry.word.toLowerCase(), DICTIONARY_BITS.both).hasSHook
+        );
+      });
+
+      pickListHookCache = nextCache;
+      renderPickList();
+    } catch (error) {
+      console.error("Unable to refresh pick-list hook flags:", error);
+    } finally {
+      pickListHookRefreshQueued = false;
+    }
+  });
+}
+
+function createScrabbleTile(letter) {
+  const tile = document.createElement("span");
+  const face = document.createElement("span");
+  const score = document.createElement("span");
+
+  tile.className = "pick-list-tile";
+  tile.style.alignItems = "flex-start";
+  tile.style.justifyContent = "flex-start";
+  tile.style.padding = "0.08rem 0 0 0.1rem";
+  tile.setAttribute("aria-hidden", "true");
+  face.className = "pick-list-tile-letter";
+  face.style.marginLeft = "0.18rem";
+  face.style.marginTop = "0.08rem";
+  face.textContent = letter.toUpperCase();
+  score.className = "pick-list-tile-score";
+  score.style.fontSize = "0.78rem";
+  score.style.right = "0.09rem";
+  score.style.bottom = "0.03rem";
+  score.textContent = String(getScrabbleTileValue(letter));
+  tile.append(face, score);
+  return tile;
+}
+
+function renderPickListWord(word) {
+  const wordRow = document.createElement("div");
+  wordRow.className = "pick-list-word-tiles";
+
+  [...word].forEach((letter) => {
+    wordRow.append(createScrabbleTile(letter));
+  });
+
+  return wordRow;
+}
+
+function createPickListFlag(text, modifier = "") {
+  const flag = document.createElement("span");
+  flag.className = `pick-list-flag${modifier ? ` ${modifier}` : ""}`;
+  flag.textContent = text;
+  return flag;
+}
+
+function getPickListNotePreview(note) {
+  const normalized = note.replace(/\s+/g, " ").trim();
+  return normalized.length > 40 ? `${normalized.slice(0, 40)}…` : normalized;
+}
+
+function createPickListNote(entry, noteIcon) {
+  const container = document.createElement("div");
+  const counter = document.createElement("span");
+  let currentNote = entry.note ?? "";
+
+  container.className = "pick-list-note";
+  counter.className = "pick-list-note-counter";
+  counter.id = `pick-list-note-counter-${entry.id}`;
+  counter.setAttribute("aria-live", "polite");
+
+  const updateNoteState = (note) => {
+    const length = note.length;
+    counter.textContent = `${length}/${PickListStore.NOTE_MAX_LENGTH}`;
+    counter.classList.toggle("is-warning", length > 100 && length < PickListStore.NOTE_MAX_LENGTH);
+    counter.classList.toggle("is-limit", length >= PickListStore.NOTE_MAX_LENGTH);
+    noteIcon.hidden = !note.trim();
+  };
+
+  const showPreview = () => {
+    const preview = document.createElement("button");
+    const previewText = document.createElement("span");
+    const collapsedText = getPickListNotePreview(currentNote);
+    const fullText = currentNote.trim() || "Add a note…";
+
+    preview.className = "pick-list-note-preview";
+    preview.type = "button";
+    preview.setAttribute("aria-label", `${currentNote.trim() ? "Edit" : "Add"} note for ${entry.word}`);
+    previewText.className = "pick-list-note-preview-text";
+    previewText.textContent = collapsedText || "Add a note…";
+    preview.classList.toggle("is-empty", !currentNote.trim());
+
+    preview.addEventListener("mouseenter", () => {
+      if (currentNote.trim()) {
+        previewText.textContent = fullText;
+        preview.classList.add("is-expanded");
+      }
+    });
+    preview.addEventListener("mouseleave", () => {
+      previewText.textContent = collapsedText || "Add a note…";
+      preview.classList.remove("is-expanded");
+    });
+    preview.addEventListener("focus", () => {
+      if (currentNote.trim()) {
+        previewText.textContent = fullText;
+        preview.classList.add("is-expanded");
+      }
+    });
+    preview.addEventListener("blur", () => {
+      previewText.textContent = collapsedText || "Add a note…";
+      preview.classList.remove("is-expanded");
+    });
+    preview.addEventListener("click", showEditor);
+    preview.append(previewText);
+    container.replaceChildren(preview);
+  };
+
+  const showEditor = () => {
+    const textarea = document.createElement("textarea");
+
+    textarea.className = "pick-list-note-editor";
+    textarea.value = currentNote;
+    textarea.maxLength = PickListStore.NOTE_MAX_LENGTH;
+    textarea.rows = 3;
+    textarea.placeholder = "Add a note…";
+    textarea.setAttribute("aria-label", `Note for ${entry.word}`);
+    textarea.setAttribute("aria-describedby", counter.id);
+    textarea.addEventListener("input", () => {
+      if (textarea.value.length > PickListStore.NOTE_MAX_LENGTH) {
+        textarea.value = textarea.value.slice(0, PickListStore.NOTE_MAX_LENGTH);
+      }
+      currentNote = textarea.value;
+      pickListEntries = PickListStore.updateNote(entry.word, currentNote);
+      updateNoteState(currentNote);
+    });
+    textarea.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        textarea.blur();
+      }
+    });
+    textarea.addEventListener("blur", showPreview);
+
+    updateNoteState(currentNote);
+    container.replaceChildren(textarea, counter);
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+  };
+
+  updateNoteState(currentNote);
+  showPreview();
+  return container;
+}
+
+function insertPickWordIntoRack(word) {
+  input.value = word;
+  input.setSelectionRange(word.length, word.length);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.focus({ preventScroll: true });
+  input.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function renderPickList() {
+  pickListEntries = [...pickListEntries].sort(comparePickListEntries);
+  pickListCount.textContent = `${pickListEntries.length} ${pickListEntries.length === 1 ? "word" : "words"}`;
+  pickListClear.disabled = pickListEntries.length === 0;
+  pickListEmpty.hidden = pickListEntries.length > 0;
+  pickListViewport.hidden = pickListEntries.length === 0;
+
+  if (pickListEntries.length === 0) {
+    pickListVirtualList.replaceChildren();
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  pickListEntries.forEach((entry) => {
+    const item = document.createElement("article");
+    const top = document.createElement("div");
+    const topActions = document.createElement("div");
+    const meta = document.createElement("span");
+    const insert = document.createElement("button");
+    const remove = document.createElement("button");
+    const tileRow = renderPickListWord(entry.word);
+    const wordLabel = document.createElement("strong");
+    const wordHeading = document.createElement("span");
+    const noteIcon = document.createElement("span");
+    const flags = document.createElement("div");
+    const analysis = getPickListAnalysis(entry.word);
+    const note = createPickListNote(entry, noteIcon);
+
+    item.className = "pick-list-entry";
+    top.className = "pick-list-entry-top";
+    topActions.className = "pick-list-entry-actions";
+    meta.className = "pick-list-entry-meta";
+    wordHeading.className = "pick-list-word-heading";
+    noteIcon.className = "pick-list-note-icon";
+    noteIcon.textContent = "📝";
+    noteIcon.title = "This word has a note";
+    noteIcon.setAttribute("aria-label", "Has note");
+    noteIcon.hidden = !entry.note.trim();
+    flags.className = "pick-list-flags";
+    wordLabel.textContent = entry.word;
+    meta.textContent = `${entry.score} pts · ${entry.length} letters · ${analysis.anagramCount.toLocaleString()} anagrams`;
+    insert.className = "pick-list-action pick-list-insert";
+    insert.type = "button";
+    insert.textContent = "Insert";
+    insert.title = "Insert into Rack";
+    insert.setAttribute("aria-label", `Insert ${entry.word} into rack`);
+    insert.addEventListener("click", () => insertPickWordIntoRack(entry.word));
+    remove.className = "pick-list-action";
+    remove.type = "button";
+    remove.textContent = "Remove";
+    remove.addEventListener("click", () => {
+      pickListEntries = PickListStore.remove(entry.word);
+      renderPickList();
+      renderResultsPickButtons();
+    });
+
+    flags.append(
+      createPickListFlag(
+        analysis.hasHook ? "S-hookable" : "No S-hook",
+        "pick-list-flag--hook"
+      )
+    );
+
+    if (analysis.hasHighValueLetters) {
+      flags.append(createPickListFlag("High-value", "pick-list-flag--high-value"));
+    }
+
+    flags.append(createPickListFlag(analysis.balanceLabel, "pick-list-flag--balance"));
+
+    if (analysis.isBingoFriendly) {
+      flags.append(createPickListFlag("Bingo-friendly", "pick-list-flag--bingo"));
+    }
+
+    wordHeading.append(wordLabel, noteIcon);
+    topActions.append(insert, remove);
+    top.append(wordHeading, topActions);
+    item.append(top, meta, note, tileRow, flags);
+    fragment.append(item);
+  });
+
+  pickListVirtualList.replaceChildren(fragment);
+  refreshPickListHookCache();
+}
+
+function togglePickWord(word, score) {
+  if (isWordPicked(word)) {
+    pickListEntries = PickListStore.remove(word);
+  } else {
+    pickListEntries = PickListStore.add({ word, score, length: word.length });
+  }
+
+  pickListHookCache.delete(word.toUpperCase());
+  renderPickList();
+  renderResultsPickButtons();
+  refreshPickListHookCache();
+}
+
 function getWildcardLetterIndexes(word, letters) {
   const availableCounts = new Uint8Array(26);
   let wildcardCount = 0;
@@ -783,7 +1327,7 @@ function appendHighlightedWord(wordLabel, word, letters) {
   const wildcardIndexes = getWildcardLetterIndexes(word, letters);
 
   if (wildcardIndexes.size === 0) {
-    wordLabel.textContent = word;
+    wordLabel.textContent = word.toUpperCase();
     return;
   }
 
@@ -792,10 +1336,10 @@ function appendHighlightedWord(wordLabel, word, letters) {
       const wildcardLetter = document.createElement("span");
       wildcardLetter.className = "wildcard-letter";
       wildcardLetter.title = "Letter supplied by a wildcard tile";
-      wildcardLetter.textContent = word[index];
+      wildcardLetter.textContent = word[index].toUpperCase();
       wordLabel.append(wildcardLetter);
     } else {
-      wordLabel.append(word[index]);
+      wordLabel.append(word[index].toUpperCase());
     }
   }
 }
@@ -807,7 +1351,11 @@ function createWordItem(word, letters, options) {
   const wordLabel = document.createElement("button");
   const linkMeta = document.createElement("span");
   const score = document.createElement("span");
+  const insertButton = document.createElement("button");
+  const pickButton = document.createElement("button");
   const dictionaryLinks = document.createElement("div");
+  const dictionaryPopoverHeader = document.createElement("div");
+  const dictionaryPopoverActions = document.createElement("div");
   const dictionaryPopoverTitle = document.createElement("span");
   const points = getScrabbleScore(word);
   const highValueLetters = getHighValueLetters(word);
@@ -827,6 +1375,21 @@ function createWordItem(word, letters, options) {
   score.className = "scrabble-score";
   score.textContent = `${points} pts`;
   linkMeta.append(score);
+
+  pickButton.className = "word-pick-button";
+  pickButton.type = "button";
+  pickButton.dataset.pickWord = word;
+  pickButton.textContent = isWordPicked(word) ? "Picked" : "Pick";
+  pickButton.setAttribute("aria-pressed", String(isWordPicked(word)));
+  pickButton.title = `Add ${word} to the pick list`;
+  pickButton.addEventListener("click", () => togglePickWord(word, points));
+
+  insertButton.className = "word-insert-button";
+  insertButton.type = "button";
+  insertButton.textContent = "Insert";
+  insertButton.title = "Insert into Rack";
+  insertButton.setAttribute("aria-label", `Insert ${word} into rack`);
+  insertButton.addEventListener("click", () => insertPickWordIntoRack(word));
 
   if (word.length === 7) {
     const bingoBadge = document.createElement("span");
@@ -857,9 +1420,13 @@ function createWordItem(word, letters, options) {
   dictionaryLinks.className = "dictionary-popover";
   dictionaryLinks.setAttribute("role", "dialog");
   dictionaryLinks.setAttribute("aria-label", `Dictionary links for ${word}`);
+  dictionaryPopoverHeader.className = "dictionary-popover-header";
+  dictionaryPopoverActions.className = "dictionary-popover-actions";
   dictionaryPopoverTitle.className = "dictionary-popover-title";
-  dictionaryPopoverTitle.textContent = `Look up ${word}`;
-  dictionaryLinks.append(dictionaryPopoverTitle);
+  dictionaryPopoverTitle.textContent = word.toUpperCase();
+  dictionaryPopoverActions.append(insertButton, pickButton);
+  dictionaryPopoverHeader.append(dictionaryPopoverActions, dictionaryPopoverTitle);
+  dictionaryLinks.append(dictionaryPopoverHeader);
 
   const dictionaryLinkRow = document.createElement("div");
   dictionaryLinkRow.className = "dictionary-links";
@@ -886,21 +1453,46 @@ function createWordItem(word, letters, options) {
 
   dictionaryLinks.append(dictionaryLinkRow);
 
-  const hookLookup = document.createElement("details");
-  const hookLookupSummary = document.createElement("summary");
+  const hookLookup = document.createElement("section");
+  const hookLookupLabel = document.createElement("span");
   const hookLookupResult = document.createElement("div");
   let hookLookupLoaded = false;
   let hookLookupLoading = false;
 
   hookLookup.className = "hook-lookup";
-  hookLookupSummary.className = "hook-lookup-summary";
-  hookLookupSummary.textContent = "Hook Lookup";
+  hookLookup.setAttribute("aria-label", `Available hooks for ${word}`);
+  hookLookupLabel.className = "hook-lookup-label";
+  hookLookupLabel.textContent = "Available Hooks:";
   hookLookupResult.className = "hook-lookup-result";
   hookLookupResult.setAttribute("aria-live", "polite");
-  hookLookup.append(hookLookupSummary, hookLookupResult);
+  hookLookupResult.textContent = "Open this word to load hooks.";
+  hookLookup.append(hookLookupLabel, hookLookupResult);
 
-  hookLookup.addEventListener("toggle", async () => {
-    if (!hookLookup.open || hookLookupLoaded || hookLookupLoading) {
+  const positionDictionaryPopover = () => {
+    if (!window.matchMedia("(max-width: 900px), (max-height: 600px)").matches) {
+      return;
+    }
+
+    const viewportPadding = 12;
+    const triggerRect = wordLabel.getBoundingClientRect();
+    const popoverRect = dictionaryLinks.getBoundingClientRect();
+    const maxLeft = Math.max(viewportPadding, window.innerWidth - viewportPadding - popoverRect.width);
+    const left = Math.min(Math.max(triggerRect.left, viewportPadding), maxLeft);
+    const belowTop = triggerRect.bottom;
+    const aboveTop = triggerRect.top - popoverRect.height;
+    const preferredTop = belowTop + popoverRect.height <= window.innerHeight - viewportPadding
+      ? belowTop
+      : aboveTop;
+    const maxTop = Math.max(viewportPadding, window.innerHeight - viewportPadding - popoverRect.height);
+    const top = Math.min(Math.max(preferredTop, viewportPadding), maxTop);
+
+    dictionaryLinks.style.setProperty("--dictionary-popover-left", `${left}px`);
+    dictionaryLinks.style.setProperty("--dictionary-popover-top", `${top}px`);
+  };
+  dictionaryPopoverPositioners.set(dictionaryLinks, positionDictionaryPopover);
+
+  const loadHookLookup = async () => {
+    if (hookLookupLoaded || hookLookupLoading) {
       return;
     }
 
@@ -931,14 +1523,24 @@ function createWordItem(word, letters, options) {
 
       hookLookupResult.append(frontRow, backRow);
       hookLookupLoaded = true;
+      positionDictionaryPopover();
     } catch (error) {
       console.error(`Unable to load hooks for ${word}:`, error);
       hookLookupResult.className = "hook-lookup-result is-error";
-      hookLookupResult.textContent = "Unable to load hooks. Collapse and try again.";
+      hookLookupResult.textContent = "Unable to load hooks. Close this window and try again.";
+      positionDictionaryPopover();
     } finally {
       hookLookupLoading = false;
     }
-  });
+  };
+
+  const openDictionaryPopover = () => {
+    positionDictionaryPopover();
+    loadHookLookup();
+  };
+
+  wordLookup.addEventListener("mouseenter", openDictionaryPopover);
+  wordLookup.addEventListener("focusin", openDictionaryPopover);
 
   dictionaryLinks.append(hookLookup);
   wordLookup.append(wordLabel, dictionaryLinks);
@@ -1013,6 +1615,7 @@ function renderMatches(letters, matches, options) {
   wordList.append(fragment);
   breakdownState = { letters, matches: [...matches], options };
   wordBreakdown.hidden = false;
+  renderResultsPickButtons();
 
   if (wordBreakdown.open) {
     renderWordBreakdown();
@@ -1896,6 +2499,8 @@ async function loadManifest() {
 
     button.disabled = false;
     buttonLabel.textContent = "Unscramble";
+    renderRackTiles();
+    refreshPickListHookCache();
     input.focus();
     runPendingHistorySearch();
   } catch (error) {
@@ -1912,7 +2517,15 @@ async function loadManifest() {
 }
 
 form.addEventListener("submit", handleSubmit);
-input.addEventListener("input", closeHistoryDropdown);
+form.addEventListener("input", syncSectionFilterResetButtons);
+form.addEventListener("change", syncSectionFilterResetButtons);
+input.addEventListener("input", () => {
+  closeHistoryDropdown();
+  renderRackTiles();
+});
+input.addEventListener("keyup", renderRackTiles);
+input.addEventListener("click", renderRackTiles);
+input.addEventListener("focus", renderRackTiles);
 input.addEventListener("keydown", (event) => {
   if (!historyModalBackdrop.hidden) {
     return;
@@ -1983,6 +2596,17 @@ historyClear.addEventListener("click", () => {
   historyEntries = HistoryStore.clear();
   historyPanelFocusIndex = -1;
   renderAllHistory();
+});
+pickListClear.addEventListener("click", () => {
+  if (pickListEntries.length === 0 || !window.confirm("Clear the pick list?")) {
+    return;
+  }
+
+  pickListEntries = PickListStore.clear();
+  renderAllPickList();
+});
+pickListSort.addEventListener("change", () => {
+  renderPickList();
 });
 historyPanel.addEventListener("toggle", () => {
   if (historyPanel.open) {
@@ -2070,6 +2694,21 @@ window.addEventListener("storage", (event) => {
   if (event.key === HistoryStore.STORAGE_KEY) {
     historyEntries = HistoryStore.read();
     renderAllHistory();
+  } else if (event.key === PickListStore.STORAGE_KEY) {
+    pickListEntries = PickListStore.read();
+    renderAllPickList();
+  }
+});
+window.addEventListener("resize", () => {
+  wordList.querySelectorAll(".dictionary-popover").forEach((popover) => {
+    if (window.getComputedStyle(popover).display !== "none") {
+      dictionaryPopoverPositioners.get(popover)?.();
+    }
+  });
+});
+document.addEventListener("selectionchange", () => {
+  if (document.activeElement === input) {
+    renderRackTiles();
   }
 });
 wordBreakdown.addEventListener("toggle", () => {
@@ -2087,6 +2726,26 @@ form.addEventListener("keydown", (event) => {
   event.preventDefault();
   form.requestSubmit(button);
 });
+document.addEventListener("keydown", (event) => {
+  if (event.repeat || !event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.key.toLowerCase() !== "l") {
+    return;
+  }
+
+  event.preventDefault();
+  const shouldOpen = !pickListPanel.open;
+  pickListPanel.open = shouldOpen;
+
+  if (!shouldOpen) {
+    pickListPanel.querySelector("summary")?.focus({ preventScroll: true });
+    return;
+  }
+
+  renderPickList();
+  requestAnimationFrame(() => {
+    pickListPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    focusPickListPanel();
+  });
+}, { capture: true });
 document.addEventListener("keydown", (event) => {
   if (
     event.repeat ||
@@ -2151,12 +2810,17 @@ document.addEventListener("keydown", (event) => {
     wordBreakdown.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 });
-function resetAllFilters() {
+function resetBasicFilters() {
   wordLengthInput.value = "0";
   startsWithInput.value = "";
   endsWithInput.value = "";
   mustIncludeInput.value = "";
   excludeLettersInput.value = "";
+  syncSectionFilterResetButtons();
+  clearMessage();
+}
+
+function resetAdvancedFilters() {
   highValueOnlyInput.checked = false;
   minimumVowelsInput.value = "0";
   minimumConsonantsInput.value = "0";
@@ -2165,9 +2829,41 @@ function resetAllFilters() {
   hookFilterInputs.forEach((option) => {
     option.checked = option.value === "";
   });
-  sortResultsInput.value = "length-desc";
-  syncSortPicker();
+  syncSectionFilterResetButtons();
   clearMessage();
+}
+
+function resetAll() {
+  input.value = "";
+  renderRackTiles();
+  resetBasicFilters();
+  resetAdvancedFilters();
+  historyEntries = HistoryStore.clear();
+  historyPanelFocusIndex = -1;
+  pickListEntries = PickListStore.clear();
+  pickListHookCache.clear();
+  renderAllHistory();
+  renderAllPickList();
+  clearResults();
+  resultsHeading.textContent = "Ready when you are";
+}
+
+function openResetConfirmation() {
+  resetConfirmReturnFocus = document.activeElement;
+  resetConfirmBackdrop.hidden = false;
+  resetConfirmCancel.focus({ preventScroll: true });
+}
+
+function closeResetConfirmation({ focusInput = false } = {}) {
+  resetConfirmBackdrop.hidden = true;
+
+  if (focusInput) {
+    input.focus({ preventScroll: true });
+  } else {
+    resetConfirmReturnFocus?.focus?.({ preventScroll: true });
+  }
+
+  resetConfirmReturnFocus = null;
 }
 
 document.addEventListener("keydown", (event) => {
@@ -2183,10 +2879,35 @@ document.addEventListener("keydown", (event) => {
   }
 
   event.preventDefault();
-  resetAllFilters();
-  input.focus();
-  input.setSelectionRange(input.value.length, input.value.length);
+  openResetConfirmation();
 });
-resetAllFiltersButton.addEventListener("click", resetAllFilters);
+resetAllButton.addEventListener("click", openResetConfirmation);
+resetConfirmCancel.addEventListener("click", () => closeResetConfirmation());
+resetConfirmOk.addEventListener("click", () => {
+  resetAll();
+  closeResetConfirmation({ focusInput: true });
+});
+resetConfirmBackdrop.addEventListener("click", (event) => {
+  if (event.target === resetConfirmBackdrop) {
+    closeResetConfirmation();
+  }
+});
+resetConfirmModal.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeResetConfirmation();
+  } else if (event.key === "Tab") {
+    event.preventDefault();
+    const focusCancel = event.shiftKey
+      ? document.activeElement !== resetConfirmCancel
+      : document.activeElement === resetConfirmOk;
+    (focusCancel ? resetConfirmCancel : resetConfirmOk).focus();
+  }
+});
+resetBasicFiltersButton.addEventListener("click", resetBasicFilters);
+resetAdvancedFiltersButton.addEventListener("click", resetAdvancedFilters);
+syncSectionFilterResetButtons();
 renderAllHistory();
+renderAllPickList();
+renderRackTiles();
 window.addEventListener("DOMContentLoaded", loadManifest, { once: true });

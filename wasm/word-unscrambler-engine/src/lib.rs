@@ -83,6 +83,7 @@ struct BoardFitAnalysis {
 #[wasm_bindgen]
 pub fn verify_domain(host: String) -> bool {
     host == "monkeytactics.com"
+        || host == "www.monkeytactics.com"
         || host == "monkeytactics-calculators.pages.dev"
         || host.ends_with(".monkeytactics-calculators.pages.dev")
         || host == "127.0.0.1"
@@ -679,12 +680,12 @@ mod tests {
     #[test]
     fn allows_production_cloudflare_and_local_wrangler_hosts() {
         assert!(verify_domain("monkeytactics.com".into()));
+        assert!(verify_domain("www.monkeytactics.com".into()));
         assert!(verify_domain("monkeytactics-calculators.pages.dev".into()));
         assert!(verify_domain(
             "preview.monkeytactics-calculators.pages.dev".into()
         ));
         assert!(verify_domain("127.0.0.1".into()));
-        assert!(!verify_domain("www.monkeytactics.com".into()));
         assert!(!verify_domain("localhost".into()));
         assert!(!verify_domain(
             "evilmonkeytactics-calculators.pages.dev".into()

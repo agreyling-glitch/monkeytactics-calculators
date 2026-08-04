@@ -1,7 +1,7 @@
 "use strict";
 
 (function initializeWordUnscramblerWasm(global) {
-  const ASSET_VERSION = "20260803-2";
+  const ASSET_VERSION = "20260803-3";
   const bridgeUrl = document.currentScript.src;
   const moduleUrl = new URL(
     `../wasm/word-unscrambler/word_unscrambler_engine.js?v=${ASSET_VERSION}`,
