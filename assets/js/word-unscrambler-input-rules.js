@@ -11,6 +11,27 @@
 
   const MAX_RACK_WILDCARDS = 2;
   const MAX_PATTERN_STARS = 3;
+  const ALLOWED_INPUT_CHARACTER = /^[a-z?/*\s]$/i;
+
+  function sanitizeSmartInput(value) {
+    let slashFound = false;
+
+    return [...String(value ?? "")].filter((character) => {
+      if (!ALLOWED_INPUT_CHARACTER.test(character)) {
+        return false;
+      }
+
+      if (character === "/") {
+        if (slashFound) {
+          return false;
+        }
+
+        slashFound = true;
+      }
+
+      return true;
+    }).join("").replace(/\s+/g, " ");
+  }
 
   function normalizePattern(value) {
     return value
@@ -61,6 +82,7 @@
     MAX_RACK_WILDCARDS,
     getLimitViolation,
     normalizePattern,
-    parseSmartInput
+    parseSmartInput,
+    sanitizeSmartInput
   });
 }));

@@ -143,7 +143,7 @@
       {
         "@type": "Question",
         "name": "How does the smart letter and pattern input work?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Enter rack letters before a slash and an optional pattern after it. In the pattern, ? matches exactly one letter and * matches any number of letters, including zero. Question marks before the slash remain wildcard rack tiles. Spaces, numbers, and other punctuation stay visible but are ignored during matching." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter rack letters before a slash and an optional pattern after it. In the pattern, ? matches exactly one letter and * matches any number of letters, including zero. Question marks before the slash remain wildcard rack tiles. The input accepts only English letters, spaces, ?, /, and *; other characters are removed." }
       },
       {
         "@type": "Question",
@@ -205,7 +205,7 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260803-16">
+  <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260803-17">
   <link rel="stylesheet" href="../assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/ads.js" defer></script>
   <!-- TrustBox script -->
@@ -330,6 +330,7 @@
                     aria-describedby="input-hint form-message"
                     aria-controls="history-dropdown history-modal"
                     aria-expanded="false"
+                    pattern="[A-Za-z?/* ]*"
                     maxlength="65"
                     required
                   >
@@ -350,7 +351,7 @@
                     aria-label="Recent searches"
                     hidden
                   ></div>
-                  <span class="visually-hidden" id="input-hint">Use up to 2 rack question-mark wildcards. After the slash, use question mark for one letter or up to 3 stars for any number of letters: ABCDE?? / a*e. Press Down Arrow to browse recent searches.</span>
+                  <span class="visually-hidden" id="input-hint">Use English letters, spaces, question marks, one slash, and asterisks only. Use up to 2 rack question-mark wildcards. After the slash, use question mark for one letter or up to 3 stars for any number of letters: ABCDE?? / a*e. Press Down Arrow to browse recent searches.</span>
                 </div>
                 <div class="primary-search-actions">
                   <button
@@ -848,8 +849,9 @@
             for a compact recent-search list.</li>
       </ol>
       <p>Letter frequency still matters: a result cannot use any letter more often than it appears
-         in your input. Spaces, numbers, and punctuation remain unchanged in the text box but are
-         ignored during matching. The selected <strong>ENABLE and/or SOWPODS</strong> word data is
+         in your input. The rack accepts English letters, spaces, <code>?</code>, <code>/</code>,
+         and <code>*</code>; other characters are removed as you type or paste. The selected
+         <strong>ENABLE and/or SOWPODS</strong> word data is
          compressed and loaded in small chunks only when a search needs them.</p>
       <p>Press <kbd>Ctrl</kbd>+<kbd>I</kbd>, or <kbd>Command</kbd>+<kbd>I</kbd> on a Mac, to jump
          back to the rack input from anywhere on the page.</p>
@@ -1054,8 +1056,9 @@
                  it. Question marks before the slash are wildcard rack tiles. After the slash,
                  <code>?</code> matches exactly one letter and <code>*</code> matches any number of
                  letters, including zero. For example, <code>ABCDE?? / A*E</code> finds rack-buildable
-                 words beginning with A and ending with E. Spaces, numbers, and other punctuation
-                 stay visible but are ignored during matching.</p>
+                 words beginning with A and ending with E. The input accepts only English letters,
+                 spaces, <code>?</code>, <code>/</code>, and <code>*</code>; other characters are
+                 removed.</p>
             </li>
             <li class="faq-item">
               <h3>How do I find the highest-scoring Scrabble word?</h3>
@@ -1246,10 +1249,10 @@
     </section>
   </div>
 
-  <script src="../assets/js/word-unscrambler-input-rules.js?v=20260802-1" defer></script>
+  <script src="../assets/js/word-unscrambler-input-rules.js?v=20260803-2" defer></script>
   <script src="../assets/js/word-unscrambler-history-store.js?v=20260801-3" defer></script>
   <script src="../assets/js/word-unscrambler-pick-list-store.js?v=20260803-3" defer></script>
   <script src="../assets/js/wasm-bridge.js?v=20260803-2" defer></script>
-  <script src="../assets/js/word-unscrambler.js?v=20260803-43" defer></script>
+  <script src="../assets/js/word-unscrambler.js?v=20260803-44" defer></script>
 </body>
 </html>

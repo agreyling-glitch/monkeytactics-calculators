@@ -12,6 +12,13 @@ test("normalizes consecutive pattern stars before validation", () => {
   assert.equal(InputRules.getLimitViolation("abcde", "a*?*e"), null);
 });
 
+test("keeps only Scrabble and smart-pattern input characters", () => {
+  assert.equal(
+    InputRules.sanitizeSmartInput("Abc123!? / a*e + 😀 / z"),
+    "Abc? / a*e z"
+  );
+});
+
 test("allows at most two rack wildcards", () => {
   assert.equal(InputRules.getLimitViolation("abcde??", ""), null);
   assert.deepEqual(InputRules.getLimitViolation("abcde???", ""), {

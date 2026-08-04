@@ -149,7 +149,6 @@ let pickListHookCache = new Map();
 let pickListHookRefreshQueued = false;
 let resetConfirmReturnFocus = null;
 
-input.style.position = "relative";
 input.style.zIndex = "3";
 input.style.background = "transparent";
 input.style.color = "transparent";
@@ -669,9 +668,11 @@ function createRackTile(letter, index) {
   const face = document.createElement("span");
   const score = document.createElement("span");
   const isWildcard = letter === "?";
+  const isPatternCharacter = letter === "/" || letter === "*";
 
   tile.className = "rack-tile";
   tile.classList.toggle("rack-tile--wildcard", isWildcard);
+  tile.classList.toggle("rack-tile--pattern", isPatternCharacter);
   tile.style.display = "inline-flex";
   tile.style.width = "2rem";
   tile.style.height = "2rem";
@@ -716,10 +717,10 @@ function createRackTile(letter, index) {
   score.style.border = "1px solid rgba(31, 41, 55, 0.15)";
   score.style.borderRadius = "0.22rem";
   score.style.boxShadow = "0 1px 0 rgba(255,255,255,0.45) inset";
-  score.style.visibility = isWildcard ? "hidden" : "visible";
+  score.style.visibility = isWildcard || isPatternCharacter ? "hidden" : "visible";
 
   face.textContent = isWildcard ? "" : letter.toUpperCase();
-  score.textContent = isWildcard ? "" : String(getScrabbleTileValue(letter));
+  score.textContent = isWildcard || isPatternCharacter ? "" : String(getScrabbleTileValue(letter));
   tile.append(face, score);
   tile.style.setProperty("--tile-index", String(index));
   return tile;
@@ -745,21 +746,30 @@ function renderRackTiles() {
   }
 
   const raw = input.value;
-  const letters = [...raw.replace(/\s+/g, "")].slice(0, 18);
-  const caretIndex = Math.min(input.selectionStart ?? letters.length, letters.length);
+  const letters = [...raw.replace(/\s+/g, "")];
+  const selectionStart = input.selectionStart ?? raw.length;
+  const caretIndex = [...raw.slice(0, selectionStart).replace(/\s+/g, "")].length;
   const tiles = letters.map((letter, index) => createRackTile(letter, index));
   tiles.splice(caretIndex, 0, createRackCaret());
 
-  rackTiles.style.position = "absolute";
-  rackTiles.style.zIndex = "2";
-  rackTiles.style.inset = "0.4rem 0.55rem 0.4rem 0.6rem";
-  rackTiles.style.display = "flex";
-  rackTiles.style.flexWrap = "wrap";
-  rackTiles.style.gap = "0.2rem";
-  rackTiles.style.alignItems = "center";
-  rackTiles.style.pointerEvents = "none";
-
   rackTiles.replaceChildren(...tiles);
+}
+
+function sanitizeRackInput() {
+  const currentValue = input.value;
+  const currentStart = input.selectionStart ?? currentValue.length;
+  const currentEnd = input.selectionEnd ?? currentStart;
+  const sanitizedValue = InputRules.sanitizeSmartInput(currentValue);
+
+  if (sanitizedValue === currentValue) {
+    return;
+  }
+
+  input.value = sanitizedValue;
+  input.setSelectionRange(
+    InputRules.sanitizeSmartInput(currentValue.slice(0, currentStart)).length,
+    InputRules.sanitizeSmartInput(currentValue.slice(0, currentEnd)).length
+  );
 }
 
 function renderAllPickList() {
@@ -2520,8 +2530,18 @@ form.addEventListener("submit", handleSubmit);
 form.addEventListener("input", syncSectionFilterResetButtons);
 form.addEventListener("change", syncSectionFilterResetButtons);
 input.addEventListener("input", () => {
+  sanitizeRackInput();
   closeHistoryDropdown();
   renderRackTiles();
+});
+input.addEventListener("beforeinput", (event) => {
+  if (
+    event.inputType === "insertText"
+    && event.data
+    && InputRules.sanitizeSmartInput(event.data) !== event.data
+  ) {
+    event.preventDefault();
+  }
 });
 input.addEventListener("keyup", renderRackTiles);
 input.addEventListener("click", renderRackTiles);
