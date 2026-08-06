@@ -545,7 +545,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-07-30"
+      "dateModified": "2026-08-05"
     }
   ]
 }
@@ -764,6 +764,11 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>
           Print
         </button>
+        <button class="btn-amort-action" id="amortPdfBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5M8 16h8M8 12h8"/></svg>
+          Download PDF
+        </button>
+        <span id="amortPdfConfirm" role="status" style="display:none;color:var(--accent);font-size:0.8rem;align-self:center;">PDF downloaded.</span>
         <button class="btn-amort-action" id="amortCsvBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
           Download CSV
@@ -807,7 +812,7 @@
          amount repaid over the life of the loan, and how much of that total is interest.
          Scroll down to the amortization schedule to see a month-by-month or year-by-year
          breakdown of every payment. Use the schedule actions to print the complete selected view
-         or download it as CSV or aligned plain text.</p>
+         or download it as a paginated PDF, CSV, or aligned plain text.</p>
     </div>
 
     <!-- FORMULA -->
@@ -934,6 +939,7 @@
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
+      <a href="https://blog.monkeytactics.com/">Blog</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms-of-service">Terms</a>
       <a href="/third-party-notices">Third-Party Notices</a>
@@ -943,6 +949,7 @@
     </nav>
   </footer>
 
+  <script src="/assets/js/calculator-pdf.js?v=20260805-2"></script>
   <!-- CALCULATOR SCRIPT -->
   <script>
   (function () {
@@ -976,6 +983,8 @@
   const amortBody          = document.getElementById('amortBody');
   const amortInfo          = document.getElementById('amortInfo');
   const amortPrintBtn      = document.getElementById('amortPrintBtn');
+  const amortPdfBtn        = document.getElementById('amortPdfBtn');
+  const amortPdfConfirm    = document.getElementById('amortPdfConfirm');
   const amortCsvBtn        = document.getElementById('amortCsvBtn');
   const amortTxtBtn        = document.getElementById('amortTxtBtn');
   const btnPrev            = document.getElementById('btnPrev');
@@ -1289,6 +1298,38 @@
     window.print();
   }
 
+  function downloadAmortizationPdf() {
+    if (!schedule.length || !window.MonkeyTacticsPdf) return;
+    const rows = getAmortizationExportRows();
+    window.MonkeyTacticsPdf.downloadReport({
+      title: 'Loan & Mortgage Calculator Report',
+      filename: 'loan-amortization-' + amortView.value + '.pdf',
+      summary: [
+        { label: 'Loan type', value: loanTypeSelect.options[loanTypeSelect.selectedIndex].textContent.trim() },
+        { label: 'Loan amount', value: fmtCurrency(parseFloat(loanAmountInput.value)) },
+        { label: 'Annual interest rate', value: parseFloat(interestRateInput.value).toFixed(2) + '%' },
+        { label: 'Loan term', value: loanTermInput.value + ' years' },
+        { label: 'Monthly payment', value: resMonthly.textContent },
+        { label: 'Total amount paid', value: resTotal.textContent },
+        { label: 'Total interest paid', value: resInterest.textContent }
+      ],
+      note: 'Principal and interest estimate only. Taxes, insurance, fees, and lender-specific costs are not included.',
+      table: {
+        title: amortView.value === 'annual' ? 'Annual Amortization Summary' : 'Monthly Amortization Schedule',
+        columns: [
+          { label: 'Period', width: 14 },
+          { label: 'Payment', width: 14, align: 'right' },
+          { label: 'Principal', width: 14, align: 'right' },
+          { label: 'Interest', width: 14, align: 'right' },
+          { label: 'Balance', width: 14, align: 'right' }
+        ],
+        rows: rows.map(function(row) { return [row.period, fmtCurrency(row.payment), fmtCurrency(row.principal), fmtCurrency(row.interest), fmtCurrency(row.balance)]; })
+      }
+    });
+    amortPdfConfirm.style.display = 'inline';
+    setTimeout(function() { amortPdfConfirm.style.display = 'none'; }, 2500);
+  }
+
   /* ── Main calculate function ── */
   function runCalculation() {
     calcError.style.display  = 'none';
@@ -1350,6 +1391,7 @@
   });
 
   amortPrintBtn.addEventListener('click', printAmortizationSchedule);
+  amortPdfBtn.addEventListener('click', downloadAmortizationPdf);
   amortCsvBtn.addEventListener('click', function () {
     downloadAmortizationFile(buildAmortizationCsv(), 'csv', 'text/csv');
   });

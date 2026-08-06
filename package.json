@@ -1,0 +1,22 @@
+{
+  "name": "monkeytactics-qr-studio",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build:qr": "vite build",
+    "build:wasm": "wasm-pack build wasm/qr-code-generator-engine --target web --release --out-dir ../../assets/wasm/qr-code-generator --out-name qr_engine && node -e \"require('fs').rmSync('assets/wasm/qr-code-generator/.gitignore',{force:true})\"",
+    "build": "npm run build:wasm && npm run build:qr",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.cjs tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest"
+  },
+  "devDependencies": {}
+}

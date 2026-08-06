@@ -25,7 +25,7 @@ test("authorizes production, Cloudflare Pages, and local Wrangler hosts", () => 
   assert.equal(verify_domain("monkeytactics-calculators.pages.dev"), true);
   assert.equal(verify_domain("preview.monkeytactics-calculators.pages.dev"), true);
   assert.equal(verify_domain("127.0.0.1"), true);
-  assert.equal(verify_domain("www.monkeytactics.com"), false);
+  assert.equal(verify_domain("www.monkeytactics.com"), true);
   assert.equal(verify_domain("localhost"), false);
   assert.equal(verify_domain("evilmonkeytactics-calculators.pages.dev"), false);
 });

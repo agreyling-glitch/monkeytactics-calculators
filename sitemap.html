@@ -11,80 +11,234 @@
   <title>HTML Sitemap | MonkeyTactics</title>
   <meta name="description" content="Explore the MonkeyTactics sitemap with all calculators, converters, and utilities for finance, health, construction, and productivity in an easy-to-browse list.">
   <link rel="canonical" href="https://monkeytactics.com/sitemap">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <style>
+    .sitemap-intro {
+      display: flex;
+      margin-bottom: 1.25rem;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .sitemap-intro p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .last-updated {
+      flex: 0 0 auto;
+      padding: 0.25rem 0.75rem;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .sitemap-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .sitemap-card {
+      padding: 1.25rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+    }
+
+    .sitemap-card--wide {
+      grid-column: 1 / -1;
+    }
+
+    .sitemap-card h2 {
+      margin: 0 0 0.85rem;
+      color: var(--text);
+      font-size: 1.05rem;
+    }
+
+    .sitemap-links {
+      display: grid;
+      margin: 0;
+      padding: 0;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+      list-style: none;
+    }
+
+    .sitemap-card:not(.sitemap-card--wide) .sitemap-links {
+      grid-template-columns: 1fr;
+    }
+
+    .sitemap-links a {
+      display: flex;
+      min-height: 2.5rem;
+      padding: 0.55rem 0.7rem;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid transparent;
+      border-radius: 0.6rem;
+      font-size: 0.9rem;
+      line-height: 1.35;
+      transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.15s;
+    }
+
+    .sitemap-links a::before {
+      color: var(--accent);
+      content: "\203A";
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .sitemap-links a:hover,
+    .sitemap-links a:focus-visible {
+      color: var(--text);
+      background: var(--accent-soft);
+      border-color: rgba(34, 197, 94, 0.3);
+      outline: none;
+      transform: translateX(2px);
+    }
+
+    @media (max-width: 700px) {
+      .sitemap-intro {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .sitemap-grid,
+      .sitemap-links {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body>
+<body class="sticky-footer-page">
   <main>
-    <h1>MonkeyTactics HTML Sitemap</h1>
+    <header>
+      <a href="/" class="brand">
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
+             alt="MonkeyTactics logo" class="brand-logo" width="383" height="375">
+        <div>
+          <div class="brand-name">MonkeyTactics</div>
+          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+        </div>
+      </a>
 
-    <h2>Site Pages</h2>
-    <ul>
-      <li><a href="/">Home</a></li>
-      <li><a href="/tools/">All Tools</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/privacy">Privacy Policy</a></li>
-      <li><a href="/terms-of-service">Terms of Service</a></li>
-      <li><a href="/third-party-notices">Third-Party Notices</a></li>
-      <li><a href="/contact">Contact</a></li>
-      <li><a href="/sitemap">HTML Sitemap</a></li>
-      <li><a href="/sitemap.xml">XML Sitemap</a></li>
-    </ul>
+      <nav aria-label="Primary navigation">
+        <a href="/tools/">All Tools</a>
+        <a href="/tools/finance">Finance</a>
+        <a href="/tools/health">Health</a>
+        <a href="/tools/utilities">Utilities</a>
+        <a href="/tools/productivity">Productivity</a>
+        <a href="/tools/construction">Construction</a>
+      </nav>
+    </header>
 
-    <h2>Finance Tools</h2>
-    <ul>
-      <li><a href="/tools/loan-mortgage-calculator">Loan &amp; Mortgage Calculator</a></li>
-      <li><a href="/tools/compound-interest-calculator">Compound Interest Calculator</a></li>
-      <li><a href="/tools/percentage-calculator">Percentage Calculator</a></li>
-    </ul>
+    <section class="hero hero--inner" aria-labelledby="sitemap-heading">
+      <h1 id="sitemap-heading">HTML Sitemap</h1>
+      <p>Browse every MonkeyTactics page, calculator, converter, and utility from one place.</p>
+    </section>
 
-    <h2>Health &amp; Body Tools</h2>
-    <ul>
-      <li><a href="/tools/bmi-calculator">BMI Calculator</a></li>
-      <li><a href="/tools/calorie-calculator">Calorie Calculator</a></li>
-      <li><a href="/tools/age-calculator">Age Calculator</a></li>
-    </ul>
+    <section aria-labelledby="directory-heading">
+      <div class="sitemap-intro">
+        <p id="directory-heading">Choose a section below to quickly find the page or tool you need.</p>
+        <span class="last-updated">Updated August 5, 2026</span>
+      </div>
 
-    <h2>Utilities</h2>
-    <ul>
-      <li><a href="/tools/date-difference-calculator">Date Difference Calculator for Business Days</a></li>
-      <li><a href="/tools/unit-converter">Unit Converter</a></li>
-      <li><a href="/tools/tip-calculator">Tip Calculator</a></li>
-      <li><a href="/tools/time-zone-converter">Time Zone Converter</a></li>
-      <li><a href="/tools/qr-code-generator">QR Code Generator</a></li>
-      <li><a href="/tools/qr-code-decoder">QR Code Decoder</a></li>
-      <li><a href="/tools/word-unscrambler">Word Unscrambler &amp; Scrabble Word Finder</a></li>
-    </ul>
+      <div class="sitemap-grid">
+        <section class="sitemap-card sitemap-card--wide" aria-labelledby="site-pages-heading">
+          <h2 id="site-pages-heading">Site Pages</h2>
+          <ul class="sitemap-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/tools/">All Tools</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="https://blog.monkeytactics.com/">MonkeyTactics Blog</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/terms-of-service">Terms of Service</a></li>
+            <li><a href="/third-party-notices">Third-Party Notices</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/sitemap">HTML Sitemap</a></li>
+            <li><a href="/sitemap.xml">XML Sitemap</a></li>
+          </ul>
+        </section>
 
-    <h2>Productivity Tools</h2>
-    <ul>
-      <li><a href="/tools/password-generator">Password Generator</a></li>
-      <li><a href="/tools/word-character-counter">Word &amp; Character Counter</a></li>
-      <li><a href="/tools/ocr-utility">OCR Utility</a></li>
-    </ul>
+        <section class="sitemap-card" aria-labelledby="finance-heading">
+          <h2 id="finance-heading">Finance Tools</h2>
+          <ul class="sitemap-links">
+            <li><a href="/tools/loan-mortgage-calculator">Loan &amp; Mortgage Calculator</a></li>
+            <li><a href="/tools/compound-interest-calculator">Compound Interest Calculator</a></li>
+            <li><a href="/tools/percentage-calculator">Percentage Calculator</a></li>
+          </ul>
+        </section>
 
-    <h2>Construction Tools</h2>
-    <ul>
-      <li><a href="/tools/concrete-calculator">Concrete Calculator</a></li>
-      <li><a href="/tools/drywall-calculator">Drywall Calculator</a></li>
-      <li><a href="/tools/paint-calculator">Paint Calculator</a></li>
-      <li><a href="/tools/tile-calculator">Tile Calculator</a></li>
-      <li><a href="/tools/roofing-shingle-calculator">Roofing Shingle Calculator</a></li>
-      <li><a href="/tools/lumber-board-foot-calculator">Lumber Board Foot Calculator</a></li>
-      <li><a href="/tools/insulation-calculator">Insulation Calculator</a></li>
-    </ul>
+        <section class="sitemap-card" aria-labelledby="health-heading">
+          <h2 id="health-heading">Health &amp; Body Tools</h2>
+          <ul class="sitemap-links">
+            <li><a href="/tools/bmi-calculator">BMI Calculator</a></li>
+            <li><a href="/tools/calorie-calculator">Calorie Calculator</a></li>
+            <li><a href="/tools/age-calculator">Age Calculator</a></li>
+          </ul>
+        </section>
 
-    <h2>Categories</h2>
-    <ul>
-      <li><a href="/tools/finance">Finance</a></li>
-      <li><a href="/tools/health">Health &amp; Body</a></li>
-      <li><a href="/tools/utilities">Utilities</a></li>
-      <li><a href="/tools/productivity">Productivity</a></li>
-      <li><a href="/tools/construction">Construction</a></li>
-    </ul>
+        <section class="sitemap-card" aria-labelledby="utilities-heading">
+          <h2 id="utilities-heading">Utilities</h2>
+          <ul class="sitemap-links">
+            <li><a href="/tools/date-difference-calculator">Date Difference Calculator for Business Days</a></li>
+            <li><a href="/tools/unit-converter">Unit Converter</a></li>
+            <li><a href="/tools/tip-calculator">Tip Calculator</a></li>
+            <li><a href="/tools/time-zone-converter">Time Zone Converter</a></li>
+            <li><a href="/tools/qr-code-generator">Advanced QR Code Generator</a></li>
+            <li><a href="/tools/qr-code-decoder">QR Code Decoder</a></li>
+            <li><a href="/tools/word-unscrambler">Word Unscrambler &amp; Scrabble Word Finder</a></li>
+          </ul>
+        </section>
+
+        <section class="sitemap-card" aria-labelledby="productivity-heading">
+          <h2 id="productivity-heading">Productivity Tools</h2>
+          <ul class="sitemap-links">
+            <li><a href="/tools/password-generator">Password Generator</a></li>
+            <li><a href="/tools/word-character-counter">Word &amp; Character Counter</a></li>
+            <li><a href="/tools/ocr-utility">OCR Utility</a></li>
+          </ul>
+        </section>
+
+        <section class="sitemap-card" aria-labelledby="construction-heading">
+          <h2 id="construction-heading">Construction Tools</h2>
+          <ul class="sitemap-links">
+            <li><a href="/tools/concrete-calculator">Concrete Calculator</a></li>
+            <li><a href="/tools/drywall-calculator">Drywall Calculator</a></li>
+            <li><a href="/tools/paint-calculator">Paint Calculator</a></li>
+            <li><a href="/tools/tile-calculator">Tile Calculator</a></li>
+            <li><a href="/tools/roofing-shingle-calculator">Roofing Shingle Calculator</a></li>
+            <li><a href="/tools/lumber-board-foot-calculator">Lumber Board Foot Calculator</a></li>
+            <li><a href="/tools/insulation-calculator">Insulation Calculator</a></li>
+          </ul>
+        </section>
+
+        <section class="sitemap-card" aria-labelledby="categories-heading">
+          <h2 id="categories-heading">Categories</h2>
+          <ul class="sitemap-links">
+            <li><a href="/tools/finance">Finance</a></li>
+            <li><a href="/tools/health">Health &amp; Body</a></li>
+            <li><a href="/tools/utilities">Utilities</a></li>
+            <li><a href="/tools/productivity">Productivity</a></li>
+            <li><a href="/tools/construction">Construction</a></li>
+          </ul>
+        </section>
+      </div>
+    </section>
   </main>
 
   <footer>
-    <p>Last updated: 2026-07-30</p>
+    <div>&copy; 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
+      <a href="https://blog.monkeytactics.com/">Blog</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms-of-service">Terms</a>
       <a href="/third-party-notices">Third-Party Notices</a>

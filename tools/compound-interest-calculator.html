@@ -287,7 +287,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-07-30"
+      "dateModified": "2026-08-05"
     }
   ]
 }
@@ -507,6 +507,11 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>
           Print
         </button>
+        <button class="btn-growth-action" id="growthPdfBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5M8 16h8M8 12h8"/></svg>
+          Download PDF
+        </button>
+        <span id="growthPdfConfirm" role="status" style="display:none;color:var(--accent);font-size:0.8rem;align-self:center;">PDF downloaded.</span>
         <button class="btn-growth-action" id="growthCsvBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
           Download CSV
@@ -535,7 +540,7 @@
          (used to convert the nominal balance into today's purchasing power equivalent).
          The results and growth table update to show all four views: gross, after-tax,
          real, and real after-tax. Use the growth schedule actions to print the selected view
-         or download its complete year-by-year data as CSV or aligned plain text.</p>
+         or download its complete year-by-year data as a paginated PDF, CSV, or aligned plain text.</p>
     </div>
 
     <!-- FORMULA -->
@@ -655,6 +660,7 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
+      <a href="https://blog.monkeytactics.com/">Blog</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms-of-service">Terms</a>
       <a href="/third-party-notices">Third-Party Notices</a>
@@ -664,6 +670,7 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
     </nav>
   </footer>
 
+  <script src="/assets/js/calculator-pdf.js?v=20260805-2"></script>
   <script>
   (function () {
 
@@ -718,6 +725,8 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
     const growthBody = $('growthBody');
     const tableView  = $('tableView');
     const growthPrintBtn = $('growthPrintBtn');
+    const growthPdfBtn = $('growthPdfBtn');
+    const growthPdfConfirm = $('growthPdfConfirm');
     const growthCsvBtn = $('growthCsvBtn');
     const growthTxtBtn = $('growthTxtBtn');
 
@@ -926,6 +935,37 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
       window.print();
     }
 
+    function downloadGrowthPdf() {
+      if (!yearlyData.length || !window.MonkeyTacticsPdf) return;
+      var columns = getGrowthExportColumns();
+      window.MonkeyTacticsPdf.downloadReport({
+        title: 'Compound Interest Calculator Report',
+        filename: 'compound-interest-growth-' + tableView.value + '.pdf',
+        landscape: columns.length > 6,
+        summary: [
+          { label: 'Initial investment', value: fmtD(parseFloat(principalInput.value) || 0) },
+          { label: 'Annual interest rate', value: parseFloat(annualRateInput.value).toFixed(2) + '%' },
+          { label: 'Investment period', value: yearsInput.value + ' years' },
+          { label: 'Compounding frequency', value: compoundFreqSelect.options[compoundFreqSelect.selectedIndex].textContent.trim() },
+          { label: 'Monthly contribution', value: fmtD(parseFloat(monthlyContribInput.value) || 0) },
+          { label: 'Tax rate', value: (parseFloat(taxRateInput.value) || 0) + '%' },
+          { label: 'Inflation rate', value: (parseFloat(inflationRateInput.value) || 0) + '%' },
+          { label: 'Final balance', value: resFinal.textContent },
+          { label: 'Inflation-adjusted balance', value: resReal.textContent },
+          { label: 'Total contributions', value: resContribs.textContent },
+          { label: 'Net interest earned', value: resInterest.textContent }
+        ],
+        note: 'Illustrative estimate only. Actual returns, taxes, fees, and inflation may differ.',
+        table: {
+          title: 'Year-by-Year Growth - ' + tableView.options[tableView.selectedIndex].textContent,
+          columns: columns.map(function(column) { return { label: column.label, width: column.key === 'year' ? 8 : 16, align: column.key === 'year' ? 'left' : 'right' }; }),
+          rows: yearlyData.map(function(row) { return columns.map(function(column) { return column.key === 'year' ? 'Year ' + row.year : fmtD(row[column.key]); }); })
+        }
+      });
+      growthPdfConfirm.style.display = 'inline';
+      setTimeout(function() { growthPdfConfirm.style.display = 'none'; }, 2500);
+    }
+
     function readURL() {
       var params = new URLSearchParams(window.location.search);
       function setVal(input, slider, display, key, formatter) {
@@ -1016,6 +1056,7 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
     calcBtn.addEventListener('click', runCalc);
     tableView.addEventListener('change', function() { renderTable(tableView.value); });
     growthPrintBtn.addEventListener('click', printGrowthSchedule);
+    growthPdfBtn.addEventListener('click', downloadGrowthPdf);
     growthCsvBtn.addEventListener('click', function() {
       downloadGrowthFile(buildGrowthCsv(), 'csv', 'text/csv');
     });

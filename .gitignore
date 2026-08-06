@@ -151,3 +151,5 @@ outputs/
 
 # Rust build output (the browser-ready wasm-pack output under assets/ is committed)
 wasm/word-unscrambler-engine/target/
+wasm/qr-code-generator-engine/target/
+wasm/target/
