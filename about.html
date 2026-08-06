@@ -1,368 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>About — MonkeyTactics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description"
-        content="Learn about MonkeyTactics — who we are, what we build, and why we believe free, private, accurate tools should be available to everyone." />
+  <title>About Adriaan Greyling &amp; MonkeyTactics</title>
+  <meta name="description" content="Meet MonkeyTactics founder Adriaan Greyling and learn why decades of financial technology experience led him to build fast, private, dependable tools." />
+  <meta name="author" content="Adriaan Greyling" />
+  <meta name="date" content="2026-08-06" />
 
-  <!-- Canonical -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <link rel="canonical" href="https://monkeytactics.com/about" />
 
+  <meta property="og:title" content="About Adriaan Greyling &amp; MonkeyTactics" />
+  <meta property="og:description" content="The product is the product. You are not. Meet the founder building private, dependable tools from decades of financial technology experience." />
+  <meta property="og:type" content="profile" />
+  <meta property="og:url" content="https://monkeytactics.com/about" />
+
   <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "AboutPage",
-  "name": "About MonkeyTactics",
-  "url": "https://monkeytactics.com/about",
-  "description": "Learn about MonkeyTactics, our mission, and the team behind our collection of calculators, converters, and productivity tools.",
-  "publisher": {
-    "@type": "Organization",
-    "name": "MonkeyTactics",
-    "url": "https://monkeytactics.com",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://monkeytactics.com/logo.png"
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About Adriaan Greyling and MonkeyTactics",
+    "url": "https://monkeytactics.com/about",
+    "description": "The founder story, engineering philosophy, and vision behind MonkeyTactics.",
+    "mainEntity": {
+      "@type": "Person",
+      "name": "Adriaan Greyling",
+      "jobTitle": "Founder of MonkeyTactics",
+      "sameAs": [
+        "https://www.linkedin.com/in/adriaan-greyling-bb228541/"
+      ],
+      "knowsAbout": [
+        "Mainframe engineering",
+        "Financial technology",
+        "Debit card transaction processing",
+        "Privacy-focused software",
+        "WebAssembly"
+      ]
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "MonkeyTactics",
+      "url": "https://monkeytactics.com"
     }
   }
-}
-</script>
+  </script>
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "https://monkeytactics.com/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "About",
-      "item": "https://monkeytactics.com/about"
-    }
-  ]
-}
-</script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://monkeytactics.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "About",
+        "item": "https://monkeytactics.com/about"
+      }
+    ]
+  }
+  </script>
 
-  <!-- Open Graph -->
-  <meta property="og:title"       content="About — MonkeyTactics" />
-  <meta property="og:description" content="Free, fast, and privacy-friendly online tools for finance, health, utilities, productivity, and construction." />
-  <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://monkeytactics.com/about" />
-
-  <!-- Global Stylesheet -->
   <link rel="stylesheet" href="/assets/css/style.css" />
-
-  <!-- About-page overrides -->
-  <style>
-    /* Hero variant for inner pages */
-    .hero--inner {
-      padding: 1.75rem 2rem;
-    }
-
-    .hero--inner h1 {
-      font-size: 1.9rem;
-    }
-
-    /* Pillar grid — 4-up on wide, 2-up on tablet, 1-up on mobile */
-    .pillars-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .pillar-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem 1.25rem 1.4rem;
-      box-shadow: var(--shadow-card);
-    }
-
-    .pillar-icon {
-      font-size: 1.75rem;
-      margin-bottom: 0.6rem;
-      display: block;
-    }
-
-    .pillar-card strong {
-      display: block;
-      font-size: 0.95rem;
-      margin-bottom: 0.35rem;
-      color: var(--accent);
-    }
-
-    .pillar-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.875rem;
-      line-height: 1.55;
-    }
-
-    /* Prose sections */
-    .about-section {
-      max-width: 740px;
-      margin-top: 2rem;
-    }
-
-    .about-section h2 {
-      margin-top: 0;
-      margin-bottom: 0.5rem;
-      font-size: 1.2rem;
-    }
-
-    .about-section p {
-      color: var(--muted);
-      line-height: 1.7;
-      margin: 0 0 0.75rem;
-    }
-
-    .about-section p:last-child {
-      margin-bottom: 0;
-    }
-
-    /* Category list inline */
-    .category-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-      padding: 0;
-      list-style: none;
-    }
-
-    .category-list li a {
-      display: inline-block;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-radius: 999px;
-      padding: 0.3rem 0.85rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: background 0.15s, color 0.15s;
-    }
-
-    .category-list li a:hover {
-      background: var(--accent);
-      color: #022c22;
-    }
-
-    /* Complete, clickable tool directory */
-    .tool-directory {
-      width: 100%;
-      margin-top: 1.25rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      border-collapse: separate;
-      border-spacing: 0;
-      overflow: hidden;
-      background: var(--card-bg);
-      box-shadow: var(--shadow-card);
-    }
-
-    .tool-directory th,
-    .tool-directory td {
-      padding: 0;
-      text-align: left;
-    }
-
-    .tool-directory-head,
-    .tool-directory-link {
-      display: grid;
-      grid-template-columns: 9rem minmax(14rem, 1fr) minmax(18rem, 1.5fr) 2rem;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .tool-directory-head {
-      padding: 0.75rem 1rem;
-      background: linear-gradient(110deg, #052e2b, #0f766e 55%, #7c3aed);
-      color: #fff;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .tool-directory tbody tr:not(:last-child) td {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .tool-directory-link {
-      --row-color: #14b8a6;
-      --row-soft: rgba(20, 184, 166, 0.1);
-      position: relative;
-      min-height: 4.25rem;
-      padding: 0.75rem 1rem 0.75rem 1.15rem;
-      color: inherit;
-      border-left: 5px solid var(--row-color);
-      transition: background 0.16s ease, transform 0.16s ease;
-    }
-
-    .tool-directory-link::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      background: linear-gradient(90deg, var(--row-soft), transparent 55%);
-      opacity: 0;
-      transition: opacity 0.16s ease;
-    }
-
-    .tool-directory-link > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    .tool-directory-link:hover,
-    .tool-directory-link:focus-visible {
-      background: var(--row-soft);
-      transform: translateX(2px);
-      outline: none;
-    }
-
-    .tool-directory-link:hover::before,
-    .tool-directory-link:focus-visible::before {
-      opacity: 1;
-    }
-
-    .tool-directory-link:focus-visible {
-      box-shadow: inset 0 0 0 3px var(--row-color);
-    }
-
-    .tool-directory-link[data-category="finance"] {
-      --row-color: #22c55e;
-      --row-soft: rgba(34, 197, 94, 0.1);
-    }
-
-    .tool-directory-link[data-category="health"] {
-      --row-color: #f43f5e;
-      --row-soft: rgba(244, 63, 94, 0.1);
-    }
-
-    .tool-directory-link[data-category="utilities"] {
-      --row-color: #3b82f6;
-      --row-soft: rgba(59, 130, 246, 0.1);
-    }
-
-    .tool-directory-link[data-category="productivity"] {
-      --row-color: #a855f7;
-      --row-soft: rgba(168, 85, 247, 0.1);
-    }
-
-    .tool-directory-link[data-category="construction"] {
-      --row-color: #f59e0b;
-      --row-soft: rgba(245, 158, 11, 0.1);
-    }
-
-    .tool-directory-category {
-      justify-self: start;
-      padding: 0.25rem 0.6rem;
-      border: 1px solid var(--row-color);
-      border-radius: 999px;
-      color: var(--row-color);
-      background: var(--row-soft);
-      font-size: 0.73rem;
-      font-weight: 700;
-      letter-spacing: 0.025em;
-      white-space: nowrap;
-    }
-
-    .tool-directory-name {
-      display: flex;
-      gap: 0.65rem;
-      align-items: center;
-      font-weight: 700;
-    }
-
-    .tool-directory-icon {
-      display: inline-grid;
-      width: 2rem;
-      height: 2rem;
-      flex: 0 0 2rem;
-      place-items: center;
-      border-radius: 0.55rem;
-      background: var(--row-soft);
-      font-size: 1rem;
-    }
-
-    .tool-directory-description {
-      color: var(--muted);
-      font-size: 0.84rem;
-      line-height: 1.45;
-    }
-
-    .tool-directory-arrow {
-      color: var(--row-color);
-      font-size: 1.5rem;
-      font-weight: 700;
-      transition: transform 0.16s ease;
-    }
-
-    .tool-directory-link:hover .tool-directory-arrow,
-    .tool-directory-link:focus-visible .tool-directory-arrow {
-      transform: translateX(4px);
-    }
-
-    /* CTA strip */
-    .about-cta {
-      margin-top: 2.5rem;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    @media (max-width: 600px) {
-      .hero--inner {
-        padding: 1.25rem;
-      }
-
-      .hero--inner h1 {
-        font-size: 1.5rem;
-      }
-
-      .tool-directory-head {
-        display: none;
-      }
-
-      .tool-directory-link {
-        grid-template-columns: 6.5rem minmax(0, 1fr) 1.25rem;
-        gap: 0.55rem 0.75rem;
-        padding: 0.8rem 0.75rem 0.8rem 0.9rem;
-      }
-
-      .tool-directory-description {
-        grid-column: 2 / 4;
-      }
-
-      .about-cta {
-        flex-direction: column;
-      }
-    }
-  </style>
-  <script src="/assets/js/ads.js" defer></script>
-  <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-26" />
-  <link rel="stylesheet" href="/assets/css/trustpilot-review-collector.css?v=20260731-2">
-  <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+  <link rel="stylesheet" href="/assets/css/about.css?v=20260806-2" />
 </head>
 
-<body>
+<body class="about-page sticky-footer-page">
   <main>
-
-    <!-- HEADER -->
     <header>
       <a href="/" class="brand">
         <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
@@ -384,156 +98,175 @@
       </nav>
     </header>
 
-    <!-- PAGE HERO -->
-    <section class="hero hero--inner" aria-labelledby="about-heading">
-      <h1 id="about-heading">About MonkeyTactics</h1>
-      <p>Free, fast, and privacy‑friendly tools for everyday calculations. No accounts. No tracking. No nonsense.</p>
-
-      <div class="hero-actions">
-        <a href="/tools/" class="btn-primary">⚡ Browse all tools</a>
-        <a href="/contact" class="btn-ghost">Get in touch</a>
+    <section class="about-hero" aria-labelledby="about-heading">
+      <div>
+        <p class="about-kicker">A different kind of software company</p>
+        <h1 id="about-heading">The product is the product. <em>You are not.</em></h1>
+        <p class="about-hero__lede">
+          MonkeyTactics is an independent collection of useful, private tools built by someone who has seen technology serve people — and watched that relationship slowly reverse.
+        </p>
+        <div class="about-hero__actions">
+          <a href="/tools/" class="btn-primary">Explore the tools</a>
+          <a href="#founder-story" class="btn-ghost">Read the founder story</a>
+        </div>
       </div>
+
+      <aside class="founder-mark" aria-label="Founder profile">
+        <img class="founder-mark__photo"
+             src="/assets/img/adriaan-greyling-profile.jpg"
+             alt="Adriaan Greyling"
+             width="356" height="399" />
+        <div class="founder-mark__caption">
+          <strong>Adriaan Greyling</strong>
+          <span>Founder · Mainframe engineer · Financial technologist</span>
+          <a href="https://www.linkedin.com/in/adriaan-greyling-bb228541/" target="_blank" rel="noopener noreferrer" aria-label="View Adriaan Greyling on LinkedIn">
+            LinkedIn profile <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </aside>
     </section>
 
-    <!-- AD -->
-    <div class="ad-container" aria-label="Advertisement">
-      <!-- AdSense: Top Display Ad -->
+    <div class="trust-strip" aria-label="Founder experience and product principles">
+      <div class="trust-strip__item">
+        <strong>Since 1996</strong>
+        <span>Working in financial technology</span>
+      </div>
+      <div class="trust-strip__item">
+        <strong>Millions daily</strong>
+        <span>Debit-card transactions analyzed</span>
+      </div>
+      <div class="trust-strip__item">
+        <strong>Your browser</strong>
+        <span>Where your tool inputs stay</span>
+      </div>
     </div>
 
-    <!-- PILLARS -->
-    <section aria-labelledby="pillars-heading">
-      <h2 id="pillars-heading">What MonkeyTactics stands for</h2>
-      <p class="text-muted">Four principles that guide every tool we build.</p>
-
-      <div class="pillars-grid">
-
-        <div class="pillar-card">
-          <span class="pillar-icon" aria-hidden="true">🆓</span>
-          <strong>Always Free</strong>
-          <p>Every tool on this site is free to use — no paywalls, no subscriptions, no sign‑up required.</p>
-        </div>
-
-        <div class="pillar-card">
-          <span class="pillar-icon" aria-hidden="true">⚡</span>
-          <strong>Fast &amp; Lightweight</strong>
-          <p>Pages load in milliseconds. Tools run instantly. No frameworks, no bloat — just clean HTML, CSS, and JS.</p>
-        </div>
-
-        <div class="pillar-card">
-          <span class="pillar-icon" aria-hidden="true">🔒</span>
-          <strong>Private by Design</strong>
-          <p>All calculations happen directly in your browser. Nothing you enter is ever sent to a server or stored anywhere.</p>
-        </div>
-
-        <div class="pillar-card">
-          <span class="pillar-icon" aria-hidden="true">✅</span>
-          <strong>Accurate &amp; Reliable</strong>
-          <p>Each tool is carefully built and tested against known reference values so you can trust the results.</p>
-        </div>
-
+    <section class="about-editorial" id="founder-story" aria-labelledby="founder-heading">
+      <div class="about-editorial__label">The founder story</div>
+      <div class="about-editorial__body">
+        <h2 id="founder-heading">Three decades changed my view of the industry.</h2>
+        <p class="lead">
+          I’m Adriaan Greyling. I entered the financial industry in 1996 and spent my career working with the systems behind everyday transactions.
+        </p>
+        <p>
+          Much of that work lived on mainframes, where reliability is not a marketing phrase. I analyzed millions of debit-card transactions every day. At that scale, small errors become large problems. Software has to be correct, understandable, and dependable under pressure.
+        </p>
+        <p>
+          Over the years, I also watched the wider technology industry change. What began as a mostly straightforward exchange — a company provides a product and a customer pays for it — became something more extractive. Increasingly, the customer became the product: profiled, tracked, retained, and monetized.
+        </p>
+        <p>
+          I am retired from the corporate world now. MonkeyTactics is my way of offering a different option: useful software with no account required, no sales funnel to enter, and no need to surrender your inputs just to get an answer.
+        </p>
+        <blockquote class="founder-quote">
+          “I don’t want to sell you anything. I just want to provide a useful alternative.”
+        </blockquote>
       </div>
     </section>
 
-    <!-- MISSION -->
-    <section class="about-section" aria-labelledby="mission-heading">
-      <h2 id="mission-heading">Our Mission</h2>
-      <p>MonkeyTactics started from a simple frustration: too many calculator sites are slow, cluttered with ads,
-         or demand you create an account just to run a basic calculation. We set out to fix that.</p>
-      <p>The goal is straightforward — build a growing library of tools that are genuinely useful, immediately
-         accessible, and respectful of your time and privacy. Every page is hand‑crafted, tested on real devices,
-         and designed to get out of your way as fast as possible.</p>
+    <section class="expertise-panel" aria-labelledby="experience-heading">
+      <div>
+        <p class="about-kicker">Experience at scale</p>
+        <h2 id="experience-heading">Built with a mainframe mindset.</h2>
+        <p>
+          Financial systems teach a durable lesson: correctness comes first. They reward careful thinking, explicit logic, performance, and respect for the person whose money or information passes through the system.
+        </p>
+        <p>
+          That mindset follows every MonkeyTactics tool — from a simple percentage calculation to a Rust and WebAssembly QR encoder. The interface should feel easy because the engineering beneath it has done the hard work.
+        </p>
+      </div>
+      <div class="scale-card" aria-label="Debit card transaction experience">
+        <div class="scale-card__icon" aria-hidden="true">⌁</div>
+        <div>
+          <strong>Millions</strong>
+          <span>of debit-card transactions analyzed every day on mainframe systems where accuracy and reliability were non-negotiable.</span>
+        </div>
+      </div>
     </section>
 
-    <!-- WHAT WE COVER -->
-    <section aria-labelledby="coverage-heading">
-      <h2 id="coverage-heading">What we cover</h2>
-      <p class="text-muted">Tools span five core categories — and we're adding more regularly.</p>
+    <section class="principles-section" aria-labelledby="principles-heading">
+      <div class="principles-header">
+        <div>
+          <p class="about-kicker">The philosophy</p>
+          <h2 id="principles-heading">Good software should respect you.</h2>
+        </div>
+        <p>These are engineering decisions, not slogans added after the product is built.</p>
+      </div>
 
-      <ul class="category-list" role="list">
-        <li><a href="/tools/finance">💰 Finance</a></li>
-        <li><a href="/tools/health">🏥 Health &amp; Body</a></li>
-        <li><a href="/tools/utilities">🔧 Everyday Utilities</a></li>
-        <li><a href="/tools/productivity">⚡ Productivity</a></li>
-        <li><a href="/tools/construction">🏗️ Construction</a></li>
+      <div class="principles-grid">
+        <article class="principle-card" data-number="01">
+          <h3>Private by design</h3>
+          <p>Your calculations and tool inputs are processed in your browser. They do not need a round trip to a server to become useful.</p>
+        </article>
+        <article class="principle-card" data-number="02">
+          <h3>Simple on purpose</h3>
+          <p>No account before the answer. No maze of screens. No feature added merely to keep you clicking. The shortest path to a correct result wins.</p>
+        </article>
+        <article class="principle-card" data-number="03">
+          <h3>Performance is respect</h3>
+          <p>Lean pages, focused code, and browser-native tools keep waiting to a minimum. Your time and your device resources matter.</p>
+        </article>
+        <article class="principle-card" data-number="04">
+          <h3>Correctness over cleverness</h3>
+          <p>Results should be explainable, testable, and dependable. Craftsmanship means getting the fundamentals right — especially when no one is watching.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="build-story" aria-label="Why MonkeyTactics builds calculators and browser tools">
+      <div>
+        <p class="about-kicker">Why calculators?</p>
+        <h2>Because small tools solve real problems.</h2>
+        <p>
+          A calculator is software in its most honest form: you bring a question, the tool applies clear logic, and it returns an answer. It does not need to know who you are. It does not need to remember you. It simply needs to work.
+        </p>
+        <p>
+          MonkeyTactics began with that straightforward promise and continues to expand into practical finance, construction, health, productivity, and utility workflows.
+        </p>
+      </div>
+      <div class="technical-note">
+        <p class="about-kicker">Why Rust + WebAssembly?</p>
+        <h2>Serious engineering, inside your browser.</h2>
+        <p>
+          The QR encoder uses <code>Rust</code> compiled to <code>WebAssembly</code> because privacy should not require giving up performance or capability. Complex work can happen locally, quickly, and predictably — without uploading your content to a remote service.
+        </p>
+      </div>
+    </section>
+
+    <section class="vision-section" aria-labelledby="vision-heading">
+      <div>
+        <p class="about-kicker">Where this is going</p>
+        <h2 id="vision-heading">A deeper toolbox, built on the same promise.</h2>
+        <p>
+          MonkeyTactics will keep growing, but growth is not the goal by itself. The goal is a more capable library of dependable tools that remains fast, understandable, and respectful of the people using it.
+        </p>
+      </div>
+      <ul class="vision-list">
+        <li>More practical tools</li>
+        <li>More engineering depth</li>
+        <li>More professional workflows</li>
+        <li>More reliability and testing</li>
+        <li>The same privacy-first foundation</li>
       </ul>
-
-      <table class="tool-directory" aria-label="All MonkeyTactics tools">
-        <thead>
-          <tr>
-            <th scope="col" colspan="3">
-              <span class="tool-directory-head">
-                <span>Category</span>
-                <span>Tool</span>
-                <span>Description</span>
-                <span aria-hidden="true"></span>
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td colspan="3"><a href="/tools/loan-mortgage-calculator" class="tool-directory-link" data-category="finance"><span class="tool-directory-category">Finance</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🏠</span>Loan &amp; Mortgage Calculator</span><span class="tool-directory-description">Calculate payments, total interest, and full amortization schedules.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/compound-interest-calculator" class="tool-directory-link" data-category="finance"><span class="tool-directory-category">Finance</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">📈</span>Compound Interest Calculator</span><span class="tool-directory-description">Model investment growth with contributions, inflation, and tax scenarios.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/percentage-calculator" class="tool-directory-link" data-category="finance"><span class="tool-directory-category">Finance</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">💯</span>Percentage Calculator</span><span class="tool-directory-description">Find percentages, changes, increases, decreases, and reverse percentages.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-
-          <tr><td colspan="3"><a href="/tools/bmi-calculator" class="tool-directory-link" data-category="health"><span class="tool-directory-category">Health</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">⚖️</span>BMI Calculator</span><span class="tool-directory-description">Calculate Body Mass Index and see healthy weight ranges for your height.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/calorie-calculator" class="tool-directory-link" data-category="health"><span class="tool-directory-category">Health</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🔥</span>Calorie Calculator</span><span class="tool-directory-description">Estimate BMR, daily calorie needs, maintenance, and calorie goals.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/age-calculator" class="tool-directory-link" data-category="health"><span class="tool-directory-category">Health</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🎂</span>Age Calculator</span><span class="tool-directory-description">Find an exact age or calculate the time between any two dates.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-
-          <tr><td colspan="3"><a href="/tools/date-difference-calculator" class="tool-directory-link" data-category="utilities"><span class="tool-directory-category">Utilities</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">📅</span>Date Difference &amp; Business Days Calculator</span><span class="tool-directory-description">Calculate date spans, business days, deadlines, and recurring schedules.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/unit-converter" class="tool-directory-link" data-category="utilities"><span class="tool-directory-category">Utilities</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🔄</span>Unit Converter</span><span class="tool-directory-description">Convert metric and imperial units for length, weight, volume, and more.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/tip-calculator" class="tool-directory-link" data-category="utilities"><span class="tool-directory-category">Utilities</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🍽️</span>Tip Calculator</span><span class="tool-directory-description">Calculate local tips, account for tax, and split or round the bill.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/time-zone-converter" class="tool-directory-link" data-category="utilities"><span class="tool-directory-category">Utilities</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🌍</span>Time Zone Converter</span><span class="tool-directory-description">Convert times between world time zones and plan international meetings.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/qr-code-generator" class="tool-directory-link" data-category="utilities"><span class="tool-directory-category">Utilities</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">📱</span>QR Code Generator</span><span class="tool-directory-description">Create downloadable QR codes for URLs, text, and Wi&#8209;Fi credentials.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/qr-code-decoder" class="tool-directory-link" data-category="utilities"><span class="tool-directory-category">Utilities</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🔍</span>QR Code Decoder</span><span class="tool-directory-description">Decode QR codes privately from images, URLs, or your camera.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/word-unscrambler" class="tool-directory-link" data-category="utilities"><span class="tool-directory-category">Utilities</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🔤</span>Word Unscrambler</span><span class="tool-directory-description">Find playable words with Scrabble scores, board filters, bingos, and hooks.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-
-          <tr><td colspan="3"><a href="/tools/password-generator" class="tool-directory-link" data-category="productivity"><span class="tool-directory-category">Productivity</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🔑</span>Password Generator</span><span class="tool-directory-description">Generate strong random passwords with customizable character rules.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/word-character-counter" class="tool-directory-link" data-category="productivity"><span class="tool-directory-category">Productivity</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">📝</span>Word &amp; Character Counter</span><span class="tool-directory-description">Count words, characters, sentences, and paragraphs in any text.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/ocr-utility" class="tool-directory-link" data-category="productivity"><span class="tool-directory-category">Productivity</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">📄</span>OCR Utility</span><span class="tool-directory-description">Extract editable text from images with private, browser-based OCR.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-
-          <tr><td colspan="3"><a href="/tools/concrete-calculator" class="tool-directory-link" data-category="construction"><span class="tool-directory-category">Construction</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🧱</span>Concrete Calculator</span><span class="tool-directory-description">Estimate concrete volume, bag quantities, and total material weight.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/drywall-calculator" class="tool-directory-link" data-category="construction"><span class="tool-directory-category">Construction</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🏠</span>Drywall Calculator</span><span class="tool-directory-description">Estimate drywall sheets for room walls and their total weight.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/paint-calculator" class="tool-directory-link" data-category="construction"><span class="tool-directory-category">Construction</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🎨</span>Paint Calculator</span><span class="tool-directory-description">Calculate coated wall area, whole gallons, and total paint weight.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/tile-calculator" class="tool-directory-link" data-category="construction"><span class="tool-directory-category">Construction</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">◫</span>Tile Calculator</span><span class="tool-directory-description">Estimate tiles, boxes, waste allowance, and boxed material weight.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/roofing-shingle-calculator" class="tool-directory-link" data-category="construction"><span class="tool-directory-category">Construction</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🏘️</span>Roofing Shingle Calculator</span><span class="tool-directory-description">Convert roof area and pitch into squares, bundles, and load weight.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/lumber-board-foot-calculator" class="tool-directory-link" data-category="construction"><span class="tool-directory-category">Construction</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🪵</span>Lumber Board Foot Calculator</span><span class="tool-directory-description">Calculate board feet and estimated dry-lumber weight.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-          <tr><td colspan="3"><a href="/tools/insulation-calculator" class="tool-directory-link" data-category="construction"><span class="tool-directory-category">Construction</span><span class="tool-directory-name"><span class="tool-directory-icon" aria-hidden="true">🧰</span>Insulation Calculator</span><span class="tool-directory-description">Estimate rolls or packs for a target R-value and total weight.</span><span class="tool-directory-arrow" aria-hidden="true">›</span></a></td></tr>
-        </tbody>
-      </table>
     </section>
 
-    <!-- PRIVACY COMMITMENT -->
-    <section class="about-section" aria-labelledby="privacy-commitment-heading">
-      <h2 id="privacy-commitment-heading">Privacy &amp; Data</h2>
-      <p>MonkeyTactics does not collect, store, or transmit any data you enter into its tools. Every calculation
-         runs entirely inside your browser using JavaScript — the numbers you type never leave your device.</p>
-      <p>For full details, see the <a href="/privacy" class="text-accent">Privacy Policy</a>.</p>
+    <section class="name-story" aria-labelledby="name-story-heading">
+      <div class="about-editorial__label">Behind the name</div>
+      <div>
+        <h2 id="name-story-heading">Why MonkeyTactics?</h2>
+        <p>
+          MonkeyTactics is named for the way real problems are solved: with simple tools, clear logic, and a bit of resourcefulness. Monkeys use what’s in front of them. Tactics provide the discipline behind the engineering. Together, they reflect the spirit of these tools — approachable on the surface, serious underneath.
+        </p>
+      </div>
     </section>
 
-    <!-- CTA -->
-    <div class="about-cta">
-      <a href="/tools/" class="btn-primary">⚡ Explore all tools</a>
-      <a href="/sitemap" class="btn-ghost">View sitemap</a>
-    </div>
-
-    <!-- AD -->
-    <div class="ad-container" aria-label="Advertisement">
-      <!-- AdSense: Bottom Display Ad -->
-    </div>
-
+    <section class="about-final-cta" aria-labelledby="cta-heading">
+      <p class="about-kicker" style="justify-content: center;">No pitch. Just an invitation.</p>
+      <h2 id="cta-heading">Use what helps. Ignore what doesn’t.</h2>
+      <p>No sign-up is required. Choose a tool, get your answer, and get on with your day.</p>
+      <a href="/tools/" class="btn-primary">Browse all tools</a>
+    </section>
   </main>
 
-  <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot">
-    <div class="review-collector__intro">
-      <h2>Share your experience</h2>
-      <p>Leave a review on Trustpilot and help improve MonkeyTactics.</p>
-    </div>
-    <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6a6c8ef0fe997f522adfe278" data-style-height="52px" data-style-width="100%" data-token="e577092d-5e8c-49a6-b710-f1a5cfc19873">
-      <a href="https://www.trustpilot.com/review/monkeytactics.com" target="_blank" rel="noopener">Trustpilot</a>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
@@ -541,11 +274,10 @@
       <a href="/privacy">Privacy</a>
       <a href="/terms-of-service">Terms</a>
       <a href="/third-party-notices">Third-Party Notices</a>
-      <a href="/about">About</a>
+      <a href="/about" aria-current="page">About</a>
       <a href="/contact">Contact</a>
       <a href="/sitemap">Sitemap</a>
     </nav>
   </footer>
-
 </body>
 </html>
