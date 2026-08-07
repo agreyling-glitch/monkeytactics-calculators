@@ -1,0 +1,149 @@
+:root{--mortgage-ink:#eefcf5;--mortgage-muted:#91a79b;--mortgage-green:#4ade80;--mortgage-mint:#b7f7cf;--mortgage-orange:#fb923c;--mortgage-panel:#101b16;--mortgage-panel-2:#14241c;--mortgage-line:rgba(183,247,207,.14)}
+body{background:radial-gradient(circle at 78% 5%,rgba(34,197,94,.11),transparent 28%),var(--bg);color:var(--text)}
+main{max-width:1180px}
+.mortgage-hero{position:relative;overflow:hidden;margin-top:1.5rem;padding:clamp(1.5rem,4vw,3.5rem);border:1px solid var(--mortgage-line);border-radius:1.5rem;background:linear-gradient(135deg,#13251b 0%,#0c1712 65%,#172016 100%);box-shadow:0 28px 70px rgba(0,0,0,.2)}
+.mortgage-hero:after{position:absolute;right:-7rem;bottom:-10rem;width:25rem;height:25rem;border:1px solid rgba(74,222,128,.18);border-radius:50%;box-shadow:0 0 0 3rem rgba(74,222,128,.025),0 0 0 6rem rgba(74,222,128,.02);content:"";pointer-events:none}
+.breadcrumb{display:flex;gap:.45rem;align-items:center;margin-bottom:2.5rem;color:var(--mortgage-muted);font-size:.78rem}.breadcrumb a{color:inherit}.breadcrumb a:hover{color:var(--mortgage-green)}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(250px,.65fr);gap:3rem;align-items:end}.eyebrow,.section-kicker{margin:0 0 .75rem;color:var(--mortgage-green);font-size:.72rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}.mortgage-hero h1{max-width:820px;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.2rem,5vw,4.6rem);font-weight:500;line-height:1.02;letter-spacing:-.045em}.hero-copy{max-width:720px;margin:1.35rem 0 0;color:#a9bbb1;font-size:1rem;line-height:1.75}.hero-pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}.hero-pills span,.frequency-badge{padding:.35rem .65rem;border:1px solid rgba(74,222,128,.2);border-radius:999px;background:rgba(74,222,128,.07);color:var(--mortgage-mint);font-size:.7rem;font-weight:700;letter-spacing:.03em}.hero-stat{display:flex;min-height:165px;flex-direction:column;justify-content:flex-end;padding:1.25rem;border-left:1px solid rgba(183,247,207,.2);color:var(--mortgage-muted)}.hero-stat span{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em}.hero-stat strong{margin:.4rem 0;color:var(--mortgage-ink);font-family:Georgia,serif;font-size:1.6rem;font-weight:500}.hero-stat i{color:var(--mortgage-orange);font-weight:400}.hero-stat small{line-height:1.5}
+.engine-status,.calc-error{margin:1rem 0;padding:.75rem 1rem;border-radius:.65rem;font-size:.82rem}.engine-status{border:1px solid rgba(74,222,128,.18);background:rgba(74,222,128,.06);color:var(--mortgage-muted)}.engine-status.ready{display:none}.calc-error{border:1px solid rgba(248,113,113,.35);background:rgba(248,113,113,.09);color:#fecaca}
+.workspace{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);margin-top:2rem;border:1px solid var(--mortgage-line);border-radius:1.25rem;background:rgba(10,18,14,.7);box-shadow:0 24px 50px rgba(0,0,0,.15)}.input-panel,.result-panel{padding:clamp(1.3rem,3vw,2.3rem)}.result-panel{border-left:1px solid var(--mortgage-line);background:linear-gradient(150deg,rgba(24,45,33,.9),rgba(12,24,17,.9));border-radius:0 1.25rem 1.25rem 0}.workspace h2,.report-section h2,.charts-section h2,.comparison-section h2,.amort-section h2,.examples-section h2,.education-grid h2,.faq-section h2,.related-section h2{margin:0;color:var(--mortgage-ink);font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.5rem,3vw,2.1rem);font-weight:500;letter-spacing:-.02em}.section-intro{max-width:600px;margin:.7rem 0 1.5rem;color:var(--mortgage-muted);font-size:.88rem;line-height:1.6}
+form label{display:flex;justify-content:space-between;margin-bottom:.45rem;color:#c7d7ce;font-size:.78rem;font-weight:700}form output{color:var(--mortgage-green)}.field-wide{margin-bottom:1.2rem}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.field{min-width:0}.money-field,.suffix-field{display:flex;align-items:center;border:1px solid var(--mortgage-line);border-radius:.6rem;background:rgba(255,255,255,.025);transition:border-color .15s,box-shadow .15s}.money-field:focus-within,.suffix-field:focus-within{border-color:var(--mortgage-green);box-shadow:0 0 0 3px rgba(74,222,128,.1)}.money-field span,.suffix-field span{padding:0 .75rem;color:var(--mortgage-muted);font-size:.82rem}.money-field input,.suffix-field input{min-width:0;flex:1;border:0;background:transparent;color:var(--mortgage-ink);font:inherit;font-size:1rem;padding:.75rem .2rem;outline:0}.suffix-field input{padding-left:.75rem}.compact input{padding-left:.1rem}select{width:100%;border:1px solid var(--mortgage-line);border-radius:.6rem;background:#111e17;color:var(--mortgage-ink);font:inherit;font-size:.9rem;padding:.75rem;outline:0}input[type=range]{width:100%;margin:.55rem 0 0;accent-color:var(--mortgage-green)}.form-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.5rem}.button-primary,.button-secondary{border-radius:999px;font:inherit;font-size:.86rem;font-weight:800;padding:.78rem 1.2rem;cursor:pointer}.button-primary{border:1px solid var(--mortgage-green);background:var(--mortgage-green);color:#062413;box-shadow:0 10px 28px rgba(74,222,128,.2)}.button-secondary{border:1px solid var(--mortgage-line);background:transparent;color:var(--mortgage-ink)}button:hover{transform:translateY(-1px)}button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--mortgage-green);outline-offset:3px}.privacy-note{display:flex;gap:.75rem;margin-top:1.4rem;padding-top:1.1rem;border-top:1px solid var(--mortgage-line)}.privacy-note svg{width:20px;fill:none;stroke:var(--mortgage-green);stroke-width:1.6}.privacy-note div{display:flex;flex-direction:column;gap:.15rem}.privacy-note strong{font-size:.78rem}.privacy-note span{color:var(--mortgage-muted);font-size:.72rem;line-height:1.45}
+.result-heading-row{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.summary-controls{display:flex;align-items:flex-end;gap:.5rem}.summary-controls label{display:flex;flex-direction:column;gap:.25rem;color:var(--mortgage-muted);font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.summary-controls label[hidden]{display:none!important}.summary-controls select{width:auto;min-width:112px;padding:.35rem 1.7rem .35rem .55rem;font-size:.72rem;text-transform:none;letter-spacing:normal}.result-empty{display:grid;min-height:310px;place-content:center;text-align:center;color:var(--mortgage-muted)}.result-empty span{color:var(--mortgage-ink);font-family:Georgia,serif;font-size:1.45rem}.result-empty p{max-width:280px;font-size:.82rem;line-height:1.55}.primary-metric{margin-top:1.6rem;padding-bottom:1.3rem;border-bottom:1px solid var(--mortgage-line)}.primary-metric span,.metric-grid span{display:block;color:var(--mortgage-muted);font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}.primary-metric strong{display:block;margin:.2rem 0;color:var(--mortgage-green);font-family:Georgia,serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:500;letter-spacing:-.04em}.primary-metric small{color:var(--mortgage-muted)}.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin:1.3rem 0}.metric-grid strong{display:block;margin-top:.3rem;color:var(--mortgage-ink);font-size:1.1rem}.cost-bar{display:flex;height:8px;overflow:hidden;border-radius:999px;background:#203129}.cost-bar span{background:var(--mortgage-green)}.cost-bar i{background:var(--mortgage-orange)}.cost-legend{display:flex;justify-content:space-between;gap:1rem;margin-top:.55rem;color:var(--mortgage-muted);font-size:.7rem}.cost-legend b{display:inline-block;width:7px;height:7px;margin-right:.3rem;border-radius:50%}.principal-dot{background:var(--mortgage-green)}.interest-dot{background:var(--mortgage-orange)}.cost-legend strong{color:var(--mortgage-ink)}.impact-card{margin-top:1.1rem;padding:1rem;border:1px solid rgba(74,222,128,.18);border-radius:.7rem;background:rgba(74,222,128,.06);color:#bad1c4;font-size:.8rem;line-height:1.55}.impact-card strong{color:var(--mortgage-green)}.result-actions{display:flex;align-items:center;gap:.75rem;margin-top:1.25rem}.text-button{border:0;border-bottom:1px solid currentColor;background:transparent;color:var(--mortgage-green);font:inherit;font-size:.78rem;font-weight:700;padding:.2rem 0;cursor:pointer}.result-actions span,.amort-actions span{color:var(--mortgage-muted);font-size:.72rem}
+.report-section,.charts-section,.comparison-section,.amort-section,.examples-section,.faq-section,.related-section{margin-top:3.5rem}.report-heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem}.report-heading-row label{display:flex;flex-direction:column;gap:.3rem;color:var(--mortgage-muted);font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.report-heading-row label[hidden]{display:none!important}.report-heading-row select{width:auto;min-width:112px;padding:.4rem 1.8rem .4rem .6rem;font-size:.72rem;text-transform:none;letter-spacing:normal}.prose-card{margin-top:1rem;padding:1.4rem 1.5rem;border-left:3px solid var(--mortgage-green);background:linear-gradient(90deg,rgba(74,222,128,.07),transparent);color:#b7c8be;line-height:1.75}.prose-card p{margin:.3rem 0}.prose-card strong{color:var(--mortgage-ink)}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.2rem}.chart-card{min-width:0;margin:0;padding:1.1rem;border:1px solid var(--mortgage-line);border-radius:.9rem;background:rgba(13,24,18,.8)}.chart-wide{grid-column:1/-1}.chart-title{display:flex;justify-content:space-between;gap:1rem;margin-bottom:.8rem}.chart-title span{display:block;color:var(--mortgage-muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em}.chart-title strong{font-family:Georgia,serif;font-size:1.1rem;font-weight:500}.chart{min-height:255px;overflow:hidden}.chart-short{min-height:180px}.chart svg{display:block;width:100%;height:auto;overflow:visible}.chart-gridline{stroke:rgba(183,247,207,.1);stroke-width:1}.chart-axis{fill:var(--mortgage-muted);font-size:10px}.chart-line{fill:none;stroke-width:2.5}.chart-area{opacity:.08}.chart-legend{display:flex;flex-wrap:wrap;gap:.65rem;justify-content:flex-end;color:var(--mortgage-muted);font-size:.68rem}.chart-legend i{display:inline-block;width:8px;height:8px;margin-right:.25rem;border-radius:50%}.chart-card figcaption{margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--mortgage-line);color:var(--mortgage-muted);font-size:.75rem;line-height:1.55}
+.comparison-heading,.amort-heading{display:flex;justify-content:space-between;gap:1rem;align-items:flex-end}.comparison-heading p{max-width:650px;margin:.5rem 0 0;color:var(--mortgage-muted);font-size:.84rem;line-height:1.6}.scenario-chips{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.2rem}.scenario-chip{position:relative;min-width:170px;padding:.8rem 2rem .8rem .9rem;border:1px solid var(--mortgage-line);border-radius:.7rem;background:var(--mortgage-panel)}.scenario-chip span{display:block;color:var(--mortgage-ink);font-size:.8rem;font-weight:700}.scenario-chip small{color:var(--mortgage-muted);font-size:.68rem}.scenario-chip button{position:absolute;top:.35rem;right:.4rem;border:0;background:transparent;color:var(--mortgage-muted);font-size:1rem;cursor:pointer}.comparison-empty{color:var(--mortgage-muted);font-size:.82rem}.preset-row{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}.preset-row button,.amort-actions button,.pagination button{border:1px solid var(--mortgage-line);border-radius:999px;background:rgba(255,255,255,.025);color:#c6d7cd;font:inherit;font-size:.72rem;font-weight:700;padding:.5rem .8rem;cursor:pointer}.table-wrap{overflow-x:auto;margin-top:1rem;border:1px solid var(--mortgage-line);border-radius:.8rem}.comparison-table,.amort-table{width:100%;min-width:720px;border-collapse:collapse;font-size:.78rem}.comparison-table th,.amort-table th{padding:.75rem .9rem;background:rgba(255,255,255,.035);color:var(--mortgage-muted);font-size:.68rem;text-align:right;text-transform:uppercase;letter-spacing:.06em}.comparison-table th:first-child,.amort-table th:first-child{text-align:left}.comparison-table td,.amort-table td{padding:.8rem .9rem;border-top:1px solid rgba(183,247,207,.08);color:#b7c8be;text-align:right}.comparison-table td:first-child,.amort-table td:first-child{color:var(--mortgage-ink);text-align:left;font-weight:700}.comparison-table tr.best td{background:rgba(74,222,128,.04)}.comparison-report{margin-top:1rem;padding:1rem;border-radius:.7rem;background:rgba(255,255,255,.025);color:var(--mortgage-muted);font-size:.82rem;line-height:1.7}.comparison-report p{margin:.3rem 0}.comparison-report strong{color:var(--mortgage-ink)}
+.amort-controls{display:flex;align-items:center;gap:.6rem}.amort-controls label{color:var(--mortgage-muted);font-size:.75rem}.amort-controls select{width:auto;padding:.5rem 1.8rem .5rem .7rem}.amort-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.55rem;margin-top:1rem}.pagination{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:.85rem;color:var(--mortgage-muted);font-size:.72rem}.pagination button:disabled{opacity:.35;cursor:default}.amort-table .principal{color:var(--mortgage-green)}.amort-table .interest{color:#fdba74}
+.examples-section>p{color:var(--mortgage-muted)}.example-grid,.related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-top:1rem}.example-grid a,.related-grid a{display:flex;min-height:85px;flex-direction:column;justify-content:space-between;padding:1rem;border:1px solid var(--mortgage-line);border-radius:.75rem;background:rgba(255,255,255,.02);color:var(--mortgage-ink);transition:border-color .15s,transform .15s}.example-grid a:hover,.related-grid a:hover{border-color:rgba(74,222,128,.5);transform:translateY(-2px)}.example-grid span,.related-grid span{color:var(--mortgage-muted);font-size:.76rem}.example-grid strong{color:var(--mortgage-green);font-size:.72rem}
+.education-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;margin-top:3.5rem;padding:2rem 0;border-top:1px solid var(--mortgage-line);border-bottom:1px solid var(--mortgage-line)}.education-grid p{color:var(--mortgage-muted);font-size:.86rem;line-height:1.75}.formula{margin:1.2rem 0;padding:1rem;border:1px solid var(--mortgage-line);border-radius:.6rem;background:rgba(74,222,128,.04);color:var(--mortgage-green);font-family:monospace;text-align:center}.faq-section details{border-bottom:1px solid var(--mortgage-line)}.faq-section summary{padding:1rem 2rem 1rem 0;color:var(--mortgage-ink);font-weight:700;cursor:pointer}.faq-section details p{max-width:850px;margin:0 0 1rem;color:var(--mortgage-muted);font-size:.84rem;line-height:1.7}.methodology{margin-top:2.5rem;padding:1rem;border:1px solid var(--mortgage-line);border-radius:.7rem;color:var(--mortgage-muted);font-size:.75rem;line-height:1.6}.methodology strong{color:var(--mortgage-ink)}.methodology p{margin:.3rem 0 0}.related-grid{grid-template-columns:repeat(3,1fr)}
+@media print{body.print-amortization main>*{display:none!important}body.print-amortization #amortizationSection{display:block!important;color:#111}body.print-amortization footer,body.print-amortization .amort-actions,body.print-amortization .amort-controls,body.print-amortization .pagination{display:none!important}body.print-amortization .table-wrap{overflow:visible;border:1px solid #aaa}body.print-amortization table{min-width:0;color:#111}body.print-amortization th,body.print-amortization td{color:#111!important;border-color:#ddd!important}}
+@media(max-width:850px){.hero-grid,.workspace{grid-template-columns:1fr}.hero-stat{display:none}.result-panel{border-top:1px solid var(--mortgage-line);border-left:0;border-radius:0 0 1.25rem 1.25rem}.example-grid{grid-template-columns:1fr 1fr}.chart-grid,.education-grid{grid-template-columns:1fr}.chart-wide{grid-column:auto}}
+@media(max-width:560px){.mortgage-hero{padding:1.25rem}.breadcrumb{margin-bottom:1.5rem}.mortgage-hero h1{font-size:2.2rem}.field-grid{grid-template-columns:1fr}.input-panel,.result-panel{padding:1.2rem}.result-heading-row,.report-heading-row{align-items:flex-start;flex-direction:column}.summary-controls{width:100%;justify-content:space-between}.metric-grid{gap:.9rem}.comparison-heading,.amort-heading{align-items:flex-start;flex-direction:column}.example-grid,.related-grid{grid-template-columns:1fr}.chart-card{padding:.8rem}.chart{min-height:190px}}
+
+/* Horizontal comparison charts need larger labels because their SVG viewBox scales to the card width. */
+.chart-axis{fill:#b8cdc1;font-size:14px}
+.chart-axis-strong{fill:#e9fff1;font-size:22px;font-weight:700}
+.chart-axis-value{fill:#e9fff1;font-size:20px;font-weight:800}
+.chart-axis-value-inside{fill:#0b2a18}
+.chart-legend svg{display:inline-block;width:8px;height:8px;margin-right:.3rem;vertical-align:middle}
+.input-scenario-list{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--mortgage-line)}
+.input-scenario-heading{display:block;margin-bottom:.65rem;color:var(--mortgage-muted);font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.input-scenario-chips{display:grid;grid-template-columns:minmax(0,1fr);gap:.55rem}
+.input-scenario-chips .scenario-chip{width:100%;min-width:0;box-sizing:border-box}
+.composition-context{display:flex;align-items:flex-end;margin-left:auto}
+.composition-context label{display:flex;flex-direction:column;gap:.3rem;color:var(--mortgage-muted);font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.composition-context label[hidden],#amortScenarioControl[hidden]{display:none!important}
+.composition-context select{width:auto;min-width:110px;padding:.35rem 1.8rem .35rem .55rem;font-size:.72rem;text-transform:none;letter-spacing:normal}
+.composition-context>span{padding:.3rem .55rem;border:1px solid var(--mortgage-line);border-radius:999px;color:var(--mortgage-ink);font-size:.68rem;font-weight:800}
+.composition-context>span.is-screen-hidden{display:none}
+.button-secondary.is-limit-reached,.preset-row button.is-limit-reached{opacity:.42;cursor:not-allowed;filter:saturate(.45)}
+.button-secondary.is-limit-reached:hover,.preset-row button.is-limit-reached:hover{transform:none}
+.scenario-limit-dialog{width:min(430px,calc(100vw - 2rem));padding:0;border:1px solid rgba(74,222,128,.28);border-radius:1rem;background:#101b16;color:var(--mortgage-ink);box-shadow:0 28px 80px rgba(0,0,0,.55)}
+.scenario-limit-dialog::backdrop{background:rgba(3,12,8,.76);backdrop-filter:blur(3px)}
+.scenario-limit-dialog form{padding:1.5rem}
+.scenario-limit-dialog .dialog-kicker{display:block;margin-bottom:.55rem;color:var(--mortgage-green);font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.scenario-limit-dialog h2{margin:0;color:var(--mortgage-ink);font-family:Georgia,"Times New Roman",serif;font-size:1.55rem;font-weight:500}
+.scenario-limit-dialog p{margin:.75rem 0 1.25rem;color:var(--mortgage-muted);font-size:.86rem;line-height:1.65}
+.scenario-limit-dialog .button-primary{padding:.65rem 1.1rem}
+.field-label-row{display:flex;align-items:baseline;gap:.55rem;margin-bottom:.45rem}.field-label-row label{margin:0}.field-label-row output{margin-left:auto}.field-link{border:0;border-bottom:1px solid currentColor;background:transparent;color:var(--mortgage-green);font:inherit;font-size:.72rem;font-weight:700;padding:0;cursor:pointer}
+.down-payment-dialog{width:min(540px,calc(100vw - 2rem))}.down-payment-dialog form>p{margin-bottom:1rem}.down-payment-grid{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}.down-payment-grid .field-wide{grid-column:1/-1;margin:0}.down-payment-field{min-width:0}.down-payment-field label{justify-content:flex-start}.dialog-calculated{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-top:1rem;padding:1rem;border:1px solid rgba(74,222,128,.2);border-radius:.7rem;background:rgba(74,222,128,.06)}.dialog-calculated span{color:var(--mortgage-muted);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}.dialog-calculated strong{color:var(--mortgage-green);font-family:Georgia,serif;font-size:1.35rem}.dialog-error{margin-top:.75rem;color:#fecaca;font-size:.78rem;line-height:1.5}.dialog-actions{display:flex;justify-content:flex-end;gap:.65rem;margin-top:1.1rem}.dialog-actions .button-secondary{padding:.65rem 1.1rem}
+@media(max-width:560px){.down-payment-grid{grid-template-columns:1fr}.down-payment-grid .field-wide{grid-column:auto}.dialog-calculated{align-items:flex-start;flex-direction:column}.dialog-actions{justify-content:stretch}.dialog-actions button{flex:1}}
+.example-category{margin-top:1.4rem}
+.example-category h3{margin:0 0 .7rem;color:var(--mortgage-ink);font-size:.82rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.amort-title-row{display:flex;align-items:center;flex-wrap:wrap;gap:.65rem}
+.amort-controls label{display:flex;align-items:center;gap:.45rem}
+.amort-scenario-label{padding:.3rem .55rem;border:1px solid var(--mortgage-line);border-radius:999px;color:var(--mortgage-ink);font-size:.68rem;font-weight:800}
+.amort-scenario-label.is-screen-hidden{display:none}
+.chart-title strong{display:block;margin-top:.55rem}
+.comparison-table td:last-child span{display:block;white-space:nowrap}
+.comparison-table td:first-child small{display:inline;margin-left:.35rem;color:var(--mortgage-muted);font-size:.72rem;font-weight:500;white-space:nowrap}
+.print-report-header,.print-faq-section,.print-report-footer{display:none}
+
+@media print{
+  @page{margin:.55in;size:auto}
+  body.print-report{background:#fff!important;color:#152019!important;font-family:Arial,sans-serif}
+  body.print-report main{max-width:none;padding:0}
+  body.print-report main>*{display:none!important}
+  body.print-report main>#printReportHeader,
+  body.print-report main>#chartsSection,
+  body.print-report main>#printFaqSection,
+  body.print-report main>#amortizationSection{display:block!important}
+  body.print-report footer{display:none!important}
+  body.print-report main>#printReportHeader{display:flex!important;height:calc(100vh - 1.1in);box-sizing:border-box;flex-direction:column;margin:0;break-after:page}
+  body.print-report #printReportHeader>#printReportFooter{display:block!important;margin-top:auto}
+  body.print-report .print-report-brand{display:flex;justify-content:space-between;align-items:center;padding-bottom:.12in;border-bottom:2px solid #27884b;color:#152019;font-size:9pt;text-transform:uppercase;letter-spacing:.08em}
+  body.print-report .print-report-brand strong{color:#176d39;font-size:12pt}
+  body.print-report .print-report-heading{display:flex;justify-content:space-between;align-items:flex-end;margin:.22in 0 .18in}
+  body.print-report .print-report-heading p{margin:0 0 .04in;color:#4f6257;font-size:8pt;text-transform:uppercase;letter-spacing:.1em}
+  body.print-report .print-report-heading h1{margin:0;color:#152019;font-family:Georgia,serif;font-size:24pt;font-weight:500}
+  body.print-report .print-report-heading>span{color:#4f6257;font-size:8pt}
+  body.print-report .print-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #b9c7bf;border-left:1px solid #b9c7bf}
+  body.print-report .print-summary-grid>div{min-height:.5in;padding:.11in .13in;border-right:1px solid #b9c7bf;border-bottom:1px solid #b9c7bf;background:#f7faf8}
+  body.print-report .print-summary-grid span{display:block;margin-bottom:.04in;color:#56685e;font-size:7.5pt;text-transform:uppercase;letter-spacing:.05em}
+  body.print-report .print-summary-grid strong{color:#152019;font-size:12pt}
+  body.print-report .print-narrative{margin-top:.15in;padding:.12in .15in;border-left:3px solid #27884b;background:#f3f8f5;color:#263a2f;font-size:9pt;line-height:1.5}
+  body.print-report .print-narrative p{margin:.03in 0}
+  body.print-report #chartsSection,
+  body.print-report #comparisonSection,
+  body.print-report #printFaqSection,
+  body.print-report #amortizationSection{margin-top:.28in;break-before:page}
+  body.print-report .section-kicker{color:#176d39!important}
+  body.print-report #chartsSection>.section-kicker,
+  body.print-report #comparisonSection .section-kicker,
+  body.print-report #amortizationSection .section-kicker{display:none!important}
+  body.print-report #chartsSection h2,
+  body.print-report #comparisonSection h2,
+  body.print-report #printFaqSection h2,
+  body.print-report #amortizationSection h2{color:#152019!important;font-size:18pt}
+  body.print-report .chart-grid{grid-template-columns:1fr 1fr;gap:.14in}
+  body.print-report .chart-card{break-inside:avoid;padding:.12in;border:1px solid #b9c7bf;background:#fff!important;box-shadow:none}
+  body.print-report .chart-wide{grid-column:1/-1}
+  body.print-report #payoffChartCard{display:none!important}
+  body.print-report .chart-title span,
+  body.print-report .chart-card figcaption{color:#43584c!important}
+  body.print-report .chart-title strong{color:#152019!important}
+  body.print-report #compositionScenarioControl{display:none!important}
+  body.print-report #compositionScenarioLabel{display:inline-block!important;border-color:#9dada4;color:#152019!important}
+  body.print-report #amortScenarioLabel{display:inline-block!important;border-color:#9dada4;color:#152019!important}
+  body.print-report .chart{min-height:0}
+  body.print-report .chart svg{max-height:2.75in}
+  body.print-report .chart-axis{fill:#33463b!important}
+  body.print-report .chart-axis-strong,
+  body.print-report .chart-axis-value{fill:#152019!important}
+  body.print-report .chart-axis-value-inside{fill:#0b2a18!important}
+  body.print-report .chart-gridline{stroke:#d8e0db!important}
+  body.print-report .chart-card figcaption{font-size:8pt}
+  body.print-report .comparison-heading{align-items:flex-start}
+  body.print-report .comparison-heading p{color:#43584c!important}
+  body.print-report .comparison-heading .text-button,
+  body.print-report .scenario-chips,
+  body.print-report .preset-row,
+  body.print-report .amort-controls,
+  body.print-report .amort-actions,
+  body.print-report .pagination{display:none!important}
+  body.print-report .table-wrap{overflow:visible;border-color:#b9c7bf}
+  body.print-report .comparison-table,
+  body.print-report .amort-table{min-width:0;font-size:7.5pt}
+  body.print-report .comparison-table th,
+  body.print-report .amort-table th{padding:.07in;background:#eaf2ed!important;color:#263a2f!important}
+  body.print-report .comparison-table td,
+  body.print-report .amort-table td{padding:.065in;border-color:#d8e0db!important;color:#263a2f!important}
+  body.print-report .comparison-table td:first-child,
+  body.print-report .amort-table td:first-child{color:#152019!important}
+  body.print-report .comparison-report{background:#f3f8f5!important;color:#33463b!important;font-size:8.5pt}
+  body.print-report .comparison-report strong{color:#152019!important}
+  body.print-report #amortizationSection{break-before:page}
+  body.print-report .amort-table tr{break-inside:avoid}
+  body.print-report .print-faq-section article{break-inside:avoid;padding:.14in 0;border-bottom:1px solid #d8e0db}
+  body.print-report .print-faq-section h3{margin:0 0 .05in;color:#152019;font-size:11pt}
+  body.print-report .print-faq-section p{margin:0;color:#43584c;font-size:9pt;line-height:1.55}
+  body.print-report #printReportFooter{break-inside:avoid;padding-top:.12in;border-top:1px solid #9dada4;color:#263a2f;font-size:8pt}
+  body.print-report .print-report-footer strong,
+  body.print-report .print-report-footer b,
+  body.print-report .print-report-footer span,
+  body.print-report .print-report-footer small{display:block}
+  body.print-report .print-report-footer strong{margin-bottom:.04in;color:#152019;text-transform:uppercase;letter-spacing:.06em}
+  body.print-report .print-scenario-url{break-inside:avoid;padding:.06in 0;border-top:1px solid #d8e0db}
+  body.print-report .print-scenario-url b{margin-bottom:.025in;color:#263a2f;font-size:8pt}
+  body.print-report .print-report-footer span{overflow-wrap:anywhere;color:#176d39;font-family:monospace;font-size:8.5pt}
+  body.print-report .print-report-footer small{margin-top:.05in;color:#5b6c62}
+}

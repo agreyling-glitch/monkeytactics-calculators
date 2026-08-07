@@ -194,6 +194,19 @@
       transform: translateX(3px);
     }
 
+    .tool-card--featured {
+      border-color: rgba(34, 197, 94, 0.38);
+      background: linear-gradient(145deg, rgba(34, 197, 94, 0.1), var(--card-bg) 55%);
+    }
+
+    .card-kicker {
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
     /* ── EMPTY STATE ── */
     .no-results {
       display: none;
@@ -247,7 +260,7 @@
   </style>
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-26" />
+  <meta name="date" content="2026-08-07" />
 </head>
 
 <body>
@@ -328,15 +341,16 @@
       <div class="tools-grid">
 
         <a href="/tools/loan-mortgage-calculator"
-           class="tool-card"
+           class="tool-card tool-card--featured"
            data-category="finance"
-           data-keywords="loan mortgage payment interest amortization schedule monthly">
+           data-keywords="loan mortgage calculator payment interest amortization schedule monthly biweekly extra payment down payment home price compare scenarios print pdf csv rust wasm webassembly">
           <span class="card-icon" aria-hidden="true">🏠</span>
+          <span class="card-kicker">Compare up to five plans</span>
           <strong>Loan &amp; Mortgage Calculator</strong>
-          <div>Calculate monthly payments, total interest paid, and view a full amortization schedule for any loan.</div>
+          <div>Compare fixed-rate mortgage scenarios, monthly or bi-weekly payments, extra principal, lifetime interest, payoff timing, charts, and amortization schedules.</div>
           <div class="card-tags">
             <span class="card-tag">Mortgage</span>
-            <span class="card-tag">Loans</span>
+            <span class="card-tag">Comparison</span>
             <span class="card-tag">Amortization</span>
           </div>
           <span class="card-arrow" aria-hidden="true">›</span>
@@ -502,7 +516,7 @@
         <a href="/tools/qr-code-generator"
            class="tool-card"
            data-category="utilities"
-           data-keywords="qr code generator maker url wifi vcard email sms logo gradient batch csv png svg pdf">
+           data-keywords="qr code generator maker url wifi vcard email sms logo gradient batch csv png svg pdf rust wasm webassembly">
           <span class="card-icon" aria-hidden="true">📱</span>
           <strong>Advanced QR Code Generator</strong>
           <div>Design single or batch QR codes with dedicated content forms, custom styling, logos, reliability checks, projects, and print-ready exports.</div>
@@ -532,7 +546,7 @@
         <a href="/tools/word-unscrambler"
            class="tool-card"
            data-category="utilities"
-           data-keywords="word unscrambler anagram solver scrabble word finder letters spelling game words hooks sowpods enable">
+           data-keywords="word unscrambler anagram solver scrabble word finder letters spelling game words hooks sowpods enable rust wasm webassembly">
           <span class="card-icon" aria-hidden="true">🔤</span>
           <strong>Word Unscrambler</strong>
           <div>Find Scrabble words with ENABLE or SOWPODS, board filters, score sorting, bingos, and hooks.</div>

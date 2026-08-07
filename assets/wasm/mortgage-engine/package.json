@@ -1,0 +1,17 @@
+{
+  "name": "mortgage-engine",
+  "type": "module",
+  "description": "Private client-side mortgage scenario engine for MonkeyTactics",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "mortgage_engine_bg.wasm",
+    "mortgage_engine.js",
+    "mortgage_engine.d.ts"
+  ],
+  "main": "mortgage_engine.js",
+  "types": "mortgage_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
