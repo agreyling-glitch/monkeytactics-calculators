@@ -1,1421 +1,246 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mortgage Calculator – Payments, Interest, and Amortization</title>
+  <meta name="description" content="Compare mortgage payments, interest, extra payments, bi-weekly schedules, and payoff dates with a private Rust and WebAssembly mortgage calculator.">
+  <meta name="author" content="MonkeyTactics">
+  <meta name="date" content="2026-08-06">
+  <link rel="canonical" href="https://monkeytactics.com/tools/loan-mortgage-calculator">
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <meta charset="UTF-8" />
-  <title>Loan &amp; Mortgage Calculator: Payments &amp; Amortization</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Calculate monthly loan or mortgage payments, total interest, and an amortization schedule. Free, private, browser-based tool." />
-
-  <!-- Open Graph -->
-  <meta property="og:title"       content="Loan &amp; Mortgage Calculator — MonkeyTactics" />
-  <meta property="og:description" content="Calculate monthly payments, total interest, and get a full amortization schedule for any loan or mortgage. Free and private." />
-  <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://monkeytactics.com/tools/loan-mortgage-calculator" />
-
-  <!-- Canonical -->
-  <link rel="canonical" href="https://monkeytactics.com/tools/loan-mortgage-calculator" />
-
-  <!-- Breadcrumb structured data -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/mortgage-calculator.css?v=20260807-25">
+  <meta property="og:title" content="Mortgage Calculator – Payments, Interest, and Amortization">
+  <meta property="og:description" content="Compare up to five mortgage scenarios privately in your browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://monkeytactics.com/tools/loan-mortgage-calculator">
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home",    "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance" },
-      { "@type": "ListItem", "position": 3, "name": "Loan & Mortgage Calculator", "item": "https://monkeytactics.com/tools/loan-mortgage-calculator" }
+    "@context":"https://schema.org",
+    "@graph":[
+      {"@type":"WebApplication","@id":"https://monkeytactics.com/tools/loan-mortgage-calculator#app","name":"MonkeyTactics Mortgage Calculator","url":"https://monkeytactics.com/tools/loan-mortgage-calculator","description":"A private mortgage payment, interest, amortization, and multi-scenario comparison calculator powered by Rust and WebAssembly.","applicationCategory":"FinanceApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript and WebAssembly","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},
+      {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Finance","item":"https://monkeytactics.com/tools/finance"},{"@type":"ListItem","position":3,"name":"Mortgage Calculator","item":"https://monkeytactics.com/tools/loan-mortgage-calculator"}]},
+      {"@type":"FAQPage","mainEntity":[
+        {"@type":"Question","name":"How is my mortgage payment calculated?","acceptedAnswer":{"@type":"Answer","text":"A fixed-rate mortgage payment uses the loan principal, periodic interest rate, and total number of payments. The result shown here covers principal and interest only."}},
+        {"@type":"Question","name":"What is an amortization schedule?","acceptedAnswer":{"@type":"Answer","text":"An amortization schedule shows each payment, the amount applied to interest and principal, and the remaining loan balance."}},
+        {"@type":"Question","name":"How do extra payments affect my mortgage?","acceptedAnswer":{"@type":"Answer","text":"Extra payments reduce principal sooner, which generally shortens payoff time and lowers total interest without changing the required scheduled payment."}},
+        {"@type":"Question","name":"Are my mortgage details stored?","acceptedAnswer":{"@type":"Answer","text":"No. Values are processed locally in your browser by WebAssembly and are not sent to or stored on a server."}}
+      ]}
     ]
   }
   </script>
-
-  <!-- FAQPage structured data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "How is a monthly mortgage payment calculated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A monthly mortgage payment is calculated using the formula: M = P × [r(1+r)^n] ÷ [(1+r)^n − 1], where P is the loan principal, r is the monthly interest rate (annual rate ÷ 12), and n is the total number of monthly payments (loan term in years × 12)." }
-      },
-      {
-        "@type": "Question",
-        "name": "What is an amortization schedule?",
-        "acceptedAnswer": { "@type": "Answer", "text": "An amortization schedule is a complete table of monthly loan payments showing how much of each payment goes toward the principal balance and how much goes toward interest. In the early years of a loan, most of the payment goes to interest; over time, more goes to principal." }
-      },
-      {
-        "@type": "Question",
-        "name": "Does this calculator include property taxes and insurance?",
-        "acceptedAnswer": { "@type": "Answer", "text": "No — this calculator computes principal and interest (P&I) only, which is the core mortgage payment. Property taxes, homeowners insurance, and PMI (private mortgage insurance) are separate costs that vary by location and lender and should be added on top of the calculated payment." }
-      },
-      {
-        "@type": "Question",
-        "name": "What is the difference between a loan and a mortgage?",
-        "acceptedAnswer": { "@type": "Answer", "text": "A mortgage is a specific type of loan secured by real estate. The calculation method is identical — both use the standard amortization formula. This calculator works for mortgages, car loans, personal loans, student loans, and any other fixed-rate installment loan." }
-      }
-    ]
-  }
-  </script>
-
-  <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
-
-  <style>
-    /* ── Hero ── */
-    .hero--inner        { padding: 1.75rem 2rem; }
-    .hero--inner h1     { font-size: 1.9rem; }
-
-    /* ── Breadcrumb ── */
-    .breadcrumb {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 0.6rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-    }
-    .breadcrumb a        { color: var(--muted); transition: color 0.15s; }
-    .breadcrumb a:hover  { color: var(--accent); }
-    .breadcrumb .sep     { opacity: 0.4; }
-
-    /* ── Tool widget ── */
-    .tool-widget {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1.75rem;
-      box-shadow: var(--shadow-card);
-      margin-top: 1.5rem;
-    }
-
-    .tool-widget h2 {
-      margin: 0 0 1.25rem;
-      font-size: 1.05rem;
-    }
-
-    /* ── Two-col layout: inputs | results ── */
-    .calc-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: start;
-    }
-
-    /* ── Inputs ── */
-    .input-group        { margin-bottom: 1.1rem; }
-    .input-group:last-child { margin-bottom: 0; }
-
-    .input-group label {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.4rem;
-    }
-
-    .input-group label .live-val {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-
-    .input-group input[type="number"],
-    .input-group select {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.95rem;
-      padding: 0.65rem 0.85rem;
-      outline: none;
-      box-sizing: border-box;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    .input-group input[type="range"] {
-      width: 100%;
-      accent-color: var(--accent);
-      cursor: pointer;
-      margin-top: 0.35rem;
-    }
-
-    .input-group input:focus,
-    .input-group select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
-    }
-
-    .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
-
-    /* ── Calculate button ── */
-    .btn-calculate {
-      width: fit-content;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: #022c22;
-      font-family: inherit;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 0.8rem 1.5rem;
-      border: none;
-      border-radius: 999px;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(34,197,94,0.35);
-      transition: opacity 0.15s, transform 0.15s;
-      margin-top: 1rem;
-    }
-    .btn-calculate:hover  { opacity: 0.9; transform: translateY(-1px); }
-    .btn-calculate:active { transform: translateY(0); }
-
-    /* ── Results panel ── */
-    .results-col {
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
-    }
-
-    .result-card {
-      background: rgba(34,197,94,0.06);
-      border: 1px solid rgba(34,197,94,0.2);
-      border-radius: var(--radius);
-      padding: 1rem 1.15rem;
-    }
-
-    .result-card.primary {
-      background: rgba(34,197,94,0.12);
-      border-color: rgba(34,197,94,0.4);
-    }
-
-    .result-card .result-label {
-      font-size: 0.75rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.3rem;
-    }
-
-    .result-card .result-value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1.1;
-    }
-
-    .result-card.primary .result-value { font-size: 2.2rem; }
-
-    .result-card .result-sub {
-      font-size: 0.775rem;
-      color: var(--muted);
-      margin-top: 0.25rem;
-    }
-
-    /* ── Breakdown bar ── */
-    .breakdown-bar {
-      height: 10px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: var(--border);
-      margin: 0.5rem 0 0.3rem;
-      display: flex;
-    }
-    .breakdown-bar .bar-principal { background: var(--accent); }
-    .breakdown-bar .bar-interest  { background: #f87171; }
-
-    .bar-legend {
-      display: flex;
-      gap: 1rem;
-      font-size: 0.775rem;
-      color: var(--muted);
-    }
-    .bar-legend .dot {
-      display: inline-block;
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      margin-right: 4px;
-      vertical-align: middle;
-    }
-    .dot-principal { background: var(--accent); }
-    .dot-interest  { background: #f87171; }
-
-    /* ── Error ── */
-    .calc-error {
-      display: none;
-      margin-top: 1rem;
-      padding: 0.75rem 1rem;
-      background: rgba(248,113,113,0.1);
-      border: 1px solid rgba(248,113,113,0.3);
-      border-radius: 0.5rem;
-      color: #fca5a5;
-      font-size: 0.875rem;
-    }
-
-    /* ── Empty state for results ── */
-    .results-empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem 1rem;
-      color: var(--muted);
-      background: rgba(255,255,255,0.02);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-      gap: 0.5rem;
-    }
-    .results-empty .empty-icon { font-size: 2rem; }
-    .results-empty p           { margin: 0; font-size: 0.875rem; }
-
-    /* ── Amortization table ── */
-    .amort-section { margin-top: 2rem; }
-    .amort-section h2 { font-size: 1.05rem; margin: 0 0 0.75rem; }
-
-    .amort-controls {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 0.75rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-
-    .amort-controls select {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 0.4rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.85rem;
-      padding: 0.3rem 0.65rem;
-      outline: none;
-    }
-
-    .amort-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-bottom: 0.85rem;
-    }
-
-    .btn-amort-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      padding: 0.5rem 0.85rem;
-      border: 1px solid var(--border);
-      border-radius: 0.55rem;
-      background: var(--card-bg);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s, background 0.15s;
-    }
-    .btn-amort-action:hover {
-      border-color: var(--accent);
-      background: rgba(34,197,94,0.08);
-      color: var(--accent);
-    }
-    .btn-amort-action:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-    .btn-amort-action svg {
-      width: 1rem;
-      height: 1rem;
-      flex: 0 0 auto;
-    }
-
-    .amort-wrap {
-      overflow-x: auto;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-    }
-
-    .amort-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      min-width: 540px;
-    }
-
-    .amort-table th {
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      font-weight: 600;
-      padding: 0.65rem 0.85rem;
-      text-align: right;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    .amort-table th:first-child { text-align: left; }
-
-    .amort-table td {
-      padding: 0.55rem 0.85rem;
-      text-align: right;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      color: var(--muted);
-    }
-    .amort-table td:first-child { text-align: left; color: var(--text); font-weight: 500; }
-
-    .amort-table tr:last-child td { border-bottom: none; }
-    .amort-table tr:hover td      { background: rgba(255,255,255,0.02); }
-    .amort-table .td-interest     { color: #f87171; }
-    .amort-table .td-principal    { color: var(--accent); }
-
-    /* Annual summary rows */
-    .amort-table tr.year-summary td {
-      background: rgba(34,197,94,0.05);
-      border-top: 1px solid rgba(34,197,94,0.15);
-      border-bottom: 1px solid rgba(34,197,94,0.15);
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .amort-pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 0.75rem;
-      font-size: 0.825rem;
-      color: var(--muted);
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .amort-pagination button {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 0.4rem;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.8rem;
-      padding: 0.3rem 0.8rem;
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
-    .amort-pagination button:hover   { border-color: var(--accent); color: var(--accent); }
-    .amort-pagination button:disabled { opacity: 0.3; cursor: default; }
-
-    @media print {
-      body.print-amortization {
-        background: #ffffff;
-        color: #111111;
-      }
-      body.print-amortization main > * { display: none !important; }
-      body.print-amortization main > #amortSection { display: block !important; }
-      body.print-amortization footer,
-      body.print-amortization .amort-controls,
-      body.print-amortization .amort-actions,
-      body.print-amortization .amort-pagination {
-        display: none !important;
-      }
-      body.print-amortization #amortSection {
-        margin: 0;
-        color: #111111;
-      }
-      body.print-amortization #amortSection h2 { color: #111111; }
-      body.print-amortization .amort-wrap {
-        overflow: visible;
-        border-color: #aaaaaa;
-      }
-      body.print-amortization .amort-table {
-        min-width: 0;
-        color: #111111;
-      }
-      body.print-amortization .amort-table thead { display: table-header-group; }
-      body.print-amortization .amort-table th {
-        background: #eeeeee !important;
-        color: #111111;
-        border-color: #aaaaaa;
-      }
-      body.print-amortization .amort-table td {
-        background: #ffffff !important;
-        color: #222222;
-        border-color: #dddddd;
-      }
-    }
-
-    /* ── SEO / content ── */
-    .seo-section          { max-width: 740px; margin-top: 2rem; }
-    .seo-section h2       { font-size: 1.1rem; margin: 0 0 0.5rem; }
-    .seo-section p        { color: var(--muted); line-height: 1.75; margin: 0 0 0.75rem; }
-    .seo-section p:last-child { margin-bottom: 0; }
-
-    .formula-block {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.85rem 1.1rem;
-      font-family: monospace;
-      font-size: 0.9rem;
-      color: var(--accent);
-      margin: 0.75rem 0;
-      line-height: 1.6;
-    }
-
-    /* ── FAQ ── */
-    .faq-section { max-width: 740px; margin-top: 2rem; }
-    .faq-section details { border: 1px solid var(--border); border-radius: 0.75rem; background: rgba(255,255,255,0.02); }
-    .faq-section summary { position: relative; display: flex; align-items: center; gap: 0.8rem; padding: 1rem 3rem 1rem 1rem; cursor: pointer; list-style: none; }
-    .faq-section summary::-webkit-details-marker { display: none; }
-    .faq-section summary::after { position: absolute; top: 50%; right: 1rem; color: var(--accent); font-size: 1.2rem; content: "+"; transform: translateY(-50%); }
-    .faq-section details[open] summary::after { content: "−"; }
-    .faq-section summary h2 { margin: 0; color: var(--text); font-size: 0.98rem; }
-    .faq-info-icon { display: grid; width: 2rem; height: 2rem; flex: 0 0 auto; place-items: center; border-radius: 50%; background: rgba(74,222,128,0.12); color: var(--accent); font-family: Georgia, serif; font-weight: 700; }
-    .faq-content { padding: 0 1.25rem 1.25rem 3.8rem; border-top: 1px solid rgba(148,163,184,0.12); }
-    .faq-list             { list-style: none; padding: 0; margin: 0; max-width: 740px; }
-    .faq-item             { border-bottom: 1px solid var(--border); padding: 1rem 0; }
-    .faq-item:last-child  { border-bottom: none; }
-    .faq-item h3          { font-size: 0.95rem; margin: 0 0 0.4rem; color: var(--text); }
-    .faq-item p           { margin: 0; color: var(--muted); font-size: 0.875rem; line-height: 1.65; }
-
-    /* ── Related tools ── */
-    .related-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 0.85rem;
-      margin-top: 1rem;
-    }
-    .related-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.9rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-      transition: border-color 0.15s, transform 0.15s;
-    }
-    .related-card:hover  { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
-    .related-card strong { font-size: 0.9rem; }
-    .related-card span   { color: var(--muted); font-size: 0.8rem; }
-
-    /* ── Responsive ── */
-    @media (max-width: 800px) {
-      .calc-layout { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 600px) {
-      .hero--inner  { padding: 1.25rem; }
-      .hero--inner h1 { font-size: 1.5rem; }
-      .tool-widget  { padding: 1.25rem; }
-      .result-card.primary .result-value { font-size: 1.75rem; }
-    }
-  </style>
-  <script src="/assets/js/ads.js" defer></script>
-  <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-22" />
-
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebApplication",
-      "@id": "https://monkeytactics.com/tools/loan-mortgage-calculator.html#app",
-      "name": "Loan & Mortgage Calculator",
-      "url": "https://monkeytactics.com/tools/loan-mortgage-calculator.html",
-      "description": "Estimate principal-and-interest payments and an amortization schedule.",
-      "applicationCategory": "FinanceApplication",
-      "operatingSystem": "Any",
-      "isAccessibleForFree": true,
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "publisher": {
-        "@id": "https://monkeytactics.com/#organization"
-      },
-      "author": {
-        "@id": "https://monkeytactics.com/#organization"
-      },
-      "reviewedBy": {
-        "@id": "https://monkeytactics.com/#organization"
-      },
-      "dateModified": "2026-08-05"
-    }
-  ]
-}
-  </script>
-  <link rel="stylesheet" href="/assets/css/trustpilot-review-collector.css?v=20260731-2">
-  <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
-
 <body>
   <main>
-
-    <!-- HEADER -->
     <header>
       <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
+        <img src="/assets/img/logo/monkeytactics-monkey-logo.png" alt="MonkeyTactics logo" class="brand-logo" width="383" height="375">
+        <div><div class="brand-name">MonkeyTactics</div><div class="brand-tagline">Free Online Calculators &amp; Tools</div></div>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance" class="active">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
+        <a href="/tools/">All Tools</a><a href="/tools/finance" class="active">Finance</a><a href="/tools/health">Health</a><a href="/tools/utilities">Utilities</a><a href="/tools/productivity">Productivity</a><a href="/tools/construction">Construction</a>
       </nav>
     </header>
 
-    <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/finance">Finance</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <span aria-current="page">Loan &amp; Mortgage Calculator</span>
-      </nav>
-      <h1 id="tool-heading">Loan &amp; Mortgage Calculator</h1>
-      <p>Calculate your monthly payment, total interest, and get a complete amortization schedule
-         for any fixed-rate loan or mortgage. Everything runs privately in your browser.</p>
-    </section>
-
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
-    <!-- CALCULATOR WIDGET -->
-    <section aria-labelledby="calc-heading">
-      <div class="tool-widget">
-        <h2 id="calc-heading">Enter Loan Details</h2>
-
-        <div class="calc-layout">
-
-          <!-- ── LEFT: INPUTS ── -->
-          <div class="inputs-col">
-
-            <!-- Loan Amount -->
-            <div class="input-group">
-              <label for="loanAmount">
-                Loan Amount
-                <span class="live-val" id="loanAmountVal">$300,000</span>
-              </label>
-              <input type="range" id="loanAmountSlider"
-                     min="10000" max="2000000" step="5000" value="300000"
-                     aria-label="Loan amount slider" />
-              <input type="number" id="loanAmount"
-                     min="1000" max="99999999" step="1000" value="300000"
-                     aria-label="Loan amount in dollars" />
-              <p class="input-hint">Enter the total amount borrowed (principal).</p>
-            </div>
-
-            <!-- Annual Interest Rate -->
-            <div class="input-group">
-              <label for="interestRate">
-                Annual Interest Rate
-                <span class="live-val" id="interestRateVal">6.5%</span>
-              </label>
-              <input type="range" id="interestRateSlider"
-                     min="0.1" max="20" step="0.05" value="6.5"
-                     aria-label="Annual interest rate slider" />
-              <input type="number" id="interestRate"
-                     min="0.01" max="50" step="0.01" value="6.5"
-                     aria-label="Annual interest rate percent" />
-              <p class="input-hint">Enter the fixed annual interest rate (APR).</p>
-            </div>
-
-            <!-- Loan Term -->
-            <div class="input-group">
-              <label for="loanTerm">
-                Loan Term
-                <span class="live-val" id="loanTermVal">30 years</span>
-              </label>
-              <input type="range" id="loanTermSlider"
-                     min="1" max="30" step="1" value="30"
-                     aria-label="Loan term slider" />
-              <input type="number" id="loanTerm"
-                     min="1" max="50" step="1" value="30"
-                     aria-label="Loan term in years" />
-              <p class="input-hint">Term length in years (e.g. 30, 20, 15, 10).</p>
-            </div>
-
-            <!-- Loan Type -->
-            <div class="input-group">
-              <label for="loanType">Loan Type</label>
-              <select id="loanType" aria-label="Loan type">
-                <option value="mortgage">🏠 Mortgage</option>
-                <option value="car">🚗 Car Loan</option>
-                <option value="personal">💳 Personal Loan</option>
-                <option value="student">🎓 Student Loan</option>
-                <option value="other">💰 Other</option>
-              </select>
-              <p class="input-hint">Loads typical defaults for that loan type — rates are approximate and for illustration only. Always confirm current rates with your lender.</p>
-            </div>
-
-            <!-- Error -->
-            <div class="calc-error" id="calcError" role="alert">
-              ⚠️ Please enter valid values — loan amount must be greater than $0 and interest rate must be greater than 0%.
-            </div>
-
-            <button class="btn-calculate" id="calcBtn" type="button">
-              Calculate Payment
-            </button>
-
-          </div><!-- /inputs-col -->
-
-          <!-- ── RIGHT: RESULTS ── -->
-          <div class="results-col" id="resultsCol">
-
-            <!-- Empty state -->
-            <div class="results-empty" id="resultsEmpty">
-              <span class="empty-icon" aria-hidden="true">🏠</span>
-              <strong>Your results will appear here</strong>
-              <p>Enter your loan details and click Calculate.</p>
-            </div>
-
-            <!-- Results (hidden until calculated) -->
-            <div id="resultsCards" style="display:none;display:flex;flex-direction:column;gap:0.85rem;">
-
-              <div class="result-card primary">
-                <div class="result-label">Monthly Payment</div>
-                <div class="result-value" id="resMonthly">—</div>
-                <div class="result-sub">Principal &amp; interest only</div>
-              </div>
-
-              <div class="result-card">
-                <div class="result-label">Total Amount Paid</div>
-                <div class="result-value" id="resTotal">—</div>
-                <div class="result-sub" id="resTotalSub">over — payments</div>
-              </div>
-
-              <div class="result-card">
-                <div class="result-label">Total Interest Paid</div>
-                <div class="result-value" id="resInterest" style="color:#f87171;">—</div>
-                <div class="result-sub" id="resInterestPct">—% of total paid</div>
-              </div>
-
-              <!-- Principal vs Interest breakdown bar -->
-              <div>
-                <div class="breakdown-bar">
-                  <div class="bar-principal" id="barPrincipal" style="width:50%"></div>
-                  <div class="bar-interest"  id="barInterest"  style="width:50%"></div>
-                </div>
-                <div class="bar-legend">
-                  <span><span class="dot dot-principal"></span>Principal <span id="pctPrincipal">—</span>%</span>
-                  <span><span class="dot dot-interest"></span>Interest <span id="pctInterest">—</span>%</span>
-                </div>
-              </div>
-
-            </div><!-- /resultsCards -->
-          <!-- COPY LINK BUTTON — add after </div> of results-panel -->
-          <div id="shareLine" style="display:none; margin-top:1.25rem; display:none; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-            <button id="copyLinkBtn" type="button" style="
-              display: inline-flex;
-              align-items: center;
-              gap: 0.4rem;
-              background: rgba(34,197,94,0.08);
-              border: 1px solid rgba(34,197,94,0.3);
-              border-radius: 999px;
-              color: var(--accent);
-              font-family: inherit;
-              font-size: 0.85rem;
-              font-weight: 600;
-              padding: 0.45rem 1rem;
-              cursor: pointer;
-              transition: background 0.15s;
-            ">
-              🔗 Copy bookmarkable link
-            </button>
-            <span id="copyConfirm" style="font-size:0.8rem; color:var(--accent); display:none;">✅ Link copied!</span>
-          </div>
-
-          </div><!-- /results-col -->
-
-        </div><!-- /calc-layout -->
-      </div><!-- /tool-widget -->
-    </section>
-
-    <!-- AMORTIZATION TABLE -->
-    <section class="amort-section" id="amortSection" style="display:none;" aria-labelledby="amort-heading">
-      <h2 id="amort-heading">Amortization Schedule</h2>
-
-      <div class="amort-controls">
-        <label for="amortView">View:</label>
-        <select id="amortView" aria-label="Amortization view">
-          <option value="monthly">Monthly breakdown</option>
-          <option value="annual">Annual summary</option>
-        </select>
-        <span id="amortInfo" style="margin-left:auto;"></span>
-      </div>
-
-      <div class="amort-actions" aria-label="Amortization schedule actions">
-        <button class="btn-amort-action" id="amortPrintBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>
-          Print
-        </button>
-        <button class="btn-amort-action" id="amortPdfBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h5M8 16h8M8 12h8"/></svg>
-          Download PDF
-        </button>
-        <span id="amortPdfConfirm" role="status" style="display:none;color:var(--accent);font-size:0.8rem;align-self:center;">PDF downloaded.</span>
-        <button class="btn-amort-action" id="amortCsvBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-          Download CSV
-        </button>
-        <button class="btn-amort-action" id="amortTxtBtn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-          Download TXT
-        </button>
-      </div>
-
-      <div class="amort-wrap">
-        <table class="amort-table" aria-label="Amortization schedule">
-          <thead id="amortHead">
-            <tr>
-              <th>Month</th>
-              <th>Payment</th>
-              <th>Principal</th>
-              <th>Interest</th>
-              <th>Balance</th>
-            </tr>
-          </thead>
-          <tbody id="amortBody"></tbody>
-        </table>
-      </div>
-
-      <div class="amort-pagination" id="amortPagination">
-        <button id="btnPrev" disabled>‹ Previous</button>
-        <span id="pageInfo">Page 1 of 1</span>
-        <button id="btnNext">Next ›</button>
-      </div>
-    </section>
-
-    <!-- HOW TO USE -->
-    <div class="seo-section">
-      <h2>How to use the Loan &amp; Mortgage Calculator</h2>
-      <p>Enter three values: the <strong>loan amount</strong> (how much you're borrowing),
-         the <strong>annual interest rate</strong> (the fixed APR from your lender), and the
-         <strong>loan term</strong> in years. Use the sliders for quick adjustments or type
-         exact values into the number fields.</p>
-      <p>Click <strong>Calculate Payment</strong> to instantly see your monthly payment, total
-         amount repaid over the life of the loan, and how much of that total is interest.
-         Scroll down to the amortization schedule to see a month-by-month or year-by-year
-         breakdown of every payment. Use the schedule actions to print the complete selected view
-         or download it as a paginated PDF, CSV, or aligned plain text.</p>
-    </div>
-
-    <!-- FORMULA -->
-    <div class="seo-section">
-      <h2>How is a monthly mortgage payment calculated?</h2>
-      <p>Monthly payments for fixed-rate loans are calculated using the standard amortization formula:</p>
-      <div class="formula-block" role="img" aria-label="Mortgage payment formula">
-        M = P × [ r(1 + r)^n ] ÷ [ (1 + r)^n − 1 ]
-      </div>
-      <p>Where:
-        <strong>M</strong> = monthly payment,
-        <strong>P</strong> = loan principal (amount borrowed),
-        <strong>r</strong> = monthly interest rate (annual rate ÷ 12 ÷ 100),
-        <strong>n</strong> = total number of monthly payments (years × 12).
-      </p>
-      <p>This formula is used by banks and lenders worldwide for all fixed-rate installment loans,
-         including mortgages, car loans, and personal loans. The key insight is that early payments
-         are mostly interest — as the balance decreases over time, more of each payment goes toward
-         the principal.</p>
-    </div>
-
-    <!-- FAQ -->
-    <section class="faq-section" aria-labelledby="faq-heading">
-      <details open>
-        <summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Frequently Asked Questions</h2></summary>
-        <div class="faq-content">
-          <ul class="faq-list">
-
-        <li class="faq-item">
-          <h3>How accurate is this mortgage calculator?</h3>
-          <p>The calculator uses the standard amortization formula identical to those used by banks
-             and mortgage lenders for fixed-rate loans. Results are accurate to the cent for
-             fixed-rate, fully amortizing loans. Results will differ for variable-rate mortgages,
-             interest-only loans, or loans with balloon payments — consult your lender for those.</p>
-        </li>
-
-        <li class="faq-item">
-          <h3>Does the payment include taxes and insurance?</h3>
-          <p>No — this calculator computes the principal and interest (P&amp;I) payment only.
-             Your total monthly housing cost will also include property taxes, homeowners insurance,
-             and possibly PMI (private mortgage insurance if your down payment is under 20%).
-             Add those separately based on your specific property and lender requirements.</p>
-        </li>
-
-        <li class="faq-item">
-          <h3>What is an amortization schedule?</h3>
-          <p>An amortization schedule is a complete table showing every loan payment across the
-             full term. Each row shows the payment number, how much goes to principal, how much
-             goes to interest, and the remaining balance. In the early years the majority of each
-             payment is interest; toward the end of the term the majority goes to principal.</p>
-        </li>
-
-        <li class="faq-item">
-          <h3>Can I use this for a car loan or personal loan?</h3>
-          <p>Yes — the calculator works for any fixed-rate installment loan including car loans,
-             personal loans, and student loans. Simply enter the loan amount, interest rate, and
-             term. The math is identical regardless of what the loan is for.</p>
-        </li>
-
-        <li class="faq-item">
-          <h3>How do I calculate how much I save by making extra payments?</h3>
-          <p>The current calculator computes standard scheduled payments. An extra payments feature
-             is on our roadmap. As a quick manual approach: reduce the loan term by the number of
-             years your extra payments would shave off and compare the interest totals between
-             the two calculations.</p>
-        </li>
-
-        <li class="faq-item">
-          <h3>Is my data private?</h3>
-          <p>Yes — all calculations run entirely in your browser using JavaScript. No numbers
-             you enter are transmitted to any server or stored anywhere. See our
-             <a href="/privacy" style="color:var(--accent)">Privacy Policy</a> for details.</p>
-        </li>
-
-          </ul>
+    <section class="mortgage-hero" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/tools/finance">Finance</a><span aria-hidden="true">/</span><span aria-current="page">Mortgage Calculator</span></nav>
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Private, local mortgage planning</p>
+          <h1 id="tool-heading">Mortgage Calculator – Payments, Interest, and Amortization</h1>
+          <p class="hero-copy">Model a fixed-rate mortgage, add extra payments, switch to bi-weekly payments, and compare up to five plans. The calculation runs entirely in your browser.</p>
+          <div class="hero-pills" aria-label="Calculator features"><span>No data stored</span><span>Up to 5 scenarios</span></div>
         </div>
-      </details>
-    </section>
-
-    <section class="seo-section methodology" aria-labelledby="methodology-heading">
-      <h4 id="methodology-heading">Methodology & Limitations</h4>
-      <p class="disclaimer">This calculator uses the loan amount, fixed annual interest rate, and term to estimate equal monthly principal-and-interest payments and an amortization schedule.</p>
-      <p class="disclaimer"><strong>Limitations:</strong> Results are estimates, not a loan offer or financial advice. They may exclude taxes, insurance, mortgage insurance, fees, escrow, rate changes, and lender-specific terms. Confirm costs and disclosures with a lender.</p>
-      <p class="disclaimer"><strong>Source:</strong> <a href="https://www.consumerfinance.gov/ask-cfpb/what-is-a-loan-estimate-en-1995/">Consumer Financial Protection Bureau: What is a Loan Estimate?</a>.</p>
-      <p class="disclaimer">Prepared and reviewed by MonkeyTactics. Last reviewed <time datetime="2026-07-22">2026-07-22</time>.</p>
-    </section>
-
-    <!-- RELATED TOOLS -->
-    <section aria-labelledby="related-heading" style="margin-top:2rem;">
-      <h2 id="related-heading">Related Tools</h2>
-      <div class="related-grid">
-
-        <a href="/tools/compound-interest-calculator" class="related-card">
-          <strong>📈 Compound Interest Calculator</strong>
-          <span>Model investment growth, savings, contributions, inflation, and tax scenarios.</span>
-        </a>
-
-        <a href="/tools/percentage-calculator" class="related-card">
-          <strong>💯 Percentage Calculator</strong>
-          <span>Work out discounts, percentage changes, and reverse percentages instantly.</span>
-        </a>
-
-        <a href="/tools/date-difference-calculator" class="related-card">
-          <strong>📅 Date Difference &amp; Business Days Calculator</strong>
-          <span>Count calendar or business days between loan milestones, payment dates, and deadlines.</span>
-        </a>
-
+        <div class="hero-stat" aria-hidden="true"><span>Explore the tradeoff</span><strong>Payment <i>vs.</i> interest</strong><small>Change one assumption. See the full loan story.</small></div>
       </div>
     </section>
 
-    <!-- BOTTOM AD -->
-    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom Display Ad --></div>
+    <div id="engineStatus" class="engine-status" role="status">Loading the private mortgage engine…</div>
+    <div id="calcError" class="calc-error" role="alert" hidden></div>
+
+    <section id="printReportHeader" class="print-report-header" aria-label="Printed mortgage scenario summary">
+      <div class="print-report-brand"><strong>MonkeyTactics</strong><span>Mortgage Scenario Report</span></div>
+      <div class="print-report-heading"><div><p>Private mortgage analysis</p><h1 id="printReportTitle">Mortgage Scenario Summary</h1></div><span id="printGeneratedDate"></span></div>
+      <div class="print-summary-grid">
+        <div><span>Loan amount</span><strong id="printLoanAmount">—</strong></div>
+        <div><span>Interest rate</span><strong id="printInterestRate">—</strong></div>
+        <div><span>Loan term</span><strong id="printLoanTerm">—</strong></div>
+        <div><span>Payment frequency</span><strong id="printFrequency">—</strong></div>
+        <div id="printExtraRow"><span>Extra payment</span><strong id="printExtraPayment">—</strong></div>
+        <div><span id="printPaymentLabel">Monthly payment</span><strong id="printPayment">—</strong></div>
+        <div><span>Total interest paid</span><strong id="printTotalInterest">—</strong></div>
+        <div><span>Total cost of loan</span><strong id="printTotalCost">—</strong></div>
+        <div><span>Estimated payoff date</span><strong id="printPayoffDate">—</strong></div>
+      </div>
+      <div id="printNarrative" class="print-narrative"></div>
+      <footer id="printReportFooter" class="print-report-footer" aria-label="Printed report scenario link">
+        <strong>Scenario URL</strong>
+        <div id="printScenarioUrls"></div>
+        <small>Reopen this exact mortgage scenario at MonkeyTactics. The parameters are generated and displayed locally.</small>
+      </footer>
+    </section>
+
+    <section class="workspace" aria-labelledby="scenario-heading">
+      <div class="input-panel">
+        <div class="section-kicker">01 / Build</div>
+        <h2 id="scenario-heading">Your Mortgage Scenario</h2>
+        <p class="section-intro">Start with the loan basics. Payment and amortization estimates exclude taxes, insurance, fees, and escrow.</p>
+        <form id="mortgageForm" novalidate>
+          <div class="field-wide">
+            <div class="field-label-row"><label for="loanAmount">Loan amount</label><button id="downPaymentButton" class="field-link" type="button">Down payment?</button><output id="loanAmountOutput" for="loanAmount">$300,000</output></div>
+            <div class="money-field"><span aria-hidden="true">$</span><input id="loanAmount" name="amount" type="number" min="1000" max="100000000" step="1000" value="300000" inputmode="decimal" required></div>
+            <input id="loanAmountRange" type="range" min="50000" max="1500000" step="5000" value="300000" aria-label="Loan amount slider">
+          </div>
+          <div class="field-grid">
+            <div class="field"><label for="interestRate">Interest rate</label><div class="suffix-field"><input id="interestRate" name="rate" type="number" min="0" max="100" step="0.01" value="6.5" inputmode="decimal" required><span>%</span></div></div>
+            <div class="field"><label for="loanTerm">Loan term</label><div class="suffix-field"><input id="loanTerm" name="term" type="number" min="1" max="100" step="1" value="30" inputmode="numeric" required><span>years</span></div></div>
+            <div class="field"><label for="paymentFrequency">Payment frequency</label><select id="paymentFrequency" name="freq"><option value="monthly">Monthly</option><option value="biweekly">Bi-weekly</option></select></div>
+            <div class="field"><label for="extraPayment">Extra each payment</label><div class="money-field compact"><span aria-hidden="true">$</span><input id="extraPayment" name="extra" type="number" min="0" max="1000000" step="25" value="0" inputmode="decimal"></div></div>
+          </div>
+          <div class="form-actions"><button id="calculateButton" class="button-primary" type="submit">Calculate mortgage</button><button id="addScenarioButton" class="button-secondary" type="button">Add to comparison</button></div>
+        </form>
+        <div class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5z"/></svg><div><strong>Your numbers stay yours.</strong><span>No accounts, cookies, analytics, or server-side storage are used for calculations.</span></div></div>
+        <div id="inputScenarioList" class="input-scenario-list" hidden>
+          <span class="input-scenario-heading">Saved comparisons</span>
+          <div id="inputScenarioChips" class="input-scenario-chips"></div>
+        </div>
+      </div>
+
+      <aside class="result-panel" aria-labelledby="summary-heading">
+        <div class="section-kicker">02 / Understand</div>
+        <div class="result-heading-row"><h2 id="summary-heading">Your Mortgage Summary</h2><div class="summary-controls"><label id="summaryScenarioControl" for="summaryScenario" hidden>Scenario<select id="summaryScenario" aria-label="Mortgage summary scenario"></select></label><span id="resultFrequency" class="frequency-badge">Monthly</span></div></div>
+        <div id="resultEmpty" class="result-empty"><span>Ready when you are.</span><p>Calculate to reveal your payment, lifetime interest, and payoff path.</p></div>
+        <div id="resultContent" hidden>
+          <div class="primary-metric"><span>Payment per period</span><strong id="periodicPayment">—</strong><small id="paymentCaption">principal and interest</small></div>
+          <div class="metric-grid">
+            <div><span>Total interest</span><strong id="totalInterest">—</strong></div>
+            <div><span>Total paid</span><strong id="totalPaid">—</strong></div>
+            <div><span>Payoff time</span><strong id="payoffTime">—</strong></div>
+            <div><span>Interest share</span><strong id="interestShare">—</strong></div>
+          </div>
+          <div class="cost-bar" aria-label="Principal and interest share"><span id="principalBar"></span><i id="interestBar"></i></div>
+          <div class="cost-legend"><span><b class="principal-dot"></b>Principal <strong id="principalPercent">—</strong></span><span><b class="interest-dot"></b>Interest <strong id="interestPercent">—</strong></span></div>
+          <div id="extraImpact" class="impact-card" hidden></div>
+          <div class="result-actions"><button id="copyLinkButton" class="text-button" type="button">Copy scenario link</button><span id="copyStatus" role="status"></span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section id="reportSection" class="report-section" aria-labelledby="report-heading" hidden>
+      <div class="section-kicker">03 / Read the result</div>
+      <div class="report-heading-row"><h2 id="report-heading">Your Mortgage Report</h2><label id="reportScenarioControl" for="reportScenario" hidden>Scenario<select id="reportScenario" aria-label="Mortgage report scenario"></select></label></div>
+      <div id="scenarioReport" class="prose-card" aria-live="polite"></div>
+    </section>
+
+    <section id="chartsSection" class="charts-section" aria-labelledby="charts-heading" hidden>
+      <div class="section-kicker">04 / See the trajectory</div>
+      <h2 id="charts-heading">Interest vs Principal Over Time</h2>
+      <div class="chart-grid">
+        <figure class="chart-card chart-wide"><div class="chart-title"><div><span>Remaining balance</span><strong>Balance over time</strong></div><div id="balanceLegend" class="chart-legend"></div></div><div id="balanceChart" class="chart" role="img" aria-label="Remaining mortgage balance over time chart"></div><figcaption id="balanceDescription"></figcaption></figure>
+        <figure class="chart-card"><div class="chart-title"><div><span>Payment composition</span><strong>Interest vs principal</strong></div><div class="composition-context"><label id="compositionScenarioControl" for="compositionScenario">Scenario<select id="compositionScenario" aria-label="Payment composition scenario"></select></label><span id="compositionScenarioLabel"></span></div></div><div id="compositionChart" class="chart" role="img" aria-label="Interest and principal by year stacked bar chart"></div><figcaption id="compositionDescription"></figcaption></figure>
+        <figure class="chart-card"><div class="chart-title"><div><span>Scenario cost</span><strong>Total interest</strong></div></div><div id="interestChart" class="chart" role="img" aria-label="Total interest comparison chart"></div><figcaption id="interestDescription"></figcaption></figure>
+        <figure id="payoffChartCard" class="chart-card chart-wide"><div class="chart-title"><div><span>Finish line</span><strong id="payoffChartTitle">Payoff time comparison</strong></div></div><div id="payoffChart" class="chart chart-short" role="img" aria-label="Mortgage payoff time comparison chart"></div><figcaption id="payoffDescription"></figcaption></figure>
+      </div>
+    </section>
+
+    <section id="comparisonSection" class="comparison-section" aria-labelledby="comparison-heading">
+      <div class="comparison-heading"><div><div class="section-kicker">05 / Compare</div><h2 id="comparison-heading">Compare Multiple Mortgage Scenarios</h2><p>Save the current inputs, then change the rate, term, frequency, or extra payment. Compare up to five plans side by side.</p></div><button id="clearScenariosButton" class="text-button" type="button">Clear saved</button></div>
+      <div id="scenarioChips" class="scenario-chips" aria-live="polite"><p class="comparison-empty">No saved scenarios yet. Add your current plan or try a preset.</p></div>
+      <div class="preset-row" aria-label="Mortgage comparison presets"><button type="button" data-preset="rate">Rate +0.5%</button><button type="button" data-preset="term">15-year term</button><button type="button" data-preset="extra">Extra $200</button><button type="button" data-preset="biweekly">Bi-weekly</button></div>
+      <div id="comparisonOutput" hidden><div class="table-wrap"><table class="comparison-table"><thead><tr><th>Scenario</th><th>Payment</th><th>Total interest</th><th>Payoff</th><th>Differences from A</th></tr></thead><tbody id="comparisonBody"></tbody></table></div><div id="comparisonReport" class="comparison-report"></div></div>
+    </section>
+
+    <section id="amortizationSection" class="amort-section" aria-labelledby="amort-heading" hidden>
+      <div class="amort-heading"><div><div class="section-kicker">06 / Inspect</div><div class="amort-title-row"><h2 id="amort-heading">Amortization Schedule</h2><span id="amortScenarioLabel" class="amort-scenario-label"></span></div></div><div class="amort-controls"><label id="amortScenarioControl" for="amortScenario">Scenario<select id="amortScenario" aria-label="Amortization schedule scenario"></select></label><label for="amortView">View<select id="amortView"><option value="annual">Annual</option><option value="periodic">Every payment</option></select></label></div></div>
+      <div class="amort-actions"><button id="printButton" type="button">Print report</button><button id="pdfButton" type="button" title="Open the print dialog and choose Save as PDF">Save as PDF</button><button id="csvButton" type="button">Download CSV</button><button id="txtButton" type="button">Download TXT</button><span id="downloadStatus" role="status"></span></div>
+      <div class="table-wrap"><table class="amort-table"><thead><tr><th>Period</th><th>Payment</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead><tbody id="amortBody"></tbody></table></div>
+      <div class="pagination"><button id="previousPage" type="button">Previous</button><span id="pageStatus">Page 1 of 1</span><button id="nextPage" type="button">Next</button></div>
+    </section>
+
+    <section id="printFaqSection" class="print-faq-section" aria-label="Mortgage calculator frequently asked questions">
+      <h2>Mortgage Calculator Questions</h2>
+      <article><h3>How is my mortgage payment calculated?</h3><p>A fixed-rate mortgage payment is calculated from the loan principal, periodic interest rate, and total number of payments. This report estimates principal and interest only; taxes, insurance, escrow, and fees are not included.</p></article>
+      <article><h3>What is an amortization schedule?</h3><p>An amortization schedule lists each loan payment and shows how much goes toward interest, how much reduces principal, and the remaining mortgage balance after the payment.</p></article>
+      <article><h3>How do extra payments affect my mortgage?</h3><p>Extra payments reduce principal sooner. In the model, this lowers future interest charges and can shorten the payoff period. Confirm prepayment rules and processing details with your lender.</p></article>
+    </section>
+
+    <section class="examples-section" aria-labelledby="examples-heading">
+      <div class="section-kicker">Generic examples</div><h2 id="examples-heading">Example Mortgage Scenarios</h2><p>Explore these non-personal examples or use them as a starting point for your own comparison.</p>
+      <div class="example-category"><h3>Classic 30-year mortgages</h3><div class="example-grid">
+        <a href="/tools/loan-mortgage-calculator?amount=200000&amp;rate=5&amp;term=30&amp;extra=0&amp;freq=monthly"><span>$200k · 5% · 30 years</span><strong>Explore scenario →</strong></a>
+        <a href="/tools/loan-mortgage-calculator?amount=300000&amp;rate=6&amp;term=30&amp;extra=0&amp;freq=monthly"><span>$300k · 6% · 30 years</span><strong>Explore scenario →</strong></a>
+        <a href="/tools/loan-mortgage-calculator?amount=400000&amp;rate=7&amp;term=30&amp;extra=0&amp;freq=monthly"><span>$400k · 7% · 30 years</span><strong>Explore scenario →</strong></a>
+        <a href="/tools/loan-mortgage-calculator?amount=500000&amp;rate=6.5&amp;term=30&amp;extra=0&amp;freq=monthly"><span>$500k · 6.5% · 30 years</span><strong>Explore scenario →</strong></a>
+      </div></div>
+      <div class="example-category"><h3>Different mortgage terms</h3><div class="example-grid">
+        <a href="/tools/loan-mortgage-calculator?amount=300000&amp;rate=6&amp;term=15&amp;extra=0&amp;freq=monthly"><span>$300k · 6% · 15 years</span><strong>Explore scenario →</strong></a>
+        <a href="/tools/loan-mortgage-calculator?amount=300000&amp;rate=6&amp;term=20&amp;extra=0&amp;freq=monthly"><span>$300k · 6% · 20 years</span><strong>Explore scenario →</strong></a>
+        <a href="/tools/loan-mortgage-calculator?amount=300000&amp;rate=6&amp;term=25&amp;extra=0&amp;freq=monthly"><span>$300k · 6% · 25 years</span><strong>Explore scenario →</strong></a>
+      </div></div>
+      <div class="example-category"><h3>Mortgages with extra payments</h3><div class="example-grid">
+        <a href="/tools/loan-mortgage-calculator?amount=300000&amp;rate=6&amp;term=30&amp;extra=100&amp;freq=monthly"><span>$300k · 6% · 30 years · +$100/mo</span><strong>Explore scenario →</strong></a>
+        <a href="/tools/loan-mortgage-calculator?amount=400000&amp;rate=7&amp;term=30&amp;extra=200&amp;freq=monthly"><span>$400k · 7% · 30 years · +$200/mo</span><strong>Explore scenario →</strong></a>
+      </div></div>
+      <div class="example-category"><h3>Bi-weekly mortgage payments</h3><div class="example-grid">
+        <a href="/tools/loan-mortgage-calculator?amount=300000&amp;rate=6&amp;term=30&amp;extra=0&amp;freq=biweekly"><span>$300k · 6% · 30 years · bi-weekly</span><strong>Explore scenario →</strong></a>
+        <a href="/tools/loan-mortgage-calculator?amount=450000&amp;rate=6.75&amp;term=30&amp;extra=0&amp;freq=biweekly"><span>$450k · 6.75% · 30 years · bi-weekly</span><strong>Explore scenario →</strong></a>
+      </div></div>
+      <div class="example-category"><h3>Lower and higher interest rates</h3><div class="example-grid">
+        <a href="/tools/loan-mortgage-calculator?amount=300000&amp;rate=4&amp;term=30&amp;extra=0&amp;freq=monthly"><span>$300k · 4% · 30 years</span><strong>Explore scenario →</strong></a>
+        <a href="/tools/loan-mortgage-calculator?amount=300000&amp;rate=8&amp;term=30&amp;extra=0&amp;freq=monthly"><span>$300k · 8% · 30 years</span><strong>Explore scenario →</strong></a>
+      </div></div>
+    </section>
+
+    <section class="education-grid">
+      <article><div class="section-kicker">How it works</div><h2>How is my mortgage payment calculated?</h2><p>A fixed-rate payment is calculated from principal, the interest rate per payment period, and the number of payments. The scheduled principal-and-interest payment stays level, while its composition changes.</p><div class="formula" aria-label="Mortgage payment formula">M = P × [r(1 + r)<sup>n</sup>] ÷ [(1 + r)<sup>n</sup> − 1]</div><p>Early payments tend to contain more interest. As the balance falls, more of the same payment reaches principal.</p></article>
+      <article><div class="section-kicker">Privacy by design</div><h2>Calculated locally, never stored</h2><p>Your inputs are passed directly to a Rust WebAssembly module in this page. The engine is deterministic, makes no external calls, and returns the schedule to your browser for the tables and charts.</p><p>Parameterized links on this page are generic examples. Copying a link is optional and happens only when you ask.</p></article>
+    </section>
+
+    <section class="faq-section" aria-labelledby="faq-heading">
+      <div class="section-kicker">Questions, answered</div><h2 id="faq-heading">Frequently Asked Questions</h2>
+      <details><summary>How is my mortgage payment calculated?</summary><p>The calculator uses the standard fixed-rate amortization formula. It includes principal and interest, but not taxes, homeowners insurance, mortgage insurance, HOA dues, or lender fees.</p></details>
+      <details><summary>What is an amortization schedule?</summary><p>An amortization schedule lists each payment and shows how it divides between interest and principal, along with the remaining balance after that payment.</p></details>
+      <details><summary>How do extra payments affect my mortgage?</summary><p>Extra money is applied to principal in the model. That lowers the balance sooner, reduces future interest, and can shorten the payoff time. Confirm prepayment rules with your lender.</p></details>
+      <details><summary>What does bi-weekly mean here?</summary><p>The bi-weekly model uses 26 equal payment periods per year and accrues interest for each of those periods. Lender programs can process bi-weekly payments differently, so compare the estimate with your loan terms.</p></details>
+      <details><summary>Is this financial advice?</summary><p>No. Results are educational estimates. Rates, rounding, payment timing, escrow, fees, and lender rules can change real loan costs.</p></details>
+    </section>
+
+    <section class="methodology"><strong>Methodology &amp; limitations</strong><p>Fixed-rate, fully amortizing model. Results are rounded to cents for display; internal calculations use floating-point precision. Confirm all figures with a lender. Prepared and reviewed by MonkeyTactics. Last reviewed <time datetime="2026-08-06">August 6, 2026</time>.</p></section>
+
+    <section aria-labelledby="related-heading" class="related-section"><h2 id="related-heading">Related Tools</h2><div class="related-grid"><a href="/tools/compound-interest-calculator"><strong>Compound Interest Calculator</strong><span>Model savings and investment growth.</span></a><a href="/tools/percentage-calculator"><strong>Percentage Calculator</strong><span>Calculate changes, discounts, and ratios.</span></a><a href="/tools/date-difference-calculator"><strong>Date Difference Calculator</strong><span>Count days between financial milestones.</span></a></div></section>
 
   </main>
 
-  <!-- FOOTER -->
-  <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot">
-    <div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div>
-    <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6a6c8ef0fe997f522adfe278" data-style-height="52px" data-style-width="100%" data-token="e577092d-5e8c-49a6-b710-f1a5cfc19873">
-      <a href="https://www.trustpilot.com/review/monkeytactics.com" target="_blank" rel="noopener">Trustpilot</a>
-    </div>
-  </section>
+  <dialog id="scenarioLimitDialog" class="scenario-limit-dialog" aria-labelledby="scenario-limit-heading">
+    <form method="dialog">
+      <span class="dialog-kicker">Comparison limit</span>
+      <h2 id="scenario-limit-heading">Five scenarios is the maximum</h2>
+      <p>You already have five mortgage scenarios saved. Remove one of the existing scenarios before adding another.</p>
+      <button type="submit" class="button-primary">Got it</button>
+    </form>
+  </dialog>
 
-  <footer>
-    <div>© 2026 MonkeyTactics</div>
-    <nav aria-label="Footer navigation">
-      <a href="https://blog.monkeytactics.com/">Blog</a>
-      <a href="/privacy">Privacy</a>
-      <a href="/terms-of-service">Terms</a>
-      <a href="/third-party-notices">Third-Party Notices</a>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-      <a href="/sitemap">Sitemap</a>
-    </nav>
-  </footer>
+  <dialog id="downPaymentDialog" class="scenario-limit-dialog down-payment-dialog" aria-labelledby="down-payment-heading">
+    <form id="downPaymentForm" novalidate>
+      <span class="dialog-kicker">Loan amount helper</span>
+      <h2 id="down-payment-heading">Calculate from a down payment</h2>
+      <p>Enter the home price, then adjust either the down payment percentage or dollar amount.</p>
+      <div class="down-payment-grid">
+        <div class="down-payment-field field-wide"><label for="homePrice">Home price</label><div class="money-field"><span aria-hidden="true">$</span><input id="homePrice" type="number" min="1000" max="100000000" step="1000" inputmode="decimal" required autofocus></div></div>
+        <div class="down-payment-field"><label for="downPaymentPercent">Down payment</label><div class="suffix-field"><input id="downPaymentPercent" type="number" min="0" max="100" step="0.01" value="20" inputmode="decimal" required><span>%</span></div></div>
+        <div class="down-payment-field"><label for="downPaymentAmount">Down payment amount</label><div class="money-field compact"><span aria-hidden="true">$</span><input id="downPaymentAmount" type="number" min="0" max="100000000" step="100" inputmode="decimal" required></div></div>
+      </div>
+      <div class="dialog-calculated"><span>Calculated loan amount</span><strong id="calculatedLoanAmount">$300,000.00</strong></div>
+      <div id="downPaymentError" class="dialog-error" role="alert" hidden></div>
+      <div class="dialog-actions"><button type="button" class="button-secondary" data-close-down-payment>Cancel</button><button type="submit" class="button-primary">Use this loan amount</button></div>
+    </form>
+  </dialog>
 
+  <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="/assets/js/calculator-pdf.js?v=20260805-2"></script>
-  <!-- CALCULATOR SCRIPT -->
-  <script>
-  (function () {
-
-  /* ── Element refs ── */
-  const loanAmountInput    = document.getElementById('loanAmount');
-  const loanAmountSlider   = document.getElementById('loanAmountSlider');
-  const loanAmountVal      = document.getElementById('loanAmountVal');
-  const interestRateInput  = document.getElementById('interestRate');
-  const interestRateSlider = document.getElementById('interestRateSlider');
-  const interestRateVal    = document.getElementById('interestRateVal');
-  const loanTermInput      = document.getElementById('loanTerm');
-  const loanTermSlider     = document.getElementById('loanTermSlider');
-  const loanTermVal        = document.getElementById('loanTermVal');
-  const loanTypeSelect     = document.getElementById('loanType');
-  const calcBtn            = document.getElementById('calcBtn');
-  const calcError          = document.getElementById('calcError');
-  const resultsEmpty       = document.getElementById('resultsEmpty');
-  const resultsCards       = document.getElementById('resultsCards');
-  const resMonthly         = document.getElementById('resMonthly');
-  const resTotal           = document.getElementById('resTotal');
-  const resTotalSub        = document.getElementById('resTotalSub');
-  const resInterest        = document.getElementById('resInterest');
-  const resInterestPct     = document.getElementById('resInterestPct');
-  const barPrincipal       = document.getElementById('barPrincipal');
-  const barInterest        = document.getElementById('barInterest');
-  const pctPrincipal       = document.getElementById('pctPrincipal');
-  const pctInterest        = document.getElementById('pctInterest');
-  const amortSection       = document.getElementById('amortSection');
-  const amortView          = document.getElementById('amortView');
-  const amortBody          = document.getElementById('amortBody');
-  const amortInfo          = document.getElementById('amortInfo');
-  const amortPrintBtn      = document.getElementById('amortPrintBtn');
-  const amortPdfBtn        = document.getElementById('amortPdfBtn');
-  const amortPdfConfirm    = document.getElementById('amortPdfConfirm');
-  const amortCsvBtn        = document.getElementById('amortCsvBtn');
-  const amortTxtBtn        = document.getElementById('amortTxtBtn');
-  const btnPrev            = document.getElementById('btnPrev');
-  const btnNext            = document.getElementById('btnNext');
-  const pageInfo           = document.getElementById('pageInfo');
-  const shareLine          = document.getElementById('shareLine');
-  const copyLinkBtn        = document.getElementById('copyLinkBtn');
-  const copyConfirm        = document.getElementById('copyConfirm');
-
-  /* ── State ── */
-  let schedule    = [];
-  let currentPage = 1;
-  const ROWS_PER_PAGE = 24;
-
-  /* ── Formatters ── */
-  function fmtCurrency(n) {
-    return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
-  function fmtCurrencyShort(n) {
-    return '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
-
-  /* ── Slider <-> Input sync ── */
-  function syncSliderToInput(slider, input, displayEl, formatter) {
-    slider.addEventListener('input', function () {
-      input.value = slider.value;
-      displayEl.textContent = formatter(parseFloat(slider.value));
-    });
-    input.addEventListener('input', function () {
-      const v = parseFloat(input.value);
-      if (!isNaN(v)) {
-        slider.value = v;
-        displayEl.textContent = formatter(v);
-      }
-    });
-  }
-
-  syncSliderToInput(loanAmountSlider, loanAmountInput, loanAmountVal,
-    function(v) { return '$' + Math.round(v).toLocaleString(); });
-  syncSliderToInput(interestRateSlider, interestRateInput, interestRateVal,
-    function(v) { return v.toFixed(2) + '%'; });
-  syncSliderToInput(loanTermSlider, loanTermInput, loanTermVal,
-    function(v) { return Math.round(v) + (Math.round(v) === 1 ? ' year' : ' years'); });
-
-  /* ── Loan type → pre-fill defaults ── */
-  const loanDefaults = {
-    mortgage: { amount: 300000, rate: 6.50, term: 30 },
-    car:      { amount:  35000, rate: 7.00, term:  5 },
-    personal: { amount:  10000, rate: 11.50, term:  3 },
-    student:  { amount:  30000, rate: 5.50, term: 10 }
-  };
-
-  loanTypeSelect.addEventListener('change', function () {
-    const defaults = loanDefaults[this.value];
-    if (!defaults) return; // 'other' — leave values as-is
-
-    // Amount
-    loanAmountInput.value  = defaults.amount;
-    loanAmountSlider.value = defaults.amount;
-    loanAmountVal.textContent = '$' + defaults.amount.toLocaleString();
-
-    // Rate
-    interestRateInput.value  = defaults.rate;
-    interestRateSlider.value = defaults.rate;
-    interestRateVal.textContent = defaults.rate.toFixed(2) + '%';
-
-    // Term
-    loanTermInput.value  = defaults.term;
-    loanTermSlider.value = defaults.term;
-    loanTermVal.textContent = defaults.term + (defaults.term === 1 ? ' year' : ' years');
-  });
-
-  /* ══════════════════════════════════════════════════
-     URL PARAMS — READ on page load
-  ══════════════════════════════════════════════════ */
-  function readURLParams() {
-    const params = new URLSearchParams(window.location.search);
-
-    if (params.has('amount')) {
-      const v = parseFloat(params.get('amount'));
-      if (!isNaN(v) && v > 0) {
-        loanAmountInput.value  = v;
-        loanAmountSlider.value = v;
-        loanAmountVal.textContent = '$' + Math.round(v).toLocaleString();
-      }
-    }
-
-    if (params.has('rate')) {
-      const v = parseFloat(params.get('rate'));
-      if (!isNaN(v) && v > 0) {
-        interestRateInput.value  = v;
-        interestRateSlider.value = v;
-        interestRateVal.textContent = v.toFixed(2) + '%';
-      }
-    }
-
-    if (params.has('term')) {
-      const v = parseInt(params.get('term'), 10);
-      if (!isNaN(v) && v > 0) {
-        loanTermInput.value  = v;
-        loanTermSlider.value = v;
-        loanTermVal.textContent = v + (v === 1 ? ' year' : ' years');
-      }
-    }
-
-    if (params.has('type')) {
-      const v = params.get('type');
-      const opt = loanTypeSelect.querySelector('option[value="' + v + '"]');
-      if (opt) loanTypeSelect.value = v;
-    }
-
-    // Auto-calculate if all 3 required params are present
-    if (params.has('amount') && params.has('rate') && params.has('term')) {
-      runCalculation();
-    }
-  }
-
-  /* ══════════════════════════════════════════════════
-     BOOKMARKABLE URL — BUILD only when requested
-  ══════════════════════════════════════════════════ */
-  function buildBookmarkableURL() {
-    const params = new URLSearchParams();
-    params.set('amount', loanAmountInput.value);
-    params.set('rate',   interestRateInput.value);
-    params.set('term',   loanTermInput.value);
-    params.set('type',   loanTypeSelect.value);
-
-    const bookmarkableURL = new URL(window.location.href);
-    bookmarkableURL.search = params.toString();
-    bookmarkableURL.hash = '';
-    return bookmarkableURL.toString();
-  }
-
-  /* ══════════════════════════════════════════════════
-     CORE CALCULATION
-  ══════════════════════════════════════════════════ */
-  function calcMortgage(principal, annualRate, termYears) {
-    const n = termYears * 12;
-    if (annualRate === 0) {
-      const monthly = principal / n;
-      const sched = [];
-      let balance = principal;
-      for (let i = 1; i <= n; i++) {
-        balance -= monthly;
-        sched.push({ month: i, payment: monthly, principal: monthly, interest: 0, balance: Math.max(0, balance) });
-      }
-      return { monthly, total: principal, totalInterest: 0, schedule: sched };
-    }
-    const r = annualRate / 100 / 12;
-    const monthly = principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-    let balance = principal;
-    const sched = [];
-    let totalInterest = 0;
-    for (let i = 1; i <= n; i++) {
-      const interestPayment   = balance * r;
-      const principalPayment  = monthly - interestPayment;
-      balance -= principalPayment;
-      totalInterest += interestPayment;
-      sched.push({
-        month:     i,
-        payment:   monthly,
-        principal: principalPayment,
-        interest:  interestPayment,
-        balance:   Math.max(0, balance)
-      });
-    }
-    return { monthly, total: monthly * n, totalInterest, schedule: sched };
-  }
-
-  function getAnnualSchedule() {
-    const years = Math.ceil(schedule.length / 12);
-    const annualRows = [];
-    for (let year = 1; year <= years; year++) {
-      const rows = schedule.slice((year - 1) * 12, year * 12);
-      annualRows.push({
-        period: 'Year ' + year,
-        payment: rows.reduce(function(sum, row) { return sum + row.payment; }, 0),
-        principal: rows.reduce(function(sum, row) { return sum + row.principal; }, 0),
-        interest: rows.reduce(function(sum, row) { return sum + row.interest; }, 0),
-        balance: rows[rows.length - 1].balance
-      });
-    }
-    return annualRows;
-  }
-
-  /* ── Amortization table render ── */
-  function renderAmortTable(showAllMonthlyRows) {
-    const isAnnual = amortView.value === 'annual';
-    amortBody.innerHTML = '';
-
-    if (isAnnual) {
-      const annualRows = getAnnualSchedule();
-      annualRows.forEach(function(row) {
-        const tr = document.createElement('tr');
-        tr.className = 'year-summary';
-        tr.innerHTML =
-          '<td>' + row.period + '</td>' +
-          '<td>' + fmtCurrency(row.payment) + '</td>' +
-          '<td class="td-principal">' + fmtCurrency(row.principal) + '</td>' +
-          '<td class="td-interest">' + fmtCurrency(row.interest) + '</td>' +
-          '<td>' + fmtCurrency(row.balance) + '</td>';
-        amortBody.appendChild(tr);
-      });
-      btnPrev.style.display  = 'none';
-      btnNext.style.display  = 'none';
-      pageInfo.style.display = 'none';
-      amortInfo.textContent  = annualRows.length + ' years shown';
-    } else {
-      const totalPages = Math.ceil(schedule.length / ROWS_PER_PAGE);
-      const start = showAllMonthlyRows ? 0 : (currentPage - 1) * ROWS_PER_PAGE;
-      const end   = showAllMonthlyRows ? schedule.length : Math.min(start + ROWS_PER_PAGE, schedule.length);
-      const rows  = schedule.slice(start, end);
-
-      rows.forEach(function(row) {
-        const tr = document.createElement('tr');
-        tr.innerHTML =
-          '<td>Month ' + row.month + '</td>' +
-          '<td>' + fmtCurrency(row.payment) + '</td>' +
-          '<td class="td-principal">' + fmtCurrency(row.principal) + '</td>' +
-          '<td class="td-interest">' + fmtCurrency(row.interest) + '</td>' +
-          '<td>' + fmtCurrency(row.balance) + '</td>';
-        amortBody.appendChild(tr);
-      });
-
-      btnPrev.style.display  = '';
-      btnNext.style.display  = '';
-      pageInfo.style.display = '';
-      btnPrev.disabled = currentPage === 1;
-      btnNext.disabled = currentPage === totalPages;
-      pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
-      amortInfo.textContent = 'Months ' + (start + 1) + '–' + end + ' of ' + schedule.length;
-    }
-  }
-
-  function getAmortizationExportRows() {
-    if (amortView.value === 'annual') return getAnnualSchedule();
-    return schedule.map(function(row) {
-      return {
-        period: 'Month ' + row.month,
-        payment: row.payment,
-        principal: row.principal,
-        interest: row.interest,
-        balance: row.balance
-      };
-    });
-  }
-
-  function escapeCsv(value) {
-    return '"' + String(value).replace(/"/g, '""') + '"';
-  }
-
-  function buildAmortizationCsv() {
-    const rows = getAmortizationExportRows();
-    const lines = [['Period', 'Payment', 'Principal', 'Interest', 'Balance']];
-    rows.forEach(function(row) {
-      lines.push([
-        row.period,
-        row.payment.toFixed(2),
-        row.principal.toFixed(2),
-        row.interest.toFixed(2),
-        row.balance.toFixed(2)
-      ]);
-    });
-    return lines.map(function(row) { return row.map(escapeCsv).join(','); }).join('\r\n');
-  }
-
-  function buildAmortizationTxt() {
-    const rows = getAmortizationExportRows();
-    const table = [['Period', 'Payment', 'Principal', 'Interest', 'Balance']];
-    rows.forEach(function(row) {
-      table.push([
-        row.period,
-        fmtCurrency(row.payment),
-        fmtCurrency(row.principal),
-        fmtCurrency(row.interest),
-        fmtCurrency(row.balance)
-      ]);
-    });
-    const widths = table[0].map(function(_, column) {
-      return Math.max.apply(null, table.map(function(row) { return row[column].length; }));
-    });
-    return table.map(function(row) {
-      return row.map(function(value, column) {
-        return column === 0 ? value.padEnd(widths[column]) : value.padStart(widths[column]);
-      }).join('  ');
-    }).join('\r\n');
-  }
-
-  function downloadAmortizationFile(content, extension, mimeType) {
-    if (!schedule.length) return;
-    const blobUrl = URL.createObjectURL(new Blob([content], { type: mimeType + ';charset=utf-8' }));
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = 'loan-amortization-' + amortView.value + '.' + extension;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 0);
-  }
-
-  function printAmortizationSchedule() {
-    if (!schedule.length) return;
-    const cleanup = function() {
-      document.body.classList.remove('print-amortization');
-      renderAmortTable();
-    };
-    renderAmortTable(true);
-    document.body.classList.add('print-amortization');
-    window.addEventListener('afterprint', cleanup, { once: true });
-    window.print();
-  }
-
-  function downloadAmortizationPdf() {
-    if (!schedule.length || !window.MonkeyTacticsPdf) return;
-    const rows = getAmortizationExportRows();
-    window.MonkeyTacticsPdf.downloadReport({
-      title: 'Loan & Mortgage Calculator Report',
-      filename: 'loan-amortization-' + amortView.value + '.pdf',
-      summary: [
-        { label: 'Loan type', value: loanTypeSelect.options[loanTypeSelect.selectedIndex].textContent.trim() },
-        { label: 'Loan amount', value: fmtCurrency(parseFloat(loanAmountInput.value)) },
-        { label: 'Annual interest rate', value: parseFloat(interestRateInput.value).toFixed(2) + '%' },
-        { label: 'Loan term', value: loanTermInput.value + ' years' },
-        { label: 'Monthly payment', value: resMonthly.textContent },
-        { label: 'Total amount paid', value: resTotal.textContent },
-        { label: 'Total interest paid', value: resInterest.textContent }
-      ],
-      note: 'Principal and interest estimate only. Taxes, insurance, fees, and lender-specific costs are not included.',
-      table: {
-        title: amortView.value === 'annual' ? 'Annual Amortization Summary' : 'Monthly Amortization Schedule',
-        columns: [
-          { label: 'Period', width: 14 },
-          { label: 'Payment', width: 14, align: 'right' },
-          { label: 'Principal', width: 14, align: 'right' },
-          { label: 'Interest', width: 14, align: 'right' },
-          { label: 'Balance', width: 14, align: 'right' }
-        ],
-        rows: rows.map(function(row) { return [row.period, fmtCurrency(row.payment), fmtCurrency(row.principal), fmtCurrency(row.interest), fmtCurrency(row.balance)]; })
-      }
-    });
-    amortPdfConfirm.style.display = 'inline';
-    setTimeout(function() { amortPdfConfirm.style.display = 'none'; }, 2500);
-  }
-
-  /* ── Main calculate function ── */
-  function runCalculation() {
-    calcError.style.display  = 'none';
-    resultsEmpty.style.display = 'none';
-
-    const principal  = parseFloat(loanAmountInput.value);
-    const annualRate = parseFloat(interestRateInput.value);
-    const termYears  = parseInt(loanTermInput.value, 10);
-
-    if (isNaN(principal) || isNaN(annualRate) || isNaN(termYears) ||
-        principal <= 0 || annualRate < 0 || termYears <= 0) {
-      calcError.style.display    = 'block';
-      resultsEmpty.style.display = 'flex';
-      resultsCards.style.display = 'none';
-      return;
-    }
-
-    const result   = calcMortgage(principal, annualRate, termYears);
-    schedule       = result.schedule;
-    currentPage    = 1;
-
-    const pctInterestVal   = (result.totalInterest / result.total * 100);
-    const pctPrincipalVal  = 100 - pctInterestVal;
-
-    resMonthly.textContent       = fmtCurrency(result.monthly);
-    resTotal.textContent         = fmtCurrency(result.total);
-    resTotalSub.textContent      = 'over ' + (termYears * 12) + ' payments';
-    resInterest.textContent      = fmtCurrency(result.totalInterest);
-    resInterestPct.textContent   = pctInterestVal.toFixed(1) + '% of total paid';
-    barPrincipal.style.width     = pctPrincipalVal.toFixed(1) + '%';
-    barInterest.style.width      = pctInterestVal.toFixed(1) + '%';
-    pctPrincipal.textContent     = pctPrincipalVal.toFixed(1);
-    pctInterest.textContent      = pctInterestVal.toFixed(1);
-
-    resultsCards.style.display   = 'flex';
-    amortSection.style.display   = 'block';
-    shareLine.style.display      = 'flex';
-
-    renderAmortTable();
-
-    resultsCards.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  /* ── Button listeners ── */
-  calcBtn.addEventListener('click', runCalculation);
-
-  amortView.addEventListener('change', function () {
-    currentPage = 1;
-    renderAmortTable();
-  });
-
-  btnPrev.addEventListener('click', function () {
-    if (currentPage > 1) { currentPage--; renderAmortTable(); }
-  });
-
-  btnNext.addEventListener('click', function () {
-    const totalPages = Math.ceil(schedule.length / ROWS_PER_PAGE);
-    if (currentPage < totalPages) { currentPage++; renderAmortTable(); }
-  });
-
-  amortPrintBtn.addEventListener('click', printAmortizationSchedule);
-  amortPdfBtn.addEventListener('click', downloadAmortizationPdf);
-  amortCsvBtn.addEventListener('click', function () {
-    downloadAmortizationFile(buildAmortizationCsv(), 'csv', 'text/csv');
-  });
-  amortTxtBtn.addEventListener('click', function () {
-    downloadAmortizationFile(buildAmortizationTxt(), 'txt', 'text/plain');
-  });
-
-  /* ══════════════════════════════════════════════════
-     COPY LINK button
-  ══════════════════════════════════════════════════ */
-  copyLinkBtn.addEventListener('click', function () {
-    navigator.clipboard.writeText(buildBookmarkableURL()).then(function () {
-      copyConfirm.style.display = 'inline';
-      setTimeout(function () { copyConfirm.style.display = 'none'; }, 2500);
-    });
-  });
-
-  /* ══════════════════════════════════════════════════
-     INIT — read URL params on page load
-  ══════════════════════════════════════════════════ */
-  readURLParams();
-
-})();
-  </script>
-
+  <script type="module" src="/assets/js/mortgage_wasm.js?v=20260807-27"></script>
 </body>
 </html>

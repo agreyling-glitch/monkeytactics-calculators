@@ -58,19 +58,45 @@ The site currently features 23 tools across five main categories:
 
 ## 🏗️ Architecture Overview
 
-MonkeyTactics is a static, front-end-only site with no server-side application or build step. Each tool uses lightweight HTML, CSS, and JavaScript, with selected browser libraries loaded from a CDN or embedded directly when a specialized capability is required.
+MonkeyTactics is a static, front-end-only site with no server-side application. Most tools use lightweight HTML, CSS, and JavaScript, while three computation-heavy tools use first-party Rust engines compiled to WebAssembly. Generated browser packages are committed under `assets/wasm/`, so production hosting serves static files and does not need a Rust toolchain.
 
 The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source membership, allowing searches against either dictionary or their deduplicated union. Its static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser loads only the chunks relevant to the submitted letters, decompresses them with the native `DecompressionStream` API, and caches the indexed words for later searches. Exact word length, starting and ending letters, wildcard patterns, required/excluded letters, vowel and consonant minimums, score ranges, sorting, and dictionary-aware hooks are applied in the browser. Hook searches load the complete index on demand.
 
-### Building the Word Unscrambler WASM engine
+### Rust/WASM calculators and tools
 
-The Word Unscrambler search, filtering, sorting, scoring, hooks, and word analysis engine is implemented in Rust at `wasm/word-unscrambler-engine`. Install the `wasm32-unknown-unknown` target and `wasm-pack`, then build its browser package from the repository root:
+| Tool | Rust crate | Browser package | Engine responsibilities |
+|---|---|---|---|
+| [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator) | `wasm/mortgage-engine` | `assets/wasm/mortgage-engine` | Fixed-rate amortization, monthly and bi-weekly payments, extra payments, and multi-scenario calculations |
+| [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator) | `wasm/qr-code-generator-engine` | `assets/wasm/qr-code-generator` | QR encoding, styling, image export, and batch generation |
+| [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Dictionary indexing, searching, filtering, sorting, scoring, hooks, and word analysis |
+
+All three engines run locally in the browser. Their Rust source, generated JavaScript bindings, and `.wasm` binaries live in this repository.
+
+### Building the Rust/WASM engines
+
+Install the `wasm32-unknown-unknown` target and `wasm-pack` once:
 
 ```powershell
 rustup target add wasm32-unknown-unknown
 cargo install wasm-pack
+```
+
+Build each browser package from the repository root:
+
+```powershell
+# QR Code Generator
+npm run build:wasm
+
+# Loan & Mortgage Calculator
+npm run build:mortgage-wasm
+
+# Word Unscrambler
 wasm-pack build wasm/word-unscrambler-engine --target web --release --out-dir ../../assets/wasm/word-unscrambler --out-name word_unscrambler_engine
 ```
+
+Commit regenerated bindings and `.wasm` binaries with the corresponding Rust changes. The release profiles use size optimization, link-time optimization, panic aborts, and symbol stripping.
+
+#### Word Unscrambler integration
 
 The checked-in bridge initializes the generated module before enabling the form:
 
@@ -83,31 +109,6 @@ Dictionary shards remain lazy-loaded by the existing UI and are passed to `init_
 
 The OCR Utility uses Tesseract.js v5 and WebAssembly to recognize English text entirely in the browser. Uploaded PNG and JPG images are preprocessed with canvas grayscale and contrast enhancement, then passed to a dedicated OCR worker. Images and extracted text are never uploaded to MonkeyTactics.
 
----
-
-## 🔑 SEO Keywords Covered
-
-This project is built around terms such as:
-
-- free online calculators
-- percentage calculator
-- BMI calculator
-- loan calculator
-- mortgage calculator
-- unit converter
-- date difference calculator business days
-- password generator
-- OCR utility
-- image to text
-- extract text from image
-- QR code generator
-- QR code decoder
-- word counter
-- word unscrambler
-- anagram solver
-- Scrabble word finder
-
-These phrases are reflected in the site content, page titles, and tool structure to help users discover the right calculator quickly.
 
 ---
 
