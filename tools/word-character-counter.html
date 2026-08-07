@@ -73,7 +73,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
 
   <style>
     /* ── Hero ── */
@@ -468,6 +468,7 @@
       .stat-trio    { grid-template-columns: 1fr 1fr; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-14" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -508,51 +509,37 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page counter-tool-page">
   <main>
 
     <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity" class="active">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/productivity">Productivity</a>
-        <span class="sep" aria-hidden="true">›</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#text-data">Text &amp; Data</a>
+        <span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">Word &amp; Character Counter</span>
       </nav>
-      <h1 id="tool-heading">Word &amp; Character Counter</h1>
-      <p>Count words and characters, estimate reading time, and spot your most-used keywords.
-         Counts update live as you type — everything runs privately in your browser.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Live writing metrics, locally calculated</p>
+          <h1 id="tool-heading">Word &amp; Character Counter</h1>
+          <p class="premium-hero-copy">Measure words, characters, sentences, paragraphs, and reading time as you type. Explore keyword density without sending your writing anywhere.</p>
+          <div class="premium-hero-pills" aria-label="Word counter features"><span>Instant live counts</span><span>Reading time &amp; keywords</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>See the shape of your writing</span><strong>Words <i>meet</i> insight</strong><small>Write freely. Measure instantly.</small></div>
+      </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
     <!-- COUNTER WIDGET -->
-    <section aria-labelledby="calc-heading">
+    <section class="counter-workspace-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Enter Your Text</h2>
+        <div class="premium-app-title counter-app-title"><div class="premium-section-kicker">01 / Analyze</div><h2 id="calc-heading">Add your text</h2><p>Paste or write content on the left and watch every metric update on the right.</p></div>
 
         <div class="calc-layout">
 

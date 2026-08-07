@@ -1,250 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>Free Online Calculators &amp; Tools | MonkeyTactics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Use fast, free, privacy-friendly calculators for finance, health, everyday utilities, and productivity. No sign-up required." />
+  <title>Free Online Calculators &amp; Tools | MonkeyTactics</title>
+  <meta name="description" content="Private, browser-powered tools for word games, mortgage planning, QR creation, calculations, and everyday work. No sign-up required." />
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-08-07" />
 
-  <!-- Open Graph -->
-  <meta property="og:title"       content="MonkeyTactics — Free Online Calculators &amp; Tools" />
-  <meta property="og:description" content="Fast, accurate, privacy-friendly online calculators and tools for everyday use." />
-  <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://monkeytactics.com/" />
-
-  <!-- Canonical -->
+  <meta property="og:title" content="MonkeyTactics — Private, Browser-Powered Tools" />
+  <meta property="og:description" content="Fast, capable calculators and utilities that run privately in your browser." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://monkeytactics.com/" />
   <link rel="canonical" href="https://monkeytactics.com/" />
 
-  <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
+  <link rel="stylesheet" href="/assets/css/home.css?v=20260807-redesign" />
   <script src="/assets/js/ads.js" defer></script>
-  <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-25" />
 
   <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": "https://monkeytactics.com/#organization",
-      "name": "MonkeyTactics",
-      "url": "https://monkeytactics.com/",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://monkeytactics.com/assets/img/logo/monkeytactics-monkey-logo.png",
-        "width": 383,
-        "height": 375
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://monkeytactics.com/#organization",
+        "name": "MonkeyTactics",
+        "url": "https://monkeytactics.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://monkeytactics.com/assets/img/logo/monkeytactics-monkey-logo.png",
+          "width": 383,
+          "height": 375
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://monkeytactics.com/#website",
+        "url": "https://monkeytactics.com/",
+        "name": "MonkeyTactics",
+        "publisher": { "@id": "https://monkeytactics.com/#organization" }
       }
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://monkeytactics.com/#website",
-      "url": "https://monkeytactics.com/",
-      "name": "MonkeyTactics",
-      "publisher": {
-        "@id": "https://monkeytactics.com/#organization"
-      }
-    }
-  ]
-}
+    ]
+  }
   </script>
 </head>
 
 <body>
   <main>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
-    <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
+    <section class="home-hero" aria-labelledby="home-heading">
+      <div class="home-hero__content">
+        <span class="home-eyebrow">Simple tools. Serious engineering.</span>
+        <h1 id="home-heading">Get the answer.<br /><span>Keep your data.</span></h1>
+        <p>Powerful calculators and utilities built to work directly in your browser—fast, private, and ready whenever you need them.</p>
+        <div class="home-hero__actions">
+          <a href="/tools/" class="home-button home-button--primary">Explore all tools <span aria-hidden="true">→</span></a>
+          <a href="#popular-tools" class="home-button home-button--secondary">See top tools</a>
+        </div>
+      </div>
+
+      <div class="home-principles" aria-label="What makes MonkeyTactics different">
+        <div><span class="home-principles__mark">01</span><strong>Browser-powered</strong><small>Results are calculated on your device.</small></div>
+        <div><span class="home-principles__mark">02</span><strong>Private by design</strong><small>Your inputs stay with you.</small></div>
+        <div><span class="home-principles__mark">03</span><strong>No account needed</strong><small>Open a tool and get to work.</small></div>
+      </div>
+    </section>
+
+    <section class="home-section" id="popular-tools" aria-labelledby="popular-heading">
+      <header class="home-section__heading">
         <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
+          <span class="home-eyebrow">Start here</span>
+          <h2 id="popular-heading">Popular Tools</h2>
         </div>
-      </a>
+        <p>Three of our most capable tools, built for jobs that need more than a basic answer.</p>
+      </header>
 
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+      <div class="featured-tools">
+        <article class="featured-tool featured-tool--word">
+          <div class="featured-tool__topline">
+            <span class="featured-tool__number">01</span>
+            <span class="featured-tool__category">Text &amp; Data</span>
+          </div>
+          <div class="featured-tool__symbol" aria-hidden="true">AZ</div>
+          <h3>Word Unscrambler</h3>
+          <p>Turn a rack of letters into playable words with a fast, browser-native search engine made for serious word-game solving.</p>
+          <ul class="capability-list">
+            <li>Search ENABLE or SOWPODS dictionaries</li>
+            <li>Use wildcards and smart board-pattern filters</li>
+            <li>Sort by score, length, bingos, and hooks</li>
+            <li>Save picks and revisit recent searches</li>
+          </ul>
+          <a href="/tools/word-unscrambler" class="featured-tool__link">Open Word Unscrambler <span aria-hidden="true">→</span></a>
+        </article>
 
-    <!-- HERO -->
-    <section class="hero">
-      <h1>Free Online Calculators and Tools</h1>
-      <p>MonkeyTactics is a growing collection of free online calculators and utilities designed to be quick,
-         accurate, and effortless to use on any device. Everything runs directly in your browser, keeping your
-         data private and secure.</p>
+        <article class="featured-tool featured-tool--mortgage">
+          <div class="featured-tool__topline">
+            <span class="featured-tool__number">02</span>
+            <span class="featured-tool__category">Calculators · Finance</span>
+          </div>
+          <div class="featured-tool__symbol" aria-hidden="true">%</div>
+          <h3>Loan &amp; Mortgage Calculator</h3>
+          <p>Go beyond a monthly-payment estimate and see how loan structure, payment frequency, and extra principal change the full cost.</p>
+          <ul class="capability-list">
+            <li>Compare as many as five fixed-rate scenarios</li>
+            <li>Model monthly or bi-weekly payments</li>
+            <li>Measure extra-payment interest savings</li>
+            <li>Review charts and complete amortization schedules</li>
+          </ul>
+          <a href="/tools/loan-mortgage-calculator" class="featured-tool__link">Plan a loan <span aria-hidden="true">→</span></a>
+        </article>
 
-      <div class="hero-actions">
-        <a href="/tools/" class="btn-primary">⚡ Browse all tools</a>
-        <a href="/tools/word-unscrambler" class="btn-ghost">Try Word Unscrambler</a>
+        <article class="featured-tool featured-tool--qr">
+          <div class="featured-tool__topline">
+            <span class="featured-tool__number">03</span>
+            <span class="featured-tool__category">Generators</span>
+          </div>
+          <div class="featured-tool__symbol featured-tool__symbol--qr" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <h3>Advanced QR Code Generator</h3>
+          <p>Create polished QR codes for more than URLs, then validate their reliability before exporting a single design or a complete batch.</p>
+          <ul class="capability-list">
+            <li>Build URL, Wi-Fi, contact, event, and action codes</li>
+            <li>Add colors, gradients, frames, and logos</li>
+            <li>Check styling risks and scan reliability</li>
+            <li>Batch from CSV and export PNG, SVG, or PDF</li>
+          </ul>
+          <a href="/tools/qr-code-generator" class="featured-tool__link">Create a QR code <span aria-hidden="true">→</span></a>
+        </article>
       </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement">
-      <!-- AdSense: Top Display Ad -->
-    </div>
+    <section class="home-section home-directory" aria-labelledby="directory-heading">
+      <header class="home-section__heading">
+        <div>
+          <span class="home-eyebrow">Explore the collection</span>
+          <h2 id="directory-heading">Find tools by what they do</h2>
+        </div>
+        <a href="/tools/" class="home-text-link">View the full directory <span aria-hidden="true">→</span></a>
+      </header>
 
-    <!-- POPULAR TOOLS -->
-    <section aria-labelledby="popular-heading">
-      <h2 id="popular-heading">Popular Tools</h2>
-      <p class="text-muted">A curated selection of the tools people use most.</p>
-
-      <div class="tools-grid">
-
-        <a href="/tools/date-difference-calculator" class="tool-card">
-          <strong>Date Difference &amp; Business Days Calculator</strong>
-          <div>Calculate exact date spans or count business days with weekends and holidays excluded.</div>
-        </a>
-
-        <a href="/tools/qr-code-generator" class="tool-card">
-          <strong>Advanced QR Code Generator</strong>
-          <div>Create custom single or batch QR codes with logos, gradients, reliability checks, projects, and PNG, SVG or PDF export.</div>
-        </a>
-
-        <a href="/tools/qr-code-decoder" class="tool-card">
-          <strong>QR Code Decoder</strong>
-          <div>Decode QR codes privately from images, screenshots, URLs, or your camera.</div>
-        </a>
-
-        <a href="/tools/ocr-utility" class="tool-card">
-          <strong>OCR Utility</strong>
-          <div>Extract editable text from PNG and JPG images privately in your browser.</div>
-        </a>
-
-        <a href="/tools/tip-calculator" class="tool-card">
-          <strong>Tip Calculator</strong>
-          <div>Calculate tips using local customs, account for sales tax, and split or round the bill for any group.</div>
-        </a>
-
-        <a href="/tools/word-unscrambler" class="tool-card">
-          <strong>Word Unscrambler</strong>
-          <div>Find Scrabble words with pattern filters, score sorting, bingos, and hooks.</div>
-        </a>
-
-        <a href="/tools/age-calculator" class="tool-card">
-          <strong>Age Calculator</strong>
-          <div>Find your exact age in years, months, and days.</div>
-        </a>
-
-        <a href="/tools/bmi-calculator" class="tool-card">
-          <strong>BMI Calculator</strong>
-          <div>Calculate your Body Mass Index and healthy weight range.</div>
-        </a>
-
-        <a href="/tools/calorie-calculator" class="tool-card">
-          <strong>Calorie Calculator</strong>
-          <div>Estimate your BMR, TDEE, maintenance calories, and daily calorie goals.</div>
-        </a>
-
-        <a href="/tools/loan-mortgage-calculator" class="tool-card">
-          <strong>Loan &amp; Mortgage Calculator</strong>
-          <div>Monthly payments, interest, and amortization schedules.</div>
-        </a>
-
-        <a href="/tools/compound-interest-calculator" class="tool-card">
-          <strong>Compound Interest Calculator</strong>
-          <div>Model growth, contributions, withdrawals, inflation, taxes, and scenarios.</div>
-        </a>
-
+      <div class="home-directory__grid">
+        <a href="/tools/#generators" class="home-directory__item"><span class="home-directory__number">01</span><span><strong>Generators</strong><small>QR codes and secure passwords</small></span><em>2</em></a>
+        <a href="/tools/#calculators" class="home-directory__item"><span class="home-directory__number">02</span><span><strong>Calculators</strong><small>Finance, health, time, and construction</small></span><em>15</em></a>
+        <a href="/tools/#text-data" class="home-directory__item"><span class="home-directory__number">03</span><span><strong>Text &amp; Data</strong><small>Convert, decode, count, and extract</small></span><em>6</em></a>
+        <a href="/tools/#batch-automation" class="home-directory__item"><span class="home-directory__number">04</span><span><strong>Batch &amp; Automation</strong><small>Multi-item and advanced workflows</small></span><em>4</em></a>
       </div>
     </section>
 
-    <!-- CATEGORIES -->
-    <section aria-labelledby="categories-heading">
-      <h2 id="categories-heading">Browse Tools by Category</h2>
-      <p class="text-muted">Explore calculators grouped by what you're trying to solve.</p>
-
-      <div class="categories-grid">
-
-        <div class="category-card">
-          <strong>Finance Tools</strong>
-          <ul>
-            <li><a href="/tools/loan-mortgage-calculator">Loan &amp; Mortgage Calculator</a></li>
-            <li><a href="/tools/compound-interest-calculator">Compound Interest Calculator</a></li>
-            <li><a href="/tools/percentage-calculator">Percentage Calculator</a></li>
-          </ul>
-        </div>
-
-        <div class="category-card">
-          <strong>Health &amp; Body Tools</strong>
-          <ul>
-            <li><a href="/tools/bmi-calculator">BMI Calculator</a></li>
-            <li><a href="/tools/calorie-calculator">Calorie Calculator</a></li>
-            <li><a href="/tools/age-calculator">Age Calculator</a></li>
-          </ul>
-        </div>
-
-        <div class="category-card">
-          <strong>Everyday Utilities</strong>
-          <ul>
-            <li><a href="/tools/date-difference-calculator">Date Difference &amp; Business Days Calculator</a></li>
-            <li><a href="/tools/unit-converter">Unit Converter</a></li>
-            <li><a href="/tools/tip-calculator">Tip Calculator</a></li>
-            <li><a href="/tools/time-zone-converter">Time Zone Converter</a></li>
-            <li><a href="/tools/qr-code-generator">QR Code Generator</a></li>
-            <li><a href="/tools/qr-code-decoder">QR Code Decoder</a></li>
-            <li><a href="/tools/word-unscrambler">Word Unscrambler</a></li>
-          </ul>
-        </div>
-
-        <div class="category-card">
-          <strong>Productivity Tools</strong>
-          <ul>
-            <li><a href="/tools/password-generator">Password Generator</a></li>
-            <li><a href="/tools/word-character-counter">Word &amp; Character Counter</a></li>
-            <li><a href="/tools/ocr-utility">OCR Utility</a></li>
-          </ul>
-        </div>
-
-        <div class="category-card">
-          <strong>Construction Tools</strong>
-          <ul>
-            <li><a href="/tools/concrete-calculator">Concrete Calculator</a></li>
-            <li><a href="/tools/drywall-calculator">Drywall Calculator</a></li>
-            <li><a href="/tools/paint-calculator">Paint Calculator</a></li>
-            <li><a href="/tools/tile-calculator">Tile Calculator</a></li>
-            <li><a href="/tools/roofing-shingle-calculator">Roofing Shingle Calculator</a></li>
-            <li><a href="/tools/lumber-board-foot-calculator">Lumber Board Foot Calculator</a></li>
-            <li><a href="/tools/insulation-calculator">Insulation Calculator</a></li>
-          </ul>
-        </div>
-
+    <section class="home-story" aria-labelledby="about-heading">
+      <div>
+        <span class="home-eyebrow">Why MonkeyTactics</span>
+        <h2 id="about-heading">Useful software should respect your time—and your privacy.</h2>
+      </div>
+      <div class="home-story__copy">
+        <p>MonkeyTactics is created by a career mainframe engineer with a simple idea: focused tools can solve real problems without accounts, friction, or unnecessary data collection.</p>
+        <p>The collection combines straightforward interfaces with serious browser-native engineering, including Rust and WebAssembly where performance and correctness matter.</p>
+        <a href="/about" class="home-text-link">Read the MonkeyTactics story <span aria-hidden="true">→</span></a>
       </div>
     </section>
 
-    <!-- ABOUT -->
-    <section aria-labelledby="about-heading">
-      <h2 id="about-heading">About MonkeyTactics</h2>
-      <p><strong>MonkeyTactics builds private, browser&#8209;native tools engineered for correctness, speed, and simplicity.</strong></p>
-      <p>Created by a career mainframe engineer, MonkeyTactics is built on a simple idea: small, clever tools — backed by serious engineering — can solve real problems without friction.</p>
-      <p>Everything runs locally in your browser. Nothing is sent to a server. Your data stays with you.</p>
-      <p><strong>MonkeyTactics — Simple tools. Serious engineering.</strong></p>
-      <p><a href="/about" class="text-accent"><em>Read the full story → About MonkeyTactics</em></a></p>
-    </section>
-
-    <!-- BOTTOM AD -->
-    <div class="ad-container" aria-label="Advertisement">
-      <!-- AdSense: Bottom Display Ad -->
-    </div>
-
+    <div class="ad-container" aria-label="Advertisement"></div>
   </main>
 
-  <!-- FOOTER -->
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
@@ -257,6 +181,5 @@
       <a href="/sitemap">Sitemap</a>
     </nav>
   </footer>
-
 </body>
 </html>

@@ -13,7 +13,7 @@
 
 ## 🔍 What Is MonkeyTactics?
 
-MonkeyTactics.com is a growing collection of free online calculators, converters, and utility tools built with lightweight HTML, CSS, and JavaScript. The site is designed for people who want quick answers without sign-ups, account creation, or unnecessary clutter.
+MonkeyTactics.com is a growing collection of free online calculators, converters, generators, and utility tools. The site combines lightweight HTML, CSS, and JavaScript with focused Rust/WebAssembly engines and a Leptos-powered universal navigation system. It is designed for people who want quick answers without sign-ups, account creation, or unnecessary clutter.
 
 Whether you need a percentage calculator, BMI calculator, unit converter, loan calculator, date difference and business days calculator, password generator, browser-based OCR, QR code generator, QR code decoder, word counter, or word unscrambler, MonkeyTactics helps users solve everyday problems in seconds directly from the browser.
 
@@ -23,42 +23,54 @@ This project is especially useful for students, professionals, developers, small
 
 ## ✨ Why This Project Is Useful
 
-- ⚡ Fast-loading, lightweight tools with no build step or framework overhead
+- ⚡ Fast-loading static pages with focused Rust/WASM components where they add value
 - 🧮 Accurate calculators for finance, health, dates, and everyday math
 - 📱 Mobile-friendly and responsive across phones, tablets, and desktops
 - 🔒 Privacy-first experience with no account requirements and no tracking overload
 - 🔎 Search-friendly pages built around clear content, semantic HTML, and fast performance
 - ♿ Accessible and easy to use for a broad audience
+- 🧭 A universal hamburger menu and searchable tool hierarchy on every page
+- ⌨️ Keyboard navigation for search results with Arrow Up, Arrow Down, and Enter
 
 ---
 
 ## 🧰 Tools
 
-The site currently features 23 tools across five main categories:
+The site currently features 23 tools organized around the hierarchy used by the universal menu and All Tools directory:
 
 - Finance: [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator), [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator), [Percentage Calculator](https://monkeytactics.com/tools/percentage-calculator)
-- Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Calorie Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
+- Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Daily Energy Needs Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
 - Utilities: [Date Difference & Business Days Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator), [QR Code Decoder](https://monkeytactics.com/tools/qr-code-decoder), [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler)
 - Productivity: [Password Generator](https://monkeytactics.com/tools/password-generator), [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter), [OCR Utility](https://monkeytactics.com/tools/ocr-utility)
 - Construction: [Concrete Calculator](https://monkeytactics.com/tools/concrete-calculator), [Drywall Calculator](https://monkeytactics.com/tools/drywall-calculator), [Paint Calculator](https://monkeytactics.com/tools/paint-calculator), [Tile Calculator](https://monkeytactics.com/tools/tile-calculator), [Roofing Shingle Calculator](https://monkeytactics.com/tools/roofing-shingle-calculator), [Lumber Board Foot Calculator](https://monkeytactics.com/tools/lumber-board-foot-calculator), [Insulation Calculator](https://monkeytactics.com/tools/insulation-calculator)
 
 ---
 
-## 🗂️ Tool Categories
+## 🗂️ Tool Hierarchy
 
-| Category | Tools | Count |
-|---|---|---:|
-| **Finance** | Loan & Mortgage, Compound Interest, Percentage | 3 |
-| **Health & Body** | BMI, Calorie, Age | 3 |
-| **Everyday Utilities** | Date Difference & Business Days, Unit Converter, Tip, Time Zone, QR Generator, QR Decoder, Word Unscrambler | 7 |
-| **Productivity** | Password Generator, Word & Character Counter, OCR Utility | 3 |
-| **Construction** | Concrete, Drywall, Paint, Tile, Roofing Shingles, Lumber Board Feet, Insulation | 7 |
+| Menu group | Subgroup | Tools |
+|---|---|---|
+| **Generators** | — | Advanced QR Code Generator, Password Generator |
+| **Calculators** | Finance | Loan & Mortgage, Compound Interest, Percentage |
+| **Calculators** | Health | BMI, Daily Energy Needs, Age |
+| **Calculators** | Time & Date | Date & Business Days, Time Zone Converter |
+| **Calculators** | Construction | Concrete, Drywall, Paint, Tile, Roofing Shingles, Lumber Board Feet, Insulation |
+| **Text & Data** | — | Unit Converter, Tip Calculator, QR Code Decoder, Word Unscrambler, Word & Character Counter, OCR Utility |
+| **Batch & Automation** | — | Batch QR Generator, Mortgage Scenario Comparison, Business Day Planner, Image Text Extraction |
+
+The All Tools page mirrors this hierarchy. The same structure is rendered by the Rust/WASM hamburger menu on every page, while global search supports pointer and keyboard selection. The homepage highlights Word Unscrambler, Loan & Mortgage Calculator, and Advanced QR Code Generator as the three featured tools.
+
+## 🎨 Interface
+
+The homepage, All Tools directory, and flagship tool pages share a responsive premium visual system with editorial hero panels, clearer workspace separation, consistent green-accented controls, and focused result surfaces. Updated tools include Word Unscrambler, Advanced QR Code Generator, Password Generator, Tip Calculator, Date & Business Days Calculator, Time Zone Converter, BMI Calculator, Daily Energy Needs Calculator, Age Calculator, QR Code Decoder, and OCR Utility.
+
+Top advertising blocks have been removed from the redesigned experiences so the primary workspace follows the page introduction directly. Lower-page advertising placements remain available. Featured tools also include a Trustpilot review invitation near the page footer.
 
 ---
 
 ## 🏗️ Architecture Overview
 
-MonkeyTactics is a static, front-end-only site with no server-side application. Most tools use lightweight HTML, CSS, and JavaScript, while three computation-heavy tools use first-party Rust engines compiled to WebAssembly. Generated browser packages are committed under `assets/wasm/`, so production hosting serves static files and does not need a Rust toolchain.
+MonkeyTactics is a static, front-end-only site with no server-side application. Most tools use lightweight HTML, CSS, and JavaScript, while four first-party Rust components compile to WebAssembly. Generated browser packages are committed under `assets/wasm/` or `static/wasm/`, so production hosting serves static files and does not require a Rust toolchain.
 
 The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source membership, allowing searches against either dictionary or their deduplicated union. Its static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser loads only the chunks relevant to the submitted letters, decompresses them with the native `DecompressionStream` API, and caches the indexed words for later searches. Exact word length, starting and ending letters, wildcard patterns, required/excluded letters, vowel and consonant minimums, score ranges, sorting, and dictionary-aware hooks are applied in the browser. Hook searches load the complete index on demand.
 
@@ -69,32 +81,9 @@ The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source mem
 | [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator) | `wasm/mortgage-engine` | `assets/wasm/mortgage-engine` | Fixed-rate amortization, monthly and bi-weekly payments, extra payments, and multi-scenario calculations |
 | [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator) | `wasm/qr-code-generator-engine` | `assets/wasm/qr-code-generator` | QR encoding, styling, image export, and batch generation |
 | [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Dictionary indexing, searching, filtering, sorting, scoring, hooks, and word analysis |
+| Hierarchical site navigation | `monkeytactics-wasm-menu` | `static/wasm` | Domain-verified Leptos header, global search with keyboard navigation, and a hamburger-driven hierarchy drawer rendered on every page |
 
-All three engines run locally in the browser. Their Rust source, generated JavaScript bindings, and `.wasm` binaries live in this repository.
-
-### Building the Rust/WASM engines
-
-Install the `wasm32-unknown-unknown` target and `wasm-pack` once:
-
-```powershell
-rustup target add wasm32-unknown-unknown
-cargo install wasm-pack
-```
-
-Build each browser package from the repository root:
-
-```powershell
-# QR Code Generator
-npm run build:wasm
-
-# Loan & Mortgage Calculator
-npm run build:mortgage-wasm
-
-# Word Unscrambler
-wasm-pack build wasm/word-unscrambler-engine --target web --release --out-dir ../../assets/wasm/word-unscrambler --out-name word_unscrambler_engine
-```
-
-Commit regenerated bindings and `.wasm` binaries with the corresponding Rust changes. The release profiles use size optimization, link-time optimization, panic aborts, and symbol stripping.
+All four components run locally in the browser. Their Rust source, generated JavaScript bindings, and `.wasm` binaries live in this repository.
 
 #### Word Unscrambler integration
 

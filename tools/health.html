@@ -22,7 +22,7 @@
   <link rel="canonical" href="https://monkeytactics.com/tools/health" />
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
 
   <style>
     .hero--inner { padding: 1.75rem 2rem; }
@@ -138,25 +138,8 @@
 <body>
   <main>
 
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health" class="active">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <section class="hero hero--inner" aria-labelledby="health-heading">
       <h1 id="health-heading">Free Health &amp; Body Calculators</h1>

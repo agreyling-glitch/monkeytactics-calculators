@@ -29,8 +29,9 @@
         content="https://monkeytactics.com/assets/img/logo/monkeytactics-monkey-logo.png" />
 
   <link rel="canonical" href="https://monkeytactics.com/tools/calorie-calculator" />
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
   <link rel="stylesheet" href="/assets/css/calorie-calculator.css?v=20260728-how-section-spacing" />
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-9" />
 
   <script type="application/ld+json">
   {
@@ -146,63 +147,32 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body class="calorie-calculator-page">
+<body class="calorie-calculator-page premium-tool-page energy-tool-page">
   <main>
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo"
-             width="383"
-             height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health" class="active">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/health">Health</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <span aria-current="page">Calorie Calculator</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#calculators">Calculators</a>
+        <span class="sep" aria-hidden="true">/</span>
+        <span aria-current="page">Daily Energy Needs Calculator</span>
       </nav>
-      <h1 id="tool-heading">Daily Energy Needs Calculator (BMR &amp; TDEE)</h1>
-      <p class="hero-tagline hero-intro">
-        Wondering, “How many calories do I need per day?” This daily calorie needs
-        calculator estimates your basal metabolic rate (BMR), total daily energy
-        expenditure (TDEE), and maintenance calories with the Mifflin–St Jeor formula.
-        Designed as a BMR calculator for men and women and a TDEE calculator with activity
-        levels, it supports metric and imperial measurements and processes every value
-        privately in your browser.
-      </p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Personal energy, clearly estimated</p>
+          <h1 id="tool-heading">Daily Energy Needs Calculator</h1>
+          <p class="premium-hero-copy">Estimate your BMR, total daily energy expenditure, and calorie targets using the Mifflin–St Jeor formula. Compare maintenance, loss, and gain goals without sending personal data anywhere.</p>
+          <div class="premium-hero-pills" aria-label="Daily energy calculator features"><span>BMR &amp; TDEE estimates</span><span>Goal-based calorie ranges</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>Fuel for the day ahead</span><strong>Energy <i>meets</i> intention</strong><small>Estimate your baseline. Shape your goal.</small></div>
+      </div>
     </section>
 
-    <div class="ad-container ad-container--spaced" aria-label="Advertisement">
-      <!-- AdSense: Top Display Ad -->
-    </div>
-
-    <section class="tool-widget" aria-labelledby="details-heading">
-      <div class="section-heading">
-        <span class="section-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-5 0-9 2.5-9 5.5V21h18v-1.5C21 16.5 17 14 12 14Z" /></svg>
-        </span>
-        <div>
-          <h2 id="details-heading">Calculate Your Metabolic Rate, Total Daily Energy Expenditure, and Ideal Calorie Intake</h2>
-          <p>Choose US or international units; values convert automatically in your browser.</p>
-        </div>
-      </div>
+    <section class="tool-widget energy-calculator-section" aria-labelledby="details-heading">
+      <div class="premium-app-title energy-app-title"><div class="premium-section-kicker">01 / Estimate</div><h2 id="details-heading">Build your daily energy profile</h2><p>Choose your units and add the details that shape your baseline and activity needs.</p></div>
 
       <form id="calorieForm" novalidate>
         <div class="details-card">

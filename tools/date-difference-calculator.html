@@ -80,7 +80,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
 
   <style>
     /* ── Hero ── */
@@ -753,6 +753,7 @@
       .holiday-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-6" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -793,50 +794,37 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page date-tool-page">
   <main>
 
     <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities" class="active">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/utilities">Utilities</a>
-        <span class="sep" aria-hidden="true">›</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#calculators">Calculators</a>
+        <span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">Date Difference &amp; Business Days Calculator</span>
       </nav>
-      <h1 id="tool-heading">Date Difference Calculator – Days, Business Days & Deadlines</h1>
-      <p>Calculate the exact number of days between two dates, including business days, weekends, and holidays. Plan work timelines, assess deadline risk levels, or generate recurring dates at fixed intervals — all processed privately in your browser.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Calendar-aware planning</p>
+          <h1 id="tool-heading">Date Difference &amp; Business Days Calculator</h1>
+          <p class="premium-hero-copy">Measure exact calendar spans, count working days, forecast buffered deadlines, and build recurring schedules. Every calculation stays private in your browser.</p>
+          <div class="premium-hero-pills" aria-label="Date calculator features"><span>Holiday-aware counts</span><span>Three planning modes</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>From dates to decisions</span><strong>Time <i>meets</i> clarity</strong><small>Count precisely. Plan with confidence.</small></div>
+      </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
     <!-- CALCULATOR WIDGET -->
-    <section aria-labelledby="calc-heading">
+    <section class="date-calculator-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Date Difference &amp; Business Days Calculator</h2>
+        <div class="premium-app-title date-app-title"><div class="premium-section-kicker">01 / Plan</div><h2 id="calc-heading">Choose how to work with your dates</h2><p>Compare a date range, map a project deadline, or generate a recurring schedule.</p></div>
 
         <!-- MODE TABS -->
         <div class="mode-tabs" role="tablist" aria-label="Calculator mode">

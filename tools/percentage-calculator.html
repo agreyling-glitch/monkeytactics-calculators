@@ -70,7 +70,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
 
   <style>
     /* ── Hero ── */
@@ -374,6 +374,7 @@
       .calc-tab       { font-size: 0.8rem; padding: 0.5rem 0.85rem; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-16" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -414,51 +415,48 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page percentage-tool-page">
   <main>
 
     <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities" class="active">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/finance">Finance</a>
+        <a href="/tools/">Calculators</a>
         <span class="sep" aria-hidden="true">›</span>
         <span aria-current="page">Percentage Calculator</span>
       </nav>
-      <h1 id="tool-heading">Percentage Calculator</h1>
-      <p>Find X% of Y, work out what percent one number is of another, or calculate a percentage
-         increase or decrease. Pick a calculation below and get an instant, exact result.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <div class="premium-eyebrow">Three percentage questions, one clear answer</div>
+          <h1 id="tool-heading">Percentage Calculator</h1>
+          <p>Find a percentage of a number, compare one value with another, or measure percentage change. Every result includes the formula behind it.</p>
+          <div class="premium-hero-pills" aria-label="Tool highlights">
+            <span>Three calculation modes</span>
+            <span>Formula-backed results</span>
+          </div>
+        </div>
+        <aside class="premium-hero-stat" aria-label="Percentage calculator summary">
+          <span>From discounts to growth</span>
+          <strong>Make every percent meaningful</strong>
+          <small>Enter the numbers. See the relationship.</small>
+        </aside>
+      </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
     <!-- CALCULATOR WIDGET -->
-    <section aria-labelledby="calc-heading">
+    <section class="percentage-workspace-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Choose a Calculation</h2>
+        <div class="premium-app-title percentage-app-title">
+          <div class="premium-section-kicker">01 / Calculate</div>
+          <h2 id="calc-heading">Choose your percentage question</h2>
+          <p>Switch between the three common calculations without losing your entered values.</p>
+        </div>
 
         <div class="calc-tabs" role="tablist" aria-label="Percentage calculation type">
           <button class="calc-tab active" id="tabOf"     type="button" role="tab" aria-selected="true"  data-panel="panelOf">X% of Y</button>

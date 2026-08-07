@@ -78,7 +78,7 @@
     ]
   }
   </script>
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu">
   <style>
     .hero--inner { padding: 1.75rem 2rem; }
     .hero--inner h1 { font-size: 1.9rem; }
@@ -218,38 +218,36 @@
       .url-row, .button-row, .result-actions, .link-warning-actions { flex-direction:column; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-11">
   <script src="/assets/js/ads.js" defer></script>
   <link rel="stylesheet" href="/assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
-<body>
+<body class="premium-tool-page qr-decoder-tool-page">
   <main>
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png" alt="MonkeyTactics logo" class="brand-logo" width="383" height="375">
-        <div><div class="brand-name">MonkeyTactics</div><div class="brand-tagline">Free Online Calculators &amp; Tools</div></div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a><a href="/tools/finance">Finance</a><a href="/tools/health">Health</a>
-        <a href="/tools/utilities" class="active">Utilities</a><a href="/tools/productivity">Productivity</a><a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href="/">Home</a><span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/utilities">Utilities</a><span class="sep" aria-hidden="true">›</span>
+        <a href="/">Home</a><span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#utilities">Utilities</a><span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">QR Code Decoder</span>
       </nav>
-      <h1 id="tool-heading">Free QR Code Decoder — Safe, Private, Browser‑Only QR Scanning</h1>
-      <p>This free QR Code Decoder lets you safely extract the contents of any QR code from an uploaded image, a pasted screenshot, a public image URL, or your camera. All decoding happens privately in your browser — images are processed locally and never uploaded anywhere. For added protection, this tool will never open or navigate to any decoded link, giving you full control over what you scan. Whether you’re checking a QR code for security, verifying a link, or decoding a saved image, this page provides a fast, secure, and privacy‑focused experience.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Private, deliberate QR inspection</p>
+          <h1 id="tool-heading">QR Code Decoder</h1>
+          <p class="premium-hero-copy">Decode a QR code from an upload, screenshot, image URL, or camera without sending the image anywhere. Links are revealed for inspection and never opened automatically.</p>
+          <div class="premium-hero-pills" aria-label="QR decoder features"><span>Four scanning methods</span><span>Local browser processing</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>Inspect before you follow</span><strong>Speed <i>meets</i> caution</strong><small>Decode locally. Decide what opens.</small></div>
+      </div>
     </section>
 
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
-    <section aria-labelledby="decoder-heading">
+    <section class="qr-decoder-section" aria-labelledby="decoder-heading">
       <div class="tool-widget">
-        <h2 id="decoder-heading">Scan a QR Code</h2>
+        <div class="premium-app-title decoder-app-title"><div class="premium-section-kicker">01 / Decode</div><h2 id="decoder-heading">Choose how to scan</h2><p>Provide a QR image using the method that fits your situation. The same private decoding pipeline handles every option.</p></div>
         <p class="privacy-note">Images are processed locally and are never uploaded by this tool.</p>
 
         <div class="method-tabs" role="tablist" aria-label="Choose how to provide a QR code image">

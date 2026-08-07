@@ -204,63 +204,45 @@
   }
   </script>
 
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/style.css?v=20260807-wasm-menu">
   <link rel="stylesheet" href="../assets/css/word-unscrambler.css?v=20260803-17">
   <link rel="stylesheet" href="../assets/css/trustpilot-review-collector.css?v=20260731-2">
+  <link rel="stylesheet" href="../assets/css/premium-tool.css?v=20260807-2">
   <script src="../assets/js/ads.js" defer></script>
   <!-- TrustBox script -->
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
   <!-- End TrustBox script -->
 </head>
 
-<body>
+<body class="premium-tool-page word-tool-page">
   <main>
-    <header>
-      <a href="/" class="brand">
-        <img
-          src="../assets/img/logo/monkeytactics-monkey-logo.png"
-          alt="MonkeyTactics logo"
-          class="brand-logo"
-          width="383"
-          height="375"
-        >
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities" class="active">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/utilities">Utilities</a>
-        <span class="sep" aria-hidden="true">›</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#text-data">Text &amp; Data</a>
+        <span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">Word Unscrambler</span>
       </nav>
-      <h1 id="tool-heading">Word Unscrambler &amp; Scrabble Word Finder</h1>
-      <p>Unscramble rack letters into words with wildcards, positional patterns, Scrabble tile
-         scores, dictionary-aware hooks, and strategic filters. Search ENABLE, SOWPODS, or both;
-         compare promising words in a private Pick List; reuse recent searches; and explore rack
-         analysis in Word Breakdown. Matching, History, and saved picks stay in your browser.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Private, local word-game analysis</p>
+          <h1 id="tool-heading">Word Unscrambler &amp; Scrabble Word Finder</h1>
+          <p class="premium-hero-copy">Turn rack letters into playable words with wildcards, smart patterns, tile scores, dictionary-aware hooks, and strategic filters. Matching runs entirely in your browser.</p>
+          <div class="premium-hero-pills" aria-label="Word finder features"><span>ENABLE &amp; SOWPODS</span><span>History stays local</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>Find the advantage</span><strong>Rack <i>meets</i> board</strong><small>Filter the possibilities. Surface the strongest play.</small></div>
+      </div>
     </section>
-
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
 
     <section aria-labelledby="unscrambler-heading">
       <div class="tool-widget">
         <form id="unscramble-form" novalidate>
           <div class="tool-heading-row">
-            <h2 id="unscrambler-heading">Unscramble Letters Into Words</h2>
+            <div class="premium-app-title"><div class="premium-section-kicker">01 / Solve</div><h2 id="unscrambler-heading">Unscramble Letters Into Words</h2><p>Choose a dictionary, enter your rack, then refine the result for the board in front of you.</p></div>
             <fieldset class="dictionary-selector">
               <legend class="visually-hidden">Dictionary</legend>
               <div class="segmented-control">

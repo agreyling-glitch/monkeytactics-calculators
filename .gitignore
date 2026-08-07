@@ -153,4 +153,5 @@ outputs/
 wasm/word-unscrambler-engine/target/
 wasm/qr-code-generator-engine/target/
 wasm/mortgage-engine/target/
+monkeytactics-wasm-menu/target/
 wasm/target/

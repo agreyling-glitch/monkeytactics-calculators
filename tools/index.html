@@ -1,644 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>All Tools — MonkeyTactics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description"
-        content="Browse all free online calculators and tools on MonkeyTactics — finance, health, utilities, productivity, and construction tools that run privately in your browser." />
-
-  <!-- Open Graph -->
-  <meta property="og:title"       content="All Tools — MonkeyTactics" />
-  <meta property="og:description" content="Browse every free calculator and tool on MonkeyTactics. Finance, health, utilities, productivity, and construction — all private and free." />
-  <meta property="og:type"        content="website" />
-  <meta property="og:url"         content="https://monkeytactics.com/tools/" />
-
-  <!-- Canonical -->
-  <link rel="canonical" href="https://monkeytactics.com/tools/" />
-
-  <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
-
-  <!-- Tools index overrides -->
-  <style>
-    /* Hero variant for inner pages */
-    .hero--inner {
-      padding: 1.75rem 2rem;
-    }
-    .hero--inner h1 {
-      font-size: 1.9rem;
-    }
-
-    /* ── SEARCH BAR ── */
-    .tools-search-wrap {
-      position: relative;
-      max-width: 480px;
-      margin-top: 1.25rem;
-    }
-
-    .tools-search-wrap .search-icon {
-      position: absolute;
-      left: 0.9rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      pointer-events: none;
-      font-style: normal;
-      font-size: 1rem;
-    }
-
-    #toolSearch {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.9rem;
-      padding: 0.65rem 1rem 0.65rem 2.5rem;
-      outline: none;
-      box-sizing: border-box;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    #toolSearch::placeholder {
-      color: var(--muted);
-      opacity: 0.8;
-    }
-
-    #toolSearch:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
-    }
-
-    /* ── FILTER TABS ── */
-    .filter-tabs {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin: 1.5rem 0 0.25rem;
-    }
-
-    .filter-tab {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 1rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-family: inherit;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-    }
-
-    .filter-tab:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text);
-    }
-
-    .filter-tab.active {
-      background: var(--accent-soft);
-      border-color: rgba(34, 197, 94, 0.4);
-      color: var(--accent);
-    }
-
-    .filter-tab .tab-count {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 999px;
-      padding: 0.05rem 0.45rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .filter-tab.active .tab-count {
-      background: rgba(34, 197, 94, 0.2);
-    }
-
-    /* ── CATEGORY SECTIONS ── */
-    .category-section {
-      margin-top: 2rem;
-    }
-
-    .category-section h2 {
-      font-size: 1.05rem;
-      margin: 0 0 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text);
-    }
-
-    .category-section h2 .cat-count {
-      font-size: 0.75rem;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-radius: 999px;
-      padding: 0.15rem 0.55rem;
-      font-weight: 600;
-    }
-
-    /* ── TOOL CARDS (enhanced) ── */
-    .tool-card {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .tool-card .card-icon {
-      font-size: 1.4rem;
-      margin-bottom: 0.15rem;
-      display: block;
-    }
-
-    .tool-card strong {
-      font-size: 0.95rem;
-    }
-
-    .tool-card .card-tags {
-      display: flex;
-      gap: 0.35rem;
-      flex-wrap: wrap;
-      margin-top: 0.4rem;
-    }
-
-    .tool-card .card-tag {
-      font-size: 0.7rem;
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--muted);
-      border-radius: 999px;
-      padding: 0.1rem 0.5rem;
-    }
-
-    .tool-card .card-arrow {
-      position: absolute;
-      bottom: 1rem;
-      right: 1rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-      transition: color 0.15s, transform 0.15s;
-    }
-
-    .tool-card:hover .card-arrow {
-      color: var(--accent);
-      transform: translateX(3px);
-    }
-
-    .tool-card--featured {
-      border-color: rgba(34, 197, 94, 0.38);
-      background: linear-gradient(145deg, rgba(34, 197, 94, 0.1), var(--card-bg) 55%);
-    }
-
-    .card-kicker {
-      color: var(--accent);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-    }
-
-    /* ── EMPTY STATE ── */
-    .no-results {
-      display: none;
-      margin-top: 2rem;
-      text-align: center;
-      color: var(--muted);
-      padding: 3rem 1rem;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-    }
-
-    .no-results .no-results-icon {
-      font-size: 2.5rem;
-      display: block;
-      margin-bottom: 0.75rem;
-    }
-
-    .no-results p {
-      margin: 0.25rem 0 0;
-      font-size: 0.9rem;
-    }
-
-    /* ── STATS BAR ── */
-    .tools-stats {
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-top: 0.5rem;
-    }
-
-    .tools-stats span {
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 600px) {
-      .hero--inner {
-        padding: 1.25rem;
-      }
-      .hero--inner h1 {
-        font-size: 1.5rem;
-      }
-      .tools-search-wrap {
-        max-width: 100%;
-      }
-      .filter-tabs {
-        gap: 0.4rem;
-      }
-    }
-  </style>
-  <script src="/assets/js/ads.js" defer></script>
+  <title>All Tools — MonkeyTactics</title>
+  <meta name="description" content="Browse every MonkeyTactics generator, calculator, text and data tool, and batch workflow." />
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-08-07" />
+
+  <meta property="og:title" content="All Tools — MonkeyTactics" />
+  <meta property="og:description" content="Browse every MonkeyTactics tool in one clear, hierarchical directory." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://monkeytactics.com/tools/" />
+  <link rel="canonical" href="https://monkeytactics.com/tools/" />
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
+  <link rel="stylesheet" href="/assets/css/tools-index.css?v=20260807-hierarchy" />
+  <script src="/assets/js/ads.js" defer></script>
 </head>
 
 <body>
   <main>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
-    <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
+    <section class="tools-hero" aria-labelledby="tools-heading">
+      <div class="tools-hero__copy">
+        <span class="tools-eyebrow">MonkeyTactics tool directory</span>
+        <h1 id="tools-heading">All Tools</h1>
+        <p>Find the right tool by following the same categories used in the menu. Everything runs privately in your browser with no sign-up required.</p>
+      </div>
 
-      <nav aria-label="Primary navigation">
-        <a href="/tools/" class="active">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
-
-    <!-- PAGE HERO -->
-    <section class="hero hero--inner" aria-labelledby="tools-heading">
-      <h1 id="tools-heading">All Tools</h1>
-      <p>Every free calculator and utility on MonkeyTactics — all running privately in your browser,
-         no sign-up required.</p>
-
-      <!-- SEARCH -->
       <div class="tools-search-wrap">
-        <i class="search-icon" aria-hidden="true">🔍</i>
-        <input
-          type="search"
-          id="toolSearch"
-          placeholder="Search tools…"
-          aria-label="Search all tools"
-          autocomplete="off"
-        />
+        <svg class="tools-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+        </svg>
+        <input type="search" id="toolSearch" placeholder="Search all tools…" aria-label="Search all tools" aria-controls="toolsDirectory" autocomplete="off" />
+        <kbd class="tools-search-shortcut" aria-hidden="true">/</kbd>
       </div>
+      <p class="tools-search-help">Use ↑ and ↓ to move through results, then Enter to open.</p>
     </section>
 
-    <!-- AD -->
-    <div class="ad-container" aria-label="Advertisement">
-      <!-- AdSense: Top Display Ad -->
+    <nav class="directory-jump" aria-label="Jump to a tool group">
+      <a href="#generators"><span>01</span>Generators <strong>2</strong></a>
+      <a href="#calculators"><span>02</span>Calculators <strong>15</strong></a>
+      <a href="#text-data"><span>03</span>Text &amp; Data <strong>6</strong></a>
+      <a href="#batch-automation"><span>04</span>Batch &amp; Automation <strong>4</strong></a>
+    </nav>
+
+    <p class="tools-stats" id="toolsStats" aria-live="polite">Showing <strong id="visibleCount">27</strong> menu entries</p>
+
+    <div class="no-results" id="noResults" role="status" aria-live="polite" hidden>
+      <span aria-hidden="true">?</span>
+      <div><strong>No matching tools</strong><p>Try another name, category, or task.</p></div>
     </div>
 
-    <!-- FILTER TABS -->
-    <div class="filter-tabs" role="tablist" aria-label="Filter tools by category">
-      <button class="filter-tab active" data-filter="all"    role="tab" aria-selected="true">All  <span class="tab-count">23</span></button>
-      <button class="filter-tab"        data-filter="finance"     role="tab" aria-selected="false">💰 Finance <span class="tab-count">3</span></button>
-      <button class="filter-tab"        data-filter="health"      role="tab" aria-selected="false">🏥 Health <span class="tab-count">3</span></button>
-      <button class="filter-tab"        data-filter="utilities"   role="tab" aria-selected="false">🔧 Utilities <span class="tab-count">7</span></button>
-      <button class="filter-tab"        data-filter="productivity" role="tab" aria-selected="false">⚡ Productivity <span class="tab-count">3</span></button>
-      <button class="filter-tab"        data-filter="construction" role="tab" aria-selected="false">🏗️ Construction <span class="tab-count">7</span></button>
+    <div class="tools-directory" id="toolsDirectory">
+      <section class="directory-group" id="generators" data-tool-group>
+        <header class="directory-group__header">
+          <span class="directory-group__number">01</span>
+          <div><h2>Generators <span>2</span></h2><p>Create secure, ready-to-use digital assets.</p></div>
+        </header>
+        <div class="directory-grid">
+          <a class="directory-tool" href="/tools/qr-code-generator" data-search="advanced qr code generator qr url wifi vcard logo gradient">
+            <span class="directory-tool__icon">QR</span><span><strong>Advanced QR Code Generator</strong><small>Create styled single or batch QR codes.</small></span><span class="directory-tool__arrow">→</span>
+          </a>
+          <a class="directory-tool" href="/tools/password-generator" data-search="password generator secure strong random symbols">
+            <span class="directory-tool__icon">PW</span><span><strong>Password Generator</strong><small>Build strong passwords with custom rules.</small></span><span class="directory-tool__arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="directory-group directory-group--calculators" id="calculators" data-tool-group>
+        <header class="directory-group__header">
+          <span class="directory-group__number">02</span>
+          <div><h2>Calculators <span>15</span></h2><p>Calculate finances, health, dates, and construction materials.</p></div>
+        </header>
+
+        <div class="calculator-groups">
+          <section class="calculator-subgroup" data-tool-subgroup>
+            <header><span class="subgroup-mark">$</span><div><h3>Finance</h3><p>3 calculators</p></div></header>
+            <div class="directory-list">
+              <a class="directory-tool" href="/tools/loan-mortgage-calculator" data-search="finance loan mortgage payment interest amortization scenarios"><span><strong>Loan &amp; Mortgage Calculator</strong><small>Compare payments, interest, and payoff plans.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/compound-interest-calculator" data-search="finance compound interest investment growth savings"><span><strong>Compound Interest Calculator</strong><small>Model savings and investment growth.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/percentage-calculator" data-search="finance percentage percent change increase decrease"><span><strong>Percentage Calculator</strong><small>Solve percentage and change calculations.</small></span><span class="directory-tool__arrow">→</span></a>
+            </div>
+          </section>
+
+          <section class="calculator-subgroup" data-tool-subgroup>
+            <header><span class="subgroup-mark">+</span><div><h3>Health</h3><p>3 calculators</p></div></header>
+            <div class="directory-list">
+              <a class="directory-tool" href="/tools/bmi-calculator" data-search="health bmi body mass index weight height"><span><strong>BMI Calculator</strong><small>Calculate BMI and healthy weight ranges.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/calorie-calculator" data-search="health calorie bmr tdee nutrition activity"><span><strong>Calorie Calculator</strong><small>Estimate BMR and daily calorie needs.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/age-calculator" data-search="health age birthday years months days"><span><strong>Age Calculator</strong><small>Find an exact age between two dates.</small></span><span class="directory-tool__arrow">→</span></a>
+            </div>
+          </section>
+
+          <section class="calculator-subgroup" data-tool-subgroup>
+            <header><span class="subgroup-mark">24</span><div><h3>Time &amp; Date</h3><p>2 calculators</p></div></header>
+            <div class="directory-list">
+              <a class="directory-tool" href="/tools/date-difference-calculator" data-search="time date business days calculator difference working deadline"><span><strong>Date &amp; Business Days Calculator</strong><small>Count date spans and working days.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/time-zone-converter" data-search="time date zone converter world clock utc meeting"><span><strong>Time Zone Converter</strong><small>Convert times across world time zones.</small></span><span class="directory-tool__arrow">→</span></a>
+            </div>
+          </section>
+
+          <section class="calculator-subgroup" data-tool-subgroup>
+            <header><span class="subgroup-mark">CM</span><div><h3>Construction</h3><p>7 calculators</p></div></header>
+            <div class="directory-list">
+              <a class="directory-tool" href="/tools/concrete-calculator" data-search="construction concrete cement slab yards bags"><span><strong>Concrete Calculator</strong><small>Estimate volume, bags, and material weight.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/drywall-calculator" data-search="construction drywall sheetrock gypsum sheets walls"><span><strong>Drywall Calculator</strong><small>Estimate drywall sheets and weight.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/paint-calculator" data-search="construction paint wall coats gallons coverage"><span><strong>Paint Calculator</strong><small>Calculate wall area and paint required.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/tile-calculator" data-search="construction tile flooring boxes waste ceramic"><span><strong>Tile Calculator</strong><small>Estimate tiles, boxes, and waste allowance.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/roofing-shingle-calculator" data-search="construction roofing shingle roof pitch squares bundles"><span><strong>Roofing Shingle Calculator</strong><small>Convert roof area into squares and bundles.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/lumber-board-foot-calculator" data-search="construction lumber wood board foot timber"><span><strong>Lumber Board Foot Calculator</strong><small>Calculate board feet and lumber weight.</small></span><span class="directory-tool__arrow">→</span></a>
+              <a class="directory-tool" href="/tools/insulation-calculator" data-search="construction insulation fiberglass r value rolls packs"><span><strong>Insulation Calculator</strong><small>Estimate insulation rolls or packs.</small></span><span class="directory-tool__arrow">→</span></a>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="directory-group" id="text-data" data-tool-group>
+        <header class="directory-group__header">
+          <span class="directory-group__number">03</span>
+          <div><h2>Text &amp; Data <span>6</span></h2><p>Convert, decode, count, and extract everyday information.</p></div>
+        </header>
+        <div class="directory-grid">
+          <a class="directory-tool" href="/tools/unit-converter" data-search="text data unit converter metric imperial length weight temperature"><span class="directory-tool__icon">UN</span><span><strong>Unit Converter</strong><small>Convert common metric and imperial units.</small></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" href="/tools/tip-calculator" data-search="text data tip calculator bill split gratuity tax"><span class="directory-tool__icon">%</span><span><strong>Tip Calculator</strong><small>Calculate and split a tip-aware bill.</small></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" href="/tools/qr-code-decoder" data-search="text data qr code decoder reader scanner image"><span class="directory-tool__icon">QD</span><span><strong>QR Code Decoder</strong><small>Read QR codes from images or a camera.</small></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" href="/tools/word-unscrambler" data-search="text data word unscrambler anagram scrabble letters"><span class="directory-tool__icon">AZ</span><span><strong>Word Unscrambler</strong><small>Find words, scores, bingos, and hooks.</small></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" href="/tools/word-character-counter" data-search="text data word character counter sentences paragraphs writing"><span class="directory-tool__icon">#</span><span><strong>Word &amp; Character Counter</strong><small>Count text as you type or paste.</small></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" href="/tools/ocr-utility" data-search="text data ocr image extraction optical character recognition"><span class="directory-tool__icon">TX</span><span><strong>OCR Utility</strong><small>Extract editable text from an image.</small></span><span class="directory-tool__arrow">→</span></a>
+        </div>
+      </section>
+
+      <section class="directory-group" id="batch-automation" data-tool-group>
+        <header class="directory-group__header">
+          <span class="directory-group__number">04</span>
+          <div><h2>Batch &amp; Automation <span>4</span></h2><p>Jump directly into multi-item and advanced workflows.</p></div>
+        </header>
+        <div class="directory-grid">
+          <a class="directory-tool" href="/tools/qr-code-generator#batch" data-search="batch automation qr generator csv multiple export"><span class="directory-tool__icon">BQ</span><span><strong>Batch QR Generator</strong><small>Create many QR codes from CSV data.</small></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" href="/tools/loan-mortgage-calculator#scenarios" data-search="batch automation mortgage scenario comparison plans"><span class="directory-tool__icon">MC</span><span><strong>Mortgage Scenario Comparison</strong><small>Compare as many as five loan plans.</small></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" href="/tools/date-difference-calculator" data-search="batch automation business day planner deadline schedule"><span class="directory-tool__icon">BD</span><span><strong>Business Day Planner</strong><small>Plan deadlines around working days.</small></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" href="/tools/ocr-utility" data-search="batch automation image text extraction ocr"><span class="directory-tool__icon">IT</span><span><strong>Image Text Extraction</strong><small>Turn image content into editable text.</small></span><span class="directory-tool__arrow">→</span></a>
+        </div>
+      </section>
     </div>
 
-    <!-- STATS BAR -->
-    <p class="tools-stats" id="toolsStats">Showing <span id="visibleCount">23</span> of 23 tools</p>
-
-    <!-- NO RESULTS -->
-    <div class="no-results" id="noResults" role="status" aria-live="polite">
-      <span class="no-results-icon" aria-hidden="true">🔍</span>
-      <strong>No tools found</strong>
-      <p>Try a different search term or clear the filter.</p>
-    </div>
-
-    <!-- ── FINANCE ── -->
-    <section class="category-section" data-category-section="finance" aria-labelledby="cat-finance">
-      <h2 id="cat-finance">
-        <span aria-hidden="true">💰</span> Finance Tools
-        <span class="cat-count">3</span>
-      </h2>
-      <div class="tools-grid">
-
-        <a href="/tools/loan-mortgage-calculator"
-           class="tool-card tool-card--featured"
-           data-category="finance"
-           data-keywords="loan mortgage calculator payment interest amortization schedule monthly biweekly extra payment down payment home price compare scenarios print pdf csv rust wasm webassembly">
-          <span class="card-icon" aria-hidden="true">🏠</span>
-          <span class="card-kicker">Compare up to five plans</span>
-          <strong>Loan &amp; Mortgage Calculator</strong>
-          <div>Compare fixed-rate mortgage scenarios, monthly or bi-weekly payments, extra principal, lifetime interest, payoff timing, charts, and amortization schedules.</div>
-          <div class="card-tags">
-            <span class="card-tag">Mortgage</span>
-            <span class="card-tag">Comparison</span>
-            <span class="card-tag">Amortization</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/compound-interest-calculator"
-           class="tool-card"
-           data-category="finance"
-           data-keywords="compound interest investment growth savings contributions inflation tax">
-          <span class="card-icon" aria-hidden="true">📈</span>
-          <strong>Compound Interest Calculator</strong>
-          <div>Model investment growth with regular contributions, inflation adjustments, and tax scenarios.</div>
-          <div class="card-tags">
-            <span class="card-tag">Investing</span>
-            <span class="card-tag">Savings</span>
-            <span class="card-tag">Growth</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/percentage-calculator"
-           class="tool-card"
-           data-category="finance"
-           data-keywords="percentage percent change increase decrease of what is">
-          <span class="card-icon" aria-hidden="true">💯</span>
-          <strong>Percentage Calculator</strong>
-          <div>Work out X% of Y, find percentage change, increase or decrease, and reverse percentages.</div>
-          <div class="card-tags">
-            <span class="card-tag">Percentage</span>
-            <span class="card-tag">Math</span>
-            <span class="card-tag">Discount</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ── HEALTH ── -->
-    <section class="category-section" data-category-section="health" aria-labelledby="cat-health">
-      <h2 id="cat-health">
-        <span aria-hidden="true">🏥</span> Health &amp; Body Tools
-        <span class="cat-count">3</span>
-      </h2>
-      <div class="tools-grid">
-
-        <a href="/tools/bmi-calculator"
-           class="tool-card"
-           data-category="health"
-           data-keywords="bmi body mass index weight height healthy overweight obesity">
-          <span class="card-icon" aria-hidden="true">⚖️</span>
-          <strong>BMI Calculator</strong>
-          <div>Calculate your Body Mass Index and see where you fall within healthy weight ranges for your height.</div>
-          <div class="card-tags">
-            <span class="card-tag">BMI</span>
-            <span class="card-tag">Weight</span>
-            <span class="card-tag">Health</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/calorie-calculator"
-           class="tool-card"
-           data-category="health"
-           data-keywords="calorie calories bmr basal metabolic rate tdee daily energy expenditure maintenance weight loss gain activity nutrition">
-          <span class="card-icon" aria-hidden="true">🔥</span>
-          <strong>Calorie Calculator</strong>
-          <div>Estimate your BMR, daily calorie needs (TDEE), maintenance calories, and calorie goals based on your activity level.</div>
-          <div class="card-tags">
-            <span class="card-tag">Calories</span>
-            <span class="card-tag">BMR</span>
-            <span class="card-tag">TDEE</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/age-calculator"
-           class="tool-card"
-           data-category="health"
-           data-keywords="age birthday years months days born exact how old">
-          <span class="card-icon" aria-hidden="true">🎂</span>
-          <strong>Age Calculator</strong>
-          <div>Find your exact age in years, months, and days from any date — or calculate time between two dates.</div>
-          <div class="card-tags">
-            <span class="card-tag">Age</span>
-            <span class="card-tag">Birthday</span>
-            <span class="card-tag">Date</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ── UTILITIES ── -->
-    <section class="category-section" data-category-section="utilities" aria-labelledby="cat-utilities">
-      <h2 id="cat-utilities">
-        <span aria-hidden="true">🔧</span> Everyday Utilities
-        <span class="cat-count">7</span>
-      </h2>
-      <div class="tools-grid">
-
-        <a href="/tools/date-difference-calculator"
-           class="tool-card"
-           data-category="utilities"
-           data-keywords="date difference calculator business days working days holidays days between dates deadline recurring dates">
-          <span class="card-icon" aria-hidden="true">📅</span>
-          <strong>Date Difference &amp; Business Days Calculator</strong>
-          <div>Calculate exact date spans or count business days with weekends and holidays excluded. Plan deadlines and recurring schedules.</div>
-          <div class="card-tags">
-            <span class="card-tag">Dates</span>
-            <span class="card-tag">Business Days</span>
-            <span class="card-tag">Deadlines</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/unit-converter"
-           class="tool-card"
-           data-category="utilities"
-           data-keywords="unit converter length weight temperature volume speed metric imperial">
-          <span class="card-icon" aria-hidden="true">🔄</span>
-          <strong>Unit Converter</strong>
-          <div>Convert between metric and imperial units — length, weight, temperature, volume, speed, and more.</div>
-          <div class="card-tags">
-            <span class="card-tag">Metric</span>
-            <span class="card-tag">Imperial</span>
-            <span class="card-tag">Convert</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/tip-calculator"
-           class="tool-card"
-           data-category="utilities"
-           data-keywords="tip calculator restaurant bill split gratuity percentage per person global international customs sales tax pre-tax rounding">
-          <span class="card-icon" aria-hidden="true">🍽️</span>
-          <strong>Tip Calculator</strong>
-          <div>Calculate tips using local customs, account for sales tax, and split or round the bill for any group.</div>
-          <div class="card-tags">
-            <span class="card-tag">Global Tips</span>
-            <span class="card-tag">Tax-Aware</span>
-            <span class="card-tag">Split &amp; Round</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/time-zone-converter"
-           class="tool-card"
-           data-category="utilities"
-           data-keywords="time zone converter world clock UTC GMT meeting schedule international">
-          <span class="card-icon" aria-hidden="true">🌍</span>
-          <strong>Time Zone Converter</strong>
-          <div>Convert times between any world time zones instantly — perfect for scheduling international meetings.</div>
-          <div class="card-tags">
-            <span class="card-tag">Time Zones</span>
-            <span class="card-tag">World Clock</span>
-            <span class="card-tag">UTC</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/qr-code-generator"
-           class="tool-card"
-           data-category="utilities"
-           data-keywords="qr code generator maker url wifi vcard email sms logo gradient batch csv png svg pdf rust wasm webassembly">
-          <span class="card-icon" aria-hidden="true">📱</span>
-          <strong>Advanced QR Code Generator</strong>
-          <div>Design single or batch QR codes with dedicated content forms, custom styling, logos, reliability checks, projects, and print-ready exports.</div>
-          <div class="card-tags">
-            <span class="card-tag">QR Code</span>
-            <span class="card-tag">Custom Design</span>
-            <span class="card-tag">Batch Export</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/qr-code-decoder"
-           class="tool-card"
-           data-category="utilities"
-           data-keywords="qr code decoder reader scanner image screenshot camera url private">
-          <span class="card-icon" aria-hidden="true">🔍</span>
-          <strong>QR Code Decoder</strong>
-          <div>Decode QR codes privately from images, screenshots, public image URLs, or your camera.</div>
-          <div class="card-tags">
-            <span class="card-tag">QR Code</span>
-            <span class="card-tag">Scanner</span>
-            <span class="card-tag">Private</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/word-unscrambler"
-           class="tool-card"
-           data-category="utilities"
-           data-keywords="word unscrambler anagram solver scrabble word finder letters spelling game words hooks sowpods enable rust wasm webassembly">
-          <span class="card-icon" aria-hidden="true">🔤</span>
-          <strong>Word Unscrambler</strong>
-          <div>Find Scrabble words with ENABLE or SOWPODS, board filters, score sorting, bingos, and hooks.</div>
-          <div class="card-tags">
-            <span class="card-tag">Scrabble</span>
-            <span class="card-tag">Hooks</span>
-            <span class="card-tag">Private</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ── PRODUCTIVITY ── -->
-    <section class="category-section" data-category-section="productivity" aria-labelledby="cat-productivity">
-      <h2 id="cat-productivity">
-        <span aria-hidden="true">⚡</span> Productivity Tools
-        <span class="cat-count">3</span>
-      </h2>
-      <div class="tools-grid">
-
-        <a href="/tools/password-generator"
-           class="tool-card"
-           data-category="productivity"
-           data-keywords="password generator strong random secure symbols numbers letters">
-          <span class="card-icon" aria-hidden="true">🔑</span>
-          <strong>Password Generator</strong>
-          <div>Generate strong, random passwords with custom length, symbols, numbers, and character rules.</div>
-          <div class="card-tags">
-            <span class="card-tag">Security</span>
-            <span class="card-tag">Password</span>
-            <span class="card-tag">Random</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/word-character-counter"
-           class="tool-card"
-           data-category="productivity"
-           data-keywords="word count character counter text length essay writing limit">
-          <span class="card-icon" aria-hidden="true">📝</span>
-          <strong>Word &amp; Character Counter</strong>
-          <div>Count words, characters, sentences, and paragraphs in any text — useful for essays, tweets, and bios.</div>
-          <div class="card-tags">
-            <span class="card-tag">Writing</span>
-            <span class="card-tag">Words</span>
-            <span class="card-tag">Characters</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-        <a href="/tools/ocr-utility"
-           class="tool-card"
-           data-category="productivity"
-           data-keywords="ocr image text extractor optical character recognition scan screenshot tesseract private">
-          <span class="card-icon" aria-hidden="true">📄</span>
-          <strong>OCR Utility</strong>
-          <div>Extract editable text from PNG and JPG images with private, browser-based OCR.</div>
-          <div class="card-tags">
-            <span class="card-tag">OCR</span>
-            <span class="card-tag">Image to Text</span>
-            <span class="card-tag">Private</span>
-          </div>
-          <span class="card-arrow" aria-hidden="true">›</span>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- CONSTRUCTION -->
-    <section class="category-section" data-category-section="construction" aria-labelledby="cat-construction">
-      <h2 id="cat-construction"><span aria-hidden="true">🏗️</span> Construction Tools <span class="cat-count">7</span></h2>
-      <div class="tools-grid">
-        <a href="/tools/concrete-calculator" class="tool-card" data-category="construction" data-keywords="concrete cement slab cubic yards bags weight"><span class="card-icon" aria-hidden="true">🧱</span><strong>Concrete Calculator</strong><div>Estimate cubic yards, bag quantities, and total material weight.</div><div class="card-tags"><span class="card-tag">Concrete</span><span class="card-tag">Weight</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
-        <a href="/tools/drywall-calculator" class="tool-card" data-category="construction" data-keywords="drywall sheetrock gypsum room walls sheets weight"><span class="card-icon" aria-hidden="true">🏠</span><strong>Drywall Calculator</strong><div>Estimate 4×8 or 4×12 sheets for room walls and their total weight.</div><div class="card-tags"><span class="card-tag">Drywall</span><span class="card-tag">Sheets</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
-        <a href="/tools/paint-calculator" class="tool-card" data-category="construction" data-keywords="paint wall area coats gallons coverage weight"><span class="card-icon" aria-hidden="true">🎨</span><strong>Paint Calculator</strong><div>Calculate coated wall area, whole gallons, and total paint weight.</div><div class="card-tags"><span class="card-tag">Paint</span><span class="card-tag">Gallons</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
-        <a href="/tools/tile-calculator" class="tool-card" data-category="construction" data-keywords="tile flooring area boxes waste ceramic weight"><span class="card-icon" aria-hidden="true">◫</span><strong>Tile Calculator</strong><div>Estimate tiles, boxes, waste allowance, and boxed material weight.</div><div class="card-tags"><span class="card-tag">Tile</span><span class="card-tag">Flooring</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
-        <a href="/tools/roofing-shingle-calculator" class="tool-card" data-category="construction" data-keywords="roof roofing shingles pitch squares bundles weight"><span class="card-icon" aria-hidden="true">🏘️</span><strong>Roofing Shingle Calculator</strong><div>Convert roof area and pitch into squares, bundles, and load weight.</div><div class="card-tags"><span class="card-tag">Roofing</span><span class="card-tag">Shingles</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
-        <a href="/tools/lumber-board-foot-calculator" class="tool-card" data-category="construction" data-keywords="lumber timber wood board foot thickness width length weight"><span class="card-icon" aria-hidden="true">🪵</span><strong>Lumber Board Foot Calculator</strong><div>Calculate board feet and estimated dry-lumber weight.</div><div class="card-tags"><span class="card-tag">Lumber</span><span class="card-tag">Board Feet</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
-        <a href="/tools/insulation-calculator" class="tool-card" data-category="construction" data-keywords="insulation fiberglass r value rolls packs walls weight"><span class="card-icon" aria-hidden="true">🧰</span><strong>Insulation Calculator</strong><div>Estimate rolls or packs for a target R-value and total weight.</div><div class="card-tags"><span class="card-tag">Insulation</span><span class="card-tag">R-value</span></div><span class="card-arrow" aria-hidden="true">›</span></a>
-      </div>
-    </section>
-
-    <!-- AD -->
-    <div class="ad-container" aria-label="Advertisement">
-      <!-- AdSense: Bottom Display Ad -->
-    </div>
-
+    <div class="ad-container" aria-label="Advertisement"></div>
   </main>
 
-  <!-- FOOTER -->
   <footer>
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation">
@@ -652,77 +169,6 @@
     </nav>
   </footer>
 
-  <!-- TOOLS FILTER + SEARCH SCRIPT -->
-  <script>
-    (function () {
-      const searchInput  = document.getElementById('toolSearch');
-      const filterTabs   = document.querySelectorAll('.filter-tab');
-      const toolCards    = document.querySelectorAll('.tool-card');
-      const catSections  = document.querySelectorAll('.category-section');
-      const noResults    = document.getElementById('noResults');
-      const visibleCount = document.getElementById('visibleCount');
-
-      let activeFilter = 'all';
-
-      /* ── Apply filter + search ── */
-      function applyFilters() {
-        const query = searchInput.value.trim().toLowerCase();
-        let visible = 0;
-
-        toolCards.forEach(function (card) {
-          const cat      = card.dataset.category;
-          const keywords = (card.dataset.keywords + ' ' + card.querySelector('strong').textContent + ' ' + card.querySelector('div').textContent).toLowerCase();
-
-          const matchesFilter = activeFilter === 'all' || cat === activeFilter;
-          const matchesSearch = !query || keywords.includes(query);
-          const show          = matchesFilter && matchesSearch;
-
-          card.style.display = show ? '' : 'none';
-          if (show) visible++;
-        });
-
-        /* Show/hide category section headings */
-        catSections.forEach(function (section) {
-          const cat         = section.dataset.categorySection;
-          const anyVisible  = activeFilter === 'all' || activeFilter === cat;
-          const hasCards    = Array.from(section.querySelectorAll('.tool-card'))
-                                   .some(function (c) { return c.style.display !== 'none'; });
-
-          section.style.display = (anyVisible && hasCards) ? '' : 'none';
-        });
-
-        /* Update stats */
-        visibleCount.textContent = visible;
-        noResults.style.display  = visible === 0 ? 'block' : 'none';
-      }
-
-      /* ── Filter tabs ── */
-      filterTabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-          filterTabs.forEach(function (t) {
-            t.classList.remove('active');
-            t.setAttribute('aria-selected', 'false');
-          });
-          tab.classList.add('active');
-          tab.setAttribute('aria-selected', 'true');
-          activeFilter = tab.dataset.filter;
-          applyFilters();
-        });
-      });
-
-      /* ── Search ── */
-      searchInput.addEventListener('input', applyFilters);
-
-      /* ── Clear search on Escape ── */
-      searchInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-          searchInput.value = '';
-          applyFilters();
-        }
-      });
-
-    })();
-  </script>
-
+  <script src="/assets/js/tools-index.js" defer></script>
 </body>
 </html>

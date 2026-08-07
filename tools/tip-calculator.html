@@ -65,7 +65,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
 
   <style>
     /* ── Hero ── */
@@ -526,6 +526,7 @@
       .result-card.primary .result-value { font-size: 1.75rem; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-5">
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -566,50 +567,37 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page tip-tool-page">
   <main>
 
     <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities" class="active">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/utilities">Utilities</a>
-        <span class="sep" aria-hidden="true">›</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#text-data">Text &amp; Data</a>
+        <span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">Tip Calculator</span>
       </nav>
-      <h1 id="tool-heading">Smart Tip Calculator – Calculate Tips, Split Bills & Adjust Totals Instantly</h1>
-      <p>Enter your bill, select a tip percentage, and instantly split the total across any number of people — with accurate pre‑tax/post‑tax tipping, smart rounding options, and real‑time calculations that run entirely in your browser for maximum privacy. No sign‑up, no tracking, just a fast and precise tip calculator built for modern dining.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Private, local bill planning</p>
+          <h1 id="tool-heading">Tip Calculator &amp; Bill Splitter</h1>
+          <p class="premium-hero-copy">Calculate tips using local customs, account for sales tax, split the bill across any group, and round the final amount—all instantly in your browser.</p>
+          <div class="premium-hero-pills" aria-label="Tip calculator features"><span>Tax-aware tipping</span><span>Flexible group splits</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>See the full check</span><strong>Tip <i>meets</i> total</strong><small>Choose the percentage. Know every person’s share.</small></div>
+      </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
     <!-- CALCULATOR WIDGET -->
-    <section aria-labelledby="calc-heading">
+    <section class="tip-calculator-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Enter Bill Details</h2>
+        <div class="premium-app-title tip-app-title"><div class="premium-section-kicker">01 / Calculate</div><h2 id="calc-heading">Enter bill details</h2><p>Set the bill, tax, tip, and party size to see a complete breakdown instantly.</p></div>
 
         <div class="calc-layout">
 

@@ -69,7 +69,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
 
   <style>
     /* ── Hero ── */
@@ -423,6 +423,7 @@
       .bmi-headline .bmi-num { font-size: 2.1rem; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-8" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -463,52 +464,37 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page bmi-tool-page">
   <main>
 
     <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health" class="active">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/health">Health</a>
-        <span class="sep" aria-hidden="true">›</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#calculators">Calculators</a>
+        <span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">BMI Calculator</span>
       </nav>
-      <h1 id="tool-heading">BMI Calculator</h1>
-      <p>Calculate your Body Mass Index with a live visual gauge and
-         personalized insights. Adjust the sliders to see your BMI update instantly — no button
-         needed.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">A clearer view of your range</p>
+          <h1 id="tool-heading">BMI Calculator</h1>
+          <p class="premium-hero-copy">Explore your Body Mass Index with instant metric and imperial conversion, a live visual range, and practical context for understanding the result.</p>
+          <div class="premium-hero-pills" aria-label="BMI calculator features"><span>Instant live results</span><span>Metric &amp; imperial</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>One useful indicator</span><strong>Numbers <i>meet</i> context</strong><small>See the range. Understand the limits.</small></div>
+      </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
     <!-- CALCULATOR WIDGET -->
-    <section aria-labelledby="calc-heading">
+    <section class="bmi-calculator-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Enter Your Details</h2>
+        <div class="premium-app-title bmi-app-title"><div class="premium-section-kicker">01 / Measure</div><h2 id="calc-heading">Enter your measurements</h2><p>Adjust height, weight, and age group to see the result and guidance update instantly.</p></div>
 
         <div class="unit-toggle" role="group" aria-label="Unit system">
           <button type="button" id="unitMetric" class="active">Metric (cm / kg)</button>
@@ -623,19 +609,20 @@
 
           </div><!-- /inputs-col -->
 
-        </div><!-- /bmi-layout -->
+          <!-- INSIGHTS -->
+          <div class="insights-panel">
+            <div class="premium-section-kicker">02 / Understand</div>
+            <h3>Health Insights</h3>
+            <div id="insightsContainer"></div>
+            <p class="disclaimer">
+              BMI is a general screening measure based on height and weight only. It does not
+              diagnose body fat, muscle mass, or overall health, and typical ranges can vary by
+              age, sex, and frame size. This tool is for general information — for guidance
+              specific to you, talk to a doctor or registered dietitian.
+            </p>
+          </div>
 
-        <!-- INSIGHTS -->
-        <div class="insights-panel">
-          <h3>Health Insights</h3>
-          <div id="insightsContainer"></div>
-          <p class="disclaimer">
-            BMI is a general screening measure based on height and weight only. It does not
-            diagnose body fat, muscle mass, or overall health, and typical ranges can vary by
-            age, sex, and frame size. This tool is for general information — for guidance
-            specific to you, talk to a doctor or registered dietitian.
-          </p>
-        </div>
+        </div><!-- /bmi-layout -->
 
       </div><!-- /tool-widget -->
     </section>

@@ -11,8 +11,10 @@
   <link rel="icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu">
   <link rel="stylesheet" href="/assets/css/mortgage-calculator.css?v=20260807-25">
+  <link rel="stylesheet" href="/assets/css/trustpilot-review-collector.css?v=20260731-2">
+  <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
   <meta property="og:title" content="Mortgage Calculator – Payments, Interest, and Amortization">
   <meta property="og:description" content="Compare up to five mortgage scenarios privately in your browser.">
   <meta property="og:type" content="website">
@@ -35,15 +37,8 @@
 </head>
 <body>
   <main>
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png" alt="MonkeyTactics logo" class="brand-logo" width="383" height="375">
-        <div><div class="brand-name">MonkeyTactics</div><div class="brand-tagline">Free Online Calculators &amp; Tools</div></div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a><a href="/tools/finance" class="active">Finance</a><a href="/tools/health">Health</a><a href="/tools/utilities">Utilities</a><a href="/tools/productivity">Productivity</a><a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <section class="mortgage-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/tools/finance">Finance</a><span aria-hidden="true">/</span><span aria-current="page">Mortgage Calculator</span></nav>
@@ -238,6 +233,13 @@
       <div class="dialog-actions"><button type="button" class="button-secondary" data-close-down-payment>Cancel</button><button type="submit" class="button-primary">Use this loan amount</button></div>
     </form>
   </dialog>
+
+  <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot">
+    <div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div>
+    <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="6a6c8ef0fe997f522adfe278" data-style-height="52px" data-style-width="100%" data-token="e577092d-5e8c-49a6-b710-f1a5cfc19873">
+      <a href="https://www.trustpilot.com/review/monkeytactics.com" target="_blank" rel="noopener">Trustpilot</a>
+    </div>
+  </section>
 
   <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="/assets/js/calculator-pdf.js?v=20260805-2"></script>

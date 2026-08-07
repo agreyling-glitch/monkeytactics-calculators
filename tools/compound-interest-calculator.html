@@ -64,7 +64,7 @@
   }
   </script>
 
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
 
   <style>
     .hero--inner        { padding: 1.75rem 2rem; }
@@ -256,6 +256,7 @@
       .result-card.primary .result-value { font-size: 1.75rem; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-17" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -296,49 +297,46 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page compound-tool-page">
   <main>
 
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance" class="active">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/finance">Finance</a>
+        <a href="/tools/">Calculators</a>
         <span class="sep" aria-hidden="true">›</span>
         <span aria-current="page">Compound Interest Calculator</span>
       </nav>
-      <h1 id="tool-heading">Compound Interest Calculator</h1>
-      <p>Model investment and savings growth with compound interest, regular contributions,
-         tax on gains, and inflation adjustment. See your true after-tax, real-dollar balance
-         year by year.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <div class="premium-eyebrow">See how time turns consistency into growth</div>
+          <h1 id="tool-heading">Compound Interest Calculator</h1>
+          <p>Model savings and investment growth with regular contributions, tax on gains, and inflation. Compare headline returns with their real purchasing power.</p>
+          <div class="premium-hero-pills" aria-label="Tool highlights">
+            <span>Tax &amp; inflation aware</span>
+            <span>Year-by-year projections</span>
+          </div>
+        </div>
+        <aside class="premium-hero-stat" aria-label="Compound interest calculator summary">
+          <span>Growth is a long conversation</span>
+          <strong>Let every year answer back</strong>
+          <small>Contributions, returns, and purchasing power in one view.</small>
+        </aside>
+      </div>
     </section>
 
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top --></div>
-
     <!-- CALCULATOR -->
-    <section aria-labelledby="calc-heading">
+    <section class="compound-workspace-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Enter Investment Details</h2>
+        <div class="premium-app-title compound-app-title">
+          <div class="premium-section-kicker">01 / Project</div>
+          <h2 id="calc-heading">Build your growth scenario</h2>
+          <p>Set the starting balance, contribution rhythm, return assumptions, and time horizon.</p>
+        </div>
 
         <div class="calc-layout">
 

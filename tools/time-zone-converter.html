@@ -33,7 +33,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐒</text></svg>" />
 
   <style>
@@ -398,6 +398,7 @@
       .input-row    { grid-template-columns: 1fr; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-7" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -438,51 +439,37 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page timezone-tool-page">
   <main>
 
     <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities" class="active">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/utilities">Utilities</a>
-        <span class="sep" aria-hidden="true">›</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#calculators">Calculators</a>
+        <span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">Time Zone Converter</span>
       </nav>
-      <h1 id="tool-heading">Time Zone Converter &amp; Meeting Planner</h1>
-      <p>Pick cities, set a time, and see everyone's local clock, business hours, and a
-         shareable link — everything runs privately in your browser.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Global scheduling, made local</p>
+          <h1 id="tool-heading">Time Zone Converter &amp; Meeting Planner</h1>
+          <p class="premium-hero-copy">Compare local clocks, spot overlapping work hours, and share a meeting plan across cities. Daylight-saving changes are handled automatically in your browser.</p>
+          <div class="premium-hero-pills" aria-label="Time zone converter features"><span>DST-aware conversion</span><span>Shareable meeting plans</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>One moment, everywhere</span><strong>Local time <i>meets</i> global teams</strong><small>Find the overlap. Share the plan.</small></div>
+      </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
     <!-- CONVERTER WIDGET -->
-    <section aria-labelledby="calc-heading">
+    <section class="timezone-calculator-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Convert Time Across Cities</h2>
+        <div class="premium-app-title timezone-app-title"><div class="premium-section-kicker">01 / Coordinate</div><h2 id="calc-heading">Build a plan across cities</h2><p>Choose a reference time, add each location, and compare the moment from every perspective.</p></div>
 
         <div class="calc-layout">
 

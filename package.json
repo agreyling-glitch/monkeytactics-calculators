@@ -6,7 +6,8 @@
     "build:qr": "vite build",
     "build:wasm": "wasm-pack build wasm/qr-code-generator-engine --target web --release --out-dir ../../assets/wasm/qr-code-generator --out-name qr_engine && node -e \"require('fs').rmSync('assets/wasm/qr-code-generator/.gitignore',{force:true})\"",
     "build:mortgage-wasm": "wasm-pack build wasm/mortgage-engine --target web --release --out-dir ../../assets/wasm/mortgage-engine --out-name mortgage_engine && node -e \"require('fs').rmSync('assets/wasm/mortgage-engine/.gitignore',{force:true})\"",
-    "build": "npm run build:wasm && npm run build:qr",
+    "build:menu": "node monkeytactics-wasm-menu/build.mjs",
+    "build": "npm run build:wasm && npm run build:menu && npm run build:qr",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.cjs tests/*.test.mjs"
   },

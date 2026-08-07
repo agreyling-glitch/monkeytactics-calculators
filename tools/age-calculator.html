@@ -70,7 +70,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
 
   <style>
     /* ── Hero ── */
@@ -353,6 +353,7 @@
       .current-age-card .result-value { font-size: 1.65rem; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-10" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -393,52 +394,37 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page age-tool-page">
   <main>
 
     <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health" class="active">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/health">Health</a>
-        <span class="sep" aria-hidden="true">›</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#calculators">Calculators</a>
+        <span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">Age Calculator</span>
       </nav>
-      <h1 id="tool-heading">Age Calculator</h1>
-      <p>Find your exact age in years, months, and days, then count down to your next birthday,
-         your next decade milestone, and your retirement date. Correctly handles February 29
-         (leap day) birthdays. Everything runs privately in your browser.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Your timeline, precisely measured</p>
+          <h1 id="tool-heading">Age Calculator</h1>
+          <p class="premium-hero-copy">Find your exact age, count down to birthdays and decade milestones, and forecast a retirement date. Leap-day birthdays are handled automatically and privately.</p>
+          <div class="premium-hero-pills" aria-label="Age calculator features"><span>Exact years, months &amp; days</span><span>Birthday &amp; retirement milestones</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>More than a number</span><strong>Age <i>meets</i> perspective</strong><small>Count the days. See what comes next.</small></div>
+      </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
     <!-- CALCULATOR WIDGET -->
-    <section aria-labelledby="calc-heading">
+    <section class="age-calculator-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Enter Your Details</h2>
+        <div class="premium-app-title age-app-title"><div class="premium-section-kicker">01 / Calculate</div><h2 id="calc-heading">Set the dates that matter</h2><p>Enter a birth date and retirement goal to reveal an exact age and the milestones ahead.</p></div>
 
         <div class="input-row">
           <div class="input-group">

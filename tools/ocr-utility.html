@@ -157,6 +157,7 @@
       color: var(--green);
     }
 
+
     .hero {
       margin-bottom: 2rem;
       padding: 1.75rem 2rem;
@@ -985,50 +986,37 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-12">
   <link rel="stylesheet" href="/assets/css/trustpilot-review-collector.css?v=20260731-2">
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page ocr-tool-page">
   <main>
-    <header class="site-header">
-      <a class="brand" href="/" aria-label="MonkeyTactics home">
-        <img class="brand-logo" src="/assets/img/logo/monkeytactics-monkey-logo.png" alt="MonkeyTactics logo" width="383" height="375">
-        <span>
-          <span class="brand-name">MonkeyTactics</span>
-          <span class="brand-tagline">Free Online Calculators &amp; Tools</span>
-        </span>
-      </a>
-      <nav class="site-nav" aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities">Utilities</a>
-        <a href="/tools/productivity" class="active">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
-    <section class="hero" aria-labelledby="page-title">
+    <section class="premium-tool-hero" aria-labelledby="page-title">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
-        <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/productivity">Productivity</a>
-        <span class="sep" aria-hidden="true">›</span>
+        <span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#utilities">Utilities</a>
+        <span class="sep" aria-hidden="true">/</span>
         <span aria-current="page">OCR Utility</span>
       </nav>
-      <h1 id="page-title">Free OCR Image‑to‑Text Converter (Local Processing, No Uploads)</h1>
-      <div class="hero-copy">
-        <p>Optical character recognition (OCR) converts text in screenshots, scanned documents, and photos into editable, searchable text. Use this free OCR image-to-text converter when you need to copy a quotation, digitize a printed page, capture notes, reuse text from a receipt, or make image-based information easier to search and edit.</p>
-        <p>Unlike cloud OCR services, this tool processes every image locally in your browser. Your image is never uploaded to MonkeyTactics or stored on a server, which helps protect private, personal, and business information. Local processing also removes upload time, so you can begin extracting text as soon as the OCR engine is ready. Choose a PNG, JPG, or JPEG image up to 20 MB, or capture an image with your device camera. Crop the image to focus on the text, then run OCR and copy or edit the result. No account, API key, or file upload is required.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Private image-to-text recognition</p>
+          <h1 id="page-title">OCR Utility</h1>
+          <p class="premium-hero-copy">Turn screenshots, scanned pages, receipts, and photos into editable text. Crop to the important area, recognize it locally in your browser, then copy or refine the result.</p>
+          <div class="premium-hero-pills" aria-label="OCR Utility features"><span>Local WASM recognition</span><span>Upload or camera capture</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>From pixels to language</span><strong>Images <i>meet</i> editable text</strong><small>Focus the frame. Extract what matters.</small></div>
       </div>
     </section>
 
-    <div class="ad-container" aria-label="Advertisement">
-      <!-- AdSense: Top Display Ad -->
-    </div>
-
-    <section class="workspace" aria-label="OCR workspace">
+    <section class="workspace" aria-labelledby="ocr-workspace-heading">
+      <div class="ocr-workspace-intro"><div class="premium-section-kicker">01 / Extract</div><h2 id="ocr-workspace-heading">Choose an image and recover its text</h2><p>Import a file or capture a frame, refine the crop, and review the recognized text alongside the source.</p></div>
       <div class="mode-switcher" role="tablist" aria-label="Choose an image source">
         <button class="mode-tab" id="uploadTab" type="button" role="tab" aria-selected="true" aria-controls="uploadPanel">Upload an Image</button>
         <button class="mode-tab" id="cameraTab" type="button" role="tab" aria-selected="false" aria-controls="cameraPanel" tabindex="-1">Camera Scanner</button>

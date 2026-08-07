@@ -65,7 +65,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐒</text></svg>" />
 
   <style>
@@ -330,6 +330,7 @@
       .result-card.primary .result-value { font-size: 1.75rem; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-15" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -370,51 +371,48 @@
   <script src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 </head>
 
-<body>
+<body class="premium-tool-page unit-tool-page">
   <main>
 
     <!-- HEADER -->
-    <header>
-      <a href="/" class="brand">
-        <img src="/assets/img/logo/monkeytactics-monkey-logo.png"
-             alt="MonkeyTactics logo"
-             class="brand-logo" width="383" height="375" />
-        <div>
-          <div class="brand-name">MonkeyTactics</div>
-          <div class="brand-tagline">Free Online Calculators &amp; Tools</div>
-        </div>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/tools/">All Tools</a>
-        <a href="/tools/finance">Finance</a>
-        <a href="/tools/health">Health</a>
-        <a href="/tools/utilities" class="active">Utilities</a>
-        <a href="/tools/productivity">Productivity</a>
-        <a href="/tools/construction">Construction</a>
-      </nav>
-    </header>
+    <div id="mt-header"></div>
+    <script type="module" src="/static/wasm/menu.js"></script>
 
     <!-- HERO -->
-    <section class="hero hero--inner" aria-labelledby="tool-heading">
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span class="sep" aria-hidden="true">›</span>
-        <a href="/tools/utilities">Utilities</a>
+        <a href="/tools/#text-data">Text &amp; Data</a>
         <span class="sep" aria-hidden="true">›</span>
         <span aria-current="page">Unit Converter</span>
       </nav>
-      <h1 id="tool-heading">Unit Converter</h1>
-      <p>Convert length, weight, temperature, volume, and speed between metric and imperial
-         units instantly. Everything runs privately in your browser.</p>
+      <div class="premium-hero-grid">
+        <div>
+          <div class="premium-eyebrow">Everyday measurement, instantly translated</div>
+          <h1 id="tool-heading">Unit Converter</h1>
+          <p>Convert length, weight, temperature, volume, and speed between metric and imperial units. Type in either direction and see the result immediately.</p>
+          <div class="premium-hero-pills" aria-label="Tool highlights">
+            <span>Metric &amp; imperial</span>
+            <span>Live bidirectional conversion</span>
+          </div>
+        </div>
+        <aside class="premium-hero-stat" aria-label="Unit converter summary">
+          <span>One value, another language</span>
+          <strong>Measurement meets context</strong>
+          <small>Choose the units. Keep the meaning.</small>
+        </aside>
+      </div>
     </section>
 
-    <!-- TOP AD -->
-    <div class="ad-container" aria-label="Advertisement"><!-- AdSense: Top Display Ad --></div>
-
     <!-- CONVERTER WIDGET -->
-    <section aria-labelledby="calc-heading">
+    <section class="unit-workspace-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <h2 id="calc-heading">Enter Conversion</h2>
+        <div class="premium-app-title unit-app-title">
+          <div class="premium-section-kicker">01 / Convert</div>
+          <h2 id="calc-heading">Set up a conversion</h2>
+          <p>Choose a measurement category, enter a value, and swap directions whenever you need.</p>
+        </div>
 
         <div class="calc-layout">
 
