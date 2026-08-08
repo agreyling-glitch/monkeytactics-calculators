@@ -255,16 +255,6 @@
   line-height: 1.6;
 }
 
-.founder-quote {
-  margin: 2.4rem 0 0;
-  padding: 0 0 0 1.5rem;
-  color: var(--text);
-  border-left: 2px solid var(--about-green);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.25rem, 2.2vw, 1.7rem);
-  line-height: 1.45;
-}
-
 .expertise-panel {
   display: grid;
   margin: clamp(3.5rem, 7vw, 5.5rem) 0 0;
@@ -395,6 +385,39 @@
 
 .technical-note code {
   color: var(--about-teal);
+}
+
+.wasm-systems {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wasm-systems li {
+  padding-left: 1rem;
+  border-left: 2px solid rgba(120, 168, 160, 0.35);
+}
+
+.wasm-systems a,
+.wasm-systems strong {
+  display: block;
+  color: var(--about-ink);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.wasm-systems a:hover {
+  color: var(--about-teal);
+}
+
+.wasm-systems span {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .vision-section {

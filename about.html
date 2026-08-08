@@ -128,10 +128,16 @@
       <div class="about-editorial__body">
         <h2 id="founder-heading">Three decades changed my view of the industry.</h2>
         <p class="lead">
-          I’m Adriaan Greyling. I entered the financial industry in 1996 and spent my career working with the systems behind everyday transactions.
+          I’m Adriaan Greyling. I entered the financial industry in 1996 and spent my career working with the systems behind everyday transactions at large banks in South Africa, Australia, and the United States.
         </p>
         <p>
           Much of that work lived on mainframes, where reliability is not a marketing phrase. I analyzed millions of debit-card transactions every day. At that scale, small errors become large problems. Software has to be correct, understandable, and dependable under pressure.
+        </p>
+        <p>
+          In one role, I was responsible for building a real-time mainframe application that made credit decisions for credit-card applicants. It gathered a substantial amount of credit-bureau data, evaluated it immediately, and helped determine the interest rate a person would receive.
+        </p>
+        <p>
+          That experience put me on the other side of the information-collection apparatus. I saw firsthand how much personal data large institutions can assemble, how quickly systems can act on it, and how directly those decisions can affect someone’s financial life.
         </p>
         <p>
           Over the years, I also watched the wider technology industry change. What began as a mostly straightforward exchange — a company provides a product and a customer pays for it — became something more extractive. Increasingly, the customer became the product: profiled, tracked, retained, and monetized.
@@ -139,9 +145,6 @@
         <p>
           I am retired from the corporate world now. MonkeyTactics is my way of offering a different option: useful software with no account required, no sales funnel to enter, and no need to surrender your inputs just to get an answer.
         </p>
-        <blockquote class="founder-quote">
-          “I don’t want to sell you anything. I just want to provide a useful alternative.”
-        </blockquote>
       </div>
     </section>
 
@@ -202,8 +205,26 @@
         <p class="about-kicker">Why Rust + WebAssembly?</p>
         <h2>Serious engineering, inside your browser.</h2>
         <p>
-          The QR encoder uses <code>Rust</code> compiled to <code>WebAssembly</code> because privacy should not require giving up performance or capability. Complex work can happen locally, quickly, and predictably — without uploading your content to a remote service.
+          Four MonkeyTactics systems use <code>Rust</code> compiled to <code>WebAssembly</code>, keeping complex work fast, predictable, and local to your browser:
         </p>
+        <ul class="wasm-systems">
+          <li>
+            <a href="/tools/qr-code-generator">Advanced QR Code Generator</a>
+            <span>Encodes, styles, and exports QR codes, including batch workflows.</span>
+          </li>
+          <li>
+            <a href="/tools/loan-mortgage-calculator">Loan &amp; Mortgage Calculator</a>
+            <span>Calculates amortization, extra payments, and multiple financing scenarios.</span>
+          </li>
+          <li>
+            <a href="/tools/word-unscrambler">Word Unscrambler</a>
+            <span>Indexes dictionaries and handles searching, filtering, scoring, and word analysis.</span>
+          </li>
+          <li>
+            <strong>Site navigation and search</strong>
+            <span>Renders the shared menu, tool hierarchy, and keyboard-friendly global search on every page.</span>
+          </li>
+        </ul>
       </div>
     </section>
 
@@ -230,6 +251,9 @@
         <h2 id="name-story-heading">Why MonkeyTactics?</h2>
         <p>
           MonkeyTactics is named for the way real problems are solved: with simple tools, clear logic, and a bit of resourcefulness. Monkeys use what’s in front of them. Tactics provide the discipline behind the engineering. Together, they reflect the spirit of these tools — approachable on the surface, serious underneath.
+        </p>
+        <p>
+          The green monkey also pays homage to the mainframe days of working at 3270 green-screen terminals — a small piece of computing history carried into every MonkeyTactics tool.
         </p>
       </div>
     </section>

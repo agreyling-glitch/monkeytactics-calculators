@@ -280,13 +280,19 @@ test("featured pages keep only the lower ad and top tools invite Trustpilot revi
     assert.doesNotMatch(html, /Top Display Ad/);
   }
 
-  for (const name of [
-    "tools/word-unscrambler.html",
-    "tools/loan-mortgage-calculator.html",
-    "tools/qr-code-generator.html",
-  ]) {
+  const reviewPages = fs.readdirSync(path.join(siteRoot, "tools"))
+    .filter((name) => name.endsWith(".html"))
+    .map((name) => `tools/${name}`)
+    .filter((name) => fs.readFileSync(path.join(siteRoot, name), "utf8").includes('class="review-collector"'));
+
+  assert.equal(reviewPages.length, 23, "all review prompts should be covered");
+
+  for (const name of reviewPages) {
     const html = fs.readFileSync(path.join(siteRoot, name), "utf8");
     assert.equal((html.match(/class="review-collector"/g) || []).length, 1, `${name} should contain one review prompt`);
-    assert.match(html, /https:\/\/www\.trustpilot\.com\/review\/monkeytactics\.com/);
+    assert.match(html, /https:\/\/www\.trustpilot\.com\/evaluate\/monkeytactics\.com/);
+    assert.match(html, /assets\/images\/trustpilot-review\.svg/);
+    assert.doesNotMatch(html, /tp\.widget\.bootstrap\.min\.js/);
+    assert.doesNotMatch(html, /class="trustpilot-widget"/);
   }
 });
