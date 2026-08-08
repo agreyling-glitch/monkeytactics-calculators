@@ -15,6 +15,8 @@ export function find_hooks_for_dictionary(word: string, dictionary_bit: number):
  */
 export function init_engine(dictionary_json: any): void;
 
+export function is_valid_word(word: string): boolean;
+
 export function score_word(word: string): number;
 
 export function unscramble(rack: string, pattern: string, options: any): any;
@@ -30,6 +32,7 @@ export interface InitOutput {
     readonly find_hooks: (a: number, b: number) => number;
     readonly find_hooks_for_dictionary: (a: number, b: number, c: number) => number;
     readonly init_engine: (a: number, b: number) => void;
+    readonly is_valid_word: (a: number, b: number) => number;
     readonly score_word: (a: number, b: number) => number;
     readonly unscramble: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly verify_domain: (a: number, b: number) => number;

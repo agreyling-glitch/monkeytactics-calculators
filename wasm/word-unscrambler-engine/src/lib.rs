@@ -116,6 +116,11 @@ pub fn score_word(word: String) -> i32 {
 }
 
 #[wasm_bindgen]
+pub fn is_valid_word(word: String) -> bool {
+    ENGINE.with(|engine| engine.borrow().has_word(&word, ENABLE | SOWPODS))
+}
+
+#[wasm_bindgen]
 pub fn find_hooks(word: String) -> JsValue {
     find_hooks_for_dictionary(word, ENABLE | SOWPODS)
 }

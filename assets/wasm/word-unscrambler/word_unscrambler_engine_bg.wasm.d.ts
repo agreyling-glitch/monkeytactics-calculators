@@ -6,6 +6,7 @@ export const board_fit_analysis: (a: number, b: number, c: number, d: number, e:
 export const find_hooks: (a: number, b: number) => number;
 export const find_hooks_for_dictionary: (a: number, b: number, c: number) => number;
 export const init_engine: (a: number, b: number) => void;
+export const is_valid_word: (a: number, b: number) => number;
 export const score_word: (a: number, b: number) => number;
 export const unscramble: (a: number, b: number, c: number, d: number, e: number) => number;
 export const verify_domain: (a: number, b: number) => number;

@@ -70,6 +70,17 @@ export function init_engine(dictionary_json) {
 
 /**
  * @param {string} word
+ * @returns {boolean}
+ */
+export function is_valid_word(word) {
+    const ptr0 = passStringToWasm0(word, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.is_valid_word(ptr0, len0);
+    return ret !== 0;
+}
+
+/**
+ * @param {string} word
  * @returns {number}
  */
 export function score_word(word) {
