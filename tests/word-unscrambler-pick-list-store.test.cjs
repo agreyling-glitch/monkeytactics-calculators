@@ -1,7 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 
-const PickListStore = require("../assets/js/word-unscrambler-pick-list-store.js");
+const PickListStore = require("../assets/js/tools/word-unscrambler/pick-list-store.js");
 
 function createStorage(initialValue = "[]") {
   const values = new Map([[PickListStore.STORAGE_KEY, initialValue]]);

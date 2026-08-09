@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { DEFAULT_STYLE } from "../src/types.ts";
-import { assessPerspectiveDistortion, buildErrorCorrectionMap, buildPreviewTransform, buildRawQrSvg, diagnoseQuietZone, projectCameraPoint } from "../src/utils/previewDiagnostics.ts";
-import { applyPerspectiveRisk, buildRiskHeatmap } from "../src/utils/riskHeatmap.ts";
+import { DEFAULT_STYLE } from "../apps/qr-studio/src/types.ts";
+import { assessPerspectiveDistortion, buildErrorCorrectionMap, buildPreviewTransform, buildRawQrSvg, diagnoseQuietZone, projectCameraPoint } from "../apps/qr-studio/src/utils/previewDiagnostics.ts";
+import { applyPerspectiveRisk, buildRiskHeatmap } from "../apps/qr-studio/src/utils/riskHeatmap.ts";
 
 const result = {
   moduleCount: 21,

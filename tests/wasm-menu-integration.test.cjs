@@ -35,7 +35,7 @@ test("every site page loads the WASM menu exactly once", () => {
     }
 
     const menuScripts = html.match(
-      new RegExp(`<script type="module" src="/static/wasm/menu\\.js\\?v=${menuAssetVersion}"></script>`, "g"),
+      new RegExp(`<script type="module" src="/assets/wasm/menu/menu\\.js\\?v=${menuAssetVersion}"></script>`, "g"),
     ) || [];
     assert.equal(
       menuScripts.length,
@@ -70,13 +70,13 @@ test("the old HTML site navigation is absent", () => {
 
 test("compiled WASM menu artifacts exist at their deployment paths", () => {
   for (const file of ["menu.css", "menu.js", "menu_bg.wasm"]) {
-    const artifact = path.join(siteRoot, "static", "wasm", file);
+    const artifact = path.join(siteRoot, "assets", "wasm", "menu", file);
     assert.ok(fs.statSync(artifact).size > 0, `${artifact} must be non-empty`);
   }
 });
 
 test("the menu loader versions its CSS and WASM dependencies", () => {
-  const loader = fs.readFileSync(path.join(siteRoot, "static", "wasm", "menu.js"), "utf8");
+  const loader = fs.readFileSync(path.join(siteRoot, "assets", "wasm", "menu", "menu.js"), "utf8");
 
   assert.match(loader, /const menuAssetVersion = new URL\(import\.meta\.url\)\.search;/);
   assert.match(loader, /stylesheet\.href = menuAssetUrl\("menu\.css"\)\.href;/);
@@ -282,8 +282,8 @@ test("the Percentage Calculator uses the premium percentage presentation", () =>
 
 test("the Compound Interest Calculator uses the premium growth presentation", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "compound-interest-calculator.html"), "utf8");
-  const script = fs.readFileSync(path.join(siteRoot, "assets", "js", "compound-interest-calculator.js"), "utf8");
-  const chartScript = fs.readFileSync(path.join(siteRoot, "assets", "js", "compound-interest-chart.js"), "utf8");
+  const script = fs.readFileSync(path.join(siteRoot, "assets", "js", "tools", "compound-interest-calculator", "compound-interest-calculator.js"), "utf8");
+  const chartScript = fs.readFileSync(path.join(siteRoot, "assets", "js", "tools", "compound-interest-calculator", "compound-interest-chart.js"), "utf8");
   assert.match(html, /class="premium-tool-page compound-tool-page"/);
   assert.match(html, /<title>Compound Interest Calculator with Contributions<\/title>/);
   assert.match(html, /Calculate compound interest with monthly contributions, five compounding frequencies/);

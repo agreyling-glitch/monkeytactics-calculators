@@ -11,20 +11,20 @@ No word data or search input is sent to a server. The browser downloads static d
 ```text
 tools/word-unscrambler.html
   |
-  +-- assets/js/word-unscrambler-input-rules.js
+  +-- assets/js/tools/word-unscrambler/input-rules.js
   |     Input normalization and validation limits
   |
-  +-- assets/js/word-unscrambler-history-store.js
+  +-- assets/js/tools/word-unscrambler/history-store.js
   |     localStorage-backed search history
   |
-  +-- assets/js/wasm-bridge.js
+  +-- assets/js/tools/word-unscrambler/wasm-bridge.js
   |     Loads, authorizes, and wraps the generated WASM module
   |       |
   |       +-- assets/wasm/word-unscrambler/
   |             word_unscrambler_engine.js
   |             word_unscrambler_engine_bg.wasm
   |
-  +-- assets/js/word-unscrambler.js
+  +-- assets/js/tools/word-unscrambler/word-unscrambler.js
         UI state, dictionary fetching, DOM rendering, and bridge calls
           |
           +-- assets/data/words/manifest.enable-sowpods-v2.json
@@ -312,7 +312,7 @@ The remaining chart code is presentation logic in JavaScript. It aggregates resu
 
 ## UI Responsibilities
 
-`assets/js/word-unscrambler.js` remains responsible for browser-specific behavior:
+`assets/js/tools/word-unscrambler/word-unscrambler.js` remains responsible for browser-specific behavior:
 
 - Reading and validating controls.
 - Parsing the rack/pattern smart input.
@@ -360,7 +360,7 @@ Generated browser artifacts under `assets/wasm/word-unscrambler/` are committed 
 After rebuilding:
 
 1. Remove the generated nested `.gitignore` if `wasm-pack` creates one, otherwise it hides the generated package from the repository.
-2. Increment `ASSET_VERSION` in `assets/js/wasm-bridge.js`.
+2. Increment `ASSET_VERSION` in `assets/js/tools/word-unscrambler/wasm-bridge.js`.
 3. Increment the bridge and main-script query versions in `tools/word-unscrambler.html`.
 4. Run the Rust and Node test suites.
 5. Commit the updated generated JavaScript and `.wasm` binary with the Rust source.

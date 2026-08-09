@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const InputRules = require("../assets/js/word-unscrambler-input-rules.js");
+const InputRules = require("../assets/js/tools/word-unscrambler/input-rules.js");
 
 test("normalizes consecutive pattern stars before validation", () => {
   assert.deepEqual(InputRules.parseSmartInput("ABCDE / a***?**e"), {

@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const HistoryStore = require("../assets/js/word-unscrambler-history-store.js");
+const HistoryStore = require("../assets/js/tools/word-unscrambler/history-store.js");
 
 function createStorage(initialValue) {
   const values = new Map();

@@ -20,6 +20,17 @@ const wasmBytes = fs.readFileSync(new URL(
 await init({ module_or_path: wasmBytes });
 init_engine(["ate", "eat", "tea", "eats"]);
 
+test("the browser bridge resolves engine files from the canonical WASM directory", () => {
+  const bridge = fs.readFileSync(new URL(
+    "../assets/js/tools/word-unscrambler/wasm-bridge.js",
+    import.meta.url,
+  ), "utf8");
+
+  assert.match(bridge, /`\/assets\/wasm\/word-unscrambler\/word_unscrambler_engine\.js\?v=\$\{ASSET_VERSION\}`/);
+  assert.match(bridge, /`\/assets\/wasm\/word-unscrambler\/word_unscrambler_engine_bg\.wasm\?v=\$\{ASSET_VERSION\}`/);
+  assert.doesNotMatch(bridge, /`\.\.\/wasm\//);
+});
+
 test("authorizes production, Cloudflare Pages, and local Wrangler hosts", () => {
   assert.equal(verify_domain("monkeytactics.com"), true);
   assert.equal(verify_domain("monkeytactics-calculators.pages.dev"), true);

@@ -70,7 +70,7 @@ Top advertising blocks have been removed from the redesigned experiences so the 
 
 ## 🏗️ Architecture Overview
 
-MonkeyTactics is a static, front-end-only site with no server-side application. Most tools use lightweight HTML, CSS, and JavaScript, while four first-party Rust components compile to WebAssembly. Generated browser packages are committed under `assets/wasm/` or `static/wasm/`, so production hosting serves static files and does not require a Rust toolchain.
+MonkeyTactics is primarily a static site built from lightweight HTML, CSS, and JavaScript, with a narrowly scoped Cloudflare Pages Function for dynamic Word Unscrambler routes. Five first-party Rust components compile to WebAssembly. Every generated browser package is committed under `assets/wasm/`, so production hosting does not require a Rust toolchain.
 
 The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source membership, allowing searches against either dictionary or their deduplicated union. Its static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser loads only the chunks relevant to the submitted letters, decompresses them with the native `DecompressionStream` API, and caches the indexed words for later searches. Exact word length, starting and ending letters, wildcard patterns, required/excluded letters, vowel and consonant minimums, score ranges, sorting, and dictionary-aware hooks are applied in the browser. Hook searches load the complete index on demand.
 
@@ -78,20 +78,30 @@ The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source mem
 
 | Tool | Rust crate | Browser package | Engine responsibilities |
 |---|---|---|---|
-| [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator) | `wasm/mortgage-engine` | `assets/wasm/mortgage-engine` | Fixed-rate amortization, monthly and bi-weekly payments, extra payments, and multi-scenario calculations |
+| [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator) | `wasm/mortgage-engine` | `assets/wasm/mortgage` | Fixed-rate amortization, monthly and bi-weekly payments, extra payments, and multi-scenario calculations |
 | [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator) | `wasm/qr-code-generator-engine` | `assets/wasm/qr-code-generator` | QR encoding, styling, image export, and batch generation |
 | [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Dictionary indexing, searching, filtering, sorting, scoring, hooks, and word analysis |
-| Hierarchical site navigation | `monkeytactics-wasm-menu` | `static/wasm` | Domain-verified Leptos header, global search with keyboard navigation, and a hamburger-driven hierarchy drawer rendered on every page |
+| [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter) | `wasm/text-analyzer-engine` | `assets/wasm/text-analyzer` | Local text metrics and structural analysis with a JavaScript fallback |
+| Hierarchical site navigation | `wasm/menu-engine` | `assets/wasm/menu` | Domain-verified Leptos header, global search with keyboard navigation, and a hamburger-driven hierarchy drawer rendered on every page |
 
-All four components run locally in the browser. Their Rust source, generated JavaScript bindings, and `.wasm` binaries live in this repository.
+All five components run locally in the browser. Their Rust source lives under `wasm/`; generated JavaScript bindings and `.wasm` binaries live under `assets/wasm/`.
+
+### Repository ownership
+
+- `tools/` contains production HTML routes only.
+- `assets/css/{shared,pages,tools}` and `assets/js/{shared,pages,tools}` contain authored browser assets.
+- `assets/generated/qr-studio` and `assets/wasm` contain generated browser output.
+- `apps/qr-studio` contains the React/TypeScript QR Studio source.
+- `dev/templates` and `dev/archive` contain non-production reference files.
+- `functions/` contains the Cloudflare Pages Function used by dynamic word routes.
 
 #### Word Unscrambler integration
 
 The checked-in bridge initializes the generated module before enabling the form:
 
 ```html
-<script src="../assets/js/wasm-bridge.js" defer></script>
-<script src="../assets/js/word-unscrambler.js" defer></script>
+<script src="../assets/js/tools/word-unscrambler/wasm-bridge.js" defer></script>
+<script src="../assets/js/tools/word-unscrambler/word-unscrambler.js" defer></script>
 ```
 
 Dictionary shards remain lazy-loaded by the existing UI and are passed to `init_engine` as arrays of `word\\tmembership` records. The WASM module authorizes `monkeytactics.com`, the Cloudflare Pages production and preview hosts under `monkeytactics-calculators.pages.dev`, and the local Wrangler host `127.0.0.1`.

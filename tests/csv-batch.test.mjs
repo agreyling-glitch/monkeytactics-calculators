@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { analyzeBatchCsv, parseBatchCsv } from "../src/utils/csvBatch.ts";
+import { analyzeBatchCsv, parseBatchCsv } from "../apps/qr-studio/src/utils/csvBatch.ts";
 
 test("auto-cleans empty and exact duplicate CSV rows", () => {
   const analysis = analyzeBatchCsv("name,data,notes\r\nHome,https://example.com,keep\r\n\r\nHome,https://example.com,duplicate\r\nBlank,,remove\r\nContact,mailto:test@example.com,keep");

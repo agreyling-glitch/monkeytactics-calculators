@@ -8,10 +8,10 @@ import init, {
   calculate_multi_scenario,
   calculate_scenario,
   verify_domain
-} from "../assets/wasm/mortgage-engine/mortgage_engine.js";
+} from "../assets/wasm/mortgage/mortgage_engine.js";
 
 const wasmBytes = fs.readFileSync(new URL(
-  "../assets/wasm/mortgage-engine/mortgage_engine_bg.wasm",
+  "../assets/wasm/mortgage/mortgage_engine_bg.wasm",
   import.meta.url
 ));
 

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-await import(new URL("../assets/js/calculator-pdf.js", import.meta.url));
+await import(new URL("../assets/js/shared/calculator-pdf.js", import.meta.url));
 
 test("creates a paginated calculator PDF report", () => {
   const rows = Array.from({ length: 140 }, (_, index) => [

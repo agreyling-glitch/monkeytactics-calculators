@@ -11,7 +11,7 @@ import init, {
   style_qr,
   verify_domain,
 } from "../assets/wasm/qr-code-generator/qr_engine.js";
-import { composePdfBooklet, composePdfContactSheet } from "../src/utils/pdfLayout.ts";
+import { composePdfBooklet, composePdfContactSheet } from "../apps/qr-studio/src/utils/pdfLayout.ts";
 
 const wasmBytes = fs.readFileSync(new URL("../assets/wasm/qr-code-generator/qr_engine_bg.wasm", import.meta.url));
 await init({ module_or_path: wasmBytes });

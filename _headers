@@ -15,17 +15,17 @@
 # Long-cache the static assets (they're fingerprintable later if needed)
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
-/assets/css/style.css
+/assets/css/shared/style.css
   Cache-Control: no-cache
 
-/static/wasm/menu_bg.wasm
+/assets/wasm/menu/menu_bg.wasm
   Content-Type: application/wasm
   Cache-Control: no-cache
 
-/static/wasm/menu.js
+/assets/wasm/menu/menu.js
   Content-Type: application/javascript
   Cache-Control: no-cache
 
-/static/wasm/menu.css
+/assets/wasm/menu/menu.css
   Content-Type: text/css
   Cache-Control: no-cache

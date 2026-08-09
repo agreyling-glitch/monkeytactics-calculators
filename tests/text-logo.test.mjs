@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { DEFAULT_STYLE } from "../src/types.ts";
-import { errorCorrectionForStyle } from "../src/utils/errorCorrection.ts";
-import { normalizeFrame } from "../src/utils/frame.ts";
-import { normalizeTextLogo } from "../src/utils/textLogo.ts";
+import { DEFAULT_STYLE } from "../apps/qr-studio/src/types.ts";
+import { errorCorrectionForStyle } from "../apps/qr-studio/src/utils/errorCorrection.ts";
+import { normalizeFrame } from "../apps/qr-studio/src/utils/frame.ts";
+import { normalizeTextLogo } from "../apps/qr-studio/src/utils/textLogo.ts";
 
 test("normalizes text logos to the mandatory character and layout limits", () => {
   const normalized = normalizeTextLogo({

@@ -60,6 +60,11 @@
       },
       {
         "@type": "Question",
+        "name": "What do the readability scores mean?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Each score estimates the U.S. school grade level a reader may need. A score near 8 suggests eighth-grade reading difficulty; lower scores are generally easier. Treat the four scores as a range, not a precise rating, and use several paragraphs for a more useful estimate." }
+      },
+      {
+        "@type": "Question",
         "name": "What does keyword density mean?",
         "acceptedAnswer": { "@type": "Answer", "text": "Keyword density is the percentage of total words that a given word represents. The list shows the most frequent words in your text, with common stopwords (the, and, of, to, etc.) excluded by default so meaningful terms are easier to spot." }
       },
@@ -73,7 +78,7 @@
   </script>
 
   <!-- Global Stylesheet -->
-  <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu" />
+  <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260807-wasm-menu" />
 
   <style>
     /* ── Hero ── */
@@ -109,10 +114,10 @@
       font-size: 1.05rem;
     }
 
-    /* ── Two-col layout: inputs | results ── */
+    /* ── Single-column workspace ── */
     .calc-layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 2rem;
       align-items: start;
     }
@@ -235,12 +240,25 @@
     }
     .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
+    .textarea-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 0.45rem;
+    }
+    .textarea-actions .btn-ghost {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
     /* ── Results panel ── */
     .results-col {
       display: flex;
       flex-direction: column;
       gap: 0.85rem;
     }
+    .input-group > .results-col { margin-top: 0.65rem; }
 
     .result-card {
       background: rgba(34,197,94,0.06);
@@ -283,6 +301,49 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 0.6rem;
     }
+    #resultsCards {
+      grid-template-columns: minmax(240px, 1.8fr) minmax(145px, 1.35fr) repeat(3, minmax(100px, 1fr));
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.1rem;
+    }
+    #resultsCards > .stat-trio { display: contents; }
+    #resultsCards .result-card {
+      min-width: 0;
+      padding: 0.6rem 0.7rem;
+      text-align: center;
+    }
+    #resultsCards .result-label {
+      margin-bottom: 0.15rem;
+      font-size: 0.65rem;
+    }
+    #resultsCards .result-value,
+    #resultsCards .result-card.primary .result-value { font-size: 1.2rem; }
+    #resultsCards .result-sub {
+      font-size: 0.68rem;
+      white-space: nowrap;
+    }
+    .reading-speed-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .reading-speed-card .result-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .reading-speed-inline {
+      display: grid;
+      grid-template-columns: 72px minmax(120px, 1fr);
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .reading-speed-inline .wpm-number {
+      width: 100%;
+      min-width: 0;
+    }
+    .reading-speed-inline input[type="range"] { width: 100%; }
     .stat-trio .result-card { padding: 0.85rem 0.9rem; }
     .stat-trio .result-value { font-size: 1.3rem; }
     .stat-trio .result-label { font-size: 0.7rem; margin-bottom: 0.2rem; }
@@ -290,24 +351,37 @@
     /* ── Empty state for results ── */
     .results-empty {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem 1rem;
+      justify-content: flex-start;
+      text-align: left;
+      padding: 0.6rem 0.75rem;
       color: var(--muted);
       background: rgba(255,255,255,0.02);
       border: 1px dashed var(--border);
       border-radius: var(--radius);
       gap: 0.5rem;
-      min-height: 240px;
+      min-height: 0;
     }
-    .results-empty .empty-icon { font-size: 2rem; }
-    .results-empty p           { margin: 0; font-size: 0.875rem; }
+    .results-empty .empty-icon { font-size: 1rem; }
+    .results-empty strong      { font-size: 0.8rem; }
+    .results-empty p           { display: none; }
 
     /* ── Keyword density table ── */
     .keywords-section { margin-top: 2rem; }
     .keywords-section h2 { font-size: 1.05rem; margin: 0 0 0.75rem; }
+    .keywords-heading-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .keywords-heading-row h2 { margin: 0; }
+    .keywords-heading-row .check {
+      margin-left: auto;
+      white-space: nowrap;
+    }
 
     .keywords-controls {
       display: flex;
@@ -365,6 +439,85 @@
       color: var(--muted);
       font-size: 0.875rem;
       font-style: italic;
+    }
+
+    /* Readability and text-structure guidance */
+    .analysis-intro {
+      max-width: 760px;
+      margin: -0.25rem 0 1rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+      line-height: 1.65;
+    }
+
+    .analysis-intro strong,
+    .metric-explanation strong { color: var(--text); }
+
+    .analysis-card-grid {
+      width: 100%;
+      grid-template-columns: repeat(4, minmax(90px, 1fr));
+      justify-content: start;
+      gap: 0.5rem;
+      overflow-x: auto;
+      overflow-y: visible;
+      padding: 0.15rem 0 0.35rem;
+    }
+
+    .readability-section { margin-top: 0.6rem; }
+    .readability-card {
+      position: relative;
+      min-width: 0;
+      padding: 0.4rem 0.5rem;
+      text-align: center;
+    }
+    .readability-card .result-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-bottom: 0.1rem;
+      font-size: 0.58rem;
+    }
+    .readability-card .result-value { font-size: 1rem; }
+    .readability-help {
+      display: inline-grid;
+      width: 0.85rem;
+      height: 0.85rem;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--accent);
+      font-size: 0.55rem;
+      line-height: 1;
+    }
+    .metric-explanation {
+      margin: 0.55rem 0 0;
+      color: var(--muted);
+      font-size: 0.775rem;
+      line-height: 1.55;
+    }
+
+    .structure-card + .structure-card { margin-top: 0.75rem; }
+
+    .structure-card canvas { margin-top: 0.65rem; }
+    #keyword-distribution-container {
+      padding: 0.35rem 0.5rem;
+    }
+    #keyword-distribution-container canvas {
+      margin-top: 0;
+      cursor: help;
+    }
+
+    .chart-hover-description {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     /* ── SEO / content ── */
@@ -466,10 +619,11 @@
       .tool-widget  { padding: 1.25rem; }
       .result-card.primary .result-value { font-size: 1.75rem; }
       .stat-trio    { grid-template-columns: 1fr 1fr; }
+      .analysis-card-grid { grid-template-columns: repeat(4, minmax(90px, 1fr)); }
     }
   </style>
-  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-14" />
-  <script src="/assets/js/ads.js" defer></script>
+  <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-14" />
+  <script src="/assets/js/shared/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
 
@@ -505,7 +659,7 @@
   ]
 }
   </script>
-  <link rel="stylesheet" href="/assets/css/trustpilot-review-collector.css?v=20260731-2">
+  <link rel="stylesheet" href="/assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
 </head>
 
 <body class="premium-tool-page counter-tool-page">
@@ -513,7 +667,7 @@
 
     <!-- HEADER -->
     <div id="mt-header"></div>
-    <script type="module" src="/static/wasm/menu.js?v=20260808-menu-assets-v1"></script>
+    <script type="module" src="/assets/wasm/menu/menu.js?v=20260808-menu-assets-v1"></script>
 
     <!-- HERO -->
     <section class="premium-tool-hero" aria-labelledby="tool-heading">
@@ -538,7 +692,7 @@
     <!-- COUNTER WIDGET -->
     <section class="counter-workspace-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <div class="premium-app-title counter-app-title"><div class="premium-section-kicker">01 / Analyze</div><h2 id="calc-heading">Add your text</h2><p>Paste or write content on the left and watch every metric update on the right.</p></div>
+        <div class="premium-app-title counter-app-title"><div class="premium-section-kicker">01 / Analyze</div><h2 id="calc-heading">Add your text</h2><p>Paste or write content and watch every metric update below.</p></div>
 
         <div class="calc-layout">
 
@@ -547,84 +701,59 @@
 
             <!-- Textarea -->
             <div class="input-group">
-              <label for="text-input">
-                Your Text
-                <span class="live-val" id="liveWords">0 words</span>
-              </label>
+              <div class="textarea-actions">
+                <button class="btn-ghost" id="clear-btn" type="button">Clear</button>
+                <button class="btn-ghost" id="copy-btn" type="button">Copy</button>
+                <button class="btn-ghost unscramble-btn" id="unscramble-selected-word" type="button">Unscramble</button>
+              </div>
               <textarea id="text-input"
                         placeholder="Paste or type your text here..."
                         aria-label="Text to analyse"></textarea>
-              <p class="input-hint">Counts update automatically as you type or paste.</p>
-            </div>
 
-            <!-- Reading speed -->
-            <div class="input-group">
-              <label for="wpmSlider">
-                Reading Speed
-                <span class="live-val" id="wpmVal">200 wpm</span>
-              </label>
-              <input type="range" id="wpmSlider"
-                     min="50" max="1000" step="10" value="200"
-                     aria-label="Reading speed slider" />
-              <div class="options-row">
-                <input type="number" id="wpm" class="wpm-number"
-                       min="50" max="1000" step="10" value="200"
-                       aria-label="Reading speed in words per minute" />
-                <label class="check">
-                  <input type="checkbox" id="exclude-stopwords" checked />
-                  Exclude common stopwords from keywords
-                </label>
+              <!-- Compact metrics strip -->
+              <div class="results-col" id="resultsCol" aria-live="polite">
+                <div id="resultsCards" style="display:grid;">
+                  <div class="result-card reading-speed-card">
+                    <label class="result-label" for="wpm">
+                      Reading Speed
+                      <span id="wpmVal">200 wpm</span>
+                    </label>
+                    <div class="reading-speed-inline">
+                      <input type="number" id="wpm" class="wpm-number"
+                             min="50" max="1000" step="10" value="200"
+                             aria-label="Reading speed in words per minute" />
+                      <input type="range" id="wpmSlider"
+                             min="50" max="1000" step="10" value="200"
+                             aria-label="Reading speed slider" />
+                    </div>
+                  </div>
+
+                  <div class="result-card primary">
+                    <div class="result-label">Words</div>
+                    <div class="result-value" id="resWords">0</div>
+                    <div class="result-sub" id="resWordsSub">— sentences · — paragraphs</div>
+                  </div>
+
+                  <div class="stat-trio">
+                    <div class="result-card">
+                      <div class="result-label">Characters</div>
+                      <div class="result-value" id="resChars">0</div>
+                    </div>
+                    <div class="result-card">
+                      <div class="result-label">No Spaces</div>
+                      <div class="result-value" id="resCharsNoSpaces">0</div>
+                    </div>
+                    <div class="result-card">
+                      <div class="result-label">Read Time</div>
+                      <div class="result-value" id="resReading">—</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p class="input-hint">Typical reading speeds: 150–180 for technical text, 200 average, 250–300 for skimmable web content.</p>
-            </div>
 
-            <div class="btn-row">
-              <button class="btn-calculate" id="clear-btn" type="button">
-                Clear text
-              </button>
-              <button class="btn-ghost" id="copy-btn" type="button">
-                Copy text
-              </button>
             </div>
 
           </div><!-- /inputs-col -->
-
-          <!-- ── RIGHT: RESULTS ── -->
-          <div class="results-col" id="resultsCol" aria-live="polite">
-
-            <!-- Empty state -->
-            <div class="results-empty" id="resultsEmpty">
-              <span class="empty-icon" aria-hidden="true">📝</span>
-              <strong>Your counts will appear here</strong>
-              <p>Start typing on the left to see word and character counts instantly.</p>
-            </div>
-
-            <!-- Results (hidden until text is entered) -->
-            <div id="resultsCards" style="display:none;">
-
-              <div class="result-card primary">
-                <div class="result-label">Words</div>
-                <div class="result-value" id="resWords">0</div>
-                <div class="result-sub" id="resWordsSub">— sentences · — paragraphs</div>
-              </div>
-
-              <div class="stat-trio">
-                <div class="result-card">
-                  <div class="result-label">Characters</div>
-                  <div class="result-value" id="resChars">0</div>
-                </div>
-                <div class="result-card">
-                  <div class="result-label">No Spaces</div>
-                  <div class="result-value" id="resCharsNoSpaces">0</div>
-                </div>
-                <div class="result-card">
-                  <div class="result-label">Read Time</div>
-                  <div class="result-value" id="resReading">—</div>
-                </div>
-              </div>
-
-            </div><!-- /resultsCards -->
-          </div><!-- /results-col -->
 
         </div><!-- /calc-layout -->
       </div><!-- /tool-widget -->
@@ -632,14 +761,20 @@
 
     <!-- KEYWORD DENSITY TABLE -->
     <section class="keywords-section" id="keywordsSection" style="display:none;" aria-labelledby="kw-heading">
-      <h2 id="kw-heading">Keyword Density</h2>
+      <div class="keywords-heading-row">
+        <h2 id="kw-heading">Keyword Density</h2>
+        <label class="check">
+          <input type="checkbox" id="exclude-stopwords" checked />
+          Exclude common stopwords from keywords
+        </label>
+      </div>
 
       <div class="keywords-controls">
         <span id="kwInfo">Top keywords in your text</span>
       </div>
 
       <div class="keywords-wrap">
-        <table class="keywords-table" aria-label="Keyword density">
+        <table class="keywords-table" id="keyword-density-table" aria-label="Keyword density">
           <thead>
             <tr>
               <th>Word</th>
@@ -713,6 +848,14 @@
         </li>
 
         <li class="faq-item">
+          <h3>What do the readability scores mean?</h3>
+          <p>Each score estimates the U.S. school grade level a reader may need. A score near 8
+             suggests eighth-grade reading difficulty; lower scores are generally easier. Treat the
+             four scores as a range, not a precise rating, and use several paragraphs for a more
+             useful estimate.</p>
+        </li>
+
+        <li class="faq-item">
           <h3>What does keyword density mean?</h3>
           <p>Keyword density is the percentage of total words that a given word represents. The
              list shows the most frequent words in your text, with common stopwords (the, and, of,
@@ -768,6 +911,24 @@
 
   </main>
 
+  <div id="unscramble-popup" class="result-card" role="dialog"
+       aria-labelledby="unscramble-popup-title" aria-describedby="unscramble-popup-status"
+       style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1000;width:min(92vw,520px);max-height:80vh;overflow:auto;background:var(--card-bg);box-shadow:var(--shadow-card);">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <h2 id="unscramble-popup-title" style="margin:0;font-size:1.05rem;">Unscramble</h2>
+      <button class="btn-ghost" id="unscramble-popup-close" type="button"
+              style="padding:0.35rem 0.65rem;" aria-label="Close unscramble results">&times;</button>
+    </div>
+    <p id="unscramble-popup-word" class="metric-explanation"></p>
+    <p id="unscramble-popup-status" class="metric-explanation" aria-live="polite"></p>
+    <div class="keywords-wrap" id="unscramble-popup-results" style="display:none;margin-top:0.75rem;">
+      <table class="keywords-table" aria-label="Unscrambled words and Scrabble scores">
+        <thead><tr><th>Word</th><th>Scrabble score</th></tr></thead>
+        <tbody id="unscramble-popup-body"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot">
     <div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div>
@@ -789,7 +950,8 @@
 
   <!-- COUNTER SCRIPT -->
   <script type="module">
-    import { analyzeText, humanizeReadingTime } from "/assets/js/word-counter.js";
+    import { analyzeText, humanizeReadingTime } from "/assets/js/tools/word-character-counter/word-counter.js";
+    import { initializeWordCounter } from "/assets/js/tools/word-character-counter/integration.js?v=20260809-19";
 
     /* ── Element refs ── */
     const textInput      = document.getElementById('text-input');
@@ -800,8 +962,6 @@
     const clearBtn       = document.getElementById('clear-btn');
     const copyBtn        = document.getElementById('copy-btn');
 
-    const liveWords      = document.getElementById('liveWords');
-    const resultsEmpty   = document.getElementById('resultsEmpty');
     const resultsCards   = document.getElementById('resultsCards');
     const resWords       = document.getElementById('resWords');
     const resWordsSub    = document.getElementById('resWordsSub');
@@ -843,19 +1003,7 @@
       const wpm  = parseInt(wpmInput.value, 10) || 200;
       const res  = analyzeText(text, { wpm, excludeStopwords: excludeStop.checked });
 
-      /* Always reflect live word count next to the label */
-      liveWords.textContent = res.words.toLocaleString() +
-        (res.words === 1 ? ' word' : ' words');
-
-      if (!text.trim()) {
-        resultsEmpty.style.display = 'flex';
-        resultsCards.style.display = 'none';
-        keywordsSection.style.display = 'none';
-        return;
-      }
-
-      resultsEmpty.style.display = 'none';
-      resultsCards.style.display = 'block';
+      resultsCards.style.display = 'grid';
 
       const sentences  = countSentences(text);
       const paragraphs = countParagraphs(text);
@@ -867,6 +1015,11 @@
       resChars.textContent         = res.characters.toLocaleString();
       resCharsNoSpaces.textContent = res.charactersNoSpaces.toLocaleString();
       resReading.textContent       = humanizeReadingTime(res.readingTimeSeconds);
+
+      if (!text.trim()) {
+        keywordsSection.style.display = 'none';
+        return;
+      }
 
       /* ── Keyword density table ── */
       const list = res.topWords.slice(0, 10);
@@ -913,6 +1066,7 @@
 
     /* ── Init ── */
     renderAnalysis();
+    initializeWordCounter();
   </script>
 
 </body>

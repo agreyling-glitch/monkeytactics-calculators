@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { clampPreviewPan, MAX_PREVIEW_ZOOM, MIN_PREVIEW_ZOOM, stepPreviewZoom, togglePreviewZoom } from "../src/utils/previewPan.ts";
+import { clampPreviewPan, MAX_PREVIEW_ZOOM, MIN_PREVIEW_ZOOM, stepPreviewZoom, togglePreviewZoom } from "../apps/qr-studio/src/utils/previewPan.ts";
 
 test("doubles the live-preview maximum zoom", () => {
   assert.equal(MAX_PREVIEW_ZOOM, 3.4);
