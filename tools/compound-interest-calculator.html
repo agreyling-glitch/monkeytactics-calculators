@@ -10,12 +10,15 @@
   <title>Compound Interest Calculator with Contributions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Free compound interest calculator with contributions, taxes, inflation, and year-by-year growth projections. Plan savings and investments instantly." />
+        content="Calculate compound interest with monthly contributions, five compounding frequencies, estimated taxes, inflation-adjusted results, charts, and yearly tables." />
 
-  <meta property="og:title"       content="Compound Interest Calculator — MonkeyTactics" />
-  <meta property="og:description" content="Calculate after-tax, inflation-adjusted investment growth with compound interest and regular contributions. Free and private." />
+  <meta property="og:title"       content="Compound Interest Calculator with Contributions | MonkeyTactics" />
+  <meta property="og:description" content="Project compound growth with regular contributions, tax estimates, inflation adjustment, interactive charts, and up to five scenarios." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/compound-interest-calculator" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Compound Interest Calculator with Contributions" />
+  <meta name="twitter:description" content="Compare compound growth scenarios with contributions, taxes, inflation, charts, and yearly results." />
   <link rel="canonical"           href="https://monkeytactics.com/tools/compound-interest-calculator" />
 
   <script type="application/ld+json">
@@ -24,7 +27,7 @@
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home",    "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Finance", "item": "https://monkeytactics.com/tools/finance" },
+      { "@type": "ListItem", "position": 2, "name": "Calculators", "item": "https://monkeytactics.com/tools/" },
       { "@type": "ListItem", "position": 3, "name": "Compound Interest Calculator", "item": "https://monkeytactics.com/tools/compound-interest-calculator" }
     ]
   }
@@ -43,22 +46,42 @@
       {
         "@type": "Question",
         "name": "Does this calculator account for taxes?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enter your tax rate and the calculator will apply it to each year's interest, showing your real after-tax balance. For example, at a 25% tax rate, only 75% of each year's interest is retained and continues compounding. The growth table shows both nominal and after-tax balances side by side." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. The optional tax rate is applied to each year's modeled gross interest. The calculator shows an after-tax nominal balance, an inflation-adjusted real balance, estimated tax paid, and gross and net interest. This simplified estimate does not model account-specific tax rules." }
       },
       {
         "@type": "Question",
-        "name": "Does this calculator account for inflation?",
+        "name": "How does inflation affect the results?",
         "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enter an expected inflation rate and the calculator will display your inflation-adjusted (real) balance — the purchasing power equivalent in today's dollars. A balance of $100,000 in 20 years at 3% inflation is only worth about $55,000 in today's money. The growth table shows real values so you can see exactly how inflation erodes purchasing power over time." }
       },
       {
         "@type": "Question",
         "name": "What is the compound interest formula?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The compound interest formula is A = P(1 + r/n)^(nt), where A is the final amount, P is the principal, r is the annual interest rate as a decimal, n is the number of compounding periods per year, and t is the time in years. With regular contributions, each contribution is also compounded for its remaining time. Tax is applied by reducing each period's earned interest by (1 - tax rate) before it is added to the balance." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Without contributions, compound growth is A = P(1 + r/n)^(nt). With contributions, this calculator annualizes the monthly amount, divides it evenly among the selected compounding periods, and adds each portion at the end of its period. Optional tax is deducted from modeled gross interest annually." }
       },
       {
         "@type": "Question",
         "name": "What is the Rule of 72?",
         "acceptedAnswer": { "@type": "Answer", "text": "The Rule of 72 is a quick shortcut: divide 72 by your annual interest rate to estimate how many years it takes to double your money. At 6% interest, your money doubles in approximately 12 years (72 / 6). It works best for rates between 3% and 15%." }
+      },
+      {
+        "@type": "Question",
+        "name": "How are monthly contributions calculated?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The calculator multiplies the monthly contribution by 12 and divides that annual amount evenly among the selected compounding periods. Each portion is added at the end of its period, matching the convention used by the Investor.gov compound interest calculator." }
+      },
+      {
+        "@type": "Question",
+        "name": "What compounding frequency should I use?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Choose the frequency stated by the account or product you are modeling. Daily and monthly compounding produce slightly different results because interest is credited at different intervals. Market investments do not earn a guaranteed fixed rate, so the selection is only a planning assumption for them." }
+      },
+      {
+        "@type": "Question",
+        "name": "Why might another compound interest calculator show a different result?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Results can differ because calculators use different contribution timing, compounding, tax, inflation, rounding, and deposit conventions. For an apples-to-apples comparison, match every input and set tax and inflation to 0% when the other calculator does not model them." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my data kept private?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Calculations run locally in your browser using the shared Rust and WebAssembly finance engine. Inputs are not sent to a calculation server, and saved comparison scenarios last only for the current page session." }
       }
     ]
   }
@@ -137,7 +160,6 @@
     .result-card.blue   .result-value  { color: #93c5fd; }
     .result-card.purple .result-value  { color: #c4b5fd; }
     .result-sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
-
     /* Results 2-col grid for secondary cards */
     .results-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
@@ -229,11 +251,49 @@
     @media print {
       body.print-growth { background: #ffffff; color: #111111; }
       body.print-growth main > * { display: none !important; }
+      body.print-growth main > #compoundPrintReport,
       body.print-growth main > #growthSection { display: block !important; }
-      body.print-growth footer,
+      body.print-growth > footer,
       body.print-growth .growth-controls,
-      body.print-growth .growth-actions { display: none !important; }
-      body.print-growth #growthSection { margin: 0; color: #111111; }
+      body.print-growth .growth-actions,
+      body.print-growth .review-collector__intro,
+      body.print-growth .trustpilot-review-link { display: none !important; }
+      body.print-growth #compoundPrintReport { margin: 0 0 0.22in; color: #111111; }
+      body.print-growth #compoundPrintReport h1,
+      body.print-growth #compoundPrintReport h2 { color: #111111; }
+      body.print-growth #compoundPrintReport .compound-chart-grid { grid-template-columns: 1fr 1fr; gap: 0.12in; }
+      body.print-growth #compoundPrintReport .compound-chart-wide { grid-column: 1 / -1; }
+      body.print-growth #compoundPrintReport .compound-chart-card { break-inside: avoid; padding: 0.1in; border-color: #aaaaaa; background: #ffffff !important; }
+      body.print-growth #compoundPrintReport .compound-chart { min-height: 0; }
+      body.print-growth #compoundPrintReport .compound-chart svg { max-height: 2.5in; }
+      body.print-growth #compoundPrintReport .compound-chart-gridline { stroke: #dddddd; }
+      body.print-growth #compoundPrintReport .compound-chart-axis,
+      body.print-growth #compoundPrintReport .compound-chart-label,
+      body.print-growth #compoundPrintReport .compound-chart-value { fill: #222222; }
+      body.print-growth #compoundPrintReport figcaption { color: #333333; }
+      body.print-growth .compound-print-url {
+        display: block !important;
+        break-inside: avoid;
+        margin-top: 0.14in;
+        padding-top: 0.1in;
+        border-top: 1px solid #9dada4;
+        color: #263a2f;
+        font-size: 8pt;
+      }
+      body.print-growth .compound-print-url strong,
+      body.print-growth .compound-print-url b,
+      body.print-growth .compound-print-url span,
+      body.print-growth .compound-print-url small { display: block; }
+      body.print-growth .compound-print-url strong { margin-bottom: 0.04in; color: #152019; letter-spacing: 0.06em; text-transform: uppercase; }
+      body.print-growth .compound-print-url b { margin-bottom: 0.025in; }
+      body.print-growth .compound-print-url span { overflow-wrap: anywhere; color: #176d39; font-family: monospace; font-size: 8.5pt; }
+      body.print-growth .compound-print-url small { margin-top: 0.05in; color: #5b6c62; }
+      body.print-growth #growthSection {
+        margin: 0;
+        color: #111111;
+        break-before: page;
+        page-break-before: always;
+      }
       body.print-growth #growthSection h2 { color: #111111; }
       body.print-growth .growth-wrap { overflow: visible; border-color: #aaaaaa; }
       body.print-growth .growth-table { min-width: 0; color: #111111; }
@@ -256,10 +316,10 @@
       .result-card.primary .result-value { font-size: 1.75rem; }
     }
   </style>
-  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260807-17" />
+  <link rel="stylesheet" href="/assets/css/premium-tool.css?v=20260809-interactive-5" />
   <script src="/assets/js/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-22" />
+  <meta name="date" content="2026-08-09" />
 
   <script type="application/ld+json">
 {
@@ -267,10 +327,10 @@
   "@graph": [
     {
       "@type": "WebApplication",
-      "@id": "https://monkeytactics.com/tools/compound-interest-calculator.html#app",
-      "name": "Compound Interest Calculator",
-      "url": "https://monkeytactics.com/tools/compound-interest-calculator.html",
-      "description": "Model compound interest, contributions, taxes, and inflation assumptions.",
+      "@id": "https://monkeytactics.com/tools/compound-interest-calculator#app",
+      "name": "Compound Interest Calculator with Contributions",
+      "url": "https://monkeytactics.com/tools/compound-interest-calculator",
+      "description": "Calculate compound growth with regular contributions, multiple compounding frequencies, estimated taxes, inflation adjustment, scenario comparisons, charts, and year-by-year tables.",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Any",
       "isAccessibleForFree": true,
@@ -288,7 +348,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-08-05"
+      "dateModified": "2026-08-09"
     }
   ]
 }
@@ -312,18 +372,18 @@
       </nav>
       <div class="premium-hero-grid">
         <div>
-          <div class="premium-eyebrow">See how time turns consistency into growth</div>
+          <div class="premium-eyebrow">Project savings and investment growth</div>
           <h1 id="tool-heading">Compound Interest Calculator</h1>
-          <p>Model savings and investment growth with regular contributions, tax on gains, and inflation. Compare headline returns with their real purchasing power.</p>
+          <p>Calculate compound interest with monthly contributions and daily, monthly, quarterly, semiannual, or annual compounding. Compare nominal growth, inflation-adjusted purchasing power, and optional estimated tax drag.</p>
           <div class="premium-hero-pills" aria-label="Tool highlights">
             <span>Tax &amp; inflation aware</span>
             <span>Year-by-year projections</span>
           </div>
         </div>
         <aside class="premium-hero-stat" aria-label="Compound interest calculator summary">
-          <span>Growth is a long conversation</span>
-          <strong>Let every year answer back</strong>
-          <small>Contributions, returns, and purchasing power in one view.</small>
+          <span>Interactive scenario planning</span>
+          <strong>Compare up to five projections</strong>
+          <small>Adjust assumptions, inspect charts, and export year-by-year results.</small>
         </aside>
       </div>
     </section>
@@ -333,8 +393,8 @@
       <div class="tool-widget">
         <div class="premium-app-title compound-app-title">
           <div class="premium-section-kicker">01 / Project</div>
-          <h2 id="calc-heading">Build your growth scenario</h2>
-          <p>Set the starting balance, contribution rhythm, return assumptions, and time horizon.</p>
+          <h2 id="calc-heading">Calculate compound interest growth</h2>
+          <p>Enter a starting balance, monthly contribution, annual rate, compounding frequency, and time horizon. Results update automatically.</p>
         </div>
 
         <div class="calc-layout">
@@ -352,8 +412,8 @@
 
             <div class="input-group">
               <label for="annualRate">Annual Interest Rate <span class="live-val" id="annualRateVal">7.00%</span></label>
-              <input type="range" id="annualRateSlider" min="0.1" max="25" step="0.1" value="7" />
-              <input type="number" id="annualRate" min="0.01" max="100" step="0.01" value="7" />
+              <input type="range" id="annualRateSlider" min="0" max="25" step="0.1" value="7" />
+              <input type="number" id="annualRate" min="0" max="100" step="0.01" value="7" />
               <p class="input-hint">Expected annual return or interest rate (gross, before tax).</p>
             </div>
 
@@ -366,11 +426,11 @@
             <div class="input-group">
               <label for="compoundFreq">Compounding Frequency</label>
               <select id="compoundFreq">
-                <option value="365">📅 Daily (365×/year)</option>
-                <option value="12" selected>📆 Monthly (12×/year)</option>
-                <option value="4">🗓️ Quarterly (4×/year)</option>
-                <option value="2">📊 Semi-annually (2×/year)</option>
-                <option value="1">📈 Annually (1×/year)</option>
+                <option value="365">Daily (365 times/year)</option>
+                <option value="12" selected>Monthly (12 times/year)</option>
+                <option value="4">Quarterly (4 times/year)</option>
+                <option value="2">Semiannually (2 times/year)</option>
+                <option value="1">Annually (1 time/year)</option>
               </select>
               <p class="input-hint">How often interest is calculated and added to your balance.</p>
             </div>
@@ -379,7 +439,7 @@
               <label for="monthlyContrib">Monthly Contribution <span class="live-val" id="monthlyContribVal">$200</span></label>
               <input type="range" id="monthlyContribSlider" min="0" max="5000" step="25" value="200" />
               <input type="number" id="monthlyContrib" min="0" step="25" value="200" />
-              <p class="input-hint">Amount added each month. Set to $0 for no contributions.</p>
+              <p class="input-hint">Annualized and spread evenly across the selected compounding periods. Set to $0 for none.</p>
             </div>
 
             <hr class="form-divider" />
@@ -387,10 +447,10 @@
 
             <div class="input-row-2">
               <div class="input-group">
-                <label for="taxRate">Tax Rate on Gains <span class="live-val" id="taxRateVal">25%</span></label>
-                <input type="range" id="taxRateSlider" min="0" max="55" step="1" value="25" />
-                <input type="number" id="taxRate" min="0" max="100" step="1" value="25" />
-                <p class="input-hint">Applied to each year's interest. Set to 0% to ignore.</p>
+                <label for="taxRate">Tax Rate on Gains <span class="live-val" id="taxRateVal">0%</span></label>
+                <input type="range" id="taxRateSlider" min="0" max="55" step="1" value="0" />
+                <input type="number" id="taxRate" min="0" max="100" step="1" value="0" />
+                <p class="input-hint">Optional. Applied to each year's interest; leave at 0% for a pre-tax projection.</p>
               </div>
               <div class="input-group">
                 <label for="inflationRate">Inflation Rate <span class="live-val" id="inflationRateVal">3%</span></label>
@@ -401,10 +461,10 @@
             </div>
 
             <div class="calc-error" id="calcError" role="alert">
-              ⚠️ Please enter a valid interest rate greater than 0% and a period of at least 1 year.
+              ⚠️ Review the inputs and enter values within the displayed ranges.
             </div>
 
-            <button class="btn-calculate" id="calcBtn" type="button">Calculate Growth</button>
+            <div class="compound-primary-actions"><button class="btn-growth-action" id="addScenarioBtn" type="button">Add scenario</button></div>
           </div>
 
           <!-- RESULTS -->
@@ -413,22 +473,21 @@
             <div class="results-empty" id="resultsEmpty">
               <span class="empty-icon" aria-hidden="true">📈</span>
               <strong>Your results will appear here</strong>
-              <p>Enter your investment details and click Calculate.</p>
+              <p>Adjust the investment parameters to update this projection.</p>
             </div>
 
             <div id="resultsCards" style="display:none; flex-direction:column; gap:0.85rem;">
-
               <!-- Nominal final balance -->
               <div class="result-card primary">
-                <div class="result-label">Nominal Final Balance</div>
+                <div class="result-label">Projected Balance</div>
                 <div class="result-value" id="resFinal">—</div>
-                <div class="result-sub">After-tax balance · before inflation</div>
+                <div class="result-sub">After estimated tax · before inflation</div>
               </div>
 
               <!-- After-tax + inflation-adjusted side by side -->
               <div class="results-secondary">
                 <div class="result-card amber">
-                  <div class="result-label">Real Balance (Today's $)</div>
+                  <div class="result-label">Real Balance (Today's Dollars)</div>
                   <div class="result-value" id="resReal">—</div>
                   <div class="result-sub">Inflation-adjusted purchasing power</div>
                 </div>
@@ -442,12 +501,12 @@
               <!-- Interest + tax side by side -->
               <div class="results-secondary">
                 <div class="result-card">
-                  <div class="result-label">Interest Earned</div>
+                  <div class="result-label">Net Interest Earned</div>
                   <div class="result-value" id="resInterest">—</div>
                   <div class="result-sub" id="resROI">—% ROI</div>
                 </div>
                 <div class="result-card purple">
-                  <div class="result-label">Total Tax Paid</div>
+                  <div class="result-label">Estimated Tax on Interest</div>
                   <div class="result-value" id="resTax">—</div>
                   <div class="result-sub" id="resTaxSub">on interest gains</div>
                 </div>
@@ -474,24 +533,84 @@
                 (before tax &amp; inflation).
               </div>
 
+              <!-- Copy link -->
+              <div class="share-line" id="shareLine">
+                <button class="btn-copy-link" id="copyLinkBtn" type="button">🔗 Copy bookmarkable link</button>
+                <span class="copy-confirm" id="copyConfirm">✅ Link copied!</span>
+              </div>
+
             </div>
           </div>
 
         </div>
 
-        <!-- Copy link -->
-        <div class="share-line" id="shareLine">
-          <button class="btn-copy-link" id="copyLinkBtn" type="button">🔗 Copy bookmarkable link</button>
-          <span class="copy-confirm" id="copyConfirm">✅ Link copied!</span>
-        </div>
-
       </div>
+    </section>
+
+    <section class="compound-scenarios-section" id="compoundScenariosSection" aria-labelledby="compound-scenarios-heading">
+      <div class="compound-section-heading">
+        <div><span class="premium-section-kicker">02 / Compare</span><h2 id="compound-scenarios-heading">Saved Growth Scenarios</h2><p>Save up to five plans to compare rates, contribution levels, time horizons, taxes, and inflation assumptions.</p></div>
+        <button class="btn-copy-link" id="clearCompoundScenarios" type="button" hidden>Clear saved</button>
+      </div>
+      <div class="compound-scenario-list" id="compoundScenarioList" aria-live="polite"><p class="compound-scenario-empty">No saved scenarios yet.</p></div>
+      <div class="compound-comparison-wrap" id="compoundComparisonWrap" hidden>
+        <table class="growth-table compound-comparison-table" aria-label="Compound interest scenario comparison">
+          <thead><tr><th>Scenario</th><th>Final balance</th><th>Real balance</th><th>Contributions</th><th>Net interest</th><th>Tax paid</th></tr></thead>
+          <tbody id="compoundComparisonBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="compound-charts-section" id="compoundChartsSection" aria-labelledby="compound-charts-heading" hidden>
+      <span class="premium-section-kicker">03 / Visualize</span>
+      <h2 id="compound-charts-heading">Growth Charts</h2>
+      <div class="compound-chart-grid">
+        <figure class="compound-chart-card compound-chart-wide compound-interactive-chart-card">
+          <div class="compound-chart-title"><strong>Interactive balance growth</strong><button class="btn-growth-action compound-chart-reset" id="compoundChartReset" type="button">Reset zoom</button></div>
+          <div class="compound-chart-controls" id="compoundChartControls" role="group" aria-label="Chart data layers">
+            <label class="compound-chart-toggle compound-toggle-nominal"><input type="checkbox" data-chart-layer="nominal" checked><i aria-hidden="true"></i>Nominal balance</label>
+            <label class="compound-chart-toggle compound-toggle-real"><input type="checkbox" data-chart-layer="real" checked><i aria-hidden="true"></i>Real balance + inflation erosion</label>
+            <label class="compound-chart-toggle compound-toggle-composition"><input type="checkbox" data-chart-layer="composition" checked><i aria-hidden="true"></i>Contributions vs net interest</label>
+            <label class="compound-chart-toggle compound-toggle-tax"><input type="checkbox" data-chart-layer="tax" checked><i aria-hidden="true"></i>Tax impact</label>
+            <div class="compound-chart-scenario-toggles" id="compoundChartScenarioToggles" aria-label="Visible scenarios"></div>
+          </div>
+          <div class="compound-chart-stage" id="compoundChartStage">
+            <div class="compound-chart compound-interactive-chart" id="compoundGrowthChart" role="img" aria-label="Interactive compound interest balance growth by scenario"></div>
+            <div class="compound-chart-tooltip" id="compoundChartTooltip" role="status" hidden></div>
+            <aside class="compound-chart-pin" id="compoundChartPin" aria-live="polite" hidden></aside>
+          </div>
+          <div class="compound-yearly-chart-heading"><strong>Yearly net interest</strong><span>Aligned with the visible year range</span></div>
+          <div class="compound-yearly-growth-chart" id="compoundYearlyGrowthChart" role="img" aria-label="Net interest earned per year"></div>
+          <figcaption>Hover for all values, click to pin a year, use the mouse wheel to zoom, and drag horizontally to pan.</figcaption>
+        </figure>
+        <figure class="compound-chart-card"><div class="compound-chart-title"><strong>Ending balance comparison</strong></div><div class="compound-chart compound-chart-short" id="compoundEndingChart" role="img" aria-label="Ending balance comparison by scenario"></div><figcaption>Compare the projected after-tax ending balance for each saved scenario.</figcaption></figure>
+        <figure class="compound-chart-card"><div class="compound-chart-title"><strong>Contributions vs net interest</strong></div><div class="compound-chart compound-chart-short" id="compoundCompositionChart" role="img" aria-label="Contribution and net interest composition by scenario"></div><figcaption>See how much of each ending balance comes from deposited money versus net investment growth.</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="compound-print-report" id="compoundPrintReport" aria-label="Printable compound interest scenario report">
+      <div class="compound-print-heading"><span>MonkeyTactics</span><h1 id="compoundPrintTitle">Compound Interest Report</h1><p id="compoundPrintAssumptions"></p></div>
+      <div class="compound-print-summary" id="compoundPrintSummary"></div>
+      <h2>Scenario graphs</h2>
+      <div class="compound-chart-grid">
+        <figure class="compound-chart-card compound-chart-wide"><div class="compound-chart-title"><strong>Balance growth over time</strong><div class="compound-chart-legend" id="compoundPrintLegend"></div></div><div class="compound-chart" id="compoundPrintGrowthChart"></div><figcaption>Nominal balance is solid; inflation-adjusted balance is dashed.</figcaption></figure>
+        <figure class="compound-chart-card"><div class="compound-chart-title"><strong>Ending balance</strong></div><div class="compound-chart compound-chart-short" id="compoundPrintEndingChart"></div></figure>
+        <figure class="compound-chart-card"><div class="compound-chart-title"><strong>Contributions vs net interest</strong></div><div class="compound-chart compound-chart-short" id="compoundPrintCompositionChart"></div></figure>
+      </div>
+      <footer class="compound-print-url" aria-label="Printed compound interest scenario link">
+        <strong>Scenario URL</strong>
+        <b id="compoundPrintUrlScenario">Scenario</b>
+        <span id="compoundPrintScenarioUrl"></span>
+        <small>Reopen this exact compound interest scenario at MonkeyTactics. The parameters are generated and displayed locally.</small>
+      </footer>
     </section>
 
     <!-- GROWTH TABLE -->
     <section class="growth-section" id="growthSection" style="display:none;" aria-labelledby="growth-heading">
       <h2 id="growth-heading">Year-by-Year Growth</h2>
       <div class="growth-controls">
+        <label id="printScenarioControl" for="printScenarioSelect">Print scenario:</label>
+        <select id="printScenarioSelect" aria-label="Scenario to print"></select>
         <label for="tableView">Show:</label>
         <select id="tableView">
           <option value="nominal">Nominal (before inflation)</option>
@@ -531,30 +650,33 @@
       <h2>How to use this calculator</h2>
       <p>Enter your <strong>initial investment</strong>, <strong>annual interest rate</strong>,
          <strong>investment period</strong>, and optionally a <strong>monthly contribution</strong>.
-         Choose how frequently interest is compounded — monthly is standard for most accounts.</p>
-      <p>For a more realistic picture, add a <strong>tax rate</strong> (applied to each year's
-         interest before it continues compounding) and an <strong>inflation rate</strong>
-         (used to convert the nominal balance into today's purchasing power equivalent).
-         The results and growth table update to show all four views: gross, after-tax,
-         real, and real after-tax. Use the growth schedule actions to print the selected view
-         or download its complete year-by-year data as a paginated PDF, CSV, or aligned plain text.</p>
+         Choose the compounding frequency stated by the account or financial product you want to model.</p>
+      <p>Leave the optional <strong>tax rate</strong> at 0% for a pre-tax projection, or enter a flat
+         estimated rate to model annual tax drag. The <strong>inflation rate</strong> converts the projected
+         balance into today's purchasing power. Results include after-tax nominal and real balances,
+         contributions, net interest, estimated tax, interactive charts, and a year-by-year table.</p>
+      <p>Save up to five scenarios to compare different rates, contribution amounts, time horizons,
+         tax assumptions, and inflation assumptions. Select any saved scenario to edit it, print it,
+         or export its yearly data as PDF, CSV, or plain text.</p>
     </div>
 
     <!-- FORMULA -->
     <div class="seo-section">
       <h2>How are tax and inflation applied?</h2>
-      <p>The calculator runs a year-by-year simulation. Each year:</p>
+      <p>The calculator processes growth at the selected compounding frequency and summarizes the results annually:</p>
       <div class="formula-block">
-Gross interest = balance × ((1 + r/n)^n − 1)
-Tax paid       = gross interest × tax rate
-Net interest   = gross interest − tax paid
-Balance        = balance + net interest + (monthly contribution × 12)
-Real balance   = nominal balance ÷ (1 + inflation rate)^year
+Periodic rate         = annual rate ÷ compounding periods
+Periodic contribution = monthly contribution × 12 ÷ compounding periods
+Periodic balance      = prior balance × (1 + periodic rate) + periodic contribution
+Annual tax paid       = annual gross interest × tax rate
+Real balance          = nominal balance ÷ (1 + inflation rate)^year
       </div>
-      <p>This means tax reduces the amount that continues compounding each year — accurately
-         modelling a taxable account. The real balance converts your nominal balance into
-         today's dollars so you can see true purchasing power, not just a nominal number
-         inflated by years of price rises.</p>
+      <p>The contribution convention matches Investor.gov: the annualized monthly contribution is
+         divided evenly among the selected compounding periods and added at each period's end.
+         Optional tax is estimated once per year from modeled gross interest. This simplified tax
+         treatment does not account for tax brackets, allowances, account types, or jurisdiction-specific rules.</p>
+      <p>The real balance divides the after-tax nominal balance by cumulative inflation. It is an estimate
+         of future purchasing power in today's dollars, not a forecast of actual prices or investment returns.</p>
     </div>
 
     <!-- FAQ -->
@@ -568,24 +690,39 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
           <h3>What is compound interest?</h3>
           <p>Compound interest is interest calculated on both the initial principal and all
              previously earned interest. Unlike simple interest — which earns only on the original
-             amount — compound interest grows exponentially. Starting earlier matters enormously:
-             10 years of extra compounding can more than double a final balance.</p>
+             amount — compound interest can accelerate growth over time. The outcome still depends
+             on the rate, contribution timing, fees, taxes, withdrawals, and actual returns.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>How are monthly contributions calculated?</h3>
+          <p>The calculator multiplies the monthly contribution by 12 and divides that annual amount
+             evenly among the selected compounding periods. Each portion is added at the end of its
+             period, matching the convention used by the Investor.gov compound interest calculator.</p>
         </li>
 
         <li class="faq-item">
           <h3>Does this calculator account for taxes?</h3>
-          <p>Yes. Enter your tax rate and each year's interest is reduced by that percentage before
-             it is added to your balance. This means less interest continues compounding — accurately
-             reflecting a taxable brokerage or savings account. Set the tax rate to 0% to model a
-             tax-advantaged account such as a Roth IRA or ISA.</p>
+          <p>Yes. The optional tax rate is applied to each year's modeled gross interest. The result
+             shows an after-tax nominal balance, an inflation-adjusted real balance, estimated tax paid,
+             and gross and net interest. Set the rate to 0% when you do not want to model annual tax.
+             Actual tax treatment depends on the account, investment, holding period, and jurisdiction.</p>
         </li>
 
         <li class="faq-item">
           <h3>How does inflation affect the results?</h3>
           <p>Inflation erodes purchasing power over time. A balance of $100,000 in 20 years at 3%
              inflation is only worth about $55,000 in today's dollars. Enter your expected inflation
-             rate and the "Real Balance" result — and the real column in the growth table — show
+             rate and the "Real Balance" result — and the real column in the growth table — shows
              your balance expressed in today's purchasing power so you can set realistic goals.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>What is the compound interest formula?</h3>
+          <p>Without contributions, the standard formula is A = P(1 + r/n)<sup>nt</sup>, where P is
+             principal, r is the annual rate as a decimal, n is compounding periods per year, and t is
+             years. With contributions, each periodic deposit compounds only for the time remaining
+             after it is added.</p>
         </li>
 
         <li class="faq-item">
@@ -598,16 +735,24 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
 
         <li class="faq-item">
           <h3>What compounding frequency should I use?</h3>
-          <p>Use the frequency that matches your actual account. Most high-yield savings accounts
-             compound daily or monthly. Investment accounts (stocks, ETFs) effectively compound
-             continuously, but monthly is a good approximation. The difference between daily and
-             monthly compounding is usually less than 0.1% per year at typical rates.</p>
+          <p>Use the frequency stated by the account or product you are modeling. Daily and monthly
+             compounding produce slightly different results because interest is credited at different
+             intervals. Stocks and ETFs do not earn a guaranteed fixed rate, so any frequency and return
+             entered for market investments is only a planning assumption.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Why might another compound interest calculator show a different result?</h3>
+          <p>Calculators can use different contribution timing, compounding, tax, inflation, rounding,
+             and deposit conventions. For an apples-to-apples comparison, match every shared input and
+             set tax and inflation to 0% when the other calculator does not include them.</p>
         </li>
 
         <li class="faq-item">
           <h3>Is my data kept private?</h3>
-          <p>Yes — all calculations run entirely in your browser using JavaScript. Nothing you
-             enter is sent to any server or stored anywhere. See our
+          <p>Yes — calculations run locally in your browser using the shared Rust and WebAssembly
+             finance engine. Inputs are not sent to a calculation server, and saved comparison scenarios
+             last only for the current page session. See our
              <a href="/privacy" style="color:var(--accent)">Privacy Policy</a> for details.</p>
         </li>
 
@@ -617,11 +762,11 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
     </section>
 
     <section class="seo-section methodology" aria-labelledby="methodology-heading">
-      <h4 id="methodology-heading">Methodology & Limitations</h4>
-      <p class="disclaimer">This model applies the entered nominal annual rate and compounding frequency, then adds monthly contributions as an annual total at the end of each simulated year. Tax is an illustrative percentage of each year's calculated interest; inflation converts the resulting nominal balance into an estimated value in today's purchasing power.</p>
+      <h2 id="methodology-heading">Methodology and limitations</h2>
+      <p class="disclaimer">This model follows the Investor.gov convention: it divides the annualized monthly contribution evenly among the selected compounding periods and applies each portion at the end of its period. Tax is an illustrative percentage of each year's calculated interest; inflation converts the resulting nominal balance into an estimated value in today's purchasing power.</p>
       <p class="disclaimer"><strong>Limitations:</strong> Results are estimates for planning, not investment, tax, or financial advice. Actual returns, timing of deposits, taxes, fees, inflation, and account rules can differ.</p>
       <p class="disclaimer"><strong>Source:</strong> <a href="https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator">U.S. Securities and Exchange Commission: Compound Interest Calculator</a>.</p>
-      <p class="disclaimer">Prepared and reviewed by MonkeyTactics. Last reviewed <time datetime="2026-07-22">2026-07-22</time>.</p>
+      <p class="disclaimer">Prepared and reviewed by MonkeyTactics. Last reviewed <time datetime="2026-08-09">August 9, 2026</time>.</p>
     </section>
 
     <!-- RELATED -->
@@ -666,412 +811,7 @@ Real balance   = nominal balance ÷ (1 + inflation rate)^year
   </footer>
 
   <script src="/assets/js/calculator-pdf.js?v=20260805-2"></script>
-  <script>
-  (function () {
-
-    /* ── Refs ── */
-    const $ = function(id) { return document.getElementById(id); };
-
-    const principalInput       = $('principal');
-    const principalSlider      = $('principalSlider');
-    const principalVal         = $('principalVal');
-    const annualRateInput      = $('annualRate');
-    const annualRateSlider     = $('annualRateSlider');
-    const annualRateVal        = $('annualRateVal');
-    const yearsInput           = $('years');
-    const yearsSlider          = $('yearsSlider');
-    const yearsVal             = $('yearsVal');
-    const compoundFreqSelect   = $('compoundFreq');
-    const monthlyContribInput  = $('monthlyContrib');
-    const monthlyContribSlider = $('monthlyContribSlider');
-    const monthlyContribVal    = $('monthlyContribVal');
-    const taxRateInput         = $('taxRate');
-    const taxRateSlider        = $('taxRateSlider');
-    const taxRateVal           = $('taxRateVal');
-    const inflationRateInput   = $('inflationRate');
-    const inflationRateSlider  = $('inflationRateSlider');
-    const inflationRateVal     = $('inflationRateVal');
-
-    const calcBtn    = $('calcBtn');
-    const calcError  = $('calcError');
-    const resultsEmpty  = $('resultsEmpty');
-    const resultsCards  = $('resultsCards');
-
-    const resFinal   = $('resFinal');
-    const resReal    = $('resReal');
-    const resContribs= $('resContribs');
-    const resInterest= $('resInterest');
-    const resROI     = $('resROI');
-    const resTax     = $('resTax');
-    const resTaxSub  = $('resTaxSub');
-    const barPrincipal=$('barPrincipal');
-    const barContrib = $('barContrib');
-    const barInterest= $('barInterest');
-    const pctPrincipal=$('pctPrincipal');
-    const pctContrib = $('pctContrib');
-    const pctInterest= $('pctInterest');
-    const r72Rate    = $('r72Rate');
-    const r72Years   = $('r72Years');
-    const shareLine  = $('shareLine');
-    const copyLinkBtn= $('copyLinkBtn');
-    const copyConfirm= $('copyConfirm');
-    const growthSection= $('growthSection');
-    const growthHead = $('growthHead');
-    const growthBody = $('growthBody');
-    const tableView  = $('tableView');
-    const growthPrintBtn = $('growthPrintBtn');
-    const growthPdfBtn = $('growthPdfBtn');
-    const growthPdfConfirm = $('growthPdfConfirm');
-    const growthCsvBtn = $('growthCsvBtn');
-    const growthTxtBtn = $('growthTxtBtn');
-
-    /* ── State ── */
-    let yearlyData = [];
-
-    /* ── Formatters ── */
-    function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
-    function fmtD(n) { return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
-
-    /* ── Slider sync ── */
-    function sync(slider, input, display, formatter) {
-      function update(v) { display.textContent = formatter(v); }
-      slider.addEventListener('input', function() { input.value = slider.value; update(parseFloat(slider.value)); });
-      input.addEventListener('input',  function() { var v = parseFloat(input.value); if (!isNaN(v)) { slider.value = v; update(v); }});
-    }
-
-    sync(principalSlider,       principalInput,       principalVal,      function(v){ return '$' + Math.round(v).toLocaleString(); });
-    sync(annualRateSlider,      annualRateInput,      annualRateVal,     function(v){ return v.toFixed(2) + '%'; });
-    sync(yearsSlider,           yearsInput,           yearsVal,          function(v){ return Math.round(v) + (Math.round(v)===1?' year':' years'); });
-    sync(monthlyContribSlider,  monthlyContribInput,  monthlyContribVal, function(v){ return '$' + Math.round(v).toLocaleString(); });
-    sync(taxRateSlider,         taxRateInput,         taxRateVal,        function(v){ return Math.round(v) + '%'; });
-    sync(inflationRateSlider,   inflationRateInput,   inflationRateVal,  function(v){ return v.toFixed(1) + '%'; });
-
-    /* ══════════════════════════════════════════
-       CORE CALCULATION ENGINE
-       Year-by-year simulation with:
-       - Compounding via (1 + r/n)^n per year
-       - Monthly contributions added annually
-       - Tax applied to each year's gross interest
-       - Real balance = nominal / (1+inflation)^t
-    ══════════════════════════════════════════ */
-    function calculate(P, rate, T, n, contrib, taxRate, inflation) {
-      var data = [];
-      var balance = P;
-      var totalContribs = P;
-      var totalGrossInterest = 0;
-      var totalTax = 0;
-
-      var annualGrowthFactor = Math.pow(1 + rate / 100 / n, n);
-      var annualContrib = contrib * 12;
-
-      for (var y = 1; y <= T; y++) {
-        var openingBalance = balance;
-
-        // Gross interest for the year
-        var grossInterest = balance * (annualGrowthFactor - 1);
-
-        // Tax on interest
-        var taxPaid = grossInterest * (taxRate / 100);
-        var netInterest = grossInterest - taxPaid;
-
-        // Add net interest and contributions
-        balance = balance + netInterest + annualContrib;
-        totalContribs += annualContrib;
-        totalGrossInterest += grossInterest;
-        totalTax += taxPaid;
-
-        // Real (inflation-adjusted) balance
-        var realBalance = balance / Math.pow(1 + inflation / 100, y);
-
-        data.push({
-          year:           y,
-          opening:        openingBalance,
-          grossInterest:  grossInterest,
-          taxPaid:        taxPaid,
-          netInterest:    netInterest,
-          contributions:  totalContribs,
-          totalNetInterest: totalGrossInterest - totalTax,
-          balance:        balance,
-          realBalance:    realBalance
-        });
-      }
-
-      return {
-        final:          balance,
-        real:           data[data.length - 1].realBalance,
-        totalContribs:  totalContribs,
-        totalGross:     totalGrossInterest,
-        totalNet:       totalGrossInterest - totalTax,
-        totalTax:       totalTax,
-        data:           data
-      };
-    }
-
-    /* ── Render growth table ── */
-    function renderTable(mode) {
-      growthHead.innerHTML = '';
-      growthBody.innerHTML = '';
-
-      var showReal    = (mode === 'real' || mode === 'both');
-      var showNominal = (mode === 'nominal' || mode === 'both');
-
-      var headRow = document.createElement('tr');
-      headRow.innerHTML = '<th>Year</th><th>Gross Interest</th><th>Tax Paid</th><th>Net Interest</th><th>Contributions</th>';
-      if (showNominal) headRow.innerHTML += '<th>Balance</th>';
-      if (showReal)    headRow.innerHTML += '<th>Real Balance</th>';
-      growthHead.appendChild(headRow);
-
-      yearlyData.forEach(function(row) {
-        var milestones = [5, 10, 15, 20, 25, 30, 40, 50];
-        var tr = document.createElement('tr');
-        if (milestones.indexOf(row.year) !== -1) tr.className = 'milestone';
-
-        var cells = '<td>Year ' + row.year + '</td>' +
-          '<td class="td-interest">' + fmtD(row.grossInterest) + '</td>' +
-          '<td class="td-tax">'      + fmtD(row.taxPaid) + '</td>' +
-          '<td class="td-interest">' + fmtD(row.netInterest) + '</td>' +
-          '<td>'                     + fmt(row.contributions) + '</td>';
-        if (showNominal) cells += '<td class="td-balance">' + fmt(row.balance) + '</td>';
-        if (showReal)    cells += '<td class="td-real">'    + fmt(row.realBalance) + '</td>';
-
-        tr.innerHTML = cells;
-        growthBody.appendChild(tr);
-      });
-    }
-
-    /* ══════════════════════════════════════════
-       BOOKMARKABLE URL — BUILD ONLY WHEN REQUESTED
-    ══════════════════════════════════════════ */
-    function buildBookmarkableURL() {
-      var params = new URLSearchParams();
-      params.set('principal', principalInput.value);
-      params.set('rate', annualRateInput.value);
-      params.set('years', yearsInput.value);
-      params.set('compound', compoundFreqSelect.value);
-      params.set('contrib', monthlyContribInput.value);
-      params.set('tax', taxRateInput.value);
-      params.set('inflation', inflationRateInput.value);
-
-      var bookmarkableURL = new URL(window.location.href);
-      bookmarkableURL.search = params.toString();
-      bookmarkableURL.hash = '';
-      return bookmarkableURL.toString();
-    }
-
-    function getGrowthExportColumns() {
-      var columns = [
-        { key: 'year', label: 'Year' },
-        { key: 'grossInterest', label: 'Gross Interest' },
-        { key: 'taxPaid', label: 'Tax Paid' },
-        { key: 'netInterest', label: 'Net Interest' },
-        { key: 'contributions', label: 'Contributions' }
-      ];
-      if (tableView.value === 'nominal' || tableView.value === 'both') {
-        columns.push({ key: 'balance', label: 'Balance' });
-      }
-      if (tableView.value === 'real' || tableView.value === 'both') {
-        columns.push({ key: 'realBalance', label: 'Real Balance' });
-      }
-      return columns;
-    }
-
-    function escapeCsv(value) {
-      return '"' + String(value).replace(/"/g, '""') + '"';
-    }
-
-    function buildGrowthCsv() {
-      var columns = getGrowthExportColumns();
-      var lines = [columns.map(function(column) { return column.label; })];
-      yearlyData.forEach(function(row) {
-        lines.push(columns.map(function(column) {
-          return column.key === 'year' ? row.year : row[column.key].toFixed(2);
-        }));
-      });
-      return lines.map(function(row) { return row.map(escapeCsv).join(','); }).join('\r\n');
-    }
-
-    function buildGrowthTxt() {
-      var columns = getGrowthExportColumns();
-      var table = [columns.map(function(column) { return column.label; })];
-      yearlyData.forEach(function(row) {
-        table.push(columns.map(function(column) {
-          return column.key === 'year' ? 'Year ' + row.year : fmtD(row[column.key]);
-        }));
-      });
-      var widths = table[0].map(function(_, column) {
-        return Math.max.apply(null, table.map(function(row) { return row[column].length; }));
-      });
-      return table.map(function(row) {
-        return row.map(function(value, column) {
-          return column === 0 ? value.padEnd(widths[column]) : value.padStart(widths[column]);
-        }).join('  ');
-      }).join('\r\n');
-    }
-
-    function downloadGrowthFile(content, extension, mimeType) {
-      if (!yearlyData.length) return;
-      var blobUrl = URL.createObjectURL(new Blob([content], { type: mimeType + ';charset=utf-8' }));
-      var link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = 'compound-interest-growth-' + tableView.value + '.' + extension;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 0);
-    }
-
-    function printGrowthSchedule() {
-      if (!yearlyData.length) return;
-      document.body.classList.add('print-growth');
-      window.addEventListener('afterprint', function() {
-        document.body.classList.remove('print-growth');
-      }, { once: true });
-      window.print();
-    }
-
-    function downloadGrowthPdf() {
-      if (!yearlyData.length || !window.MonkeyTacticsPdf) return;
-      var columns = getGrowthExportColumns();
-      window.MonkeyTacticsPdf.downloadReport({
-        title: 'Compound Interest Calculator Report',
-        filename: 'compound-interest-growth-' + tableView.value + '.pdf',
-        landscape: columns.length > 6,
-        summary: [
-          { label: 'Initial investment', value: fmtD(parseFloat(principalInput.value) || 0) },
-          { label: 'Annual interest rate', value: parseFloat(annualRateInput.value).toFixed(2) + '%' },
-          { label: 'Investment period', value: yearsInput.value + ' years' },
-          { label: 'Compounding frequency', value: compoundFreqSelect.options[compoundFreqSelect.selectedIndex].textContent.trim() },
-          { label: 'Monthly contribution', value: fmtD(parseFloat(monthlyContribInput.value) || 0) },
-          { label: 'Tax rate', value: (parseFloat(taxRateInput.value) || 0) + '%' },
-          { label: 'Inflation rate', value: (parseFloat(inflationRateInput.value) || 0) + '%' },
-          { label: 'Final balance', value: resFinal.textContent },
-          { label: 'Inflation-adjusted balance', value: resReal.textContent },
-          { label: 'Total contributions', value: resContribs.textContent },
-          { label: 'Net interest earned', value: resInterest.textContent }
-        ],
-        note: 'Illustrative estimate only. Actual returns, taxes, fees, and inflation may differ.',
-        table: {
-          title: 'Year-by-Year Growth - ' + tableView.options[tableView.selectedIndex].textContent,
-          columns: columns.map(function(column) { return { label: column.label, width: column.key === 'year' ? 8 : 16, align: column.key === 'year' ? 'left' : 'right' }; }),
-          rows: yearlyData.map(function(row) { return columns.map(function(column) { return column.key === 'year' ? 'Year ' + row.year : fmtD(row[column.key]); }); })
-        }
-      });
-      growthPdfConfirm.style.display = 'inline';
-      setTimeout(function() { growthPdfConfirm.style.display = 'none'; }, 2500);
-    }
-
-    function readURL() {
-      var params = new URLSearchParams(window.location.search);
-      function setVal(input, slider, display, key, formatter) {
-        if (params.has(key)) {
-          var v = parseFloat(params.get(key));
-          if (!isNaN(v)) {
-            input.value  = v;
-            slider.value = v;
-            display.textContent = formatter(v);
-          }
-        }
-      }
-      setVal(principalInput,      principalSlider,      principalVal,      'principal',  function(v){ return '$' + Math.round(v).toLocaleString(); });
-      setVal(annualRateInput,     annualRateSlider,     annualRateVal,     'rate',       function(v){ return v.toFixed(2) + '%'; });
-      setVal(yearsInput,          yearsSlider,          yearsVal,          'years',      function(v){ return Math.round(v) + ' years'; });
-      setVal(monthlyContribInput, monthlyContribSlider, monthlyContribVal, 'contrib',    function(v){ return '$' + Math.round(v).toLocaleString(); });
-      setVal(taxRateInput,        taxRateSlider,        taxRateVal,        'tax',        function(v){ return Math.round(v) + '%'; });
-      setVal(inflationRateInput,  inflationRateSlider,  inflationRateVal,  'inflation',  function(v){ return v.toFixed(1) + '%'; });
-      if (params.has('compound')) {
-        var cv = params.get('compound');
-        var opt = compoundFreqSelect.querySelector('option[value="' + cv + '"]');
-        if (opt) compoundFreqSelect.value = cv;
-      }
-      if (params.has('principal') && params.has('rate') && params.has('years')) {
-        runCalc();
-      }
-    }
-
-    /* ══════════════════════════════════════════
-       MAIN RUN
-    ══════════════════════════════════════════ */
-    function runCalc() {
-      calcError.style.display = 'none';
-
-      var P         = parseFloat(principalInput.value)       || 0;
-      var rate      = parseFloat(annualRateInput.value);
-      var T         = parseInt(yearsInput.value, 10);
-      var n         = parseInt(compoundFreqSelect.value, 10);
-      var contrib   = parseFloat(monthlyContribInput.value)  || 0;
-      var taxRate   = parseFloat(taxRateInput.value)         || 0;
-      var inflation = parseFloat(inflationRateInput.value)   || 0;
-
-      if (isNaN(rate) || rate <= 0 || isNaN(T) || T < 1) {
-        calcError.style.display = 'block';
-        return;
-      }
-
-      var res = calculate(P, rate, T, n, contrib, taxRate, inflation);
-      yearlyData = res.data;
-
-      /* Results cards */
-      resFinal.textContent    = fmt(res.final);
-      resReal.textContent     = fmt(res.real);
-      resContribs.textContent = fmt(res.totalContribs);
-      resInterest.textContent = fmt(res.totalNet);
-
-      var roi = res.totalContribs > 0 ? ((res.final - res.totalContribs) / res.totalContribs * 100) : 0;
-      resROI.textContent = roi.toFixed(1) + '% ROI on contributions';
-      resTax.textContent = fmt(res.totalTax);
-      resTaxSub.textContent = taxRate > 0 ? 'at ' + taxRate + '% tax rate' : 'tax rate set to 0%';
-
-      /* Breakdown bar */
-      var total = res.final;
-      var pP = total > 0 ? (P / total * 100) : 0;
-      var pC = total > 0 ? ((res.totalContribs - P) / total * 100) : 0;
-      var pI = Math.max(0, 100 - pP - pC);
-      barPrincipal.style.width = pP.toFixed(1) + '%';
-      barContrib.style.width   = pC.toFixed(1) + '%';
-      barInterest.style.width  = pI.toFixed(1) + '%';
-      pctPrincipal.textContent = pP.toFixed(1);
-      pctContrib.textContent   = pC.toFixed(1);
-      pctInterest.textContent  = pI.toFixed(1);
-
-      /* Rule of 72 */
-      r72Rate.textContent  = rate.toFixed(2);
-      r72Years.textContent = (72 / rate).toFixed(1);
-
-      /* Show */
-      resultsEmpty.style.display  = 'none';
-      resultsCards.style.display  = 'flex';
-      growthSection.style.display = 'block';
-      shareLine.style.display     = 'flex';
-
-      renderTable(tableView.value);
-      resultsCards.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
-    calcBtn.addEventListener('click', runCalc);
-    tableView.addEventListener('change', function() { renderTable(tableView.value); });
-    growthPrintBtn.addEventListener('click', printGrowthSchedule);
-    growthPdfBtn.addEventListener('click', downloadGrowthPdf);
-    growthCsvBtn.addEventListener('click', function() {
-      downloadGrowthFile(buildGrowthCsv(), 'csv', 'text/csv');
-    });
-    growthTxtBtn.addEventListener('click', function() {
-      downloadGrowthFile(buildGrowthTxt(), 'txt', 'text/plain');
-    });
-
-    /* Copy link */
-    copyLinkBtn.addEventListener('click', function() {
-      navigator.clipboard.writeText(buildBookmarkableURL()).then(function() {
-        copyConfirm.style.display = 'inline';
-        setTimeout(function() { copyConfirm.style.display = 'none'; }, 2500);
-      });
-    });
-
-    /* Init */
-    readURL();
-
-  })();
-  </script>
+  <script type="module" src="/assets/js/compound-interest-calculator.js?v=20260809-content-audit-2"></script>
 
 </body>
 </html>

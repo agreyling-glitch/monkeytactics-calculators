@@ -71,6 +71,50 @@ pub struct ScenarioResult {
     pub amortization_schedule: Vec<ScheduleEntry>,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CompoundScenarioInput {
+    #[serde(default)]
+    pub name: String,
+    pub principal: f64,
+    pub annual_interest_rate: f64,
+    pub years: u32,
+    pub compounding_periods_per_year: u32,
+    #[serde(default)]
+    pub monthly_contribution: f64,
+    #[serde(default)]
+    pub tax_rate: f64,
+    #[serde(default)]
+    pub inflation_rate: f64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CompoundYearEntry {
+    pub year: u32,
+    pub opening: f64,
+    pub gross_interest: f64,
+    pub tax_paid: f64,
+    pub net_interest: f64,
+    pub contributions: f64,
+    pub total_net_interest: f64,
+    pub balance: f64,
+    pub real_balance: f64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CompoundScenarioResult {
+    pub name: String,
+    pub final_balance: f64,
+    pub real_balance: f64,
+    pub total_contributions: f64,
+    pub total_gross_interest: f64,
+    pub total_net_interest: f64,
+    pub total_tax: f64,
+    pub yearly: Vec<CompoundYearEntry>,
+}
+
 fn round_money(value: f64) -> f64 {
     (value * 100.0).round() / 100.0
 }
@@ -155,6 +199,103 @@ pub fn calculate(input: &ScenarioInput) -> Result<ScenarioResult, String> {
     })
 }
 
+fn validate_compound(input: &CompoundScenarioInput) -> Result<(), String> {
+    if !input.principal.is_finite() || input.principal < 0.0 {
+        return Err("Initial investment cannot be negative.".into());
+    }
+    if !input.annual_interest_rate.is_finite()
+        || input.annual_interest_rate < 0.0
+        || input.annual_interest_rate > 100.0
+    {
+        return Err("Annual interest rate must be between 0% and 100%.".into());
+    }
+    if input.years == 0 || input.years > 100 {
+        return Err("Investment period must be between 1 and 100 years.".into());
+    }
+    if !matches!(input.compounding_periods_per_year, 1 | 2 | 4 | 12 | 365) {
+        return Err(
+            "Compounding frequency must be annual, semi-annual, quarterly, monthly, or daily."
+                .into(),
+        );
+    }
+    if !input.monthly_contribution.is_finite() || input.monthly_contribution < 0.0 {
+        return Err("Monthly contribution cannot be negative.".into());
+    }
+    if !input.tax_rate.is_finite() || input.tax_rate < 0.0 || input.tax_rate > 100.0 {
+        return Err("Tax rate must be between 0% and 100%.".into());
+    }
+    if !input.inflation_rate.is_finite()
+        || input.inflation_rate < 0.0
+        || input.inflation_rate > 100.0
+    {
+        return Err("Inflation rate must be between 0% and 100%.".into());
+    }
+    Ok(())
+}
+
+pub fn calculate_compound(input: &CompoundScenarioInput) -> Result<CompoundScenarioResult, String> {
+    validate_compound(input)?;
+    let periods = input.compounding_periods_per_year as f64;
+    let periodic_rate = input.annual_interest_rate / 100.0 / periods;
+    let annual_contribution = input.monthly_contribution * 12.0;
+    // Investor.gov spreads the annualized monthly contribution evenly across
+    // every selected compounding period (for example, 600 * 12 / 365 daily).
+    let periodic_contribution = annual_contribution / periods;
+    let mut balance = input.principal;
+    let mut total_contributions = input.principal;
+    let mut total_gross_interest = 0.0;
+    let mut total_tax = 0.0;
+    let mut yearly = Vec::with_capacity(input.years as usize);
+
+    for year in 1..=input.years {
+        let opening = balance;
+        let mut pre_tax_balance = balance;
+        let mut gross_interest = 0.0;
+        for _period in 0..input.compounding_periods_per_year {
+            let periodic_interest = pre_tax_balance * periodic_rate;
+            gross_interest += periodic_interest;
+            pre_tax_balance += periodic_interest + periodic_contribution;
+        }
+        let tax_paid = gross_interest * (input.tax_rate / 100.0);
+        let net_interest = gross_interest - tax_paid;
+        balance = pre_tax_balance - tax_paid;
+        total_contributions += annual_contribution;
+        total_gross_interest += gross_interest;
+        total_tax += tax_paid;
+        if !balance.is_finite() {
+            return Err("The selected values produce a balance too large to calculate.".into());
+        }
+        let real_balance = balance / (1.0 + input.inflation_rate / 100.0).powi(year as i32);
+        yearly.push(CompoundYearEntry {
+            year,
+            opening: round_money(opening),
+            gross_interest: round_money(gross_interest),
+            tax_paid: round_money(tax_paid),
+            net_interest: round_money(net_interest),
+            contributions: round_money(total_contributions),
+            total_net_interest: round_money(total_gross_interest - total_tax),
+            balance: round_money(balance),
+            real_balance: round_money(real_balance),
+        });
+    }
+
+    let real_balance = yearly.last().map(|row| row.real_balance).unwrap_or(0.0);
+    Ok(CompoundScenarioResult {
+        name: if input.name.trim().is_empty() {
+            "Scenario".into()
+        } else {
+            input.name.trim().into()
+        },
+        final_balance: round_money(balance),
+        real_balance,
+        total_contributions: round_money(total_contributions),
+        total_gross_interest: round_money(total_gross_interest),
+        total_net_interest: round_money(total_gross_interest - total_tax),
+        total_tax: round_money(total_tax),
+        yearly,
+    })
+}
+
 fn error_json(message: impl AsRef<str>) -> String {
     serde_json::json!({ "error": message.as_ref() }).to_string()
 }
@@ -204,6 +345,41 @@ pub fn calculate_multi_scenario(inputs_json: String) -> String {
     }
 }
 
+#[wasm_bindgen]
+pub fn calculate_compound_scenario(input_json: String) -> String {
+    let input: CompoundScenarioInput = match serde_json::from_str(&input_json) {
+        Ok(input) => input,
+        Err(error) => return error_json(format!("Invalid compound scenario JSON: {error}")),
+    };
+    match calculate_compound(&input) {
+        Ok(result) => {
+            serde_json::to_string(&result).unwrap_or_else(|error| error_json(error.to_string()))
+        }
+        Err(error) => error_json(error),
+    }
+}
+
+#[wasm_bindgen]
+pub fn calculate_compound_multi_scenario(inputs_json: String) -> String {
+    let inputs: Vec<CompoundScenarioInput> = match serde_json::from_str(&inputs_json) {
+        Ok(inputs) => inputs,
+        Err(error) => return error_json(format!("Invalid compound scenarios JSON: {error}")),
+    };
+    if inputs.is_empty() {
+        return error_json("Add at least one compound-interest scenario.");
+    }
+    if inputs.len() > MAX_SCENARIOS {
+        return error_json("A maximum of five scenarios can be compared at once.");
+    }
+    let results: Result<Vec<_>, _> = inputs.iter().map(calculate_compound).collect();
+    match results {
+        Ok(results) => {
+            serde_json::to_string(&results).unwrap_or_else(|error| error_json(error.to_string()))
+        }
+        Err(error) => error_json(error),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -216,6 +392,19 @@ mod tests {
             term_years: years,
             payment_frequency: frequency,
             extra_payment_per_period: extra,
+        }
+    }
+
+    fn compound_scenario() -> CompoundScenarioInput {
+        CompoundScenarioInput {
+            name: "Growth A".into(),
+            principal: 10_000.0,
+            annual_interest_rate: 7.0,
+            years: 20,
+            compounding_periods_per_year: 12,
+            monthly_contribution: 200.0,
+            tax_rate: 25.0,
+            inflation_rate: 3.0,
         }
     }
 
@@ -255,6 +444,51 @@ mod tests {
         let mut input = scenario(6.5, 30, 0.0, PaymentFrequency::Monthly);
         input.loan_amount = -1.0;
         assert!(calculate(&input).is_err());
+    }
+
+    #[test]
+    fn compound_growth_applies_monthly_contributions() {
+        let result = calculate_compound(&compound_scenario()).unwrap();
+        assert_eq!(result.yearly.len(), 20);
+        assert!((result.final_balance - 113_773.38).abs() < 0.02);
+        assert!((result.real_balance - 62_993.56).abs() < 0.02);
+        assert!((result.total_contributions - 58_000.0).abs() < 0.01);
+        assert!((result.total_tax - 18_591.13).abs() < 0.02);
+    }
+
+    #[test]
+    fn compound_monthly_contributions_match_investor_gov_reference() {
+        let mut input = compound_scenario();
+        input.monthly_contribution = 600.0;
+        input.tax_rate = 0.0;
+        input.inflation_rate = 0.0;
+        let result = calculate_compound(&input).unwrap();
+        assert!((result.final_balance - 352_943.38).abs() < 0.02);
+    }
+
+    #[test]
+    fn compound_daily_contributions_match_investor_gov_reference() {
+        let mut input = compound_scenario();
+        input.compounding_periods_per_year = 365;
+        input.monthly_contribution = 600.0;
+        input.tax_rate = 0.0;
+        input.inflation_rate = 0.0;
+        let result = calculate_compound(&input).unwrap();
+        assert!((result.final_balance - 354_739.71).abs() < 0.02);
+    }
+
+    #[test]
+    fn compound_growth_supports_contribution_only_scenarios() {
+        let mut input = compound_scenario();
+        input.principal = 0.0;
+        input.annual_interest_rate = 0.0;
+        input.years = 10;
+        input.monthly_contribution = 100.0;
+        input.tax_rate = 0.0;
+        input.inflation_rate = 0.0;
+        let result = calculate_compound(&input).unwrap();
+        assert_eq!(result.final_balance, 12_000.0);
+        assert_eq!(result.total_net_interest, 0.0);
     }
 
     #[test]

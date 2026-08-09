@@ -1,10 +1,10 @@
-import init, { calculate_multi_scenario, calculate_scenario, verify_domain } from "/assets/wasm/mortgage-engine/mortgage_engine.js";
+import init, { calculate_multi_scenario, calculate_scenario, verify_domain } from "/assets/wasm/mortgage-engine/mortgage_engine.js?v=20260809-period-contributions-1";
 
 const $ = (id) => document.getElementById(id);
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const moneyExact = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const colors = ["#4ade80", "#fb923c", "#60a5fa", "#c084fc", "#facc15"];
-const state = { currentInput: null, currentResult: null, baselineResult: null, saved: [], comparisonInputs: [], comparisonResults: [], summaryScenarioName: null, reportScenarioName: null, compositionScenarioName: null, amortScenarioName: null, printCompositionScenarioName: null, page: 1, pageSize: 15 };
+const state = { currentInput: null, currentResult: null, baselineResult: null, saved: [], selectedSavedIndex: null, comparisonInputs: [], comparisonResults: [], summaryScenarioName: null, reportScenarioName: null, compositionScenarioName: null, amortScenarioName: null, printCompositionScenarioName: null, page: 1, pageSize: 15 };
 
 const elements = {
   status: $("engineStatus"), error: $("calcError"), form: $("mortgageForm"), amount: $("loanAmount"), amountRange: $("loanAmountRange"), amountOutput: $("loanAmountOutput"),
@@ -257,9 +257,25 @@ function scenarioSubtitle(input) {
 
 function createScenarioChip(input, index) {
   const chip = document.createElement("div");
-  chip.className = "scenario-chip";
-  chip.innerHTML = `<span>${input.name}</span><small>${scenarioSubtitle(input)}</small><button type="button" aria-label="Remove ${input.name}" data-remove="${index}">×</button>`;
+  const selected = state.selectedSavedIndex === index;
+  chip.className = `scenario-chip${selected ? " is-selected" : ""}`;
+  chip.innerHTML = `<button class="scenario-select" type="button" aria-pressed="${selected}" data-select="${index}"><span>${input.name}</span><small>${scenarioSubtitle(input)}</small></button><button type="button" aria-label="Remove ${input.name}" data-remove="${index}">×</button>`;
   return chip;
+}
+
+function selectedSavedScenario() {
+  return Number.isInteger(state.selectedSavedIndex) ? state.saved[state.selectedSavedIndex] || null : null;
+}
+
+function syncScenarioEditorControls() {
+  const selected = selectedSavedScenario();
+  elements.add.textContent = selected ? `Done editing ${selected.name}` : "Add to comparison";
+  elements.add.classList.toggle("is-editing", Boolean(selected));
+  if (selected) {
+    elements.add.setAttribute("aria-disabled", "false");
+    elements.add.classList.remove("is-limit-reached");
+    elements.add.title = "";
+  }
 }
 
 function updateScenarioLimitControls() {
@@ -281,6 +297,7 @@ function renderChips() {
   elements.inputChips.replaceChildren();
   elements.inputScenarioList.hidden = !state.saved.length;
   updateScenarioLimitControls();
+  syncScenarioEditorControls();
   if (!state.saved.length) {
     elements.chips.innerHTML = '<p class="comparison-empty">No saved scenarios yet. Add your current plan or try a preset.</p>';
     return;
@@ -291,10 +308,43 @@ function renderChips() {
   });
 }
 
+function selectSavedScenario(event) {
+  const button = event.target.closest("[data-select]");
+  if (!button) return;
+  const index = Number(button.dataset.select);
+  const input = state.saved[index];
+  if (!input) return;
+  state.selectedSavedIndex = index;
+  state.summaryScenarioName = input.name;
+  state.reportScenarioName = input.name;
+  state.compositionScenarioName = input.name;
+  state.amortScenarioName = input.name;
+  elements.amount.value = String(input.loanAmount);
+  elements.amountRange.value = String(Math.min(Number(elements.amountRange.max), Math.max(Number(elements.amountRange.min), input.loanAmount)));
+  elements.rate.value = String(input.annualInterestRate);
+  elements.term.value = String(input.termYears);
+  elements.frequency.value = input.paymentFrequency;
+  elements.extra.value = String(input.extraPaymentPerPeriod);
+  updateAmountOutput();
+  renderChips();
+  calculateAll();
+  elements.form.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function updateSelectedSavedScenario() {
+  const selected = selectedSavedScenario();
+  if (!selected) return;
+  state.saved[state.selectedSavedIndex] = readInput(selected.name);
+  renderChips();
+}
+
 function removeSavedScenario(event) {
   const button = event.target.closest("[data-remove]");
   if (!button) return;
-  state.saved.splice(Number(button.dataset.remove), 1);
+  const removedIndex = Number(button.dataset.remove);
+  state.saved.splice(removedIndex, 1);
+  if (state.selectedSavedIndex === removedIndex) state.selectedSavedIndex = null;
+  else if (state.selectedSavedIndex > removedIndex) state.selectedSavedIndex--;
   state.saved.forEach((item, index) => { item.name = `Scenario ${String.fromCharCode(65 + index)}`; });
   renderChips();
   calculateAll();
@@ -544,7 +594,7 @@ function renderAmortization(showAll = false) {
 async function calculateAll({ scroll = false } = {}) {
   clearError();
   try {
-    const input = readInput();
+    const input = readInput(selectedSavedScenario()?.name || nextScenarioName());
     const result = parseEngineResponse(calculate_scenario(JSON.stringify(input)));
     let baseline = null;
     if (input.extraPaymentPerPeriod > 0) baseline = parseEngineResponse(calculate_scenario(JSON.stringify({ ...input, name: "Without extra payments", extraPaymentPerPeriod: 0 })));
@@ -670,10 +720,13 @@ function bindEvents() {
   elements.downPaymentDialog.querySelector("[data-close-down-payment]").addEventListener("click", () => elements.downPaymentDialog.close());
   elements.amount.addEventListener("input", () => { elements.amountRange.value = String(Math.min(Number(elements.amountRange.max), Math.max(Number(elements.amountRange.min), Number(elements.amount.value) || 0))); updateAmountOutput(); });
   elements.amountRange.addEventListener("input", () => { elements.amount.value = elements.amountRange.value; updateAmountOutput(); });
-  elements.add.addEventListener("click", () => addCurrentScenario());
-  elements.clear.addEventListener("click", () => { state.saved = []; renderChips(); calculateAll(); });
+  elements.form.addEventListener("input", () => { try { updateSelectedSavedScenario(); } catch (_) { /* calculateAll reports invalid transitional input. */ } calculateAll(); });
+  elements.add.addEventListener("click", () => { if (selectedSavedScenario()) { state.selectedSavedIndex = null; renderChips(); } else addCurrentScenario(); });
+  elements.clear.addEventListener("click", () => { state.saved = []; state.selectedSavedIndex = null; renderChips(); calculateAll(); });
   elements.chips.addEventListener("click", removeSavedScenario);
   elements.inputChips.addEventListener("click", removeSavedScenario);
+  elements.chips.addEventListener("click", selectSavedScenario);
+  elements.inputChips.addEventListener("click", selectSavedScenario);
   document.querySelector(".preset-row").addEventListener("click", (event) => { const button = event.target.closest("[data-preset]"); if (button) applyPreset(button.dataset.preset); });
   elements.amortView.addEventListener("change", () => { state.page = 1; renderAmortization(); });
   elements.summaryScenario.addEventListener("change", () => {
@@ -721,7 +774,7 @@ async function start() {
   bindEvents();
   readUrl();
   try {
-    await init();
+    await init({ module_or_path: "/assets/wasm/mortgage-engine/mortgage_engine_bg.wasm?v=20260809-period-contributions-1" });
     const approvedHost = verify_domain(window.location.host)
       || (window.location.hostname === "127.0.0.1" && verify_domain(window.location.hostname));
     if (!approvedHost) throw new Error("Mortgage engine is not available on this host.");
@@ -731,7 +784,6 @@ async function start() {
     elements.status.textContent = error instanceof Error ? error.message : "Mortgage engine is not available on this host.";
     elements.status.classList.remove("ready");
     elements.status.classList.add("failed");
-    $("calculateButton").disabled = true;
     elements.add.disabled = true;
   }
 }

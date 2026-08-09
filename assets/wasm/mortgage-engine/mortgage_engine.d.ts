@@ -1,6 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export function calculate_compound_multi_scenario(inputs_json: string): string;
+
+export function calculate_compound_scenario(input_json: string): string;
+
 export function calculate_multi_scenario(inputs_json: string): string;
 
 export function calculate_scenario(input_json: string): string;
@@ -14,6 +18,8 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
+    readonly calculate_compound_multi_scenario: (a: number, b: number, c: number) => void;
+    readonly calculate_compound_scenario: (a: number, b: number, c: number) => void;
     readonly calculate_multi_scenario: (a: number, b: number, c: number) => void;
     readonly calculate_scenario: (a: number, b: number, c: number) => void;
     readonly verify_domain: (a: number, b: number) => number;

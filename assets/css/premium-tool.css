@@ -1282,6 +1282,343 @@
   box-shadow: 0 20px 44px rgba(0, 0, 0, 0.12);
 }
 
+.compound-tool-page .compound-primary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.compound-tool-page .compound-primary-actions .btn-calculate,
+.compound-tool-page .compound-primary-actions .btn-growth-action { margin: 0; }
+
+.compound-tool-page #addScenarioBtn.is-editing {
+  min-height: 2.9rem;
+  padding: 0.72rem 1.2rem;
+  border-color: #facc15;
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  color: #241500;
+  font-weight: 850;
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.14), 0 12px 30px rgba(245, 158, 11, 0.28);
+}
+
+.compound-tool-page #addScenarioBtn.is-editing::before {
+  content: "✓";
+  display: inline-grid;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.42rem;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(36, 21, 0, 0.14);
+  font-size: 0.78rem;
+}
+
+.compound-tool-page #addScenarioBtn.is-editing:hover {
+  border-color: #fde047;
+  background: linear-gradient(135deg, #fde047, #fbbf24);
+  box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.18), 0 14px 34px rgba(245, 158, 11, 0.34);
+}
+
+.compound-scenarios-section,
+.compound-charts-section {
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--premium-line);
+  border-radius: 1.25rem;
+  background: rgba(10, 18, 14, 0.82);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.12);
+}
+
+.compound-section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.compound-section-heading h2,
+.compound-charts-section h2 {
+  margin: 0;
+  color: var(--premium-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  font-weight: 500;
+}
+
+.compound-section-heading p {
+  max-width: 680px;
+  margin: 0.55rem 0 0;
+  color: var(--premium-muted);
+  font-size: 0.84rem;
+  line-height: 1.65;
+}
+
+.compound-scenario-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+}
+
+.compound-scenario-empty { color: var(--premium-muted); font-size: 0.82rem; }
+
+.compound-scenario-chip {
+  position: relative;
+  min-width: 180px;
+  overflow: hidden;
+  border: 1px solid var(--premium-line);
+  border-radius: 0.75rem;
+  background: rgba(16, 27, 22, 0.78);
+}
+
+.compound-scenario-chip.is-selected {
+  border-color: rgba(74, 222, 128, 0.65);
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.12);
+}
+
+.compound-scenario-chip > button:first-child {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 2.2rem 0.8rem 0.9rem;
+  border: 0;
+  background: transparent;
+  color: var(--premium-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.compound-scenario-chip.is-selected > button:first-child { background: rgba(74, 222, 128, 0.08); }
+.compound-scenario-chip strong,
+.compound-scenario-chip small { display: block; }
+.compound-scenario-chip strong { font-size: 0.82rem; }
+.compound-scenario-chip small { margin-top: 0.2rem; color: var(--premium-muted); font-size: 0.68rem; }
+
+.compound-scenario-remove {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.4rem;
+  border: 0;
+  background: transparent;
+  color: var(--premium-muted);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.compound-comparison-wrap {
+  overflow-x: auto;
+  margin-top: 1rem;
+  border: 1px solid var(--premium-line);
+  border-radius: 0.8rem;
+}
+
+.compound-comparison-table { min-width: 820px; margin: 0; }
+.compound-comparison-table td:first-child { text-align: left; }
+.compound-comparison-table td:first-child small { display: block; margin-top: 0.15rem; color: var(--premium-muted); font-size: 0.68rem; }
+
+.compound-chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.compound-chart-wide { grid-column: 1 / -1; }
+
+.compound-chart-card {
+  min-width: 0;
+  margin: 0;
+  padding: 1.1rem;
+  border: 1px solid var(--premium-line);
+  border-radius: 0.9rem;
+  background: rgba(13, 24, 18, 0.82);
+}
+
+.compound-chart-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.8rem;
+}
+
+.compound-chart-title strong { color: var(--premium-ink); font-family: Georgia, "Times New Roman", serif; font-size: 1.08rem; font-weight: 500; }
+.compound-chart { min-height: 250px; overflow: hidden; }
+.compound-chart-short { min-height: 170px; }
+.compound-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.compound-chart-gridline { stroke: rgba(183, 247, 207, 0.12); stroke-width: 1; }
+.compound-chart-axis { fill: #b8cdc1; font-size: 14px; }
+.compound-chart-label { fill: #e9fff1; font-size: 17px; font-weight: 700; }
+.compound-chart-value { fill: #e9fff1; font-size: 16px; font-weight: 800; }
+.compound-chart-line { fill: none; stroke-width: 3; }
+.compound-chart-line-real { opacity: 0.65; stroke-dasharray: 8 7; }
+.compound-chart-legend { display: flex; flex-wrap: wrap; gap: 0.7rem; justify-content: flex-end; color: var(--premium-muted); font-size: 0.7rem; }
+.compound-chart-legend i { display: inline-block; width: 8px; height: 8px; margin-right: 0.3rem; border-radius: 50%; }
+.compound-chart-card figcaption { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid var(--premium-line); color: var(--premium-muted); font-size: 0.75rem; line-height: 1.55; }
+
+/* Interactive compound chart controls and overlays. */
+.compound-chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.compound-chart-toggle {
+  display: inline-flex;
+  gap: 0.42rem;
+  align-items: center;
+  min-height: 32px;
+  padding: 0.34rem 0.58rem;
+  border: 1px solid var(--premium-line);
+  border-radius: 999px;
+  background: rgba(183, 247, 207, 0.045);
+  color: var(--premium-muted);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.compound-chart-toggle:has(input:checked) {
+  border-color: rgba(74, 222, 128, 0.42);
+  background: rgba(74, 222, 128, 0.08);
+  color: var(--premium-ink);
+}
+
+.compound-chart-toggle input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--premium-green);
+}
+
+.compound-chart-toggle > i {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.compound-toggle-nominal > i { background: #4ade80; }
+.compound-toggle-real > i { background: #facc15; }
+.compound-toggle-composition > i { background: linear-gradient(90deg, #60a5fa 0 50%, #4ade80 50%); }
+.compound-toggle-tax > i { background: #fb7185; }
+
+.compound-chart-scenario-toggles {
+  display: contents;
+}
+
+.compound-chart-scenario-toggle i,
+.compound-tooltip-series i,
+.compound-chart-pin i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.compound-chart-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.7rem;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+
+.compound-interactive-chart { min-height: 290px; }
+.compound-interactive-chart svg { pointer-events: none; }
+.compound-interactive-layer { transition: opacity 320ms ease, filter 320ms ease; }
+.compound-interactive-layer.is-hidden { opacity: 0 !important; filter: blur(1px); pointer-events: none; }
+.compound-area-contributions { fill: #60a5fa; opacity: 0.18; }
+.compound-area-interest { fill: #4ade80; opacity: 0.25; }
+.compound-area-erosion { fill: #facc15; opacity: 0.24; }
+.compound-area-tax { fill: #fb7185; opacity: 0.32; stroke: #fb7185; stroke-dasharray: 4 4; stroke-width: 1; }
+.compound-hover-line { stroke: rgba(233, 255, 241, 0.65); stroke-dasharray: 4 4; stroke-width: 1; }
+.compound-crossover line { stroke: #facc15; stroke-dasharray: 6 5; stroke-width: 1.5; }
+.compound-crossover text { fill: #fef08a; font-size: 12px; font-weight: 700; }
+
+.compound-chart-tooltip,
+.compound-chart-pin {
+  position: absolute;
+  z-index: 4;
+  width: min(270px, calc(100% - 16px));
+  padding: 0.72rem;
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  border-radius: 0.65rem;
+  background: rgba(4, 13, 8, 0.96);
+  color: var(--premium-ink);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
+  font-size: 0.7rem;
+  line-height: 1.45;
+  pointer-events: none;
+}
+
+.compound-chart-tooltip > strong,
+.compound-chart-pin > strong { display: block; margin-bottom: 0.4rem; font-size: 0.8rem; }
+.compound-tooltip-series + .compound-tooltip-series { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--premium-line); }
+.compound-tooltip-series b,
+.compound-tooltip-series span,
+.compound-chart-pin b,
+.compound-chart-pin span { display: block; }
+.compound-tooltip-series b,
+.compound-chart-pin b { display: flex; gap: 0.35rem; align-items: center; margin-bottom: 0.16rem; }
+
+.compound-chart-pin {
+  top: 8px;
+  right: 8px;
+  pointer-events: auto;
+}
+
+.compound-chart-pin > button {
+  position: absolute;
+  top: 0.32rem;
+  right: 0.42rem;
+  border: 0;
+  background: transparent;
+  color: var(--premium-muted);
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.compound-chart-pin > div + div { margin-top: 0.42rem; }
+.compound-pin-delta { padding-top: 0.5rem; border-top: 1px solid var(--premium-line); color: #fef08a; }
+.compound-pin-delta strong,
+.compound-pin-delta span { display: block; }
+
+.compound-yearly-chart-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+  margin-top: 0.25rem;
+  color: var(--premium-ink);
+  font-size: 0.78rem;
+}
+
+.compound-yearly-chart-heading span { color: var(--premium-muted); font-size: 0.67rem; }
+.compound-yearly-growth-chart { min-height: 112px; overflow: hidden; }
+.compound-yearly-growth-chart svg { display: block; width: 100%; height: auto; }
+.compound-year-bar { opacity: 0.72; transition: opacity 180ms ease; }
+.compound-year-bar:hover { opacity: 1; }
+.compound-chart-reset { flex: 0 0 auto; padding: 0.45rem 0.7rem; }
+
+.compound-print-report { display: none; }
+.compound-print-heading { padding-bottom: 0.14in; border-bottom: 2px solid #222222; }
+.compound-print-heading > span { color: #176d39; font-size: 9pt; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.compound-print-heading h1 { margin: 0.04in 0; font-size: 22pt; }
+.compound-print-heading p { margin: 0; color: #333333; font-size: 9pt; }
+.compound-print-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.08in; margin: 0.14in 0 0.18in; }
+.compound-print-summary > div { padding: 0.08in; border: 1px solid #cccccc; }
+.compound-print-summary span,
+.compound-print-summary strong { display: block; }
+.compound-print-summary span { color: #555555; font-size: 7.5pt; letter-spacing: 0.04em; text-transform: uppercase; }
+.compound-print-summary strong { margin-top: 0.02in; color: #111111; font-size: 11pt; }
+.compound-print-report > h2 { margin: 0 0 0.08in; font-size: 14pt; }
+
 .compound-tool-page .growth-section h2,
 .compound-tool-page .seo-section > h2,
 .compound-tool-page .faq-section h2,
@@ -1305,6 +1642,8 @@
     border-top: 1px solid var(--premium-line);
     border-left: 0;
   }
+  .compound-chart-grid { grid-template-columns: 1fr; }
+  .compound-chart-wide { grid-column: auto; }
 }
 
 @media (max-width: 850px) {
@@ -1319,4 +1658,16 @@
   .premium-tool-hero .breadcrumb { margin-bottom: 1.5rem; }
   .premium-tool-hero h1 { font-size: 2.2rem; }
   .word-tool-page .tool-heading-row { align-items: flex-start; }
+  .compound-section-heading { flex-direction: column; }
+  .compound-primary-actions > * { width: 100%; }
+  .compound-scenario-chip { width: 100%; }
+  .compound-chart-card { padding: 0.8rem; }
+  .compound-chart { min-height: 190px; }
+  .compound-chart-title { align-items: center; }
+  .compound-chart-controls { gap: 0.38rem; }
+  .compound-chart-toggle { flex: 1 1 calc(50% - 0.38rem); border-radius: 0.55rem; }
+  .compound-interactive-chart { min-height: 210px; }
+  .compound-chart-pin { position: relative; top: auto; right: auto; width: auto; margin: 0 8px 8px; }
+  .compound-yearly-chart-heading { align-items: flex-start; flex-direction: column; gap: 0.15rem; }
+  .compound-yearly-growth-chart { min-height: 90px; }
 }

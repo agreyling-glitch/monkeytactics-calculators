@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" href="/assets/css/style.css?v=20260807-wasm-menu">
-  <link rel="stylesheet" href="/assets/css/mortgage-calculator.css?v=20260807-25">
+  <link rel="stylesheet" href="/assets/css/mortgage-calculator.css?v=20260809-2">
   <link rel="stylesheet" href="/assets/css/trustpilot-review-collector.css?v=20260731-2">
   <meta property="og:title" content="Mortgage Calculator – Payments, Interest, and Amortization">
   <meta property="og:description" content="Compare up to five mortgage scenarios privately in your browser.">
@@ -94,7 +94,7 @@
             <div class="field"><label for="paymentFrequency">Payment frequency</label><select id="paymentFrequency" name="freq"><option value="monthly">Monthly</option><option value="biweekly">Bi-weekly</option></select></div>
             <div class="field"><label for="extraPayment">Extra each payment</label><div class="money-field compact"><span aria-hidden="true">$</span><input id="extraPayment" name="extra" type="number" min="0" max="1000000" step="25" value="0" inputmode="decimal"></div></div>
           </div>
-          <div class="form-actions"><button id="calculateButton" class="button-primary" type="submit">Calculate mortgage</button><button id="addScenarioButton" class="button-secondary" type="button">Add to comparison</button></div>
+          <div class="form-actions"><button id="addScenarioButton" class="button-secondary" type="button">Add to comparison</button></div>
         </form>
         <div class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5z"/></svg><div><strong>Your numbers stay yours.</strong><span>No accounts, cookies, analytics, or server-side storage are used for calculations.</span></div></div>
         <div id="inputScenarioList" class="input-scenario-list" hidden>
@@ -106,7 +106,7 @@
       <aside class="result-panel" aria-labelledby="summary-heading">
         <div class="section-kicker">02 / Understand</div>
         <div class="result-heading-row"><h2 id="summary-heading">Your Mortgage Summary</h2><div class="summary-controls"><label id="summaryScenarioControl" for="summaryScenario" hidden>Scenario<select id="summaryScenario" aria-label="Mortgage summary scenario"></select></label><span id="resultFrequency" class="frequency-badge">Monthly</span></div></div>
-        <div id="resultEmpty" class="result-empty"><span>Ready when you are.</span><p>Calculate to reveal your payment, lifetime interest, and payoff path.</p></div>
+        <div id="resultEmpty" class="result-empty" hidden style="display:none"></div>
         <div id="resultContent" hidden>
           <div class="primary-metric"><span>Payment per period</span><strong id="periodicPayment">—</strong><small id="paymentCaption">principal and interest</small></div>
           <div class="metric-grid">
@@ -240,6 +240,6 @@
 
   <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="/assets/js/calculator-pdf.js?v=20260805-2"></script>
-  <script type="module" src="/assets/js/mortgage_wasm.js?v=20260807-27"></script>
+  <script type="module" src="/assets/js/mortgage_wasm.js?v=20260809-period-contributions-1"></script>
 </body>
 </html>

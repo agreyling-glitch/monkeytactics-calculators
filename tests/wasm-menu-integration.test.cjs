@@ -282,13 +282,66 @@ test("the Percentage Calculator uses the premium percentage presentation", () =>
 
 test("the Compound Interest Calculator uses the premium growth presentation", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "compound-interest-calculator.html"), "utf8");
+  const script = fs.readFileSync(path.join(siteRoot, "assets", "js", "compound-interest-calculator.js"), "utf8");
+  const chartScript = fs.readFileSync(path.join(siteRoot, "assets", "js", "compound-interest-chart.js"), "utf8");
   assert.match(html, /class="premium-tool-page compound-tool-page"/);
+  assert.match(html, /<title>Compound Interest Calculator with Contributions<\/title>/);
+  assert.match(html, /Calculate compound interest with monthly contributions, five compounding frequencies/);
+  assert.match(html, /"url": "https:\/\/monkeytactics\.com\/tools\/compound-interest-calculator"/);
+  assert.doesNotMatch(html, /compound-interest-calculator\.html#app/);
+  assert.match(html, /How are monthly contributions calculated\?/);
+  assert.match(html, /Why might another compound interest calculator show a different result\?/);
+  assert.match(html, /Methodology and limitations/);
   assert.match(html, /class="premium-tool-hero"/);
   assert.match(html, /class="compound-workspace-section"/);
   assert.match(html, /01 \/ Project/);
   assert.match(html, /Tax &amp; inflation aware/);
+  assert.match(html, /id="compoundChartsSection"/);
+  assert.match(html, /id="printScenarioSelect"/);
+  assert.match(html, /id="compoundPrintReport"/);
+  assert.match(html, /<span>MonkeyTactics<\/span><h1 id="compoundPrintTitle">/);
+  assert.doesNotMatch(html, /MonkeyTactics Finance/);
+  assert.match(html, /id="compoundPrintScenarioUrl"/);
+  assert.match(html, /body\.print-growth > footer,/);
+  assert.match(html, /body\.print-growth \.compound-print-url \{[\s\S]*display: block !important;/);
+  assert.doesNotMatch(html, /body\.print-growth footer,/);
+  assert.match(html, /id="compoundChartControls"/);
+  assert.match(html, /data-chart-layer="nominal"/);
+  assert.match(html, /data-chart-layer="real"/);
+  assert.match(html, /data-chart-layer="composition"/);
+  assert.match(html, /data-chart-layer="tax"/);
+  assert.match(html, /id="compoundChartTooltip"/);
+  assert.match(html, /id="compoundChartPin"/);
+  assert.match(html, /id="compoundYearlyGrowthChart"/);
+  assert.match(html, /body\.print-growth \.trustpilot-review-link \{ display: none !important; \}/);
+  assert.match(html, /body\.print-growth #growthSection \{[\s\S]*break-before: page;[\s\S]*page-break-before: always;/);
+  assert.doesNotMatch(html, /id="calcBtn"/);
+  assert.match(script, /calculate_compound_scenario/);
+  assert.match(script, /control\.addEventListener\("input", \(\) => runCalculation\(\)\)/);
+  assert.match(script, /Done editing/);
+  assert.match(script, /renderGrowthChart\(\[input\], \[result\], elements\.printGrowthChart/);
+  assert.match(script, /input\.name === "Current plan" \? "Compound Interest Report"/);
+  assert.match(script, /function publicScenarioUrl\(input\)/);
+  assert.match(script, /elements\.printScenarioUrl\.textContent = publicScenarioUrl\(input\)/);
+  assert.match(script, /initChart\(\{/);
+  assert.match(script, /updateChart\(inputs, results\)/);
+  assert.match(chartScript, /export function initChart/);
+  assert.match(chartScript, /export function updateChart/);
+  assert.match(chartScript, /export function addInteractions/);
+  assert.match(chartScript, /Crossover: Interest exceeds contributions/);
+  assert.match(chartScript, /addEventListener\("wheel"/);
+  assert.match(chartScript, /addEventListener\("pointerdown"/);
+  assert.match(chartScript, /const nominalDelta = rows\[1\]\.row\.nominal - rows\[0\]\.row\.nominal/);
+  assert.match(chartScript, /const hidden = !layerVisible \|\| !scenarioVisible/);
   assert.doesNotMatch(html, /AdSense: Top/);
   assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+});
+
+test("the About page lists the Compound Interest Calculator as a Rust WebAssembly app", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "about.html"), "utf8");
+  assert.match(html, /Five MonkeyTactics systems use <code>Rust<\/code> compiled to <code>WebAssembly<\/code>/);
+  assert.match(html, /href="\/tools\/compound-interest-calculator">Compound Interest Calculator<\/a>/);
+  assert.match(html, /Projects compound growth, regular contributions, tax drag, inflation, and up to five scenarios/);
 });
 
 test("featured pages keep only the lower ad and top tools invite Trustpilot reviews", () => {

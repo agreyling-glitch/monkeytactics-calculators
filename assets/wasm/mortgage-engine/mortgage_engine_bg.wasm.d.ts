@@ -1,6 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export const calculate_compound_multi_scenario: (a: number, b: number, c: number) => void;
+export const calculate_compound_scenario: (a: number, b: number, c: number) => void;
 export const calculate_multi_scenario: (a: number, b: number, c: number) => void;
 export const calculate_scenario: (a: number, b: number, c: number) => void;
 export const verify_domain: (a: number, b: number) => number;
