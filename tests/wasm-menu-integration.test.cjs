@@ -4,6 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const siteRoot = path.resolve(__dirname, "..");
+const menuAssetVersion = "20260808-menu-assets-v1";
 const integrationMarkup = [
   '<div id="mt-header"></div>',
 ];
@@ -34,7 +35,7 @@ test("every site page loads the WASM menu exactly once", () => {
     }
 
     const menuScripts = html.match(
-      /<script type="module" src="\/static\/wasm\/menu\.js(?:\?v=[^"]+)?"><\/script>/g,
+      new RegExp(`<script type="module" src="/static/wasm/menu\\.js\\?v=${menuAssetVersion}"></script>`, "g"),
     ) || [];
     assert.equal(
       menuScripts.length,
@@ -72,6 +73,15 @@ test("compiled WASM menu artifacts exist at their deployment paths", () => {
     const artifact = path.join(siteRoot, "static", "wasm", file);
     assert.ok(fs.statSync(artifact).size > 0, `${artifact} must be non-empty`);
   }
+});
+
+test("the menu loader versions its CSS and WASM dependencies", () => {
+  const loader = fs.readFileSync(path.join(siteRoot, "static", "wasm", "menu.js"), "utf8");
+
+  assert.match(loader, /const menuAssetVersion = new URL\(import\.meta\.url\)\.search;/);
+  assert.match(loader, /stylesheet\.href = menuAssetUrl\("menu\.css"\)\.href;/);
+  assert.match(loader, /__wbg_init\(\{ module_or_path: menuAssetUrl\("menu_bg\.wasm"\) \}\)/);
+  assert.match(loader, /Failed to initialize the MonkeyTactics navigation/);
 });
 
 test("the All Tools page mirrors the WASM menu hierarchy", () => {

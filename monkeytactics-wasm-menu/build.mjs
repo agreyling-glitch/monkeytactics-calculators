@@ -23,15 +23,25 @@ if (result.status !== 0) {
 await appendFile(
   join(distDir, "menu.js"),
   `
-// Load the navigation stylesheet and auto-start. Failures are intentionally silent.
+// Keep every menu artifact on the same deployment version as the module URL.
+const menuAssetVersion = new URL(import.meta.url).search;
+const menuAssetUrl = (name) => {
+  const url = new URL(name, import.meta.url);
+  url.search = menuAssetVersion;
+  return url;
+};
+
+// Load the navigation stylesheet and auto-start.
 if (typeof document !== "undefined" && !document.getElementById("mt-header-styles")) {
   const stylesheet = document.createElement("link");
   stylesheet.id = "mt-header-styles";
   stylesheet.rel = "stylesheet";
-  stylesheet.href = new URL("menu.css", import.meta.url).href;
+  stylesheet.href = menuAssetUrl("menu.css").href;
   document.head.appendChild(stylesheet);
 }
-__wbg_init().catch(() => {});
+__wbg_init({ module_or_path: menuAssetUrl("menu_bg.wasm") }).catch((error) => {
+  console.error("Failed to initialize the MonkeyTactics navigation.", error);
+});
 `,
   "utf8",
 );
