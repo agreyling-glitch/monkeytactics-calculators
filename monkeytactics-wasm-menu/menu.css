@@ -132,12 +132,37 @@
   text-decoration: none;
 }
 
+#mt-header .mt-search-results a.mt-tool-result + a.mt-guide-result {
+  position: relative;
+  margin-top: 0.55rem;
+}
+
+#mt-header .mt-search-results a.mt-tool-result + a.mt-guide-result::before {
+  position: absolute;
+  top: -0.3rem;
+  right: 0.45rem;
+  left: 0.45rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(74, 222, 128, 0.48) 15%,
+    rgba(74, 222, 128, 0.48) 85%,
+    transparent
+  );
+  content: "";
+}
+
 #mt-header .mt-search-results a:hover,
 #mt-header .mt-search-results a:focus-visible,
 #mt-header .mt-search-results a.active {
   outline: none;
   background: rgba(34, 197, 94, 0.12);
   color: #86efac;
+}
+
+#mt-header .mt-search-results a.active {
+  box-shadow: inset 3px 0 0 #4ade80;
 }
 
 #mt-header .mt-search-results a.active small {
@@ -147,6 +172,14 @@
 #mt-header .mt-search-results small {
   color: #64748b;
   font-size: 0.68rem;
+}
+
+#mt-header .mt-search-results a.mt-guide-result small {
+  color: #fb923c;
+}
+
+#mt-header .mt-search-results a.mt-guide-result.active small {
+  color: #fdba74;
 }
 
 #mt-header .mt-search-empty {

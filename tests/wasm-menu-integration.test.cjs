@@ -6,7 +6,6 @@ const test = require("node:test");
 const siteRoot = path.resolve(__dirname, "..");
 const integrationMarkup = [
   '<div id="mt-header"></div>',
-  '<script type="module" src="/static/wasm/menu.js"></script>',
 ];
 
 const pageFiles = [
@@ -33,6 +32,15 @@ test("every site page loads the WASM menu exactly once", () => {
         `${path.relative(siteRoot, file)} must contain ${markup} exactly once`,
       );
     }
+
+    const menuScripts = html.match(
+      /<script type="module" src="\/static\/wasm\/menu\.js(?:\?v=[^"]+)?"><\/script>/g,
+    ) || [];
+    assert.equal(
+      menuScripts.length,
+      1,
+      `${path.relative(siteRoot, file)} must load the WASM menu exactly once`,
+    );
   }
 });
 

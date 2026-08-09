@@ -1,10 +1,11 @@
 # MonkeyTactics WASM navigation
 
 This client-side Leptos component owns the complete MonkeyTactics site header.
-It renders the brand, global tool search, a four-group hierarchical menu, and a
-hamburger-triggered slide-in drawer at every screen size. Pressing `/` focuses
-the header search. Search results support wrapping Up/Down arrow navigation and
-Enter activation. `Escape` closes search results, dropdowns, and the drawer.
+It renders the brand, global tool-and-guide search, a four-group hierarchical
+menu, and a hamburger-triggered slide-in drawer at every screen size. Pressing
+`/` focuses the header search. Search results support wrapping Up/Down arrow
+navigation and Enter activation. `Escape` closes search results, dropdowns, and
+the drawer.
 
 The hierarchy in `src/tools.rs` is derived from the site's 23 real tools:
 
@@ -16,6 +17,17 @@ The hierarchy in `src/tools.rs` is derived from the site's 23 real tools:
 Calculators contains a third hierarchy level with Finance, Health, Time & Date,
 and Construction subsections. Counts are computed recursively from leaf tools,
 and global search traverses the same nested tree.
+
+The component also loads the public Hugo blog index from
+`https://blog.monkeytactics.com/menu-search.json`. Article titles and tags are
+searchable, and failures are silent so the local tool index remains available.
+The blog generates this compact endpoint during every Hugo build; publishing a
+new tagged article is enough to add it to the menu after the endpoint's
+five-minute cache expires.
+
+When the menu runs on `127.0.0.1` or `localhost`, it loads
+`http://localhost:1313/menu-search.json` instead. This allows a Wrangler site at
+`http://127.0.0.1:8788/` to search articles served by the local Hugo server.
 
 The component mounts only when the current hostname passes the exact allowlist
 in `src/domain.rs`. Every failure path returns silently.
