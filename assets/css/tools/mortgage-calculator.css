@@ -61,6 +61,7 @@ form label{display:flex;justify-content:space-between;margin-bottom:.45rem;color
 
 @media print{
   @page{margin:.55in;size:auto}
+  .review-collector{display:none!important}
   body.print-report{background:#fff!important;color:#152019!important;font-family:Arial,sans-serif}
   body.print-report main{max-width:none;padding:0}
   body.print-report main>*{display:none!important}
