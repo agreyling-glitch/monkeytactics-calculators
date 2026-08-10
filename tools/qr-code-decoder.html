@@ -156,6 +156,13 @@
     .result-label { margin-bottom:.45rem; color:var(--muted); font-size:.75rem; letter-spacing:.05em; text-transform:uppercase; }
     .result-value { margin:0; color:var(--text); font-size:.95rem; line-height:1.55; overflow-wrap:anywhere; white-space:pre-wrap; }
     .result-value a { color:var(--accent); text-decoration:underline; text-underline-offset:3px; }
+    .resolved-url { margin-top:.85rem; padding:.7rem .8rem; border:1px solid rgba(56,189,248,.28); border-radius:.65rem; background:rgba(14,165,233,.08); }
+    .resolved-url[hidden] { display:none; }
+    .resolved-url .result-label { margin-bottom:.3rem; }
+    .resolved-url-value { margin:0; color:#bae6fd; font-size:.85rem; line-height:1.5; overflow-wrap:anywhere; }
+    .resolved-url-value a { color:#7dd3fc; text-decoration:underline; text-underline-offset:3px; }
+    .resolved-url-value.is-pending { color:var(--muted); }
+    .resolved-url-value.is-error { color:#fca5a5; }
     .link-safety-row { display:flex; justify-content:flex-start; margin-top:.75rem; }
     .link-safety-row[hidden] { display:none; }
     .btn-trust {
@@ -166,6 +173,7 @@
       transition:border-color .15s, background .15s, transform .15s;
     }
     .btn-trust:hover { border-color:#38bdf8; background:rgba(14,165,233,.2); transform:translateY(-1px); }
+    .btn-trust:disabled { cursor:wait; opacity:.6; transform:none; }
     .btn-trust svg { width:.9rem; height:.9rem; fill:currentColor; }
     .result-actions { display:flex; gap:.65rem; margin-top:.85rem; }
     .link-warning-dialog {
@@ -324,6 +332,10 @@
             <img id="resultPreview" class="result-preview" alt="Preview of the decoded QR code image" hidden>
             <div class="result-label">Decoded result</div>
             <p id="resultValue" class="result-value"></p>
+            <div id="resolvedUrl" class="resolved-url" hidden>
+              <div class="result-label">Final destination URL</div>
+              <p id="resolvedUrlValue" class="resolved-url-value"></p>
+            </div>
             <div id="linkSafetyRow" class="link-safety-row" hidden>
               <button id="checkLinkButton" class="btn-trust" type="button"
                       title="Check if this link is safe using VirusTotal">
@@ -368,7 +380,7 @@
 
     <div class="seo-section">
       <h2>Is This QR Code Safe?</h2>
-       <p>Safety Notice: This tool will never open or navigate to any decoded link. All results stay on this page for your review.</p>
+       <p>Safety Notice: This tool will never open or navigate to a decoded link automatically. Web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review.</p>
     </div>
 
     <section class="faq-section" aria-labelledby="faq-heading">
@@ -472,6 +484,7 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
       cameraButton: $('cameraButton'), stopCameraButton: $('stopCameraButton'),
       status: $('status'), resultPanel: $('resultPanel'), resultValue: $('resultValue'),
       resultPreview: $('resultPreview'),
+      resolvedUrl: $('resolvedUrl'), resolvedUrlValue: $('resolvedUrlValue'),
       linkSafetyRow: $('linkSafetyRow'), checkLinkButton: $('checkLinkButton'),
       copyButton: $('copyButton'), clearButton: $('clearButton'),
       linkWarningDialog: $('linkWarningDialog'), linkWarningUrl: $('linkWarningUrl'),
@@ -483,6 +496,13 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
     let cameraStream = null;
     let scanFrame = 0;
     let decodedText = '';
+    let resolvedText = '';
+    let warningLink = '';
+    let resolveRequestId = 0;
+    const isLocalPage = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const qrProxyUrl = isLocalPage
+      ? 'http://127.0.0.1:8787/'
+      : 'https://qr-proxy.monkeytactics.workers.dev/';
 
     function selectMethod(tab, moveFocus) {
       methodTabs.forEach((item) => {
@@ -514,6 +534,55 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
       } catch (_) { return false; }
     }
 
+    function showLinkWarning(url) {
+      if (!isSafeWebUrl(url)) return;
+      warningLink = url;
+      elements.linkWarningUrl.textContent = url;
+      elements.linkWarningDialog.showModal();
+    }
+
+    async function resolveFinalUrl(url, requestId) {
+      elements.resolvedUrl.hidden = false;
+      elements.resolvedUrlValue.textContent = 'Resolving final destination\u2026';
+      elements.resolvedUrlValue.className = 'resolved-url-value is-pending';
+      elements.checkLinkButton.disabled = true;
+
+      try {
+        const endpoint = new URL(qrProxyUrl);
+        endpoint.searchParams.set('url', url);
+        const response = await fetch(endpoint.toString(), {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit',
+          referrerPolicy: 'no-referrer'
+        });
+        const payload = await response.json();
+
+        if (!response.ok) throw new Error(payload.error || 'HTTP ' + response.status);
+        if (!payload.finalUrl || !isSafeWebUrl(payload.finalUrl)) throw new TypeError('Invalid proxy response');
+        if (requestId !== resolveRequestId) return;
+
+        resolvedText = payload.finalUrl;
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = resolvedText;
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          showLinkWarning(resolvedText);
+        });
+        elements.resolvedUrlValue.textContent = '';
+        elements.resolvedUrlValue.appendChild(link);
+        elements.resolvedUrlValue.className = 'resolved-url-value';
+      } catch (_) {
+        if (requestId !== resolveRequestId) return;
+        resolvedText = '';
+        elements.resolvedUrlValue.textContent = 'Final destination could not be resolved. You can still check the decoded URL safely.';
+        elements.resolvedUrlValue.className = 'resolved-url-value is-error';
+      } finally {
+        if (requestId === resolveRequestId) elements.checkLinkButton.disabled = false;
+      }
+    }
+
     function showGeneratedQrResult(text) {
       if (!window.QRCode || typeof window.QRCode.toDataURL !== 'function') {
         showResult(text, '');
@@ -531,6 +600,8 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
 
     function showResult(text, previewUrl) {
       decodedText = text;
+      resolvedText = '';
+      const requestId = ++resolveRequestId;
       if (previewUrl) {
         elements.resultPreview.src = previewUrl;
         elements.resultPreview.hidden = false;
@@ -546,14 +617,21 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
         link.textContent = text;
         link.addEventListener('click', (event) => {
           event.preventDefault();
-          elements.linkWarningUrl.textContent = text;
-          elements.linkWarningDialog.showModal();
+          showLinkWarning(text);
         });
         elements.resultValue.appendChild(link);
       } else {
         elements.resultValue.textContent = text;
       }
       elements.linkSafetyRow.hidden = !containsUrl;
+      elements.resolvedUrl.hidden = !containsUrl;
+      elements.checkLinkButton.disabled = false;
+      if (containsUrl) {
+        resolveFinalUrl(text, requestId);
+      } else {
+        elements.resolvedUrlValue.textContent = '';
+        elements.resolvedUrlValue.className = 'resolved-url-value';
+      }
       hideStatus();
       elements.resultPanel.style.display = 'block';
       elements.resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -704,13 +782,20 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
     function clearAll() {
       stopCamera();
       decodedText = '';
+      resolvedText = '';
+      warningLink = '';
+      resolveRequestId += 1;
       elements.file.value = '';
       elements.imageUrl.value = '';
       elements.paste.value = '';
       elements.resultValue.textContent = '';
       elements.resultPreview.removeAttribute('src');
       elements.resultPreview.hidden = true;
+      elements.resolvedUrl.hidden = true;
+      elements.resolvedUrlValue.textContent = '';
+      elements.resolvedUrlValue.className = 'resolved-url-value';
       elements.linkSafetyRow.hidden = true;
+      elements.checkLinkButton.disabled = false;
       elements.resultPanel.style.display = 'none';
       context.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
       hideStatus();
@@ -781,15 +866,18 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
       if (!isSafeWebUrl(decodedText)) return;
       // VirusTotal's current GUI accepts lookup values through the query
       // parameter and redirects known URLs to their report.
-      const analysisUrl = 'https://www.virustotal.com/gui/search?query=' + encodeURIComponent(decodedText);
+      const analysisUrl = 'https://www.virustotal.com/gui/search?query=' + encodeURIComponent(resolvedText || decodedText);
       window.open(analysisUrl, '_blank', 'noopener,noreferrer');
     });
     elements.confirmLinkButton.addEventListener('click', () => {
-      if (!isSafeWebUrl(decodedText)) return;
+      if (!isSafeWebUrl(warningLink)) return;
       elements.linkWarningDialog.close();
-      window.open(decodedText, '_blank', 'noopener,noreferrer');
+      window.open(warningLink, '_blank', 'noopener,noreferrer');
     });
-    elements.cancelLinkButton.addEventListener('click', () => elements.linkWarningDialog.close());
+    elements.cancelLinkButton.addEventListener('click', () => {
+      warningLink = '';
+      elements.linkWarningDialog.close();
+    });
     elements.linkWarningDialog.addEventListener('click', (event) => {
       if (event.target === elements.linkWarningDialog) elements.linkWarningDialog.close();
     });
