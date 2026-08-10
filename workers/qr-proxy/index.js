@@ -8,6 +8,8 @@ const ALLOWED_ORIGINS = new Set([
   "http://127.0.0.1:8788",
   "http://localhost:8788",
 ]);
+const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+const MAX_REDIRECTS = 10;
 
 function jsonResponse(body, status, origin) {
   const headers = {
@@ -72,16 +74,41 @@ export default {
     }
 
     try {
-      const response = await fetch(targetUrl.toString(), {
-        method: "GET",
-        redirect: "follow",
-      });
+      let currentUrl = targetUrl;
+      const visitedUrls = new Set();
 
-      if (response.body) {
-        await response.body.cancel();
+      for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
+        const currentUrlString = currentUrl.toString();
+
+        if (visitedUrls.has(currentUrlString)) {
+          throw new Error("Redirect loop detected");
+        }
+        visitedUrls.add(currentUrlString);
+
+        const response = await fetch(currentUrlString, {
+          method: "HEAD",
+          redirect: "manual",
+        });
+
+        if (!REDIRECT_STATUSES.has(response.status)) {
+          return jsonResponse({ finalUrl: currentUrlString }, 200, origin);
+        }
+
+        const location = response.headers.get("Location");
+        if (!location) {
+          throw new Error("Redirect response is missing a Location header");
+        }
+        if (redirectCount === MAX_REDIRECTS) {
+          throw new Error("Too many redirects");
+        }
+
+        currentUrl = new URL(location, currentUrl);
+        if (currentUrl.protocol !== "http:" && currentUrl.protocol !== "https:") {
+          throw new Error("Redirect target must use HTTP or HTTPS");
+        }
       }
 
-      return jsonResponse({ finalUrl: response.url }, 200, origin);
+      throw new Error("Too many redirects");
     } catch (error) {
       console.error("QR proxy request failed", error);
       return jsonResponse({ error: "Unable to resolve URL" }, 502, origin);
