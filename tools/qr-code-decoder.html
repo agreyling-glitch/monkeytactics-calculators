@@ -502,7 +502,7 @@ if (typeof window.jsQR !== 'function' && typeof module === 'object' && typeof mo
     const isLocalPage = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const qrProxyUrl = isLocalPage
       ? 'http://127.0.0.1:8787/'
-      : 'https://qr-proxy.monkeytactics.workers.dev/';
+      : 'https://qr-proxy.monkeytactics.com/';
 
     function selectMethod(tab, moveFocus) {
       methodTabs.forEach((item) => {
