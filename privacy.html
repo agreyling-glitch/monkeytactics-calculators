@@ -10,12 +10,12 @@
   <title>Privacy Policy — MonkeyTactics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="MonkeyTactics Privacy Policy — what data we collect, how we use it, and how we keep your information private." />
+        content="MonkeyTactics Privacy Policy — local browser processing, limited password breach and QR link requests, device-local caching, and third-party services." />
   <meta name="robots" content="noindex, follow" />
 
   <!-- Open Graph -->
   <meta property="og:title"       content="Privacy Policy — MonkeyTactics" />
-  <meta property="og:description" content="Learn how MonkeyTactics handles your data — and why most of it never leaves your device." />
+  <meta property="og:description" content="Learn how MonkeyTactics processes most inputs locally and handles limited password breach checks, QR link resolution, and device-local caching." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/privacy" />
 
@@ -135,6 +135,11 @@
       font-weight: 600;
     }
 
+    .badge-limited {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
     /* Contact card */
     .contact-card {
       margin-top: 1rem;
@@ -193,7 +198,7 @@
     }
   </style>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-25" />
+  <meta name="date" content="2026-08-11" />
 </head>
 
 <body>
@@ -213,7 +218,7 @@
     <!-- POLICY BODY -->
     <div class="policy-body">
 
-      <span class="last-updated">Last updated: July 25, 2026</span>
+      <span class="last-updated">Last updated: August 11, 2026</span>
 
       <!-- QUICK SUMMARY TABLE -->
       <section class="policy-section" aria-labelledby="summary-heading">
@@ -230,9 +235,14 @@
           </thead>
           <tbody>
             <tr>
-              <td>Calculator inputs &amp; results</td>
-              <td><span class="badge-no">No</span></td>
-              <td>Runs entirely in your browser — never sent anywhere</td>
+              <td>Calculator and tool inputs</td>
+              <td><span class="badge-limited">Limited</span></td>
+              <td>Normally processed locally; the password breach check and QR web-link resolver have the limited disclosures described below</td>
+            </tr>
+            <tr>
+              <td>Device-local breach cache</td>
+              <td><span class="badge-limited">Limited</span></td>
+              <td>Stores anonymous range replies for up to 24 hours; never stores passwords or complete password hashes</td>
             </tr>
             <tr>
               <td>Personal information</td>
@@ -250,9 +260,9 @@
               <td>Google may serve ads; see Google's own privacy policy</td>
             </tr>
             <tr>
-              <td>Data sold to third parties</td>
+              <td>Personal data sold</td>
               <td><span class="badge-no">No</span></td>
-              <td>We do not sell or share your data with third parties</td>
+              <td>We do not sell personal data; limited tool requests are used only to provide the features described below</td>
             </tr>
           </tbody>
         </table>
@@ -271,14 +281,30 @@
       <!-- 2. CALCULATOR DATA -->
       <section class="policy-section" aria-labelledby="calculator-heading">
         <h2 id="calculator-heading">2. Calculator &amp; Tool Data</h2>
-        <p>All calculations on MonkeyTactics run <strong>entirely within your browser</strong> using
-           client-side JavaScript. This means:</p>
+        <p>Most calculations and tool operations on MonkeyTactics run <strong>entirely within your browser</strong>
+           using client-side JavaScript. Except for the limited network features described below:</p>
         <ul>
-          <li>Numbers, values, and inputs you enter are <strong>never transmitted</strong> to any server.</li>
+          <li>Numbers, financial figures, health metrics, uploaded files, images, and other ordinary tool inputs are not transmitted to MonkeyTactics.</li>
           <li>Results are computed locally on your device and displayed instantly.</li>
-          <li>When you close or navigate away from a tool page, any entered data is gone — we do not store it.</li>
+          <li>Entered values are not saved as user records or associated with an account.</li>
         </ul>
-        <p>Your financial figures, health metrics, and any other inputs are yours alone.</p>
+        <h3>Password breach checks</h3>
+        <p>When you choose <strong>Check for breach</strong> on the Password Generator, your browser creates
+           a SHA-1 fingerprint of the password locally. Only the first five characters of that fingerprint
+           are sent to the Pwned Passwords range API. The password and complete fingerprint are never sent.
+           The API returns a large anonymous group of possible matches, and the exact comparison happens on
+           your device.</p>
+        <p>The anonymous range reply is stored in your browser's IndexedDB cache for up to 24 hours so repeated
+           checks do not make another API request. The cache keeps no more than 100 recently used range replies.
+           It does not store the entered password, complete password hash, or selected matching record, and your
+           browser may clear the cache according to its own storage rules.</p>
+        <h3>QR Code Decoder web-link resolution</h3>
+        <p>QR images, screenshots, clipboard images, and camera frames are decoded locally and are not uploaded.
+           If the decoded content is an HTTP or HTTPS web link, the complete decoded link is sent to the
+           <strong>MonkeyTactics privacy proxy</strong> only to resolve its final destination for your review.
+           The proxy follows the link's redirect chain using header-only requests and returns the final URL; it
+           does not automatically open or navigate your browser to the decoded destination. Other decoded QR
+           content is not sent to the proxy.</p>
       </section>
 
       <!-- 3. CLOUDFLARE CDN & SECURITY -->

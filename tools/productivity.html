@@ -10,11 +10,11 @@
   <title>Free Productivity Tools: Password, OCR &amp; Word Counter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Free online productivity tools — generate passwords, extract text from images with OCR, and count words and characters. Fast, private, no sign-up required." />
+        content="Free productivity tools to generate and analyze passwords, check known breach exposure, extract text with OCR, and count words and characters." />
 
   <!-- Open Graph -->
   <meta property="og:title"       content="Free Productivity Tools — MonkeyTactics" />
-  <meta property="og:description" content="Generate passwords, extract text from images, and count words and characters. Free, private, and browser-based." />
+  <meta property="og:description" content="Generate and analyze passwords, privately check known breach exposure, extract text from images, and count words and characters." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/productivity" />
 
@@ -84,7 +84,7 @@
   </style>
   <script src="/assets/js/shared/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-26" />
+  <meta name="date" content="2026-08-11" />
 
   <script type="application/ld+json">
 {
@@ -135,8 +135,8 @@
 
     <section class="hero hero--inner" aria-labelledby="productivity-heading">
       <h1 id="productivity-heading">Free Productivity Tools</h1>
-      <p>Three sharp tools to help you work smarter — generate secure passwords, extract text
-         from images, and count every word and character in your writing.</p>
+      <p>Three sharp tools to help you work smarter — generate and analyze passwords, check known
+         breach exposure, extract text from images, and count every word and character in your writing.</p>
       <div class="hero-actions">
         <a href="/tools/password-generator" class="btn-primary">🔑 Try Password Generator</a>
         <a href="/tools/" class="btn-ghost">Browse all tools</a>
@@ -153,11 +153,11 @@
         <a href="/tools/password-generator" class="tool-card">
           <span class="card-icon" aria-hidden="true">🔑</span>
           <strong>Password Generator</strong>
-          <div>Generate strong, random passwords with customisable length, uppercase, lowercase, numbers, and special symbols. Copy to clipboard instantly.</div>
+          <div>Generate passwords up to 2,048 characters, inspect detailed strength analytics, and privately check known breach exposure.</div>
           <div class="card-tags">
             <span class="card-tag">Security</span>
             <span class="card-tag">Password</span>
-            <span class="card-tag">Random</span>
+            <span class="card-tag">Breach Check</span>
           </div>
           <span class="card-arrow" aria-hidden="true">›</span>
         </a>
@@ -237,10 +237,11 @@
     <!-- SEO CONTENT -->
     <div class="seo-section">
       <h2>Why these tools are built with privacy in mind</h2>
-      <p>The Password Generator runs entirely in your browser using the Web Crypto API — the same
-         standard used by browsers for secure random number generation. Generated passwords are never
-         transmitted to any server, logged, or stored. They exist only in your browser window until
-         you copy them.</p>
+      <p>Password generation and analytics run in your browser using the Web Crypto API. Generated
+         passwords and passwords entered for analysis are not transmitted, logged, or stored. If you
+         select <strong>Check for breach</strong>, only the first five characters of a locally created
+         SHA-1 fingerprint are sent to the Pwned Passwords range API. Anonymous range replies are cached
+         on your device for up to 24 hours, with a maximum of 100 entries.</p>
       <p>Similarly, text you paste into the Word &amp; Character Counter never leaves your device.
          It is processed locally by JavaScript with zero server involvement, making it safe to use
          with sensitive documents, drafts, or confidential writing.</p>
@@ -262,7 +263,7 @@
         </li>
         <li class="faq-item">
           <h3>What is the maximum password length supported?</h3>
-          <p>The Password Generator supports passwords up to 128 characters. For most use cases,
+          <p>The Password Generator supports passwords up to 2,048 characters. For most use cases,
              16–32 characters provides an excellent balance of security and usability.</p>
         </li>
         <li class="faq-item">

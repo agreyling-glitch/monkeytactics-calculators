@@ -9,13 +9,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Free QR Code Decoder — Scan Images &amp; Camera</title>
-  <meta name="description" content="Free QR Code Decoder that scans images, screenshots, URLs, or your camera. Private, browser‑only processing with no uploads, and it never opens decoded links.">
+  <meta name="description" content="Decode QR images locally without uploads. Decoded web links go only to the MonkeyTactics privacy proxy to resolve their final destination for review.">
   <link rel="canonical" href="https://monkeytactics.com/tools/qr-code-decoder">
   <meta name="robots" content="index, follow">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-07-24">
+  <meta name="date" content="2026-08-11">
   <meta property="og:title" content="Free QR Code Decoder — Scan Images &amp; Camera">
-  <meta property="og:description" content="Decode a QR code from an image, screenshot, URL, clipboard, or camera. Processing stays private in your browser.">
+  <meta property="og:description" content="Decode QR images locally and review the final destination of web links through the MonkeyTactics privacy proxy.">
   <meta property="og:url" content="https://monkeytactics.com/tools/qr-code-decoder">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MonkeyTactics">
@@ -28,14 +28,14 @@
         "@id": "https://monkeytactics.com/tools/qr-code-decoder#app",
         "name": "QR Code Decoder",
         "url": "https://monkeytactics.com/tools/qr-code-decoder",
-        "description": "Decode any QR code safely from an image, screenshot, URL, or your camera. All processing happens privately in your browser with no uploads, and the tool never opens or navigates to decoded links.",
+        "description": "Decode QR images locally without uploads. Decoded web links are sent only to the MonkeyTactics privacy proxy to resolve their final destination for review, and the tool never opens them automatically.",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
         "browserRequirements": "Requires JavaScript; camera scanning requires camera permission.",
         "isAccessibleForFree": true,
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
-        "dateModified": "2026-08-05"
+        "dateModified": "2026-08-11"
       },
       {
         "@type": "BreadcrumbList",
@@ -71,7 +71,7 @@
           {
             "@type": "Question",
             "name": "How can I check whether a decoded QR link is safe?",
-            "acceptedAnswer": { "@type": "Answer", "text": "When the decoded content is a web URL, use Check Link Safely to open its VirusTotal URL analysis page before visiting the link." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Decoded web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review; the tool never opens them automatically. You can then use Check Link Safely to open the final URL's VirusTotal analysis page before visiting it." }
           }
         ]
       }
@@ -245,8 +245,8 @@
         <div>
           <p class="premium-eyebrow">Private, deliberate QR inspection</p>
           <h1 id="tool-heading">QR Code Decoder</h1>
-          <p class="premium-hero-copy">Decode a QR code from an upload, screenshot, image URL, or camera without sending the image anywhere. Links are revealed for inspection and never opened automatically.</p>
-          <div class="premium-hero-pills" aria-label="QR decoder features"><span>Four scanning methods</span><span>Local browser processing</span></div>
+          <p class="premium-hero-copy">Decode a QR code from an upload, screenshot, image URL, or camera without uploading the image. Decoded web links are sent only to the MonkeyTactics privacy proxy to resolve their final destination for review and are never opened automatically.</p>
+          <div class="premium-hero-pills" aria-label="QR decoder features"><span>Four scanning methods</span><span>Local image processing</span><span>Private link resolution</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>Inspect before you follow</span><strong>Speed <i>meets</i> caution</strong><small>Decode locally. Decide what opens.</small></div>
       </div>
@@ -255,7 +255,7 @@
     <section class="qr-decoder-section" aria-labelledby="decoder-heading">
       <div class="tool-widget">
         <div class="premium-app-title decoder-app-title"><div class="premium-section-kicker">01 / Decode</div><h2 id="decoder-heading">Choose how to scan</h2><p>Provide a QR image using the method that fits your situation. The same private decoding pipeline handles every option.</p></div>
-        <p class="privacy-note">Images are processed locally and are never uploaded by this tool.</p>
+        <p class="privacy-note">Images are processed locally and are never uploaded. If decoded content is a web link, the link is sent to the MonkeyTactics privacy proxy only to resolve its final destination for your review.</p>
 
         <div class="method-tabs" role="tablist" aria-label="Choose how to provide a QR code image">
           <button id="upload-tab" class="method-tab" type="button" role="tab"
@@ -373,14 +373,14 @@
     </div>
 
     <div class="seo-section">
-      <h2>Private, browser-based QR code scanning (No Uploads, No Tracking)</h2>
+      <h2>Local QR image scanning with private link resolution</h2>
       <p>This free QR code reader performs decoding locally with JavaScript and the Canvas API. Uploaded files, pasted screenshots, and camera frames are not uploaded to MonkeyTactics or stored by this utility.</p>
-      <p>If a QR code contains a website address, the result appears as a clickable link. After decoding a QR code, you can optionally check the link using VirusTotal to ensure it’s safe before visiting it.</p>
+      <p>If a QR code contains a website address, that decoded web link is sent to the MonkeyTactics privacy proxy only to follow redirects and resolve the final destination for your review. The proxy uses header-only requests; it does not send the QR image or automatically open the destination in your browser. You can optionally check the final link using VirusTotal before visiting it.</p>
     </div>
 
     <div class="seo-section">
       <h2>Is This QR Code Safe?</h2>
-       <p>Safety Notice: This tool will never open or navigate to a decoded link automatically. Web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review.</p>
+       <p><strong>Safety Notice:</strong> This tool will never open or navigate to a decoded link automatically. Web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review. Review unfamiliar destinations before choosing to open them.</p>
     </div>
 
     <section class="faq-section" aria-labelledby="faq-heading">
@@ -413,7 +413,7 @@
             </li>
             <li class="faq-item">
               <h3>How can I check whether a decoded QR link is safe?</h3>
-              <p>When the result is a web URL, select <strong>Check Link Safely</strong> to open its VirusTotal analysis page. Review unfamiliar destinations before visiting them or entering personal information.</p>
+              <p>Decoded web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review; they are never opened automatically. Select <strong>Check Link Safely</strong> to open the final URL's VirusTotal analysis page. Review unfamiliar destinations before visiting them or entering personal information.</p>
             </li>
             <li class="faq-item">
               <h3>What image formats does the QR decoder support?</h3>

@@ -1,6 +1,11 @@
 const ASCII_SYMBOLS = "!@#$%^&*()-_=+[]{}|;:,.<>?";
 const SECONDS_PER_YEAR = 31_556_952;
 const COLLISION_SAMPLE_SIZE = 1_000_000_000;
+export const PWNED_RANGE_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+export const PWNED_RANGE_CACHE_MAX_ENTRIES = 100;
+const PWNED_RANGE_CACHE_DB = "monkeytactics-password-check";
+const PWNED_RANGE_CACHE_STORE = "ranges";
+const PWNED_RANGE_CACHE_MAX_RESPONSE_LENGTH = 100_000;
 
 function characterType(character) {
   if (character.codePointAt(0) > 0x7f) return "unicode";
@@ -205,4 +210,160 @@ export function analyzeCredential(value) {
       type: characterType(character)
     }))
   };
+}
+
+/**
+ * Create the uppercase SHA-1 digest required by the Pwned Passwords range API.
+ * The password is encoded and hashed entirely in the caller's browser.
+ */
+export async function sha1Hex(value, cryptoApi = globalThis.crypto) {
+  if (!cryptoApi?.subtle) throw new Error("Secure hashing is unavailable in this browser");
+  const bytes = new TextEncoder().encode(String(value));
+  const digest = await cryptoApi.subtle.digest("SHA-1", bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+}
+
+function requestResult(request) {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("Local cache request failed"));
+  });
+}
+
+function transactionComplete(transaction) {
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error || new Error("Local cache transaction failed"));
+    transaction.onabort = () => reject(transaction.error || new Error("Local cache transaction was cancelled"));
+  });
+}
+
+function openPwnedRangeCache(indexedDb) {
+  if (!indexedDb?.open) return Promise.resolve(null);
+  return new Promise((resolve, reject) => {
+    const request = indexedDb.open(PWNED_RANGE_CACHE_DB, 1);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      const store = database.objectStoreNames.contains(PWNED_RANGE_CACHE_STORE)
+        ? request.transaction.objectStore(PWNED_RANGE_CACHE_STORE)
+        : database.createObjectStore(PWNED_RANGE_CACHE_STORE, { keyPath: "prefix" });
+      if (!store.indexNames.contains("lastAccessed")) {
+        store.createIndex("lastAccessed", "lastAccessed");
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("Local cache is unavailable"));
+    request.onblocked = () => reject(new Error("Local cache upgrade was blocked"));
+  });
+}
+
+/**
+ * Device-local cache for anonymous Pwned Passwords range responses.
+ * It never stores a password, full password hash, or selected match.
+ */
+export function createPwnedRangeCache(
+  indexedDb = globalThis.indexedDB,
+  {
+    ttlMs = PWNED_RANGE_CACHE_TTL_MS,
+    maxEntries = PWNED_RANGE_CACHE_MAX_ENTRIES,
+    now = () => Date.now()
+  } = {}
+) {
+  let databasePromise;
+  const getDatabase = () => {
+    if (!databasePromise) databasePromise = openPwnedRangeCache(indexedDb);
+    return databasePromise;
+  };
+
+  return {
+    async get(prefix) {
+      const database = await getDatabase();
+      if (!database) return null;
+      const transaction = database.transaction(PWNED_RANGE_CACHE_STORE, "readwrite");
+      const complete = transactionComplete(transaction);
+      const store = transaction.objectStore(PWNED_RANGE_CACHE_STORE);
+      const record = await requestResult(store.get(prefix));
+      const currentTime = now();
+      if (!record || currentTime - record.fetchedAt >= ttlMs || record.fetchedAt > currentTime) {
+        if (record) store.delete(prefix);
+        await complete;
+        return null;
+      }
+      store.put({ ...record, lastAccessed: currentTime });
+      await complete;
+      return { responseText: record.responseText, fetchedAt: record.fetchedAt };
+    },
+
+    async set(prefix, responseText) {
+      if (typeof responseText !== "string" || responseText.length > PWNED_RANGE_CACHE_MAX_RESPONSE_LENGTH) return;
+      const database = await getDatabase();
+      if (!database) return;
+      const transaction = database.transaction(PWNED_RANGE_CACHE_STORE, "readwrite");
+      const complete = transactionComplete(transaction);
+      const store = transaction.objectStore(PWNED_RANGE_CACHE_STORE);
+      const currentTime = now();
+      store.put({ prefix, responseText, fetchedAt: currentTime, lastAccessed: currentTime });
+      const records = await requestResult(store.getAll());
+      records
+        .sort((left, right) => right.lastAccessed - left.lastAccessed)
+        .slice(Math.max(1, maxEntries))
+        .forEach((record) => store.delete(record.prefix));
+      await complete;
+    }
+  };
+}
+
+const defaultPwnedRangeCache = createPwnedRangeCache();
+
+/**
+ * Check a password with k-anonymity: only the first five SHA-1 characters
+ * leave the browser. The returned range is filtered locally to exact matches.
+ */
+export async function checkPwnedPassword(
+  value,
+  fetchImpl = globalThis.fetch,
+  cryptoApi = globalThis.crypto,
+  cache = defaultPwnedRangeCache
+) {
+  const password = String(value);
+  if (!password) throw new Error("Enter a password before checking for a breach");
+
+  const hash = await sha1Hex(password, cryptoApi);
+  const prefix = hash.slice(0, 5);
+  const suffix = hash.slice(5);
+  let cachedRange = null;
+  try {
+    cachedRange = await cache?.get(prefix);
+  } catch {
+    cachedRange = null;
+  }
+
+  let responseText = cachedRange?.responseText;
+  let fetchedAt = cachedRange?.fetchedAt;
+  const cacheHit = typeof responseText === "string";
+  if (!cacheHit) {
+    if (typeof fetchImpl !== "function") throw new Error("Breach checking is unavailable in this browser");
+    const response = await fetchImpl(`https://api.pwnedpasswords.com/range/${prefix}`, {
+      method: "GET",
+      headers: { "Add-Padding": "true" }
+    });
+    if (!response.ok) throw new Error("The breach service is temporarily unavailable");
+    responseText = await response.text();
+    fetchedAt = Date.now();
+    try {
+      await cache?.set(prefix, responseText);
+    } catch {
+      // Browser privacy settings or storage limits can disable caching.
+    }
+  }
+
+  const matches = responseText
+    .split(/\r?\n/)
+    .map((line) => line.trim().match(/^([A-F0-9]{35}):(\d+)$/i))
+    .filter((match) => match && match[1].toUpperCase() === suffix && Number(match[2]) > 0)
+    .map((match) => ({ suffix: match[1].toUpperCase(), count: Number(match[2]) }));
+
+  return { prefix, matches, cacheHit, fetchedAt };
 }

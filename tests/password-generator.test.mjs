@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
+import { webcrypto } from "node:crypto";
 
 const siteRoot = path.resolve(import.meta.dirname, "..");
 const modulePath = path.join(siteRoot, "assets", "js", "tools", "password-generator", "password-generator.js");
@@ -11,7 +12,13 @@ const { generatePassword } = await import(moduleUrl);
 const analyticsPath = path.join(siteRoot, "assets", "js", "tools", "password-generator", "credential-analytics.js");
 const analyticsSource = fs.readFileSync(analyticsPath, "utf8");
 const analyticsUrl = `data:text/javascript;base64,${Buffer.from(analyticsSource).toString("base64")}`;
-const { analyzeCredential } = await import(analyticsUrl);
+const {
+  analyzeCredential,
+  sha1Hex,
+  checkPwnedPassword,
+  PWNED_RANGE_CACHE_TTL_MS,
+  PWNED_RANGE_CACHE_MAX_ENTRIES
+} = await import(analyticsUrl);
 
 test("password generator supports passwords up to 2,048 characters", () => {
   const password = generatePassword({
@@ -73,7 +80,41 @@ test("password generator publishes capability-aligned SEO metadata and content",
   assert.match(html, /"dateModified": "2026-08-11"/);
   assert.match(html, /aria-label="Password generator guide"/);
   assert.match(html, /aria-label="Password generator capabilities"/);
+  assert.match(html, /Password Generator, Analyzer &amp; Breach Checker/);
+  assert.match(html, /id="check-passwords"/);
+  assert.match(html, /Check password strength and known breach exposure/);
+  assert.match(html, /only the 100 most recently used replies are kept/i);
+  assert.match(html, /How does the password breach check protect my password\?/);
+  assert.match(html, /What password information is cached\?/);
   assert.doesNotMatch(html, /up to 30 passwords/i);
+
+  const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((match) => JSON.parse(match[1]));
+  assert.ok(structuredData.length >= 3);
+});
+
+test("site directories and privacy disclosures describe password checks and QR link resolution", () => {
+  const privacy = fs.readFileSync(path.join(siteRoot, "privacy.html"), "utf8");
+  const productivity = fs.readFileSync(path.join(siteRoot, "tools", "productivity.html"), "utf8");
+  const directory = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
+  const decoder = fs.readFileSync(path.join(siteRoot, "tools", "qr-code-decoder.html"), "utf8");
+
+  assert.match(privacy, /Last updated: August 11, 2026/);
+  assert.match(privacy, /Only the first five characters[\s\S]*Pwned Passwords range API/);
+  assert.match(privacy, /IndexedDB cache for up to 24 hours/);
+  assert.match(privacy, /MonkeyTactics privacy proxy[\s\S]*resolve its final destination for your review/);
+  assert.match(privacy, /header-only requests/);
+
+  assert.match(productivity, /passwords up to 2,048 characters/);
+  assert.match(productivity, /privately check known breach exposure/);
+  assert.doesNotMatch(productivity, /supports passwords up to 128 characters/);
+  assert.match(directory, /password generator analyzer checker breach pwned entropy/);
+  assert.match(directory, /Generate, analyze, and check breach exposure/);
+
+  assert.match(decoder, /Web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review/);
+  assert.match(decoder, /The proxy uses header-only requests/);
+  const decoderStructuredData = JSON.parse(decoder.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  assert.match(JSON.stringify(decoderStructuredData), /MonkeyTactics privacy proxy/);
 });
 
 test("credential analytics reports character distribution and Shannon entropy", () => {
@@ -112,10 +153,91 @@ test("credential analytics includes diagnostics, attack estimates, collisions, a
   ]));
 });
 
+test("password breach lookup hashes locally and sends only the five-character prefix", async () => {
+  const password = "password";
+  const hash = await sha1Hex(password, webcrypto);
+  assert.equal(hash, "5BAA61E4C9B93F3F0682250B6CF8331B7EE68FD8");
+
+  let requestedUrl = "";
+  const fakeFetch = async (url, options) => {
+    requestedUrl = url;
+    assert.equal(options.method, "GET");
+    assert.equal(options.headers["Add-Padding"], "true");
+    assert.doesNotMatch(url, /1E4C9B93F3F0682250B6CF8331B7EE68FD8/i);
+    assert.equal("body" in options, false);
+    return {
+      ok: true,
+      text: async () => "1E4C9B93F3F0682250B6CF8331B7EE68FD8:3303003\r\nFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:0"
+    };
+  };
+  const result = await checkPwnedPassword(password, fakeFetch, webcrypto);
+
+  assert.equal(requestedUrl, "https://api.pwnedpasswords.com/range/5BAA6");
+  assert.deepEqual(result.matches, [{ suffix: "1E4C9B93F3F0682250B6CF8331B7EE68FD8", count: 3303003 }]);
+});
+
+test("password breach lookup discards zero-count padding records", async () => {
+  const fakeFetch = async () => ({
+    ok: true,
+    text: async () => "1E4C9B93F3F0682250B6CF8331B7EE68FD8:0"
+  });
+  const result = await checkPwnedPassword("password", fakeFetch, webcrypto);
+  assert.deepEqual(result.matches, []);
+});
+
+test("password breach lookup reuses a local range cache", async () => {
+  const records = new Map();
+  const cache = {
+    get: async (prefix) => records.get(prefix) || null,
+    set: async (prefix, responseText) => records.set(prefix, { responseText, fetchedAt: 123 })
+  };
+  let requestCount = 0;
+  const fakeFetch = async () => {
+    requestCount += 1;
+    return {
+      ok: true,
+      text: async () => "1E4C9B93F3F0682250B6CF8331B7EE68FD8:42"
+    };
+  };
+
+  const first = await checkPwnedPassword("password", fakeFetch, webcrypto, cache);
+  const second = await checkPwnedPassword("password", fakeFetch, webcrypto, cache);
+
+  assert.equal(first.cacheHit, false);
+  assert.equal(second.cacheHit, true);
+  assert.equal(requestCount, 1);
+  assert.deepEqual(second.matches, [{ suffix: "1E4C9B93F3F0682250B6CF8331B7EE68FD8", count: 42 }]);
+  assert.equal(PWNED_RANGE_CACHE_TTL_MS, 86_400_000);
+  assert.equal(PWNED_RANGE_CACHE_MAX_ENTRIES, 100);
+});
+
+test("check-my-password tab exposes strength, analytics, and breach controls", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "tools", "password-generator.html"), "utf8");
+  assert.match(html, /data-mode="check"[^>]*[\s\S]*?Check my Password/);
+  assert.match(html, /id="panel-check"/);
+  assert.match(html, /id="passwordToCheck" type="password"/);
+  assert.match(html, /id="checkBreachBtn"/);
+  assert.match(html, /class="btn-calculate breach-check-button"/);
+  assert.match(html, /What happens when you check\?/);
+  assert.match(html, /Your full password and full fingerprint are never sent/);
+  assert.match(html, /cached on this device for up to 24 hours/);
+  assert.match(html, /only the 100 most recently used replies are kept/);
+  assert.match(html, /className = 'breach-warning-icon'/);
+  assert.doesNotMatch(html, /suffixLabel\.textContent/);
+  assert.match(html, /Character Distribution/);
+  assert.match(html, /Shannon Entropy per Character/);
+  assert.match(html, /Randomness Diagnostics/);
+  assert.match(html, /Brute-Force Time Estimator/);
+  assert.match(html, /Collision Probability/);
+  assert.match(html, /Character Heatmap/);
+  assert.match(html, /checkPwnedPassword\(password\)/);
+  assert.match(html, /credential-analytics\.js\?v=20260811-3/);
+});
+
 test("analytics modal renders premium randomness and attack-resistance panels", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "password-generator.html"), "utf8");
 
-  assert.match(html, /credential-analytics\.js\?v=20260811-1/);
+  assert.match(html, /credential-analytics\.js\?v=20260811-3/);
   assert.match(html, /id="chiSquareStatus"/);
   assert.match(html, /id="runsStatus"/);
   assert.match(html, /id="monobitStatus"/);
