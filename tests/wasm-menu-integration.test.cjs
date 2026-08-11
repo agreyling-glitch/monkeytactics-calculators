@@ -258,6 +258,15 @@ test("the Word and Character Counter uses the premium text analysis presentation
   assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
 });
 
+test("the Word and Character Counter keeps analysis controls inside mobile viewports", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "tools", "word-character-counter.html"), "utf8");
+  assert.match(html, /\.calc-layout > \*,[\s\S]*?\.results-col \{ min-width: 0; \}/);
+  assert.match(html, /\.textarea-actions \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\); \}/);
+  assert.match(html, /#resultsCards \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow-x: visible;/);
+  assert.match(html, /\.analysis-card-grid \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow-x: visible;/);
+  assert.match(html, /\.keywords-heading-row \{ align-items: flex-start; flex-direction: column; \}/);
+});
+
 test("the Unit Converter uses the premium measurement presentation", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "unit-converter.html"), "utf8");
   assert.match(html, /class="premium-tool-page unit-tool-page"/);

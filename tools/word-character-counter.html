@@ -7,35 +7,93 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>Word &amp; Character Counter with Reading Time</title>
+  <title>Free Word Counter &amp; Character Counter | Text Analyzer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Free word and character counter — count words and characters (with and without spaces), estimate reading time, and see keyword density for any text. No sign-up required." />
+        content="Count words, characters, sentences, and paragraphs. Check reading time, readability, keyword density, n-grams, and text structure privately in your browser." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="MonkeyTactics" />
+  <meta name="date" content="2026-07-22" />
+  <meta name="dateModified" content="2026-08-11" />
+  <meta name="theme-color" content="#0f172a" />
 
   <!-- Open Graph -->
-  <meta property="og:title"       content="Word &amp; Character Counter — MonkeyTactics" />
-  <meta property="og:description" content="Count words and characters, estimate reading time, and spot top keywords — all in your browser. Free and private." />
+  <meta property="og:title"       content="Free Word Counter &amp; Character Counter" />
+  <meta property="og:description" content="Analyze word and character counts, readability, keyword density, n-grams, and text structure privately in your browser." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/word-character-counter" />
+  <meta property="og:site_name"   content="MonkeyTactics" />
+  <meta property="og:locale"      content="en_US" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Free Word Counter &amp; Character Counter" />
+  <meta name="twitter:description" content="Analyze counts, readability, keywords, n-grams, and writing structure locally in your browser." />
 
   <!-- Canonical -->
   <link rel="canonical" href="https://monkeytactics.com/tools/word-character-counter" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
 
-  <!-- Breadcrumb structured data -->
+  <!-- Page and application structured data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home",        "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Productivity", "item": "https://monkeytactics.com/tools/productivity" },
-      { "@type": "ListItem", "position": 3, "name": "Word & Character Counter", "item": "https://monkeytactics.com/tools/word-character-counter" }
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://monkeytactics.com/tools/word-character-counter#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://monkeytactics.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://monkeytactics.com/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Word & Character Counter", "item": "https://monkeytactics.com/tools/word-character-counter" }
+        ]
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://monkeytactics.com/tools/word-character-counter#app",
+        "name": "Free Word Counter and Character Counter",
+        "alternateName": "MonkeyTactics Text Analyzer",
+        "url": "https://monkeytactics.com/tools/word-character-counter",
+        "description": "A free, private browser-based text analyzer for live word and character counts, reading time, readability scores, keyword density, n-grams, text-structure charts, report exports, and selected-word unscrambling.",
+        "applicationCategory": "UtilitiesApplication",
+        "applicationSubCategory": "Writing and Text Analysis Tool",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript and a modern web browser",
+        "isAccessibleForFree": true,
+        "inLanguage": "en-US",
+        "featureList": [
+          "Live word, character, sentence, and paragraph counts",
+          "Character count with and without whitespace",
+          "Adjustable reading-time estimate",
+          "Flesch-Kincaid, Gunning Fog, SMOG, and Coleman-Liau readability scores",
+          "Keyword counts, density, and stopword filtering",
+          "Unigram, bigram, and trigram analysis",
+          "Sentence rhythm, paragraph structure, and keyword distribution charts",
+          "Plain-text and Markdown analysis exports",
+          "Local selected-word unscrambling with Scrabble scores",
+          "Private in-browser analysis"
+        ],
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@id": "https://monkeytactics.com/#organization" },
+        "author": { "@id": "https://monkeytactics.com/#organization" },
+        "datePublished": "2026-07-22",
+        "dateModified": "2026-08-11"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://monkeytactics.com/tools/word-character-counter#webpage",
+        "url": "https://monkeytactics.com/tools/word-character-counter",
+        "name": "Free Word Counter and Character Counter",
+        "description": "Count words and characters, estimate reading time, measure readability and keyword density, explore n-grams and writing structure, and export a text analysis report.",
+        "inLanguage": "en-US",
+        "isPartOf": { "@id": "https://monkeytactics.com/#website" },
+        "breadcrumb": { "@id": "https://monkeytactics.com/tools/word-character-counter#breadcrumb" },
+        "mainEntity": { "@id": "https://monkeytactics.com/tools/word-character-counter#app" },
+        "datePublished": "2026-07-22",
+        "dateModified": "2026-08-11"
+      }
     ]
   }
   </script>
-
-  <!-- WebApplication structured data -->
 
   <!-- FAQPage structured data -->
   <script type="application/ld+json">
@@ -70,8 +128,13 @@
       },
       {
         "@type": "Question",
+        "name": "Can I export the text analysis?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. After you add text, use Export Analysis to download the counts, readability scores, and top keywords as a plain-text or Markdown report." }
+      },
+      {
+        "@type": "Question",
         "name": "Is my text private?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes — all analysis runs entirely in your browser using JavaScript. Nothing you paste is transmitted to any server or stored anywhere. See our Privacy Policy for details." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Analysis runs in your browser, and text entered in the tool is not transmitted to a server or stored by the tool. See our Privacy Policy for details." }
       }
     ]
   }
@@ -121,6 +184,10 @@
       gap: 2rem;
       align-items: start;
     }
+    .calc-layout > *,
+    .inputs-col,
+    .input-group,
+    .results-col { min-width: 0; }
 
     /* ── Inputs ── */
     .input-group        { margin-bottom: 1.1rem; }
@@ -433,6 +500,28 @@
     .keywords-table tr:last-child td { border-bottom: none; }
     .keywords-table tr:hover td      { background: rgba(255,255,255,0.02); }
 
+    .unscramble-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .unscramble-pagination .btn-ghost {
+      min-width: 5.75rem;
+      padding: 0.45rem 0.7rem;
+    }
+    .unscramble-pagination .btn-ghost:disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+    #unscramble-popup-page-status {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
     .keywords-empty {
       padding: 1.5rem 1rem;
       text-align: center;
@@ -618,47 +707,29 @@
       .hero--inner h1 { font-size: 1.5rem; }
       .tool-widget  { padding: 1.25rem; }
       .result-card.primary .result-value { font-size: 1.75rem; }
-      .stat-trio    { grid-template-columns: 1fr 1fr; }
-      .analysis-card-grid { grid-template-columns: repeat(4, minmax(90px, 1fr)); }
+      .textarea-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .textarea-actions .unscramble-btn { grid-column: 1 / -1; }
+      #resultsCards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow-x: visible;
+      }
+      #resultsCards > .reading-speed-card,
+      #resultsCards > .result-card.primary,
+      #resultsCards > .stat-trio > .result-card:last-child { grid-column: 1 / -1; }
+      .reading-speed-inline { grid-template-columns: 64px minmax(0, 1fr); }
+      .stat-trio { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .analysis-card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow-x: visible;
+      }
+      .keywords-section { min-width: 0; max-width: 100%; }
+      .keywords-heading-row { align-items: flex-start; flex-direction: column; }
+      .keywords-heading-row .check { margin-left: 0; white-space: normal; }
+      .keywords-wrap { max-width: 100%; }
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-14" />
   <script src="/assets/js/shared/ads.js" defer></script>
-  <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-22" />
-
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebApplication",
-      "@id": "https://monkeytactics.com/tools/word-character-counter.html#app",
-      "name": "Word & Character Counter",
-      "url": "https://monkeytactics.com/tools/word-character-counter.html",
-      "description": "Count words and characters in text.",
-      "applicationCategory": "UtilitiesApplication",
-      "operatingSystem": "Any",
-      "isAccessibleForFree": true,
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "publisher": {
-        "@id": "https://monkeytactics.com/#organization"
-      },
-      "author": {
-        "@id": "https://monkeytactics.com/#organization"
-      },
-      "reviewedBy": {
-        "@id": "https://monkeytactics.com/#organization"
-      },
-      "dateModified": "2026-08-05"
-    }
-  ]
-}
-  </script>
   <link rel="stylesheet" href="/assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
 </head>
 
@@ -682,8 +753,8 @@
         <div>
           <p class="premium-eyebrow">Live writing metrics, locally calculated</p>
           <h1 id="tool-heading">Word &amp; Character Counter</h1>
-          <p class="premium-hero-copy">Measure words, characters, sentences, paragraphs, and reading time as you type. Explore keyword density without sending your writing anywhere.</p>
-          <div class="premium-hero-pills" aria-label="Word counter features"><span>Instant live counts</span><span>Reading time &amp; keywords</span></div>
+          <p class="premium-hero-copy">Count words, characters, sentences, and paragraphs as you type. Measure reading time, readability, keyword density, phrase frequency, and writing structure without uploading your text.</p>
+          <div class="premium-hero-pills" aria-label="Word counter features"><span>Instant live counts</span><span>Readability &amp; keywords</span><span>Private browser analysis</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>See the shape of your writing</span><strong>Words <i>meet</i> insight</strong><small>Write freely. Measure instantly.</small></div>
       </div>
@@ -692,7 +763,7 @@
     <!-- COUNTER WIDGET -->
     <section class="counter-workspace-section" aria-labelledby="calc-heading">
       <div class="tool-widget">
-        <div class="premium-app-title counter-app-title"><div class="premium-section-kicker">01 / Analyze</div><h2 id="calc-heading">Add your text</h2><p>Paste or write content and watch every metric update below.</p></div>
+        <div class="premium-app-title counter-app-title"><div class="premium-section-kicker">01 / Analyze</div><h2 id="calc-heading">Paste or type your text</h2><p>Your counts and writing analysis update instantly as you type.</p></div>
 
         <div class="calc-layout">
 
@@ -789,15 +860,17 @@
 
     <!-- HOW TO USE -->
     <div class="seo-section">
-      <h2>How to use the Word &amp; Character Counter</h2>
-      <p>Paste or type any text into the box on the left. Word and character counts appear
-         instantly on the right — there is no need to click a button. Adjust the
-         <strong>Reading Speed</strong> slider to match your audience, and the estimated reading
-         time recalculates on the fly.</p>
-      <p>Scroll down to the <strong>Keyword Density</strong> table to see the most frequent words
-         in your text and the percentage of the total each one represents. Tick
-         <em>Exclude common stopwords</em> to hide words like "the", "and", and "of" so meaningful
-         terms are easier to spot.</p>
+      <h2>How to use this free text analyzer</h2>
+      <p>Paste or type text into the editor. The word counter updates words, characters with and
+         without spaces, sentences, paragraphs, and estimated reading time immediately. Adjust
+         <strong>Reading Speed</strong> to match your audience; no calculate button is required.</p>
+      <p>Use the <strong>Keyword Density</strong> table to find repeated terms and their share of the
+         total word count. You can include or exclude common stopwords, select a keyword to isolate
+         it on the distribution chart, or unscramble a selected word with the local word finder.</p>
+      <p>Review the four readability grade estimates, unigram, bigram, and trigram tables, sentence
+         rhythm, paragraph structure, and keyword distribution to understand how the writing is
+         organized. Download the finished analysis as a plain-text or Markdown report when you need
+         to save or share the results.</p>
     </div>
 
     <!-- FORMULA -->
@@ -814,6 +887,18 @@
          (words per minute) defaults to 200. <strong>Characters</strong> includes every character
          and space; <strong>No Spaces</strong> excludes all whitespace — useful when checking text
          against platform limits that ignore whitespace.</p>
+    </div>
+
+    <div class="seo-section">
+      <h2>Readability, keyword, and phrase analysis</h2>
+      <p>Readability is reported with Flesch-Kincaid Grade, Gunning Fog, SMOG, and Coleman-Liau.
+         Each formula uses a different combination of sentence length, word length, letter count,
+         or estimated syllables, so the scores are best treated as a range rather than a single
+         definitive grade level.</p>
+      <p>Keyword density shows individual word frequency, while the n-gram tables reveal common
+         one-, two-, and three-word phrases. These measurements can help editors notice repetition
+         and topic gaps, but they are diagnostic signals rather than keyword targets. Clear,
+         useful writing should take priority over reaching a particular density percentage.</p>
     </div>
 
     <!-- FAQ -->
@@ -872,9 +957,15 @@
         </li>
 
         <li class="faq-item">
+          <h3>Can I export the text analysis?</h3>
+          <p>Yes. After you add text, use Export Analysis to download the counts, readability
+             scores, and top keywords as a plain-text or Markdown report.</p>
+        </li>
+
+        <li class="faq-item">
           <h3>Is my data private?</h3>
-          <p>Yes — all analysis runs entirely in your browser using JavaScript. No text you enter
-             is transmitted to any server or stored anywhere. See our
+          <p>Yes — analysis runs entirely in your browser. No text you enter
+             is transmitted to a server or stored by this tool. See our
              <a href="/privacy" style="color:var(--accent)">Privacy Policy</a> for details.</p>
         </li>
 
@@ -888,19 +979,19 @@
       <h2 id="related-heading">Related Tools</h2>
       <div class="related-grid">
 
-        <a href="/tools/password-generator" class="related-card">
-          <strong>🔑 Password Generator</strong>
-          <span>Create strong, random passwords with custom length and character rules.</span>
+        <a href="/tools/word-unscrambler" class="related-card">
+          <strong>Word Unscrambler</strong>
+          <span>Turn rack letters into words with patterns, filters, Scrabble scores, and hooks.</span>
+        </a>
+
+        <a href="/tools/ocr-utility" class="related-card">
+          <strong>OCR Utility</strong>
+          <span>Extract editable text from an image before analyzing or revising it.</span>
         </a>
 
         <a href="/tools/qr-code-generator" class="related-card">
-          <strong>📱 QR Code Generator</strong>
-          <span>Turn any link or text into a downloadable, scannable QR code.</span>
-        </a>
-
-        <a href="/tools/time-zone-converter" class="related-card">
-          <strong>🌍 Time Zone Converter</strong>
-          <span>Convert times across cities and schedule meetings across time zones.</span>
+          <strong>QR Code Generator</strong>
+          <span>Turn finished text or a link into a customizable, downloadable QR code.</span>
         </a>
 
       </div>
@@ -921,11 +1012,18 @@
     </div>
     <p id="unscramble-popup-word" class="metric-explanation"></p>
     <p id="unscramble-popup-status" class="metric-explanation" aria-live="polite"></p>
-    <div class="keywords-wrap" id="unscramble-popup-results" style="display:none;margin-top:0.75rem;">
-      <table class="keywords-table" aria-label="Unscrambled words and Scrabble scores">
-        <thead><tr><th>Word</th><th>Scrabble score</th></tr></thead>
-        <tbody id="unscramble-popup-body"></tbody>
-      </table>
+    <div id="unscramble-popup-results" style="display:none;margin-top:0.75rem;">
+      <div class="keywords-wrap">
+        <table class="keywords-table" aria-label="Unscrambled words and Scrabble scores">
+          <thead><tr><th>Word</th><th>Scrabble score</th></tr></thead>
+          <tbody id="unscramble-popup-body"></tbody>
+        </table>
+      </div>
+      <nav id="unscramble-popup-pagination" class="unscramble-pagination" aria-label="Unscramble result pages" hidden>
+        <button class="btn-ghost" id="unscramble-popup-previous" type="button">Previous</button>
+        <p id="unscramble-popup-page-status" aria-live="polite">Page 1 of 1</p>
+        <button class="btn-ghost" id="unscramble-popup-next" type="button">Next</button>
+      </nav>
     </div>
   </div>
 
@@ -951,7 +1049,7 @@
   <!-- COUNTER SCRIPT -->
   <script type="module">
     import { analyzeText, humanizeReadingTime } from "/assets/js/tools/word-character-counter/word-counter.js";
-    import { initializeWordCounter } from "/assets/js/tools/word-character-counter/integration.js?v=20260809-19";
+    import { initializeWordCounter } from "/assets/js/tools/word-character-counter/integration.js?v=20260811-20";
 
     /* ── Element refs ── */
     const textInput      = document.getElementById('text-input');

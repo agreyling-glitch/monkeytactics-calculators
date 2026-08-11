@@ -328,10 +328,15 @@ export async function initializeWordCounter() {
   const popupStatus = document.getElementById("unscramble-popup-status");
   const popupResults = document.getElementById("unscramble-popup-results");
   const popupBody = document.getElementById("unscramble-popup-body");
+  const popupPagination = document.getElementById("unscramble-popup-pagination");
+  const popupPrevious = document.getElementById("unscramble-popup-previous");
+  const popupNext = document.getElementById("unscramble-popup-next");
+  const popupPageStatus = document.getElementById("unscramble-popup-page-status");
   if (
     !textInput || !resultsPanel || !keywordSection || !keywordTable || !selectedWordButton
     || !unscramblePopup || !popupClose || !popupWord
-    || !popupStatus || !popupResults || !popupBody
+    || !popupStatus || !popupResults || !popupBody || !popupPagination
+    || !popupPrevious || !popupNext || !popupPageStatus
   ) return;
 
   const readabilitySection = createReadabilitySection(resultsPanel);
@@ -341,38 +346,45 @@ export async function initializeWordCounter() {
   let lockedKeyword = null;
   let popupRequestId = 0;
   let popupReturnFocus = null;
+  const popupPageSize = 15;
+  let popupMatches = [];
+  let popupPage = 0;
   if (!await initWasmEngine()) return;
 
   function closeUnscramblePopup() {
     popupRequestId += 1;
     unscramblePopup.style.display = "none";
+    popupMatches = [];
+    popupPage = 0;
     popupReturnFocus?.focus?.({ preventScroll: true });
     popupReturnFocus = null;
   }
 
-  function renderPopupMatches(matches, requestId) {
+  function renderPopupPage() {
     popupBody.replaceChildren();
-    popupResults.style.display = matches.length ? "block" : "none";
-    let index = 0;
-
-    function appendBatch() {
-      if (requestId !== popupRequestId) return;
-      const fragment = document.createDocumentFragment();
-      const end = Math.min(index + 200, matches.length);
-      for (; index < end; index += 1) {
-        const match = matches[index];
-        const row = document.createElement("tr");
-        row.append(
-          element("td", null, match.word),
-          element("td", null, String(match.score))
-        );
-        fragment.append(row);
-      }
-      popupBody.append(fragment);
-      if (index < matches.length) window.requestAnimationFrame(appendBatch);
+    popupResults.style.display = popupMatches.length ? "block" : "none";
+    if (!popupMatches.length) {
+      popupPagination.hidden = true;
+      return;
     }
 
-    appendBatch();
+    const pageCount = Math.ceil(popupMatches.length / popupPageSize);
+    popupPage = Math.max(0, Math.min(popupPage, pageCount - 1));
+    const start = popupPage * popupPageSize;
+    const fragment = document.createDocumentFragment();
+    popupMatches.slice(start, start + popupPageSize).forEach(function (match) {
+      const row = document.createElement("tr");
+      row.append(
+        element("td", null, match.word),
+        element("td", null, String(match.score))
+      );
+      fragment.append(row);
+    });
+    popupBody.append(fragment);
+    popupPagination.hidden = pageCount <= 1;
+    popupPrevious.disabled = popupPage === 0;
+    popupNext.disabled = popupPage === pageCount - 1;
+    popupPageStatus.textContent = "Page " + (popupPage + 1) + " of " + pageCount;
   }
 
   async function openUnscramblePopup(value, trigger) {
@@ -382,6 +394,9 @@ export async function initializeWordCounter() {
     unscramblePopup.style.display = "block";
     popupResults.style.display = "none";
     popupBody.replaceChildren();
+    popupMatches = [];
+    popupPage = 0;
+    popupPagination.hidden = true;
     popupWord.textContent = word ? "Selected word: " + word : "No valid word selected";
     popupStatus.textContent = word
       ? "Finding matches in the local dictionaryâ€¦"
@@ -395,7 +410,8 @@ export async function initializeWordCounter() {
       popupStatus.textContent = matches.length === 1
         ? "1 valid word found locally."
         : matches.length + " valid words found locally.";
-      renderPopupMatches(matches, requestId);
+      popupMatches = matches;
+      renderPopupPage();
     } catch (error) {
       if (requestId !== popupRequestId) return;
       popupStatus.textContent = error instanceof TypeError
@@ -418,6 +434,17 @@ export async function initializeWordCounter() {
   }
 
   popupClose.addEventListener("click", closeUnscramblePopup);
+  popupPrevious.addEventListener("click", function () {
+    if (popupPage === 0) return;
+    popupPage -= 1;
+    renderPopupPage();
+  });
+  popupNext.addEventListener("click", function () {
+    const pageCount = Math.ceil(popupMatches.length / popupPageSize);
+    if (popupPage >= pageCount - 1) return;
+    popupPage += 1;
+    renderPopupPage();
+  });
   unscramblePopup.addEventListener("keydown", function (event) {
     if (event.key === "Escape") closeUnscramblePopup();
   });

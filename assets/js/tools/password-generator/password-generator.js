@@ -41,7 +41,7 @@ const DICTIONARY_SUFFIX = ".enable-sowpods.v1.txt.gz";
 /**
  * Generate a random password using crypto.getRandomValues.
  * @param {object} options
- * @param {number} options.length      - password length (min 4, max 128)
+ * @param {number} options.length      - password length (min 4, max 2048)
  * @param {boolean} options.uppercase   - include uppercase letters
  * @param {boolean} options.lowercase   - include lowercase letters
  * @param {boolean} options.digits     - include digits
@@ -52,16 +52,18 @@ const DICTIONARY_SUFFIX = ".enable-sowpods.v1.txt.gz";
  * @param {boolean} options.noDuplicates - prevent repeated characters
  * @param {string} options.word          - include this contiguous word
  * @param {string} options.beginsWith    - begin the password with this text
+ * @param {string} options.endsWith      - end the password with this text
  * @returns {string} generated password
  * @throws {Error} if no character sets are selected
  */
 export function generatePassword(options) {
-  const length = Math.min(128, Math.max(4, options.length || 16));
+  const length = Math.min(2048, Math.max(4, options.length || 16));
   const minDigits = Math.min(10, Math.max(1, Math.floor(Number(options.minDigits) || 1)));
   const minSymbols = Math.min(10, Math.max(1, Math.floor(Number(options.minSymbols) || 1)));
   const beginsWith = String(options.beginsWith || "").slice(0, 32);
+  const endsWith = String(options.endsWith || "").slice(0, 32);
   const word = String(options.word || "").trim().slice(0, 32);
-  const fixedText = beginsWith + word;
+  const fixedText = beginsWith + word + endsWith;
   const noDuplicates = Boolean(options.noDuplicates);
 
   const useSets = [];
@@ -76,13 +78,13 @@ export function generatePassword(options) {
 
   const AMBIGUOUS = new Set("Il1O0");
   if (options.excludeAmbiguous && [...fixedText].some((character) => AMBIGUOUS.has(character))) {
-    throw new Error("Begins With and Add Word cannot contain similar characters while that option is enabled");
+    throw new Error("Begins With, Ends With, and Add Word cannot contain similar characters while that option is enabled");
   }
   if (noDuplicates && new Set(fixedText).size !== fixedText.length) {
-    throw new Error("Begins With and Add Word contain duplicate characters");
+    throw new Error("Begins With, Ends With, and Add Word contain duplicate characters");
   }
   if (fixedText.length > length) {
-    throw new Error("Password length is too short for Begins With and Add Word");
+    throw new Error("Password length is too short for Begins With, Ends With, and Add Word");
   }
 
   let pool = "";
@@ -150,7 +152,7 @@ export function generatePassword(options) {
     const insertAt = cryptoRandom(chars.length + 1);
     chars.splice(insertAt, 0, word);
   }
-  return beginsWith + chars.join("");
+  return beginsWith + chars.join("") + endsWith;
 }
 
 /**
