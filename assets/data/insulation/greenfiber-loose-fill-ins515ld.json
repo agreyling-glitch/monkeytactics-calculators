@@ -1,0 +1,23 @@
+{
+  "product_name": "Greenfiber Loose-Fill INS515LD",
+  "material": "cellulose",
+  "bag_weight_lbs": 30,
+  "r_value_per_inch": 3.7,
+  "settling_factor": 1.11,
+  "coverage": [
+    { "r_value": 11, "installed_thickness_in": 3.38, "settled_thickness_in": 3.04, "bags_per_1000_sqft": 9.8 },
+    { "r_value": 13, "installed_thickness_in": 4.01, "settled_thickness_in": 3.61, "bags_per_1000_sqft": 11.8 },
+    { "r_value": 19, "installed_thickness_in": 5.88, "settled_thickness_in": 5.29, "bags_per_1000_sqft": 18.1 },
+    { "r_value": 22, "installed_thickness_in": 6.8, "settled_thickness_in": 6.12, "bags_per_1000_sqft": 21.5 },
+    { "r_value": 26, "installed_thickness_in": 8.02, "settled_thickness_in": 7.22, "bags_per_1000_sqft": 26.1 },
+    { "r_value": 30, "installed_thickness_in": 9.22, "settled_thickness_in": 8.3, "bags_per_1000_sqft": 30.8 },
+    { "r_value": 32, "installed_thickness_in": 9.82, "settled_thickness_in": 8.84, "bags_per_1000_sqft": 33.3 },
+    { "r_value": 38, "installed_thickness_in": 11.6, "settled_thickness_in": 10.44, "bags_per_1000_sqft": 40.9 },
+    { "r_value": 40, "installed_thickness_in": 12.19, "settled_thickness_in": 10.97, "bags_per_1000_sqft": 43.6 },
+    { "r_value": 44, "installed_thickness_in": 13.36, "settled_thickness_in": 12.03, "bags_per_1000_sqft": 49.0 },
+    { "r_value": 48, "installed_thickness_in": 14.53, "settled_thickness_in": 13.07, "bags_per_1000_sqft": 54.6 },
+    { "r_value": 49, "installed_thickness_in": 14.82, "settled_thickness_in": 13.34, "bags_per_1000_sqft": 56.0 },
+    { "r_value": 50, "installed_thickness_in": 15.11, "settled_thickness_in": 13.6, "bags_per_1000_sqft": 57.4 },
+    { "r_value": 60, "installed_thickness_in": 17.99, "settled_thickness_in": 16.19, "bags_per_1000_sqft": 72.4 }
+  ]
+}

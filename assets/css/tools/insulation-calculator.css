@@ -1,0 +1,781 @@
+.insulation-tool-page .insulation-tabs { margin-bottom: 1rem; }
+.insulation-tool-page [role="tabpanel"][hidden] { display: none; }
+
+.insulation-tool-page .engine-status {
+  margin: 0 0 0.8rem;
+  color: #c7d7ce;
+  font-size: 0.82rem;
+}
+
+.insulation-tool-page .engine-status::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  background: #fbbf24;
+}
+
+.insulation-tool-page .engine-status.ready::before { background: #4ade80; }
+.insulation-tool-page .engine-status.failed::before { background: #f87171; }
+.insulation-tool-page .field-help {
+  display: block;
+  margin-top: 0.4rem;
+  color: #9fb2a8;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.insulation-tool-page .climate-target-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 4.5rem auto;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 0.72rem;
+  background: rgba(59, 130, 246, 0.055);
+}
+.insulation-tool-page .climate-target-control div span { display: block; color: #82988d; font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.insulation-tool-page .climate-target-control div strong { color: #dbeafe; font-size: 0.78rem; }
+.insulation-tool-page .climate-target-control label { color: #91a79c; font-size: 0.7rem; }
+.insulation-tool-page .climate-target-control select,
+.insulation-tool-page .climate-target-control button { min-height: 2.25rem; padding: 0.45rem 0.6rem; border-radius: 0.55rem; font: inherit; font-size: 0.72rem; }
+.insulation-tool-page .climate-target-control select { border: 1px solid #274236; color: #eaf7ef; background: #0d1a15; }
+.insulation-tool-page .climate-target-control button { border: 1px solid rgba(96, 165, 250, 0.42); color: #dbeafe; background: rgba(59, 130, 246, 0.13); cursor: pointer; font-weight: 750; }
+.insulation-tool-page .climate-target-control button:hover { border-color: #60a5fa; background: rgba(59, 130, 246, 0.2); }
+
+.insulation-tool-page #blownProduct option.customize-product-option {
+  color: #789087;
+  font-style: italic;
+}
+
+.insulation-tool-page .area-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.insulation-tool-page .area-helper-button {
+  padding: 0;
+  color: #86efac;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.insulation-tool-page .area-helper-button:hover { color: #bbf7d0; text-decoration: underline; }
+.insulation-tool-page .area-helper-button:focus-visible { outline: 2px solid #86efac; outline-offset: 3px; border-radius: 2px; }
+
+.insulation-tool-page .area-calculator-dialog {
+  box-sizing: border-box;
+  width: min(560px, calc(100% - 1.25rem));
+  max-height: min(760px, calc(100vh - 1.25rem));
+  padding: 0;
+  overflow: auto;
+  color: #eaf7ef;
+  border: 1px solid rgba(134, 239, 172, 0.26);
+  border-radius: 1rem;
+  background: #0b1712;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.insulation-tool-page .area-calculator-dialog::backdrop {
+  background: rgba(2, 8, 5, 0.76);
+  backdrop-filter: blur(3px);
+}
+
+.insulation-tool-page .area-calculator-dialog form { padding: clamp(1rem, 4vw, 1.4rem); }
+.insulation-tool-page .area-dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.insulation-tool-page .area-dialog-heading span { color: #86efac; font-size: 0.68rem; font-weight: 750; letter-spacing: 0.08em; text-transform: uppercase; }
+.insulation-tool-page .area-dialog-heading h2 { margin: 0.18rem 0 0.3rem; color: #f0faf4; font-size: 1.35rem; }
+.insulation-tool-page .area-dialog-heading p { margin: 0; color: #91a79c; font-size: 0.8rem; line-height: 1.45; }
+.insulation-tool-page .area-dialog-close {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  color: #a8bbb1;
+  border: 1px solid rgba(183, 247, 207, 0.15);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.insulation-tool-page .area-dialog-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+.insulation-tool-page .area-dialog-fields .input-group { margin: 0; }
+.insulation-tool-page .area-formula {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(74, 222, 128, 0.18);
+  border-radius: 0.75rem;
+  background: rgba(34, 197, 94, 0.07);
+}
+.insulation-tool-page .area-formula span { color: #8ea49a; font-size: 0.7rem; }
+.insulation-tool-page .area-formula strong { color: #dcfce7; font-size: 1.65rem; }
+.insulation-tool-page .area-formula small { color: #91a79c; font-size: 0.72rem; }
+.insulation-tool-page .area-dialog-actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.7rem; margin-top: 1rem; }
+.insulation-tool-page .area-dialog-actions button {
+  min-height: 2.7rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+.insulation-tool-page #cancelAreaCalculator { color: #bdcec5; border: 1px solid rgba(183, 247, 207, 0.15); background: rgba(255, 255, 255, 0.035); }
+.insulation-tool-page #useCalculatedArea { color: #062d18; border: 1px solid rgba(134, 239, 172, 0.45); background: linear-gradient(135deg, #86efac, #4ade80); }
+.insulation-tool-page #useCalculatedArea:disabled { color: #71837a; border-color: rgba(183, 247, 207, 0.08); background: rgba(255, 255, 255, 0.04); cursor: not-allowed; }
+
+.insulation-tool-page .existing-insulation {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(183, 247, 207, 0.16);
+  border-radius: 0.8rem;
+}
+
+.insulation-tool-page .batt-sections,
+.insulation-tool-page .batt-options {
+  min-width: 0;
+  margin: 0 0 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(183, 247, 207, 0.16);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.insulation-tool-page .batt-sections legend,
+.insulation-tool-page .batt-options legend {
+  padding: 0 0.35rem;
+  color: #e7f3ec;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.insulation-tool-page .batt-sections > p { margin: 0 0 0.8rem; color: #91a79c; font-size: 0.76rem; line-height: 1.45; }
+.insulation-tool-page .batt-section-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.65rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(183, 247, 207, 0.08);
+}
+.insulation-tool-page .batt-section-row:first-child { padding-top: 0; }
+.insulation-tool-page .batt-section-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.insulation-tool-page .batt-section-number { color: #86efac; font-size: 0.74rem; font-weight: 750; }
+.insulation-tool-page .batt-section-row .input-group { margin: 0; }
+.insulation-tool-page .batt-section-row label { font-size: 0.7rem; }
+.insulation-tool-page .batt-remove-section {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  color: #fca5a5;
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  border-radius: 0.5rem;
+  background: rgba(248, 113, 113, 0.06);
+  cursor: pointer;
+  font-size: 1rem;
+}
+.insulation-tool-page .batt-remove-section:disabled { opacity: 0.25; cursor: not-allowed; }
+.insulation-tool-page .batt-section-net {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.48rem 0.6rem;
+  border-radius: 0.5rem;
+  background: rgba(34, 197, 94, 0.055);
+}
+.insulation-tool-page .batt-section-net span { color: #82988d; font-size: 0.7rem; }
+.insulation-tool-page .batt-section-net strong { color: #d9fbe5; font-size: 0.78rem; }
+.insulation-tool-page .batt-section-row.has-section-error .batt-section-net { background: rgba(248, 113, 113, 0.08); }
+.insulation-tool-page .batt-section-row.has-section-error .batt-section-net strong { color: #fca5a5; }
+.insulation-tool-page .batt-add-section {
+  margin-top: 0.7rem;
+  padding: 0.55rem 0.75rem;
+  color: #a7f3d0;
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  border-radius: 0.55rem;
+  background: rgba(34, 197, 94, 0.07);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.insulation-tool-page .batt-openings { margin: 0.85rem 0 0; }
+.insulation-tool-page .batt-options .input-group > label span { color: #82988d; font-weight: 500; }
+.insulation-tool-page .batt-live-note { margin: 0.4rem 0 0; color: #82988d; font-size: 0.73rem; text-align: center; }
+.insulation-tool-page .batt-primary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.insulation-tool-page .batt-guidance {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-left: 3px solid #4ade80;
+  border-radius: 0.25rem 0.65rem 0.65rem 0.25rem;
+  background: rgba(34, 197, 94, 0.055);
+}
+.insulation-tool-page .batt-guidance strong { color: #d9fbe5; font-size: 0.78rem; }
+.insulation-tool-page .batt-guidance span { color: #9fb2a8; font-size: 0.73rem; line-height: 1.45; }
+
+.insulation-tool-page .custom-product-panel {
+  min-width: 0;
+  margin: 1rem 0;
+  padding: 1.1rem;
+  border: 1px solid rgba(74, 222, 128, 0.28);
+  border-radius: 0.9rem;
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.07), rgba(16, 27, 22, 0.35));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.insulation-tool-page .custom-product-panel[hidden] { display: none; }
+.insulation-tool-page .custom-product-panel legend {
+  padding: 0 0.35rem;
+  color: #e7f3ec;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.insulation-tool-page .custom-product-panel textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 8.25rem;
+  padding: 0.75rem;
+  resize: vertical;
+  color: #edf8f1;
+  border: 1px solid rgba(183, 247, 207, 0.16);
+  border-radius: 0.6rem;
+  background: rgba(16, 27, 22, 0.72);
+  font: 0.82rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.insulation-tool-page .custom-product-panel textarea::placeholder { color: #82988d; }
+
+.insulation-tool-page .custom-product-panel textarea:focus {
+  outline: 2px solid rgba(74, 222, 128, 0.55);
+  outline-offset: 1px;
+}
+
+.insulation-tool-page .custom-apply-button {
+  width: 100%;
+  padding: 0.72rem 1rem;
+  color: #062d18;
+  border: 1px solid rgba(134, 239, 172, 0.45);
+  border-radius: 0.6rem;
+  background: linear-gradient(135deg, #86efac, #4ade80);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.insulation-tool-page .custom-apply-button:hover { filter: brightness(1.06); }
+.insulation-tool-page .custom-apply-button:active { transform: translateY(1px); }
+.insulation-tool-page .custom-apply-button:focus-visible {
+  outline: 2px solid #bbf7d0;
+  outline-offset: 2px;
+}
+
+.insulation-tool-page .custom-product-actions {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.insulation-tool-page .custom-product-status {
+  display: block;
+  color: #9fb2a8;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.insulation-tool-page .custom-product-status.ready { color: #86efac; }
+
+.insulation-tool-page .existing-insulation legend {
+  padding: 0 0.35rem;
+  color: #e7f3ec;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.insulation-tool-page .existing-insulation legend span {
+  color: #9fb2a8;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.insulation-tool-page .result-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.insulation-tool-page .compliance-badge {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  border-radius: 999px;
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.1);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+
+.insulation-tool-page .compliance-badge.warning {
+  border-color: rgba(251, 191, 36, 0.4);
+  color: #fde68a;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.insulation-tool-page .blown-primary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.insulation-tool-page .depth-track {
+  height: 0.45rem;
+  margin: 0.7rem 0 0.55rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(183, 247, 207, 0.1);
+}
+
+.insulation-tool-page .depth-track span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22c55e, #86efac);
+  transition: width 0.3s ease;
+}
+
+.insulation-tool-page .metric-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+  border: 1px solid rgba(183, 247, 207, 0.14);
+  border-radius: 0.8rem;
+  overflow: hidden;
+}
+
+.insulation-tool-page .metric-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(183, 247, 207, 0.1);
+}
+
+.insulation-tool-page .metric-list > div:nth-child(odd) { border-right: 1px solid rgba(183, 247, 207, 0.1); }
+.insulation-tool-page .metric-list > div:nth-last-child(-n + 2) { border-bottom: 0; }
+.insulation-tool-page .metric-list span { color: #a9bbb1; font-size: 0.78rem; }
+.insulation-tool-page .metric-list strong { color: #edf8f1; white-space: nowrap; font-size: 0.9rem; }
+.insulation-tool-page .result-footnote { margin: 0.9rem 0 0; color: #9fb2a8; font-size: 0.78rem; line-height: 1.5; }
+.insulation-tool-page .ceiling-load-warning {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.85rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(251, 191, 36, 0.34);
+  border-radius: 0.72rem;
+  background: rgba(251, 191, 36, 0.075);
+}
+.insulation-tool-page .ceiling-load-warning[hidden] { display: none; }
+.insulation-tool-page .ceiling-load-warning strong { color: #fde68a; font-size: 0.78rem; }
+.insulation-tool-page .ceiling-load-warning span { color: #d6cda9; font-size: 0.72rem; line-height: 1.45; }
+
+.insulation-tool-page .coverage-table-panel {
+  margin-top: 1rem;
+  border: 1px solid rgba(183, 247, 207, 0.14);
+  border-radius: 0.9rem;
+  background: rgba(8, 18, 14, 0.72);
+  overflow: hidden;
+}
+.insulation-tool-page .coverage-table-panel[hidden] { display: none; }
+.insulation-tool-page .coverage-table-panel summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 1rem; color: #d9fbe5; cursor: pointer; font-size: 0.8rem; font-weight: 750; }
+.insulation-tool-page .coverage-table-panel summary strong { color: #86efac; font-size: 0.72rem; text-align: right; }
+.insulation-tool-page .coverage-table-scroll { overflow-x: auto; border-top: 1px solid rgba(183, 247, 207, 0.1); }
+.insulation-tool-page .coverage-table-panel table { width: 100%; border-collapse: collapse; min-width: 570px; }
+.insulation-tool-page .coverage-table-panel th,
+.insulation-tool-page .coverage-table-panel td { padding: 0.62rem 0.8rem; border-bottom: 1px solid rgba(183, 247, 207, 0.08); color: #c7d7ce; font-size: 0.72rem; text-align: right; }
+.insulation-tool-page .coverage-table-panel th { color: #91a79c; background: rgba(255, 255, 255, 0.025); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.insulation-tool-page .coverage-table-panel th:first-child,
+.insulation-tool-page .coverage-table-panel td:first-child { text-align: left; }
+.insulation-tool-page .coverage-table-panel tr.is-active td { color: #eafff1; background: rgba(34, 197, 94, 0.1); font-weight: 750; }
+.insulation-tool-page .coverage-table-panel > p { margin: 0; padding: 0.75rem 1rem; color: #82988d; font-size: 0.7rem; line-height: 1.45; }
+
+.insulation-tool-page .batt-manage-presets {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 0.85rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(134, 239, 172, 0.24);
+  border-radius: 0.75rem;
+  color: #d9fbe5;
+  background: rgba(34, 197, 94, 0.07);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+.insulation-tool-page .batt-manage-presets:hover { border-color: rgba(134, 239, 172, 0.48); background: rgba(34, 197, 94, 0.12); }
+.insulation-tool-page .batt-manage-presets:focus-visible { outline: 2px solid #86efac; outline-offset: 3px; }
+.insulation-tool-page .batt-manage-presets span { font-size: 0.84rem; font-weight: 750; }
+.insulation-tool-page .batt-manage-presets small { color: #91a79c; font-size: 0.7rem; }
+
+.insulation-tool-page .result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-top: 0.85rem; }
+.insulation-tool-page .result-actions .batt-manage-presets { margin-top: 0; }
+.insulation-tool-page .insulation-print-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 0.75rem;
+  color: #dbeafe;
+  background: rgba(59, 130, 246, 0.08);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+.insulation-tool-page .insulation-print-button:hover { border-color: rgba(96, 165, 250, 0.58); background: rgba(59, 130, 246, 0.14); }
+.insulation-tool-page .insulation-print-button:focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
+.insulation-tool-page .insulation-print-button span { font-size: 0.84rem; font-weight: 750; }
+.insulation-tool-page .insulation-print-button small { color: #93a9bd; font-size: 0.7rem; }
+
+.insulation-tool-page .insulation-print-report { display: none; }
+
+.insulation-tool-page .seo-section a { color: #86efac; text-underline-offset: 0.16em; }
+.insulation-tool-page .seo-section h3 { margin: 0 0 0.4rem; color: #dff5e7; font-size: 0.92rem; }
+.insulation-tool-page .insulation-seo-grid,
+.insulation-tool-page .insulation-product-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.insulation-tool-page .insulation-seo-grid > div,
+.insulation-tool-page .insulation-product-groups > div {
+  padding: 0.85rem;
+  border: 1px solid rgba(183, 247, 207, 0.13);
+  border-radius: 0.75rem;
+  background: rgba(16, 27, 22, 0.58);
+}
+.insulation-tool-page .insulation-seo-grid p { margin: 0; font-size: 0.82rem; line-height: 1.6; }
+.insulation-tool-page .insulation-product-groups ul { margin: 0; padding-left: 1.05rem; color: #9fb2a8; font-size: 0.8rem; line-height: 1.65; }
+
+.insulation-tool-page .batt-presets-dialog {
+  box-sizing: border-box;
+  width: min(650px, calc(100% - 1.25rem));
+  max-height: min(760px, calc(100vh - 1.25rem));
+  padding: 0;
+  overflow: auto;
+  color: #eaf7ef;
+  border: 1px solid rgba(134, 239, 172, 0.26);
+  border-radius: 1rem;
+  background: #0b1712;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+.insulation-tool-page .batt-presets-dialog::backdrop { background: rgba(2, 8, 5, 0.76); backdrop-filter: blur(3px); }
+.insulation-tool-page .batt-presets-shell { padding: clamp(1rem, 4vw, 1.4rem); }
+.insulation-tool-page .batt-preset-editor {
+  padding: 0.9rem;
+  border: 1px solid rgba(183, 247, 207, 0.14);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.018);
+}
+.insulation-tool-page .batt-preset-editor > label { display: block; margin-bottom: 0.4rem; color: #dcebe2; font-size: 0.75rem; font-weight: 700; }
+.insulation-tool-page .batt-preset-editor > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem; }
+.insulation-tool-page .batt-preset-editor input {
+  min-width: 0;
+  padding: 0.7rem 0.75rem;
+  border: 1px solid #274236;
+  border-radius: 0.62rem;
+  color: #eef9f2;
+  background: #0d1a15;
+  font: inherit;
+}
+.insulation-tool-page .batt-preset-editor input:focus { outline: 2px solid rgba(134, 239, 172, 0.42); border-color: #4ade80; }
+.insulation-tool-page #saveBattPreset,
+.insulation-tool-page #saveBlownPreset,
+.insulation-tool-page .batt-preset-load {
+  padding: 0.68rem 0.85rem;
+  border: 1px solid #4ade80;
+  border-radius: 0.62rem;
+  color: #06250f;
+  background: #86efac;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+.insulation-tool-page #saveBattPreset:hover,
+.insulation-tool-page #saveBlownPreset:hover,
+.insulation-tool-page .batt-preset-load:hover { background: #bbf7d0; }
+.insulation-tool-page .batt-preset-status { min-height: 1.1rem; margin: 0.55rem 0 0; color: #91a79c; font-size: 0.7rem; line-height: 1.4; }
+.insulation-tool-page .batt-preset-status.is-error { color: #fca5a5; }
+.insulation-tool-page .batt-preset-library { margin-top: 1rem; }
+.insulation-tool-page .batt-preset-library-heading { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.6rem; }
+.insulation-tool-page .batt-preset-library-heading h3 { margin: 0; color: #f0faf4; font-size: 0.95rem; }
+.insulation-tool-page .batt-preset-library-heading span { color: #82988d; font-size: 0.7rem; }
+.insulation-tool-page .batt-preset-list { display: grid; gap: 0.55rem; }
+.insulation-tool-page .batt-preset-empty { margin: 0; padding: 1.1rem; border: 1px dashed rgba(183, 247, 207, 0.16); border-radius: 0.75rem; color: #82988d; font-size: 0.78rem; text-align: center; }
+.insulation-tool-page .batt-preset-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(183, 247, 207, 0.14);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.025);
+}
+.insulation-tool-page .batt-preset-card strong { display: block; overflow-wrap: anywhere; color: #eaf7ef; font-size: 0.82rem; }
+.insulation-tool-page .batt-preset-card small { display: block; margin-top: 0.2rem; color: #82988d; font-size: 0.67rem; line-height: 1.35; }
+.insulation-tool-page .batt-preset-actions { display: flex; gap: 0.4rem; }
+.insulation-tool-page .batt-preset-delete { padding: 0.62rem 0.7rem; border: 1px solid rgba(248, 113, 113, 0.28); border-radius: 0.62rem; color: #fca5a5; background: transparent; cursor: pointer; font: inherit; font-size: 0.72rem; font-weight: 700; }
+.insulation-tool-page .batt-preset-delete:hover { border-color: rgba(248, 113, 113, 0.58); background: rgba(248, 113, 113, 0.08); }
+
+.insulation-tool-page .insulation-insights {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 1.5rem auto;
+  padding: clamp(1rem, 2vw, 1.6rem);
+  border: 1px solid rgba(183, 247, 207, 0.15);
+  border-radius: 1.1rem;
+  background: rgba(8, 18, 14, 0.74);
+}
+
+.insulation-tool-page .insulation-insights[hidden] { display: none; }
+.insulation-tool-page .insights-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.insulation-tool-page .insights-heading h2 { margin: 0.15rem 0 0.35rem; color: #f0faf4; }
+.insulation-tool-page .insights-heading p { margin: 0; color: #9fb2a8; }
+.insulation-tool-page .insights-product {
+  flex: 0 0 auto;
+  max-width: 42%;
+  padding: 0.45rem 0.7rem;
+  overflow: hidden;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  border-radius: 999px;
+  color: #a7f3d0;
+  background: rgba(34, 197, 94, 0.08);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.insulation-tool-page .insights-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(180px, 1.1fr);
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(183, 247, 207, 0.12);
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.insulation-tool-page .insights-controls .input-group { margin: 0; }
+.insulation-tool-page .insights-controls label span { color: #82988d; font-weight: 500; }
+.insulation-tool-page .money-input { position: relative; }
+.insulation-tool-page .money-input > span {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0.75rem;
+  color: #86efac;
+  transform: translateY(-50%);
+}
+.insulation-tool-page .money-input input { padding-left: 1.65rem; }
+.insulation-tool-page .insights-total {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.7rem;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.14), rgba(16, 185, 129, 0.06));
+}
+.insulation-tool-page .insights-total span { color: #9fb2a8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.insulation-tool-page .insights-total strong { margin: 0.2rem 0; color: #dcfce7; font-size: 1.25rem; }
+.insulation-tool-page .insights-total small { color: #82988d; font-size: 0.68rem; }
+
+.insulation-tool-page .insights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+.insulation-tool-page .batt-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+.insulation-tool-page .batt-insights .chart-wrap { height: 235px; }
+.insulation-tool-page .insight-card {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid rgba(183, 247, 207, 0.11);
+  border-radius: 0.9rem;
+  background: linear-gradient(145deg, rgba(19, 33, 27, 0.78), rgba(10, 21, 16, 0.88));
+}
+.insulation-tool-page .insight-wide { grid-column: 1 / -1; }
+.insulation-tool-page .insight-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+.insulation-tool-page .insight-card-heading span { color: #86efac; font-size: 0.67rem; font-weight: 750; letter-spacing: 0.08em; text-transform: uppercase; }
+.insulation-tool-page .insight-card-heading h3 { margin: 0.12rem 0 0; color: #edf8f1; font-size: 1rem; }
+.insulation-tool-page .insight-card-heading > strong { color: #c8ddd2; font-size: 0.76rem; text-align: right; }
+.insulation-tool-page .insight-card > p { margin: 0.55rem 0 0; color: #8fa49a; font-size: 0.72rem; line-height: 1.45; }
+.insulation-tool-page .insight-card a { color: #86efac; }
+.insulation-tool-page .chart-wrap { position: relative; width: 100%; height: 220px; }
+.insulation-tool-page .chart-wrap.chart-tall { height: 270px; }
+.insulation-tool-page .chart-wrap canvas { display: block; width: 100%; height: 100%; }
+.insulation-tool-page .chart-donut { height: 220px; }
+.insulation-tool-page .chart-donut > strong {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 35%;
+  color: #e9f8ef;
+  font-size: 0.82rem;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.insulation-tool-page .chart-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; margin-top: 0.4rem; color: #9fb2a8; font-size: 0.7rem; }
+.insulation-tool-page .chart-legend span::before { content: ""; display: inline-block; width: 0.55rem; height: 0.55rem; margin-right: 0.3rem; border-radius: 2px; }
+.insulation-tool-page .legend-installed::before, .insulation-tool-page .legend-material::before, .insulation-tool-page .legend-rinch::before { background: #4ade80; }
+.insulation-tool-page .legend-settled::before, .insulation-tool-page .legend-labor::before, .insulation-tool-page .legend-shrink::before { background: #60a5fa; }
+.insulation-tool-page .legend-waste::before, .insulation-tool-page .legend-weight::before { background: #fbbf24; }
+.insulation-tool-page .legend-efficiency::before { background: #c084fc; }
+
+.insulation-tool-page .insight-climate img {
+  display: block;
+  width: 100%;
+  max-height: 410px;
+  object-fit: contain;
+  border-radius: 0.65rem;
+  background: #fff;
+}
+
+.insulation-tool-page .heat-bars { display: grid; gap: 1rem; padding: 1.2rem 0.2rem 0.65rem; }
+.insulation-tool-page .heat-bars > div { display: grid; grid-template-columns: 3.4rem 1fr 3rem; align-items: center; gap: 0.55rem; }
+.insulation-tool-page .heat-bars span, .insulation-tool-page .heat-bars strong { color: #bdd0c6; font-size: 0.74rem; }
+.insulation-tool-page .heat-bars strong { text-align: right; }
+.insulation-tool-page .heat-bars i { display: block; height: 1.7rem; overflow: hidden; border-radius: 0.4rem; background: rgba(255, 255, 255, 0.045); }
+.insulation-tool-page .heat-bars b { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #fb7185, #fbbf24); transition: width 0.3s ease; }
+.insulation-tool-page .heat-bars > div:last-child b { background: linear-gradient(90deg, #22c55e, #86efac); }
+
+.insulation-tool-page .thickness-gauge { display: grid; grid-template-columns: 2.5rem 5.5rem 1fr; justify-content: center; gap: 0.8rem; min-height: 230px; padding-top: 0.4rem; }
+.insulation-tool-page .gauge-scale { color: #789085; font-size: 0.62rem; line-height: 1; background: repeating-linear-gradient(to bottom, rgba(183,247,207,.18) 0 1px, transparent 1px 20%); }
+.insulation-tool-page .gauge-column { position: relative; display: flex; flex-direction: column; justify-content: flex-end; overflow: visible; border: 1px solid rgba(183, 247, 207, 0.18); border-radius: 0.65rem; background: rgba(255, 255, 255, 0.035); }
+.insulation-tool-page .gauge-column > span { display: block; width: 100%; transition: height 0.3s ease; }
+.insulation-tool-page .gauge-added { background: linear-gradient(#86efac, #4ade80); }
+.insulation-tool-page .gauge-existing { border-radius: 0 0 0.55rem 0.55rem; background: #60a5fa; }
+.insulation-tool-page .gauge-column > i { position: absolute; left: -0.45rem; right: -0.45rem; border-top: 2px dashed #fbbf24; }
+.insulation-tool-page .gauge-column > i em { position: absolute; left: calc(100% + 0.55rem); top: -0.6rem; width: 7rem; color: #fcd34d; font-size: 0.65rem; font-style: normal; line-height: 1.2; }
+.insulation-tool-page .gauge-labels { display: flex; flex-direction: column; justify-content: flex-end; gap: 0.45rem; padding-bottom: 0.3rem; color: #9fb2a8; font-size: 0.7rem; }
+.insulation-tool-page .gauge-labels i { display: inline-block; width: 0.6rem; height: 0.6rem; margin-right: 0.35rem; border-radius: 2px; }
+.insulation-tool-page .swatch-existing { background: #60a5fa; }
+.insulation-tool-page .swatch-added { background: #4ade80; }
+
+@media (max-width: 850px) {
+  .insulation-tool-page .insights-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .insulation-tool-page .batt-insights-grid { grid-template-columns: 1fr; }
+  .insulation-tool-page .insulation-seo-grid,
+  .insulation-tool-page .insulation-product-groups { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .insulation-tool-page .blown-primary-grid,
+  .insulation-tool-page .metric-list { grid-template-columns: 1fr; }
+  .insulation-tool-page .metric-list > div:nth-child(odd) { border-right: 0; }
+  .insulation-tool-page .metric-list > div:nth-last-child(2) { border-bottom: 1px solid rgba(183, 247, 207, 0.1); }
+  .insulation-tool-page .insulation-insights { width: min(100% - 1rem, 1180px); padding: 0.75rem; }
+  .insulation-tool-page .insights-heading { align-items: flex-start; flex-direction: column; }
+  .insulation-tool-page .insights-product { max-width: 100%; }
+  .insulation-tool-page .insights-controls, .insulation-tool-page .insights-grid { grid-template-columns: 1fr; }
+  .insulation-tool-page .insight-wide { grid-column: auto; }
+  .insulation-tool-page .chart-wrap { height: 205px; }
+  .insulation-tool-page .chart-wrap.chart-tall { height: 255px; }
+  .insulation-tool-page .area-dialog-fields { grid-template-columns: 1fr; }
+  .insulation-tool-page .batt-section-row { grid-template-columns: 1fr; }
+  .insulation-tool-page .batt-section-heading,
+  .insulation-tool-page .batt-section-net { grid-column: auto; }
+  .insulation-tool-page .batt-primary-grid { grid-template-columns: 1fr; }
+  .insulation-tool-page .batt-manage-presets { align-items: flex-start; flex-direction: column; gap: 0.2rem; }
+  .insulation-tool-page .result-actions { grid-template-columns: 1fr; }
+  .insulation-tool-page .insulation-print-button { align-items: flex-start; flex-direction: column; gap: 0.2rem; }
+  .insulation-tool-page .batt-preset-editor > div,
+  .insulation-tool-page .batt-preset-card { grid-template-columns: 1fr; }
+  .insulation-tool-page #saveBattPreset,
+  .insulation-tool-page #saveBlownPreset { width: 100%; }
+  .insulation-tool-page .batt-preset-actions { justify-content: stretch; }
+  .insulation-tool-page .batt-preset-actions button { flex: 1; }
+  .insulation-tool-page .climate-target-control { grid-template-columns: 1fr auto; }
+  .insulation-tool-page .climate-target-control > div { grid-column: 1 / -1; }
+  .insulation-tool-page .climate-target-control > button { grid-column: 1 / -1; }
+}
+
+@media print {
+  @page { margin: 0.55in; }
+  body.print-insulation { color: #111; background: #fff !important; }
+  body.print-insulation main > * { display: none !important; }
+  body.print-insulation main > #insulationPrintReport { display: block !important; }
+  body.print-insulation > .review-collector,
+  body.print-insulation > footer { display: none !important; }
+  body.print-insulation .insulation-print-report {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    color: #111;
+    background: #fff;
+    font: 10pt/1.4 Arial, sans-serif;
+  }
+  body.print-insulation .insulation-print-report header { padding-bottom: 0.18in; border-bottom: 2px solid #166534; }
+  body.print-insulation .insulation-print-report h1 { margin: 0 0 0.02in; color: #111; font-size: 21pt; }
+  body.print-insulation .insulation-print-report header p { margin: 0; color: #555; font-size: 8.5pt; }
+  body.print-insulation .insulation-print-report section { margin-top: 0.2in; break-inside: avoid; }
+  body.print-insulation .insulation-print-report h2 { margin: 0 0 0.08in; color: #166534; font-size: 11pt; }
+  body.print-insulation .insulation-print-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid #bbb; border-radius: 5px; overflow: hidden; }
+  body.print-insulation .insulation-print-grid > div { display: flex; align-items: baseline; justify-content: space-between; gap: 0.12in; padding: 0.08in 0.1in; border-bottom: 1px solid #ddd; }
+  body.print-insulation .insulation-print-grid > div:nth-child(odd) { border-right: 1px solid #ddd; }
+  body.print-insulation .insulation-print-grid > div:nth-last-child(-n + 2) { border-bottom: 0; }
+  body.print-insulation .insulation-print-grid span { color: #555; font-size: 8.5pt; }
+  body.print-insulation .insulation-print-grid strong { color: #111; font-size: 9pt; text-align: right; }
+  body.print-insulation .insulation-print-results strong { color: #14532d; }
+  body.print-insulation .insulation-print-guidance p { margin: 0 0 0.07in; padding: 0.08in 0.1in; border-left: 3px solid #65a30d; background: #f7fee7; font-size: 8.5pt; }
+  body.print-insulation .insulation-print-report footer { display: flex !important; justify-content: space-between; gap: 0.2in; margin-top: 0.25in; padding-top: 0.1in; border-top: 1px solid #aaa; color: #555; font-size: 7.5pt; }
+  body.print-insulation .insulation-print-report footer p { max-width: 70%; margin: 0; }
+  body.print-insulation .insulation-print-report footer span { white-space: nowrap; }
+}

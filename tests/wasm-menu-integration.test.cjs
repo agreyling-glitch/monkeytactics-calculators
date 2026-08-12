@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const siteRoot = path.resolve(__dirname, "..");
-const menuAssetVersion = "20260808-menu-assets-v1";
+const menuAssetVersion = "20260812-menu-assets-v2";
 const integrationMarkup = [
   '<div id="mt-header"></div>',
 ];
@@ -102,6 +102,25 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
 
   assert.equal((html.match(/class="directory-tool"/g) || []).length, 27);
   assert.doesNotMatch(html, /class="filter-tab/);
+});
+
+test("site-wide references describe the Batt and Blown Insulation Calculator", () => {
+  const expectedName = /Batt (?:&amp;|&) Blown Insulation Calculator/;
+  for (const relativePath of [
+    "README.md",
+    "sitemap.html",
+    "tools/construction.html",
+    "tools/index.html",
+    "tools/drywall-calculator.html",
+    "tools/paint-calculator.html",
+    "tools/roofing-shingle-calculator.html",
+    "wasm/menu-engine/src/tools.rs",
+  ]) {
+    const content = fs.readFileSync(path.join(siteRoot, relativePath), "utf8");
+    assert.match(content, expectedName, `${relativePath} must use the current calculator name`);
+  }
+  const construction = fs.readFileSync(path.join(siteRoot, "tools", "construction.html"), "utf8");
+  assert.match(construction, /batt packages or blown-in bags, R-value, depth, load, and cost/i);
 });
 
 test("the homepage features only the three designated popular tools", () => {

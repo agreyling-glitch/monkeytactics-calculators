@@ -1,0 +1,19 @@
+{
+  "product_name": "Thermo-Cell ProCell Blue",
+  "material": "cellulose",
+  "bag_weight_lbs": 25,
+  "r_value_per_inch": 3.66,
+  "settling_factor": 1.0,
+  "coverage": [
+    { "r_value": 10, "installed_thickness_in": 2.7, "settled_thickness_in": 2.7, "bags_per_1000_sqft": 11.7 },
+    { "r_value": 20, "installed_thickness_in": 5.4, "settled_thickness_in": 5.4, "bags_per_1000_sqft": 23.4 },
+    { "r_value": 30, "installed_thickness_in": 8.1, "settled_thickness_in": 8.1, "bags_per_1000_sqft": 35.1 },
+    { "r_value": 40, "installed_thickness_in": 10.8, "settled_thickness_in": 10.8, "bags_per_1000_sqft": 51.5 },
+    { "r_value": 50, "installed_thickness_in": 13.5, "settled_thickness_in": 13.5, "bags_per_1000_sqft": 64.4 },
+    { "r_value": 60, "installed_thickness_in": 16.2, "settled_thickness_in": 16.2, "bags_per_1000_sqft": 77.3 },
+    { "r_value": 70, "installed_thickness_in": 18.9, "settled_thickness_in": 18.9, "bags_per_1000_sqft": 94.3 },
+    { "r_value": 80, "installed_thickness_in": 21.6, "settled_thickness_in": 21.6, "bags_per_1000_sqft": 107.7 },
+    { "r_value": 90, "installed_thickness_in": 24.3, "settled_thickness_in": 24.3, "bags_per_1000_sqft": 121.2 },
+    { "r_value": 100, "installed_thickness_in": 27.0, "settled_thickness_in": 27.0, "bags_per_1000_sqft": 134.7 }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "product_name": "Johns Manville Climate Pro",
+  "material": "fiberglass",
+  "bag_weight_lbs": 31.5,
+  "r_value_per_inch": 2.7,
+  "settling_factor": 1.0,
+  "coverage": [
+    { "r_value": 11, "installed_thickness_in": 4.3, "settled_thickness_in": 4.3, "bags_per_1000_sqft": 4.8 },
+    { "r_value": 13, "installed_thickness_in": 5.0, "settled_thickness_in": 5.0, "bags_per_1000_sqft": 5.7 },
+    { "r_value": 19, "installed_thickness_in": 7.2, "settled_thickness_in": 7.2, "bags_per_1000_sqft": 8.4 },
+    { "r_value": 22, "installed_thickness_in": 8.3, "settled_thickness_in": 8.3, "bags_per_1000_sqft": 9.9 },
+    { "r_value": 26, "installed_thickness_in": 9.7, "settled_thickness_in": 9.7, "bags_per_1000_sqft": 11.8 },
+    { "r_value": 30, "installed_thickness_in": 11.1, "settled_thickness_in": 11.1, "bags_per_1000_sqft": 13.7 },
+    { "r_value": 38, "installed_thickness_in": 13.8, "settled_thickness_in": 13.8, "bags_per_1000_sqft": 17.7 },
+    { "r_value": 44, "installed_thickness_in": 15.7, "settled_thickness_in": 15.7, "bags_per_1000_sqft": 20.8 },
+    { "r_value": 49, "installed_thickness_in": 17.3, "settled_thickness_in": 17.3, "bags_per_1000_sqft": 23.5 },
+    { "r_value": 60, "installed_thickness_in": 20.7, "settled_thickness_in": 20.7, "bags_per_1000_sqft": 29.5 }
+  ]
+}

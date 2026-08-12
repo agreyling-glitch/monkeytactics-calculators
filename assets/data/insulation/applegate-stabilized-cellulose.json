@@ -1,0 +1,25 @@
+{
+  "product_name": "Applegate Stabilized Cellulose",
+  "material": "cellulose",
+  "bag_weight_lbs": 26.5,
+  "r_value_per_inch": 3.55,
+  "settling_factor": 1.05,
+  "coverage": [
+    { "r_value": 11, "installed_thickness_in": 3.14, "settled_thickness_in": 3.12, "bags_per_1000_sqft": 12.1 },
+    { "r_value": 13, "installed_thickness_in": 3.71, "settled_thickness_in": 3.68, "bags_per_1000_sqft": 14.3 },
+    { "r_value": 19, "installed_thickness_in": 5.42, "settled_thickness_in": 5.38, "bags_per_1000_sqft": 20.8 },
+    { "r_value": 22, "installed_thickness_in": 6.27, "settled_thickness_in": 6.23, "bags_per_1000_sqft": 24.1 },
+    { "r_value": 24, "installed_thickness_in": 6.95, "settled_thickness_in": 6.75, "bags_per_1000_sqft": 26.8 },
+    { "r_value": 26, "installed_thickness_in": 7.53, "settled_thickness_in": 7.31, "bags_per_1000_sqft": 29.1 },
+    { "r_value": 30, "installed_thickness_in": 8.69, "settled_thickness_in": 8.44, "bags_per_1000_sqft": 33.5 },
+    { "r_value": 32, "installed_thickness_in": 9.27, "settled_thickness_in": 9.0, "bags_per_1000_sqft": 35.8 },
+    { "r_value": 38, "installed_thickness_in": 11.18, "settled_thickness_in": 10.59, "bags_per_1000_sqft": 43.7 },
+    { "r_value": 40, "installed_thickness_in": 11.76, "settled_thickness_in": 11.14, "bags_per_1000_sqft": 46.0 },
+    { "r_value": 45, "installed_thickness_in": 13.23, "settled_thickness_in": 12.54, "bags_per_1000_sqft": 51.7 },
+    { "r_value": 48, "installed_thickness_in": 14.12, "settled_thickness_in": 13.37, "bags_per_1000_sqft": 55.2 },
+    { "r_value": 49, "installed_thickness_in": 14.41, "settled_thickness_in": 13.65, "bags_per_1000_sqft": 56.3 },
+    { "r_value": 50, "installed_thickness_in": 14.71, "settled_thickness_in": 13.93, "bags_per_1000_sqft": 57.5 },
+    { "r_value": 55, "installed_thickness_in": 16.18, "settled_thickness_in": 15.32, "bags_per_1000_sqft": 63.2 },
+    { "r_value": 60, "installed_thickness_in": 17.65, "settled_thickness_in": 16.71, "bags_per_1000_sqft": 69.0 }
+  ]
+}

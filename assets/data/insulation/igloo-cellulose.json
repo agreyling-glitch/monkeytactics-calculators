@@ -1,0 +1,17 @@
+{
+  "product_name": "Igloo Cellulose",
+  "material": "cellulose",
+  "bag_weight_lbs": 25,
+  "r_value_per_inch": 3.71,
+  "settling_factor": 1.12,
+  "coverage": [
+    { "r_value": 10, "installed_thickness_in": 2.98, "settled_thickness_in": 2.69, "bags_per_1000_sqft": 15.9 },
+    { "r_value": 12, "installed_thickness_in": 3.58, "settled_thickness_in": 3.23, "bags_per_1000_sqft": 19.1 },
+    { "r_value": 20, "installed_thickness_in": 5.97, "settled_thickness_in": 5.38, "bags_per_1000_sqft": 31.8 },
+    { "r_value": 30, "installed_thickness_in": 8.95, "settled_thickness_in": 8.06, "bags_per_1000_sqft": 47.7 },
+    { "r_value": 32, "installed_thickness_in": 9.55, "settled_thickness_in": 8.6, "bags_per_1000_sqft": 50.9 },
+    { "r_value": 40, "installed_thickness_in": 11.94, "settled_thickness_in": 10.75, "bags_per_1000_sqft": 63.7 },
+    { "r_value": 50, "installed_thickness_in": 15.46, "settled_thickness_in": 13.44, "bags_per_1000_sqft": 87.6 },
+    { "r_value": 60, "installed_thickness_in": 19.35, "settled_thickness_in": 16.13, "bags_per_1000_sqft": 109.7 }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "product_name": "Owens Corning ProPink L77",
+  "material": "fiberglass",
+  "bag_weight_lbs": 32,
+  "r_value_per_inch": 2.9,
+  "settling_factor": 1.0,
+  "coverage": [
+    { "r_value": 13, "installed_thickness_in": 4.75, "settled_thickness_in": 4.75, "bags_per_1000_sqft": 5.4 },
+    { "r_value": 19, "installed_thickness_in": 7.0, "settled_thickness_in": 7.0, "bags_per_1000_sqft": 8.0 },
+    { "r_value": 22, "installed_thickness_in": 8.0, "settled_thickness_in": 8.0, "bags_per_1000_sqft": 9.4 },
+    { "r_value": 26, "installed_thickness_in": 9.25, "settled_thickness_in": 9.25, "bags_per_1000_sqft": 11.2 },
+    { "r_value": 30, "installed_thickness_in": 10.5, "settled_thickness_in": 10.5, "bags_per_1000_sqft": 13.0 },
+    { "r_value": 38, "installed_thickness_in": 13.25, "settled_thickness_in": 13.25, "bags_per_1000_sqft": 16.7 },
+    { "r_value": 44, "installed_thickness_in": 15.0, "settled_thickness_in": 15.0, "bags_per_1000_sqft": 19.7 },
+    { "r_value": 49, "installed_thickness_in": 16.75, "settled_thickness_in": 16.75, "bags_per_1000_sqft": 22.2 },
+    { "r_value": 60, "installed_thickness_in": 20.0, "settled_thickness_in": 20.0, "bags_per_1000_sqft": 28.0 }
+  ]
+}

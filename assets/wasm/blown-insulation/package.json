@@ -1,0 +1,17 @@
+{
+  "name": "blown-insulation-engine",
+  "type": "module",
+  "description": "Client-side blown-insulation coverage calculator for MonkeyTactics",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "blown_insulation_engine_bg.wasm",
+    "blown_insulation_engine.js",
+    "blown_insulation_engine.d.ts"
+  ],
+  "main": "blown_insulation_engine.js",
+  "types": "blown_insulation_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

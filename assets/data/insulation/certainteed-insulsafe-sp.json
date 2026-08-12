@@ -1,0 +1,19 @@
+{
+  "product_name": "CertainTeed InsulSafe SP",
+  "material": "fiberglass",
+  "bag_weight_lbs": 31,
+  "r_value_per_inch": 2.6,
+  "settling_factor": 1.0,
+  "coverage": [
+    { "r_value": 11, "installed_thickness_in": 4.5, "settled_thickness_in": 4.5, "bags_per_1000_sqft": 5.3 },
+    { "r_value": 13, "installed_thickness_in": 5.25, "settled_thickness_in": 5.25, "bags_per_1000_sqft": 6.2 },
+    { "r_value": 19, "installed_thickness_in": 7.75, "settled_thickness_in": 7.75, "bags_per_1000_sqft": 9.3 },
+    { "r_value": 22, "installed_thickness_in": 8.75, "settled_thickness_in": 8.75, "bags_per_1000_sqft": 10.8 },
+    { "r_value": 26, "installed_thickness_in": 10.25, "settled_thickness_in": 10.25, "bags_per_1000_sqft": 12.8 },
+    { "r_value": 30, "installed_thickness_in": 11.75, "settled_thickness_in": 11.75, "bags_per_1000_sqft": 14.9 },
+    { "r_value": 38, "installed_thickness_in": 14.5, "settled_thickness_in": 14.5, "bags_per_1000_sqft": 19.1 },
+    { "r_value": 44, "installed_thickness_in": 16.75, "settled_thickness_in": 16.75, "bags_per_1000_sqft": 22.4 },
+    { "r_value": 49, "installed_thickness_in": 18.5, "settled_thickness_in": 18.5, "bags_per_1000_sqft": 25.2 },
+    { "r_value": 60, "installed_thickness_in": 22.0, "settled_thickness_in": 22.0, "bags_per_1000_sqft": 31.4 }
+  ]
+}

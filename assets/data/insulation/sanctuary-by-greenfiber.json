@@ -1,0 +1,17 @@
+{
+  "product_name": "SANCTUARY by Greenfiber",
+  "material": "cellulose",
+  "bag_weight_lbs": 25,
+  "r_value_per_inch": 3.7,
+  "settling_factor": 1.08,
+  "coverage": [
+    { "r_value": 13, "installed_thickness_in": 3.9, "settled_thickness_in": 3.6, "bags_per_1000_sqft": 13.8 },
+    { "r_value": 19, "installed_thickness_in": 5.7, "settled_thickness_in": 5.3, "bags_per_1000_sqft": 20.5 },
+    { "r_value": 22, "installed_thickness_in": 6.6, "settled_thickness_in": 6.1, "bags_per_1000_sqft": 24.2 },
+    { "r_value": 30, "installed_thickness_in": 8.9, "settled_thickness_in": 8.3, "bags_per_1000_sqft": 36.5 },
+    { "r_value": 38, "installed_thickness_in": 11.2, "settled_thickness_in": 10.4, "bags_per_1000_sqft": 50.1 },
+    { "r_value": 44, "installed_thickness_in": 12.9, "settled_thickness_in": 12.0, "bags_per_1000_sqft": 60.8 },
+    { "r_value": 49, "installed_thickness_in": 14.3, "settled_thickness_in": 13.3, "bags_per_1000_sqft": 68.5 },
+    { "r_value": 60, "installed_thickness_in": 17.3, "settled_thickness_in": 16.1, "bags_per_1000_sqft": 83.5 }
+  ]
+}

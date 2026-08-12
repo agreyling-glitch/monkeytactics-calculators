@@ -127,7 +127,7 @@ const CONSTRUCTION_CALCULATORS: &[ToolItem] = &[
     },
     ToolItem {
         id: "insulation-calculator",
-        label: "Insulation Calculator",
+        label: "Batt & Blown Insulation Calculator",
         url: "/tools/insulation-calculator",
         children: &[],
     },
