@@ -773,6 +773,45 @@
       link.remove();
     }
 
+    function dataUrlToBlob(dataUrl) {
+      const parts = String(dataUrl).split(',');
+      const mimeMatch = parts[0].match(/^data:([^;]+);base64$/);
+      if (!mimeMatch || !parts[1]) throw new TypeError('Invalid image data URL');
+      const binary = atob(parts[1]);
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+      return new Blob([bytes], { type: mimeMatch[1] });
+    }
+
+    async function savePngImage() {
+      if (!resultImageUrl) return;
+      try {
+        const blob = resultImageUrl.startsWith('data:')
+          ? dataUrlToBlob(resultImageUrl)
+          : await (await fetch(resultImageUrl)).blob();
+        const file = new File([blob], 'decoded-code.png', { type: 'image/png' });
+        const isIosSafari = /iPad|iPhone|iPod/.test(navigator.userAgent)
+          || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        if (isIosSafari && typeof navigator.share === 'function'
+          && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: 'Decoded QR or barcode image' });
+            elements.imageActionsDialog.close();
+            return;
+          } catch (error) {
+            if (error && error.name === 'AbortError') return;
+          }
+        }
+
+        const objectUrl = URL.createObjectURL(blob);
+        downloadUrl(objectUrl, file.name);
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
+      } catch (_) {
+        showStatus('The PNG could not be saved. Try Save SVG instead.', 'error');
+      }
+    }
+
     function embeddedImageSvg(dataUrl) {
       const safeUrl = String(dataUrl).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
       const width = elements.resultPreview.naturalWidth || 600;
@@ -1399,7 +1438,7 @@
         setTimeout(() => { elements.imageCopyButton.textContent = 'Copy'; }, 1600);
       } catch (_) { showStatus('Image copying is not supported by this browser. Use Save PNG instead.', 'error'); }
     });
-    elements.imagePngButton.addEventListener('click', () => downloadUrl(resultImageUrl, 'decoded-code.png'));
+    elements.imagePngButton.addEventListener('click', savePngImage);
     elements.imageSvgButton.addEventListener('click', () => {
       const svg = resultImageSvg || embeddedImageSvg(resultImageUrl);
       const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));

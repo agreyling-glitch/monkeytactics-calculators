@@ -105,6 +105,12 @@ test("decoded image opens copy and download actions and bottom buttons have the 
   assert.match(decoderHtml, /id="imageSvgButton"[^>]*>Save SVG<\/button>/);
   assert.match(decoderHtml, /new ClipboardItem\(\{ 'image\/png': blob \}\)/);
   assert.match(decoderHtml, /embeddedImageSvg\(resultImageUrl\)/);
+  assert.match(decoderHtml, /function dataUrlToBlob\(dataUrl\)/);
+  assert.match(decoderHtml, /function savePngImage\(\)/);
+  assert.match(decoderHtml, /navigator\.canShare\(\{ files: \[file\] \}\)/);
+  assert.match(decoderHtml, /navigator\.share\(\{ files: \[file\], title: 'Decoded QR or barcode image' \}\)/);
+  assert.match(decoderHtml, /URL\.createObjectURL\(blob\)/);
+  assert.match(decoderHtml, /imagePngButton\.addEventListener\('click', savePngImage\)/);
   assert.match(decoderHtml, /id="uploadAnotherButton"[\s\S]*id="clearButton"[\s\S]*id="copyButton"/);
 });
 
