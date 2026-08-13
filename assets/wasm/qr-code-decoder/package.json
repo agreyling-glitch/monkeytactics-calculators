@@ -1,0 +1,17 @@
+{
+  "name": "monkeytactics-qr-decoder-engine",
+  "type": "module",
+  "description": "Local Rust/WASM QR decoding and preprocessing engine for MonkeyTactics",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "qr_decoder_engine_bg.wasm",
+    "qr_decoder_engine.js",
+    "qr_decoder_engine.d.ts"
+  ],
+  "main": "qr_decoder_engine.js",
+  "types": "qr_decoder_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

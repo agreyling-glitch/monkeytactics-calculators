@@ -228,7 +228,7 @@ test("the QR Code Decoder uses the premium private scanning presentation", () =>
   assert.match(html, /class="premium-tool-hero"/);
   assert.match(html, /class="qr-decoder-section"/);
   assert.match(html, /01 \/ Decode/);
-  assert.match(html, /Four scanning methods/);
+  assert.match(html, /QR &amp; barcode detection/);
   assert.doesNotMatch(html, /Top Display Ad/);
   assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
 });
@@ -365,9 +365,10 @@ test("the Compound Interest Calculator uses the premium growth presentation", ()
   assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
 });
 
-test("the About page lists the Compound Interest Calculator as a Rust WebAssembly app", () => {
+test("the About page lists the Rust WebAssembly apps", () => {
   const html = fs.readFileSync(path.join(siteRoot, "about.html"), "utf8");
-  assert.match(html, /Five MonkeyTactics systems use <code>Rust<\/code> compiled to <code>WebAssembly<\/code>/);
+  assert.match(html, /Six MonkeyTactics systems use <code>Rust<\/code> compiled to <code>WebAssembly<\/code>/);
+  assert.match(html, /href="\/tools\/qr-code-decoder">QR Code Decoder<\/a>/);
   assert.match(html, /href="\/tools\/compound-interest-calculator">Compound Interest Calculator<\/a>/);
   assert.match(html, /Projects compound growth, regular contributions, tax drag, inflation, and up to five scenarios/);
 });

@@ -1,0 +1,9 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="54" height="12" version="1.1" xmlns="http://www.w3.org/2000/svg">
+ <desc>Zint Generated Symbol</desc>
+ <g id="barcode" fill="#000000">
+  <rect x="0" y="0" width="54" height="12" fill="#FFFFFF"/>
+  <path d="M3.6 0h10v6h-10ZM15.6 0h2v12h-2ZM19.6 0h2v6h-2ZM23.6 0h2v6h-2ZM27.6 0h2v12h-2ZM31.6 0h2v6h-2ZM35.6 0h2v12h-2ZM39.6 0h2v12h-2ZM43.6 0h6v6h-6ZM3.6 6h2v6h-2ZM7.6 6h2v6h-2ZM11.6 6h2v6h-2ZM21.6 6h4v6h-4ZM43.6 6h2v6h-2ZM47.6 6h2v6h-2Z"/>
+ </g>
+</svg>

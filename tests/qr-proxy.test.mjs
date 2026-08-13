@@ -44,9 +44,17 @@ test("resolves redirects with HEAD requests and never reads page content", async
   const response = await worker.fetch(workerRequest("https://short.example/start"), {});
 
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), {
-    finalUrl: "https://final.example/destination",
-  });
+  const payload = await response.json();
+  assert.equal(payload.finalUrl, "https://final.example/destination");
+  assert.equal(payload.finalStatus, 200);
+  assert.equal(payload.redirectCount, 2);
+  assert.equal(typeof payload.totalDurationMs, "number");
+  assert.deepEqual(payload.trace.map(({ url, status, location }) => ({ url, status, location })), [
+    { url: "https://short.example/start", status: 302, location: "https://short.example/middle" },
+    { url: "https://short.example/middle", status: 307, location: "https://final.example/destination" },
+    { url: "https://final.example/destination", status: 200, location: undefined },
+  ]);
+  assert.ok(payload.trace.every(({ durationMs }) => typeof durationMs === "number" && durationMs >= 0));
   assert.deepEqual(calls.map(({ url }) => url), [
     "https://short.example/start",
     "https://short.example/middle",
@@ -71,9 +79,13 @@ test("stops immediately when the HEAD response is not a redirect", async (t) => 
   const response = await worker.fetch(workerRequest("https://example.com/page"), {});
 
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), {
-    finalUrl: "https://example.com/page",
-  });
+  const payload = await response.json();
+  assert.equal(payload.finalUrl, "https://example.com/page");
+  assert.equal(payload.finalStatus, 405);
+  assert.equal(payload.redirectCount, 0);
+  assert.deepEqual(payload.trace.map(({ url, status }) => ({ url, status })), [
+    { url: "https://example.com/page", status: 405 },
+  ]);
   assert.equal(fetchCount, 1);
 });
 

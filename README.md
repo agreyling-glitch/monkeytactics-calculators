@@ -70,7 +70,7 @@ Top advertising blocks have been removed from the redesigned experiences so the 
 
 ## 🏗️ Architecture Overview
 
-MonkeyTactics is primarily a static site built from lightweight HTML, CSS, and JavaScript, with a narrowly scoped Cloudflare Pages Function for dynamic Word Unscrambler routes. Five first-party Rust components compile to WebAssembly. Every generated browser package is committed under `assets/wasm/`, so production hosting does not require a Rust toolchain.
+MonkeyTactics is primarily a static site built from lightweight HTML, CSS, and JavaScript, with a narrowly scoped Cloudflare Pages Function for dynamic Word Unscrambler routes. Six first-party Rust components compile to WebAssembly. Every generated browser package is committed under `assets/wasm/`, so production hosting does not require a Rust toolchain.
 
 The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source membership, allowing searches against either dictionary or their deduplicated union. Its static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser loads only the chunks relevant to the submitted letters, decompresses them with the native `DecompressionStream` API, and caches the indexed words for later searches. Exact word length, starting and ending letters, wildcard patterns, required/excluded letters, vowel and consonant minimums, score ranges, sorting, and dictionary-aware hooks are applied in the browser. Hook searches load the complete index on demand.
 
@@ -80,11 +80,12 @@ The Word Unscrambler uses ENABLE and SOWPODS word lists with per-word source mem
 |---|---|---|---|
 | [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator) | `wasm/mortgage-engine` | `assets/wasm/mortgage` | Fixed-rate amortization, monthly and bi-weekly payments, extra payments, and multi-scenario calculations |
 | [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator) | `wasm/qr-code-generator-engine` | `assets/wasm/qr-code-generator` | QR encoding, styling, image export, and batch generation |
+| [QR & Barcode Decoder](https://monkeytactics.com/tools/qr-code-decoder) | `wasm/qr-code-decoder-engine` | `assets/wasm/qr-code-decoder` | Local QR and barcode decoding, controlled image preprocessing, and stylized-module normalization |
 | [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Dictionary indexing, searching, filtering, sorting, scoring, hooks, and word analysis |
 | [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter) | `wasm/text-analyzer-engine` | `assets/wasm/text-analyzer` | Local text metrics and structural analysis with a JavaScript fallback |
 | Hierarchical site navigation | `wasm/menu-engine` | `assets/wasm/menu` | Domain-verified Leptos header, global search with keyboard navigation, and a hamburger-driven hierarchy drawer rendered on every page |
 
-All five components run locally in the browser. Their Rust source lives under `wasm/`; generated JavaScript bindings and `.wasm` binaries live under `assets/wasm/`.
+All six components run locally in the browser. Their Rust source lives under `wasm/`; generated JavaScript bindings and `.wasm` binaries live under `assets/wasm/`.
 
 ### Repository ownership
 

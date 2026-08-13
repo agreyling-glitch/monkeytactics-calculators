@@ -11,6 +11,16 @@ const ALLOWED_ORIGINS = new Set([
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 const MAX_REDIRECTS = 10;
 
+function now() {
+  return typeof performance !== "undefined" && typeof performance.now === "function"
+    ? performance.now()
+    : Date.now();
+}
+
+function millisecondsSince(started) {
+  return Math.max(0, Number((now() - started).toFixed(2)));
+}
+
 function jsonResponse(body, status, origin) {
   const headers = {
     "Content-Type": "application/json; charset=utf-8",
@@ -76,6 +86,8 @@ export default {
     try {
       let currentUrl = targetUrl;
       const visitedUrls = new Set();
+      const trace = [];
+      const traceStarted = now();
 
       for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
         const currentUrlString = currentUrl.toString();
@@ -85,13 +97,26 @@ export default {
         }
         visitedUrls.add(currentUrlString);
 
+        const hopStarted = now();
         const response = await fetch(currentUrlString, {
           method: "HEAD",
           redirect: "manual",
         });
+        const hop = {
+          url: currentUrlString,
+          status: response.status,
+          durationMs: millisecondsSince(hopStarted),
+        };
 
         if (!REDIRECT_STATUSES.has(response.status)) {
-          return jsonResponse({ finalUrl: currentUrlString }, 200, origin);
+          trace.push(hop);
+          return jsonResponse({
+            finalUrl: currentUrlString,
+            finalStatus: response.status,
+            redirectCount,
+            totalDurationMs: millisecondsSince(traceStarted),
+            trace,
+          }, 200, origin);
         }
 
         const location = response.headers.get("Location");
@@ -102,10 +127,13 @@ export default {
           throw new Error("Too many redirects");
         }
 
-        currentUrl = new URL(location, currentUrl);
-        if (currentUrl.protocol !== "http:" && currentUrl.protocol !== "https:") {
+        const nextUrl = new URL(location, currentUrl);
+        if (nextUrl.protocol !== "http:" && nextUrl.protocol !== "https:") {
           throw new Error("Redirect target must use HTTP or HTTPS");
         }
+        hop.location = nextUrl.toString();
+        trace.push(hop);
+        currentUrl = nextUrl;
       }
 
       throw new Error("Too many redirects");

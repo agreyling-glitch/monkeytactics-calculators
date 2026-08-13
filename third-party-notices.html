@@ -190,19 +190,23 @@ SOFTWARE.</pre>
         <p>The QR Code Generator and QR Code Decoder use the following open-source
            JavaScript libraries.</p>
 
-        <h3>jsQR 1.4.0</h3>
+        <h3>rqrr 0.10.1</h3>
         <ul>
-          <li>Purpose: Client-side QR code decoding</li>
-          <li>License: Apache License 2.0</li>
-          <li>Distribution: Embedded in the QR Code Decoder page</li>
-          <li>Source:
-            <a href="https://github.com/cozmo/jsQR" rel="external">
-              github.com/cozmo/jsQR
-            </a>
-          </li>
-          <li>
-            <a href="/licenses/apache-2.0.txt">View the complete Apache License 2.0</a>
-          </li>
+          <li>Purpose: Primary QR detection and decoding in the Rust/WebAssembly decoder</li>
+          <li>License: (MIT OR Apache-2.0) AND ISC</li>
+          <li>Source: <a href="https://github.com/WanzenBug/rqrr" rel="external">github.com/WanzenBug/rqrr</a></li>
+          <li><a href="/licenses/apache-2.0.txt">View the complete Apache License 2.0</a></li>
+          <li><a href="/licenses/rqrr-MIT-ISC.txt">View the rqrr MIT and ISC notices</a></li>
+        </ul>
+
+        <h3>zxing-wasm 2.2.2 and ZXing-C++</h3>
+        <ul>
+          <li>Purpose: Cross-browser local QR decoding fallback</li>
+          <li>Distribution: Self-hosted JavaScript and WebAssembly reader assets</li>
+          <li>Licenses: zxing-wasm is MIT; ZXing-C++ is Apache License 2.0</li>
+          <li>Sources: <a href="https://github.com/Sec-ant/zxing-wasm" rel="external">zxing-wasm</a> and <a href="https://github.com/zxing-cpp/zxing-cpp" rel="external">ZXing-C++</a></li>
+          <li><a href="/licenses/apache-2.0.txt">View the complete Apache License 2.0</a></li>
+          <li><a href="/licenses/zxing-wasm-MIT.txt">View the zxing-wasm MIT notice</a></li>
         </ul>
 
         <h3>Tesseract.js 5.x</h3>

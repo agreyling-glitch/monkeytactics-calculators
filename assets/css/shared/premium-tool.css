@@ -734,6 +734,55 @@
   background: linear-gradient(145deg, rgba(34, 197, 94, 0.1), rgba(16, 27, 22, 0.88));
 }
 
+.qr-decoder-tool-page .decoder-debug-panel {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--premium-line);
+  border-radius: 0.85rem;
+  background: rgba(3, 9, 6, 0.38);
+}
+
+.qr-decoder-tool-page .decoder-debug-panel summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--premium-ink);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.qr-decoder-tool-page .decoder-debug-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--premium-muted);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.qr-decoder-tool-page .decoder-debug-output {
+  max-height: 22rem;
+  margin: 0.75rem 0 0;
+  padding: 0.85rem;
+  overflow: auto;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.65rem;
+  background: rgba(0, 0, 0, 0.3);
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 600px) {
+  .qr-decoder-tool-page .decoder-debug-panel summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 .qr-decoder-tool-page .seo-section > h2,
 .qr-decoder-tool-page .faq-section h2,
 .qr-decoder-tool-page #related-heading {

@@ -45,14 +45,24 @@ SOFTWARE.
 
 ## JavaScript libraries
 
-### jsQR
+### rqrr
 
-- Version: `1.4.0`
-- Purpose: Client-side QR code decoding
-- Distribution: Embedded in `tools/qr-code-decoder.html`
-- Source: <https://github.com/cozmo/jsQR>
-- License: Apache License 2.0
-- Full license: [Apache License 2.0](licenses/apache-2.0.txt)
+- Version: `0.10.1`
+- Purpose: Primary QR detection and decoding in the Rust/WebAssembly decoder
+- Source: <https://github.com/WanzenBug/rqrr>
+- License: `(MIT OR Apache-2.0) AND ISC`
+- Full Apache license: [Apache License 2.0](licenses/apache-2.0.txt)
+- MIT and ISC notices: [rqrr notices](licenses/rqrr-MIT-ISC.txt)
+
+### zxing-wasm and ZXing-C++
+
+- zxing-wasm version: `2.2.2`
+- Purpose: Cross-browser local QR decoding fallback
+- Distribution: Self-hosted JavaScript and WebAssembly reader assets
+- Sources: <https://github.com/Sec-ant/zxing-wasm>, <https://github.com/zxing-cpp/zxing-cpp>
+- Licenses: zxing-wasm is MIT; ZXing-C++ is Apache License 2.0
+- Full Apache license: [Apache License 2.0](licenses/apache-2.0.txt)
+- zxing-wasm MIT notice: [zxing-wasm MIT notice](licenses/zxing-wasm-MIT.txt)
 
 ### Tesseract.js
 

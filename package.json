@@ -5,12 +5,13 @@
   "scripts": {
     "build:qr": "vite build",
     "build:qr-wasm": "wasm-pack build wasm/qr-code-generator-engine --target web --release --out-dir ../../assets/wasm/qr-code-generator --out-name qr_engine && node -e \"require('fs').rmSync('assets/wasm/qr-code-generator/.gitignore',{force:true})\"",
+    "build:qr-decoder-wasm": "node wasm/qr-code-decoder-engine/build.mjs",
     "build:mortgage-wasm": "wasm-pack build wasm/mortgage-engine --target web --release --out-dir ../../assets/wasm/mortgage --out-name mortgage_engine && node -e \"require('fs').rmSync('assets/wasm/mortgage/.gitignore',{force:true})\"",
     "build:insulation-wasm": "wasm-pack build wasm/blown-insulation-engine --target web --release --out-dir ../../assets/wasm/blown-insulation --out-name blown_insulation_engine && node -e \"require('fs').rmSync('assets/wasm/blown-insulation/.gitignore',{force:true})\"",
     "build:word-wasm": "wasm-pack build wasm/word-unscrambler-engine --target web --release --out-dir ../../assets/wasm/word-unscrambler --out-name word_unscrambler_engine && node -e \"require('fs').rmSync('assets/wasm/word-unscrambler/.gitignore',{force:true})\"",
     "build:text-wasm": "wasm-pack build wasm/text-analyzer-engine --target web --release --out-dir ../../assets/wasm/text-analyzer --out-name text_analyzer && node -e \"require('fs').rmSync('assets/wasm/text-analyzer/.gitignore',{force:true})\"",
     "build:menu-wasm": "node wasm/menu-engine/build.mjs",
-    "build:wasm": "npm run build:qr-wasm && npm run build:mortgage-wasm && npm run build:insulation-wasm && npm run build:word-wasm && npm run build:text-wasm && npm run build:menu-wasm",
+    "build:wasm": "npm run build:qr-wasm && npm run build:qr-decoder-wasm && npm run build:mortgage-wasm && npm run build:insulation-wasm && npm run build:word-wasm && npm run build:text-wasm && npm run build:menu-wasm",
     "build:sitemaps": "node scripts/generate-sitemaps.mjs",
     "build": "npm run build:wasm && npm run build:qr && npm run build:sitemaps",
     "typecheck": "tsc --noEmit",
@@ -23,7 +24,8 @@
     "react": "latest",
     "react-dom": "latest",
     "@types/react": "latest",
-    "@types/react-dom": "latest"
+    "@types/react-dom": "latest",
+    "zxing-wasm": "2.2.2"
   },
   "devDependencies": {}
 }
