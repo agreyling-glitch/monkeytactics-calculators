@@ -229,6 +229,135 @@
     .result-actions button[hidden] { display:none; }
     .result-preview:not([hidden]) { cursor:pointer; }
     .result-preview:not([hidden]):focus-visible { outline:3px solid rgba(34,197,94,.3); outline-offset:3px; }
+    .history-panel {
+      margin-top: 1.3rem;
+      padding: 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: .9rem;
+      background: rgba(255,255,255,.02);
+    }
+    .history-details {
+      border: none;
+    }
+    .history-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: .1rem 0 .9rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      color: var(--text);
+    }
+    .history-summary::-webkit-details-marker,
+    .history-summary::marker {
+      display: none;
+    }
+    .history-summary::after {
+      content: "▸";
+      color: var(--muted);
+      font-size: .9rem;
+      transition: transform .2s;
+      flex: 0 0 auto;
+    }
+    .history-details[open] .history-summary::after {
+      transform: rotate(90deg);
+    }
+    .history-summary-inner {
+      display: grid;
+      gap: .3rem;
+      margin: 0;
+    }
+    .history-body {
+      display: grid;
+      gap: .6rem;
+      border-top: 1px solid rgba(148,163,184,.16);
+      padding-top: .85rem;
+    }
+    .history-toolbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:.6rem;
+      margin:.4rem 0 .9rem;
+    }
+    .history-toolbar-actions { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .history-empty {
+      margin: 0;
+      color: var(--muted);
+      font-size: .84rem;
+    }
+    .history-list { margin:0; padding:0; list-style:none; display:grid; gap:.85rem; }
+    .history-item { display:grid; gap:.75rem; grid-template-columns:minmax(140px,1fr) 1fr; padding: .9rem; border:1px solid var(--border); border-radius:.8rem; background:rgba(255,255,255,.02); }
+    .history-image-stack { display:grid; gap:.5rem; align-content:start; }
+    .history-screenshot,
+    .history-qr {
+      width:100%;
+      max-width:132px;
+      min-height:132px;
+      border:1px solid var(--border);
+      border-radius:.55rem;
+      background:#fff;
+      object-fit:contain;
+    }
+    .history-qr-placeholder {
+      display:grid;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      max-width:132px;
+      min-height:132px;
+      border:1px solid var(--border);
+      border-radius:.55rem;
+      background:rgba(255,255,255,.5);
+      color:var(--muted);
+      font-size:.72rem;
+      text-align:center;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:700;
+    }
+    .history-item-body { display:grid; gap:.45rem; }
+    .history-title {
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:.5rem;
+      color:var(--text);
+      font-weight:700;
+      font-size:.86rem;
+    }
+    .history-title time { color:var(--muted); font-weight:500; font-size:.74rem; }
+    .history-meta { margin:0; color:var(--text); font-size:.83rem; line-height:1.45; }
+    .history-payload-label {
+      margin: .12rem 0 0;
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-weight:700;
+    }
+    .history-payload,
+    .history-destination {
+      margin:0;
+      color: var(--text);
+      font-size:.84rem;
+      line-height:1.45;
+      overflow-wrap:anywhere;
+    }
+    .history-destination { color: var(--muted); }
+    .history-actions { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .action-link { margin: 0; }
+    .history-action-delete {
+      border-color: rgba(248,113,113,.45);
+      color: #fecaca;
+    }
+    .history-action-delete:hover {
+      border-color: #fca5a5;
+      color: #fecaca;
+      background: rgba(248,113,113,.12);
+    }
     .action-dialog { width:min(420px,calc(100% - 2rem)); padding:0; border:1px solid rgba(56,189,248,.4); border-radius:1rem; background:#0f172a; color:var(--text); box-shadow:0 24px 70px rgba(0,0,0,.55); }
     .action-dialog::backdrop { background:rgba(2,6,23,.78); backdrop-filter:blur(3px); }
     .action-dialog-content { position:relative; padding:1.25rem; }
@@ -299,6 +428,8 @@
       .format-sample-item img { height:54px; }
       .method-panel { min-height:0; }
       .url-row, .button-row, .result-actions, .link-warning-actions { flex-direction:column; }
+      .history-item { grid-template-columns:1fr; }
+      .history-image-stack { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260813-12">
@@ -335,8 +466,8 @@
         <fieldset class="scan-mode-fieldset">
           <legend>Code type</legend>
           <div class="scan-mode-options">
-            <label class="scan-mode-option"><input type="radio" name="scanMode" value="auto" checked><span>Auto detect</span></label>
-            <label class="scan-mode-option"><input type="radio" name="scanMode" value="qr"><span>QR only</span></label>
+      <label class="scan-mode-option"><input type="radio" name="scanMode" value="auto"><span>Auto detect</span></label>
+      <label class="scan-mode-option"><input type="radio" name="scanMode" value="qr" checked><span>QR only</span></label>
             <label class="scan-mode-option"><input type="radio" name="scanMode" value="barcode"><span>Barcode only</span></label>
           </div>
         </fieldset>
@@ -399,7 +530,7 @@
           <section id="camera-panel" class="method-panel" role="tabpanel"
                    aria-labelledby="camera-tab" tabindex="0" hidden>
             <h3 id="camera-heading">Camera scanner</h3>
-            <div id="cameraFrame" class="camera-frame" data-scan-mode="auto">
+            <div id="cameraFrame" class="camera-frame" data-scan-mode="qr">
               <video id="cameraVideo" playsinline muted aria-label="Camera preview"></video>
               <div id="cameraPlaceholder" class="camera-placeholder">Start the scanner to preview your camera here.</div>
               <div class="camera-guide" aria-hidden="true">
@@ -453,6 +584,27 @@
             </div>
           </div>
         </div>
+        <section class="history-panel">
+          <details id="historySection" class="history-details" open>
+            <summary id="history-summary" class="history-summary">
+              <div class="history-summary-inner">
+                <div class="premium-section-kicker">02 / History</div>
+                <h2 id="history-heading">Last 10 scans</h2>
+              </div>
+            </summary>
+            <div class="history-body">
+              <div class="history-toolbar">
+                <div></div>
+                <div class="history-toolbar-actions">
+                  <button id="downloadHistoryZipButton" class="btn-secondary" type="button">Download history ZIP</button>
+                  <button id="clearHistoryButton" class="btn-secondary" type="button">Clear history</button>
+                </div>
+              </div>
+            <p class="history-empty" id="historyEmptyMessage">No scans yet. Your last 10 scans (decoded or captured from unresolved attempts) will appear here.</p>
+            <ol id="historyList" class="history-list" hidden></ol>
+            </div>
+          </details>
+          </section>
         <canvas id="decodeCanvas" aria-hidden="true"></canvas>
       </div>
     </section>
@@ -631,6 +783,7 @@
   <!-- qrcode 1.1.0 is MIT licensed; see /third-party-notices. -->
   <!-- QRCode regenerates a clean preview from camera-decoded content locally. -->
   <script src="/assets/js/vendor/qrcode-1.1.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <!-- zxing-wasm 2.2.2 bundles ZXing-C++ under Apache-2.0; see /third-party-notices. -->
   <script src="/assets/wasm/qr-code-decoder/zxing/reader.js?v=20260813-2"></script>
   <script type="module">
@@ -654,6 +807,8 @@
       urlResultTableWrap: $('urlResultTableWrap'), decodedUrlText: $('decodedUrlText'), finalUrlText: $('finalUrlText'), finalUrlMenuButton: $('finalUrlMenuButton'),
       redirectTrace: $('redirectTrace'), redirectTraceSummary: $('redirectTraceSummary'), redirectTraceList: $('redirectTraceList'),
       uploadAnotherButton: $('uploadAnotherButton'), copyButton: $('copyButton'), clearButton: $('clearButton'),
+      historyList: $('historyList'), historyEmptyMessage: $('historyEmptyMessage'),
+      clearHistoryButton: $('clearHistoryButton'), downloadHistoryZipButton: $('downloadHistoryZipButton'),
       debugPanel: $('debugPanel'), debugToggle: $('debugToggle'), debugOutput: $('debugOutput'),
       linkWarningDialog: $('linkWarningDialog'), linkWarningUrl: $('linkWarningUrl'),
       confirmLinkButton: $('confirmLinkButton'), cancelLinkButton: $('cancelLinkButton'),
@@ -676,6 +831,16 @@
     let resolveRequestId = 0;
     let cameraDecodeBusy = false;
     let zxingConfigured = false;
+    const urlToHistoryId = {};
+    const HISTORY_STORAGE_KEY = 'qr-decoder-history:v1';
+    const MAX_HISTORY_ENTRIES = 10;
+    const HISTORY_EXPORT_JSON_VERSION = '1';
+    const HISTORY_EXPORT_NAME = 'qr-code-decoder-history';
+    let scanHistory = [];
+    let currentHistoryId = '';
+    let failedCaptureImageUrl = '';
+    let failedCaptureReason = '';
+    let jsZipLoadPromise = null;
     const QR_FORMATS = ['QRCode', 'MicroQRCode', 'rMQRCode'];
     const BARCODE_FORMATS = ['Aztec', 'Codabar', 'Code39', 'Code93', 'Code128', 'DataBar', 'DataBarExpanded', 'DataMatrix', 'EAN-8', 'EAN-13', 'ITF', 'MaxiCode', 'PDF417', 'UPC-A', 'UPC-E', 'DXFilmEdge', 'DataBarLimited'];
     const NATIVE_BARCODE_FORMATS = ['aztec', 'codabar', 'code_39', 'code_93', 'code_128', 'data_matrix', 'ean_8', 'ean_13', 'itf', 'pdf417', 'upc_a', 'upc_e'];
@@ -689,7 +854,7 @@
 
     function currentScanMode() {
       const selected = elements.scanModeInputs.find((input) => input.checked);
-      return selected ? selected.value : 'auto';
+      return selected ? selected.value : 'qr';
     }
 
     function isQrFormat(format) {
@@ -706,15 +871,322 @@
       return labels[format] || format || 'Unknown format';
     }
 
+    function isPlausibleNativeBarcodeValue(text, format) {
+      const value = String(text || '').trim();
+      if (!value || value.length < 4 || value.length > 128 || /\s/.test(value)) {
+        return false;
+      }
+      switch (format) {
+        case 'ean_8':
+          return /^\d{7,8}$/.test(value);
+        case 'ean_13':
+          return /^\d{12,13}$/.test(value);
+        case 'upc_a':
+          return /^\d{11,12}$/.test(value);
+        case 'upc_e':
+          return /^\d{6,8}$/.test(value);
+        case 'itf':
+          return /^\d{4,24}$/.test(value) && value.length % 2 === 0;
+        case 'codabar':
+          return /^[0-9\-\$\:\/\.\+]+$/.test(value);
+        case 'code_39':
+          return /^[A-Z0-9 ./$+%-]+$/i.test(value);
+        case 'code_93':
+          return /^[A-Za-z0-9 !"#$%&'()*+,\-.\/:;=?@_~]+$/.test(value);
+        case 'code_128':
+          return /^[\x20-\x7E]+$/.test(value);
+        default:
+          return true;
+      }
+    }
+
+    function historyStorageAvailable() {
+      try {
+        const test = '__history_test__';
+        localStorage.setItem(test, '1');
+        localStorage.removeItem(test);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function normalizeHistoryRecord(raw) {
+      if (!raw || typeof raw !== 'object') return null;
+      const text = typeof raw.payload === 'string' ? raw.payload : '';
+      const format = typeof raw.format === 'string' ? raw.format : 'Unknown';
+      if (!text && !format) return null;
+      return {
+        id: typeof raw.id === 'string' ? raw.id : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        timestamp: Number.isFinite(raw.timestamp) ? raw.timestamp : Date.now(),
+        format,
+        payload: text,
+        destination: typeof raw.destination === 'string' ? raw.destination : '',
+        screenshotUrl: typeof raw.screenshotUrl === 'string' ? raw.screenshotUrl : '',
+        qrCodeUrl: typeof raw.qrCodeUrl === 'string' ? raw.qrCodeUrl : ''
+      };
+    }
+
+    function loadHistoryFromStorage() {
+      if (!historyStorageAvailable()) return [];
+      try {
+        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.map(normalizeHistoryRecord).filter(Boolean);
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function persistHistory() {
+      if (!historyStorageAvailable()) return;
+      try {
+        localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(scanHistory.slice(0, MAX_HISTORY_ENTRIES)));
+      } catch (_) {}
+    }
+
+    function addScanToHistory(record) {
+      if (!record) return;
+      scanHistory = [record, ...scanHistory.filter((item) => item.id !== record.id)].slice(0, MAX_HISTORY_ENTRIES);
+      persistHistory();
+      renderScanHistory();
+    }
+
+    function formatHistoryDate(timestamp) {
+      return new Date(timestamp).toLocaleString();
+    }
+
+    function setFailedScanCaptureState(imageUrl, reason) {
+      failedCaptureImageUrl = imageUrl || '';
+      failedCaptureReason = reason || '';
+      updateScanModeUi();
+    }
+
+    function clearFailedScanCaptureState() {
+      failedCaptureImageUrl = '';
+      failedCaptureReason = '';
+      updateScanModeUi();
+    }
+
+    function recordFailedScanToHistory() {
+      return captureFailedScanToHistory(failedCaptureImageUrl, failedCaptureReason);
+    }
+
+    function captureFailedScanToHistory(imageUrl, reason) {
+      if (!imageUrl) return '';
+      const decodeReason = reason || failedCaptureReason;
+      const id = createHistoryEntryId();
+      const entry = {
+        id,
+        timestamp: Date.now(),
+        format: 'Unresolved',
+        payload: '[No payload decoded]',
+        destination: decodeReason ? `Could not decode ${decodeReason}` : 'Could not decode',
+        screenshotUrl: imageUrl,
+        qrCodeUrl: '',
+        note: 'Unresolved scan captured for review'
+      };
+      addScanToHistory(entry);
+      return id;
+    }
+
+    function truncatePayload(value) {
+      const text = String(value || '');
+      return text.length > 240 ? `${text.slice(0, 237)}…` : text;
+    }
+
+    async function createQrPreviewImage(payload) {
+      if (!window.QRCode || typeof window.QRCode.toDataURL !== 'function') return '';
+      return new Promise((resolve) => {
+        window.QRCode.toDataURL(payload, {
+          width: 220,
+          margin: 2,
+          color: {
+            dark: '#0f172a',
+            light: '#ffffff'
+          }
+        }, (error, value) => resolve(error ? '' : value));
+      });
+    }
+
+    async function ensureQrCodeImage(record) {
+      if (record.qrCodeUrl) return record.qrCodeUrl;
+      if (!record.payload || !window.QRCode || typeof window.QRCode.toDataURL !== 'function') return '';
+      const qrCodeUrl = await createQrPreviewImage(record.payload);
+      if (qrCodeUrl) {
+        record.qrCodeUrl = qrCodeUrl;
+        persistHistory();
+      }
+      return qrCodeUrl;
+    }
+
+    function createHistoryEntryId() {
+      return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    }
+
+    function updateHistoryEntry(id, changes) {
+      const index = scanHistory.findIndex((item) => item.id === id);
+      if (index < 0) return;
+      scanHistory[index] = { ...scanHistory[index], ...changes };
+      persistHistory();
+      renderScanHistory();
+    }
+
+    function renderScanHistory() {
+      const hasItems = scanHistory.length > 0;
+      elements.historyEmptyMessage.hidden = hasItems;
+      elements.historyList.hidden = !hasItems;
+      if (!hasItems) {
+        return;
+      }
+      elements.historyList.replaceChildren();
+      scanHistory.forEach((record) => {
+        const item = document.createElement('li');
+        const imageStack = document.createElement('div');
+        const screenshot = document.createElement('img');
+        const qrPlaceholder = document.createElement('span');
+        const qrCode = document.createElement('img');
+        const body = document.createElement('div');
+        const title = document.createElement('p');
+        const time = document.createElement('time');
+        const type = document.createElement('span');
+        const payloadLabel = document.createElement('p');
+        const payloadText = document.createElement('p');
+        const destinationLabel = document.createElement('p');
+        const destinationText = document.createElement('p');
+        const actions = document.createElement('div');
+      const saveScreenshotButton = document.createElement('button');
+      const saveQrButton = document.createElement('button');
+      const generateQrButton = document.createElement('button');
+      const deleteEntryButton = document.createElement('button');
+
+        item.className = 'history-item';
+        imageStack.className = 'history-image-stack';
+
+        screenshot.className = 'history-screenshot';
+        screenshot.alt = 'Scanned code screenshot';
+        screenshot.src = record.screenshotUrl || '';
+        screenshot.loading = 'lazy';
+        qrCode.className = 'history-qr';
+        qrCode.alt = 'Generated QR PNG for payload';
+        qrCode.loading = 'lazy';
+        if (record.qrCodeUrl) {
+          qrCode.src = record.qrCodeUrl;
+        } else {
+          qrCode.style.display = 'none';
+          qrPlaceholder.className = 'history-qr-placeholder';
+          qrPlaceholder.textContent = 'QR not ready';
+        }
+
+        body.className = 'history-item-body';
+
+        title.className = 'history-title';
+        type.textContent = formatLabel(record.format) || 'Unknown format';
+        time.dateTime = new Date(record.timestamp).toISOString();
+        time.textContent = formatHistoryDate(record.timestamp);
+        title.append(type, time);
+
+        payloadLabel.className = 'history-payload-label';
+        payloadLabel.textContent = 'Payload';
+        payloadText.className = 'history-payload';
+        payloadText.textContent = record.payload ? truncatePayload(record.payload) : 'No payload text was decoded.';
+
+        destinationLabel.className = 'history-payload-label';
+        destinationLabel.textContent = 'Destination';
+        destinationText.className = 'history-destination';
+        destinationText.textContent = record.destination || 'Not available';
+
+        actions.className = 'history-actions';
+        saveScreenshotButton.type = 'button';
+        saveScreenshotButton.className = 'btn-secondary';
+        saveScreenshotButton.dataset.action = 'save-screenshot';
+        saveScreenshotButton.dataset.id = record.id;
+        saveScreenshotButton.textContent = 'Save screenshot PNG';
+        if (!record.screenshotUrl) saveScreenshotButton.disabled = true;
+
+        saveQrButton.type = 'button';
+        saveQrButton.className = 'btn-secondary';
+        saveQrButton.dataset.action = 'save-qr';
+        saveQrButton.dataset.id = record.id;
+        saveQrButton.textContent = 'Save QR PNG';
+        saveQrButton.disabled = !record.qrCodeUrl;
+
+        generateQrButton.type = 'button';
+        generateQrButton.className = 'btn-secondary';
+        generateQrButton.dataset.action = 'refresh-qr';
+        generateQrButton.dataset.id = record.id;
+        generateQrButton.textContent = 'Generate QR PNG';
+        deleteEntryButton.type = 'button';
+        deleteEntryButton.className = 'btn-secondary history-action-delete';
+        deleteEntryButton.dataset.action = 'delete-entry';
+        deleteEntryButton.dataset.id = record.id;
+        deleteEntryButton.textContent = 'Clear this entry';
+        actions.append(saveScreenshotButton, saveQrButton, generateQrButton, deleteEntryButton);
+
+        body.append(title, payloadLabel, payloadText, destinationLabel, destinationText, actions);
+        imageStack.append(screenshot);
+        imageStack.append(record.qrCodeUrl ? qrCode : qrPlaceholder);
+        item.append(imageStack, body);
+        elements.historyList.appendChild(item);
+      });
+    }
+
     function updateScanModeUi() {
       const mode = currentScanMode();
       elements.cameraFrame.dataset.scanMode = mode;
-      elements.cameraButton.textContent = mode === 'qr' ? 'Scan QR' : mode === 'barcode' ? 'Scan barcode' : 'Scan codes';
+      if (failedCaptureImageUrl) {
+        elements.cameraButton.textContent = 'Save screenshot + history entry';
+        elements.cameraButton.disabled = false;
+      } else {
+        elements.cameraButton.textContent = mode === 'qr' ? 'Scan QR' : mode === 'barcode' ? 'Scan barcode' : 'Scan codes';
+        elements.cameraButton.disabled = false;
+      }
       elements.cameraGuideLabel.textContent = mode === 'qr'
         ? 'Center the QR code inside the square'
         : mode === 'barcode'
           ? 'Align the barcode across the horizontal guide'
           : 'Center a QR code or barcode in the frame';
+    }
+
+    function saveFailedScanFromButton() {
+      if (!failedCaptureImageUrl) return false;
+      const id = recordFailedScanToHistory();
+      if (!id) {
+        showStatus('Could not save this scan to history.', 'error');
+        return false;
+      }
+      showStatus('Saved unresolved scan to history.', 'info');
+      clearFailedScanCaptureState();
+      return true;
+    }
+
+    function captureCurrentFrameToHistory() {
+      if (!cameraStream) return false;
+      if (!elements.canvas.width || !elements.canvas.height) {
+        showStatus('No camera frame is available yet. Wait a moment and try again.', 'error');
+        return false;
+      }
+      const id = captureFailedScanToHistory(elements.canvas.toDataURL('image/png'), 'manual camera capture');
+      if (!id) {
+        showStatus('Could not save this camera frame to history.', 'error');
+        return false;
+      }
+      showStatus('Saved camera frame to history.', 'info');
+      return true;
+    }
+
+    function handleScanButtonClick() {
+      if (failedCaptureImageUrl) {
+        saveFailedScanFromButton();
+        return;
+      }
+      if (cameraStream) {
+        captureCurrentFrameToHistory();
+        return;
+      }
+      startCamera();
     }
 
     function selectMethod(tab, moveFocus) {
@@ -738,6 +1210,7 @@
     function hideStatus() {
       elements.status.textContent = '';
       elements.status.className = 'status';
+      clearFailedScanCaptureState();
     }
 
     function isSafeWebUrl(value) {
@@ -773,14 +1246,120 @@
       link.remove();
     }
 
-    function dataUrlToBlob(dataUrl) {
-      const parts = String(dataUrl).split(',');
-      const mimeMatch = parts[0].match(/^data:([^;]+);base64$/);
-      if (!mimeMatch || !parts[1]) throw new TypeError('Invalid image data URL');
-      const binary = atob(parts[1]);
-      const bytes = new Uint8Array(binary.length);
-      for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-      return new Blob([bytes], { type: mimeMatch[1] });
+    function downloadDataUrl(dataUrl, filename) {
+      downloadUrl(String(dataUrl), filename);
+    }
+
+      function dataUrlToBlob(dataUrl) {
+        const parts = String(dataUrl).split(',');
+        const mimeMatch = parts[0].match(/^data:([^;]+);base64$/);
+        if (!mimeMatch || !parts[1]) throw new TypeError('Invalid image data URL');
+        const binary = atob(parts[1]);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+        return new Blob([bytes], { type: mimeMatch[1] });
+      }
+
+    function sanitizeFilenameSegment(value, fallback) {
+      const safe = String(value || fallback || 'entry')
+        .trim()
+        .replace(/[^a-zA-Z0-9._-]/g, '_')
+        .replace(/_{2,}/g, '_')
+        .slice(0, 80);
+      return safe || fallback || 'entry';
+    }
+
+    function loadJsZip() {
+      if (window.JSZip) return Promise.resolve(window.JSZip);
+      if (jsZipLoadPromise) return jsZipLoadPromise;
+      jsZipLoadPromise = new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+        script.async = true;
+        script.onload = () => resolve(window.JSZip || null);
+        script.onerror = () => resolve(null);
+        document.head.appendChild(script);
+      });
+      return jsZipLoadPromise;
+    }
+
+    async function urlToBlob(url) {
+      if (!url) return null;
+      if (url.startsWith('data:')) {
+        try { return dataUrlToBlob(url); } catch (_) { return null; }
+      }
+      try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        return await response.blob();
+      } catch (_) {
+        return null;
+      }
+    }
+
+    async function exportHistoryZip() {
+      if (!scanHistory.length) {
+        showStatus('No history available to export.', 'error');
+        return;
+      }
+      const JSZip = await loadJsZip();
+      if (!JSZip || typeof JSZip !== 'function') {
+        showStatus('History ZIP export could not load. Try again after a reload.', 'error');
+        return;
+      }
+      const zip = new JSZip();
+      const exportEntries = [];
+      const now = new Date();
+      const blobTasks = [];
+      scanHistory.forEach((record, index) => {
+        const prefix = `scan-${sanitizeFilenameSegment(record.id || String(index), 'scan')}`;
+        const entry = {
+          ...record,
+          screenshotFile: '',
+          qrCodeFile: ''
+        };
+
+        if (record.screenshotUrl) {
+          const screenshotName = `${prefix}-screenshot.png`;
+          blobTasks.push((async () => {
+            const blob = await urlToBlob(record.screenshotUrl);
+            if (blob) {
+              entry.screenshotFile = `images/${screenshotName}`;
+              zip.file(entry.screenshotFile, blob);
+            }
+          })());
+        }
+        if (record.qrCodeUrl) {
+          const qrCodeName = `${prefix}-qr.png`;
+          blobTasks.push((async () => {
+            const blob = await urlToBlob(record.qrCodeUrl);
+            if (blob) {
+              entry.qrCodeFile = `images/${qrCodeName}`;
+              zip.file(entry.qrCodeFile, blob);
+            }
+          })());
+        }
+        exportEntries.push(entry);
+      });
+
+      if (blobTasks.length > 0) await Promise.all(blobTasks);
+
+      zip.file('history.json', JSON.stringify({
+        version: HISTORY_EXPORT_JSON_VERSION,
+        generatedAt: now.toISOString(),
+        count: scanHistory.length,
+        entries: exportEntries
+      }, null, 2));
+      zip.file('README.txt', 'History export for monkeytactics qr-code-decoder. Image files are embedded as PNG images and referenced by filename in history.json.');
+      try {
+        const content = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(content);
+        const generatedName = `${sanitizeFilenameSegment(HISTORY_EXPORT_NAME, 'qr-code-decoder-history')}-${now.toISOString().replace(/[:.]/g, '-')}.zip`;
+        downloadUrl(url, generatedName);
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+      } catch (_) {
+        showStatus('Could not create ZIP export.', 'error');
+      }
     }
 
     async function savePngImage() {
@@ -888,20 +1467,45 @@
         if (requestId !== resolveRequestId) return;
 
         resolvedText = payload.finalUrl;
+        if (urlToHistoryId[requestId]) {
+          updateHistoryEntry(urlToHistoryId[requestId], { destination: payload.finalUrl });
+          delete urlToHistoryId[requestId];
+        }
         elements.finalUrlText.textContent = resolvedText;
         elements.finalUrlMenuButton.disabled = false;
         renderRedirectTrace(payload);
       } catch (_) {
         if (requestId !== resolveRequestId) return;
         resolvedText = '';
+        if (urlToHistoryId[requestId]) {
+          updateHistoryEntry(urlToHistoryId[requestId], { destination: 'Final destination could not be resolved.' });
+          delete urlToHistoryId[requestId];
+        }
         elements.finalUrlText.textContent = 'Final destination could not be resolved.';
         elements.finalUrlMenuButton.disabled = true;
       }
     }
 
-    function showGeneratedQrResult(text, format) {
+    function recordDecodedResultForHistory(text, format, sourceImageUrl) {
+      if (!text) return '';
+      const id = createHistoryEntryId();
+      const entry = {
+        id,
+        timestamp: Date.now(),
+        format: format || 'Unknown',
+        payload: String(text),
+        destination: isSafeWebUrl(String(text)) ? 'Resolving final destination...' : 'N/A',
+        screenshotUrl: sourceImageUrl || '',
+        qrCodeUrl: ''
+      };
+      currentHistoryId = id;
+      addScanToHistory(entry);
+      return id;
+    }
+
+    function showGeneratedQrResult(text, format, sourceImageUrl) {
       if (!window.QRCode || typeof window.QRCode.toDataURL !== 'function' || typeof window.QRCode.toString !== 'function') {
-        showResult(text, '', format);
+        showResult(text, '', format, '', sourceImageUrl);
         return;
       }
       const options = {
@@ -913,15 +1517,20 @@
       Promise.all([
         new Promise((resolve) => window.QRCode.toDataURL(text, options, (error, value) => resolve(error ? '' : value))),
         new Promise((resolve) => window.QRCode.toString(text, { ...options, type: 'svg' }, (error, value) => resolve(error ? '' : value)))
-      ]).then(([dataUrl, svg]) => showResult(text, dataUrl, format, svg));
+      ]).then(([dataUrl, svg]) => showResult(text, dataUrl, format, svg, sourceImageUrl));
     }
 
-    function showResult(text, previewUrl, format, svg) {
+    function showResult(text, previewUrl, format, svg, sourceImageUrl) {
+      clearFailedScanCaptureState();
       decodedText = text;
       resolvedText = '';
       resultImageUrl = previewUrl || '';
       resultImageSvg = svg || '';
       const requestId = ++resolveRequestId;
+      currentHistoryId = recordDecodedResultForHistory(text, format, sourceImageUrl || previewUrl || '');
+      if (currentHistoryId) {
+        urlToHistoryId[requestId] = currentHistoryId;
+      }
       if (previewUrl) {
         elements.resultPreview.src = previewUrl;
         elements.resultPreview.hidden = false;
@@ -959,11 +1568,11 @@
       elements.resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function showDecodedResult(result, showFullPreview) {
+    function showDecodedResult(result, showFullPreview, sourceImageUrl) {
       if (!showFullPreview && isQrFormat(result.format)) {
-        showGeneratedQrResult(result.text, result.format);
+        showGeneratedQrResult(result.text, result.format, sourceImageUrl);
       } else {
-        showResult(result.text, showFullPreview ? elements.canvas.toDataURL('image/png') : '', result.format);
+        showResult(result.text, showFullPreview ? elements.canvas.toDataURL('image/png') : '', result.format, '', sourceImageUrl);
       }
     }
 
@@ -1025,6 +1634,8 @@
     async function decodeCanvas(showNotFound, showFullPreview, sourceDimensions) {
       const started = performance.now();
       const mode = currentScanMode();
+      const sourceImageUrl = elements.canvas.toDataURL('image/png');
+      clearFailedScanCaptureState();
       const diagnostics = {
         scanMode: mode,
         sourceDimensions,
@@ -1044,12 +1655,20 @@
           error: nativeResult.error
         });
         if (nativeResult.text) {
-          diagnostics.selectedEngine = 'native-barcode-detector';
-          diagnostics.detectedFormat = nativeResult.format;
-          diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
-          updateDebug(diagnostics);
-          showDecodedResult(nativeResult, showFullPreview);
-          return true;
+          if (mode !== 'qr' && nativeResult.format !== 'qr_code' && !isPlausibleNativeBarcodeValue(nativeResult.text, nativeResult.format)) {
+            diagnostics.attempts.push({
+              engine: 'native-barcode-filter',
+              durationMs: 0,
+              outcome: 'filtered'
+            });
+          } else {
+            diagnostics.selectedEngine = 'native-barcode-detector';
+            diagnostics.detectedFormat = nativeResult.format;
+            diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
+            updateDebug(diagnostics);
+            showDecodedResult(nativeResult, showFullPreview, sourceImageUrl);
+            return true;
+          }
         }
 
         if (mode !== 'barcode') {
@@ -1068,7 +1687,7 @@
             diagnostics.detectedFormat = 'QRCode';
             diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
             updateDebug(diagnostics);
-            showDecodedResult({ text: rustResult.text, format: 'QRCode' }, showFullPreview);
+            showDecodedResult({ text: rustResult.text, format: 'QRCode' }, showFullPreview, sourceImageUrl);
             return true;
           }
         }
@@ -1086,7 +1705,7 @@
           diagnostics.detectedFormat = zxingResult.format;
           diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
           updateDebug(diagnostics);
-          showDecodedResult(zxingResult, showFullPreview);
+          showDecodedResult(zxingResult, showFullPreview, sourceImageUrl);
           return true;
         }
 
@@ -1120,7 +1739,7 @@
                 diagnostics.detectedFormat = normalizedResult.format;
                 diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
                 updateDebug(diagnostics);
-                showDecodedResult(normalizedResult, true);
+                showDecodedResult(normalizedResult, true, sourceImageUrl);
                 return true;
               }
             }
@@ -1138,13 +1757,22 @@
         diagnostics.error = error && error.message ? error.message : String(error);
         diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
         updateDebug(diagnostics);
-        if (showNotFound) showStatus('This image could not be read. Try a PNG or JPG instead.', 'error');
+        if (showNotFound) {
+          showStatus('This image could not be read. Try a PNG or JPG instead.', 'error');
+          if (sourceImageUrl) {
+            const reason = error && error.message ? error.message : 'a decode exception';
+            setFailedScanCaptureState(sourceImageUrl, reason);
+          }
+        }
         return false;
       }
-      if (showNotFound) {
-        const label = mode === 'qr' ? 'QR code' : mode === 'barcode' ? 'barcode' : 'QR code or barcode';
-        showStatus(`No ${label} was found after all local decoder passes.`, 'error');
-      }
+        if (showNotFound) {
+          const label = mode === 'qr' ? 'QR code' : mode === 'barcode' ? 'barcode' : 'QR code or barcode';
+          showStatus(`No ${label} was found after all local decoder passes.`, 'error');
+          if (sourceImageUrl) {
+            setFailedScanCaptureState(sourceImageUrl, label);
+          }
+        }
       return false;
     }
 
@@ -1196,6 +1824,7 @@
     }
 
     async function startCamera() {
+      if (cameraStream) return;
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         showStatus('Camera scanning is unavailable in this browser. Upload or paste an image instead.', 'error');
         return;
@@ -1214,7 +1843,6 @@
       }
 
       stopCamera();
-      elements.cameraButton.disabled = true;
       showStatus('Requesting camera access…', 'info');
       try {
         try {
@@ -1274,6 +1902,7 @@
 
     function clearAll() {
       stopCamera();
+      currentHistoryId = '';
       decodedText = '';
       resolvedText = '';
       warningLink = '';
@@ -1301,6 +1930,12 @@
       context.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
       elements.debugOutput.textContent = elements.debugToggle.checked ? 'Waiting for an image.' : 'Debug recording is off.';
       hideStatus();
+    }
+
+    function clearScanHistory() {
+      scanHistory = [];
+      persistHistory();
+      renderScanHistory();
     }
 
     methodTabs.forEach((tab, index) => {
@@ -1362,6 +1997,70 @@
         : 'Debug recording is off.';
     });
 
+    elements.historyList.addEventListener('click', async (event) => {
+      const button = event.target.closest('button[data-action][data-id]');
+      if (!button) return;
+      const { action, id } = button.dataset;
+      const entry = scanHistory.find((item) => item.id === id);
+      if (!entry) return;
+
+      if (action === 'save-screenshot') {
+        if (!entry.screenshotUrl) return;
+        downloadUrl(entry.screenshotUrl, `scan-${id}-screenshot.png`);
+        return;
+      }
+
+      if (action === 'refresh-qr') {
+        button.disabled = true;
+        const originalLabel = button.textContent;
+        button.textContent = 'Generating...';
+        const qrCodeUrl = await ensureQrCodeImage(entry);
+        if (!qrCodeUrl) {
+          button.textContent = originalLabel;
+          button.disabled = false;
+          showStatus('QR PNG could not be generated.', 'error');
+          return;
+        }
+        button.textContent = 'Generate QR PNG';
+        persistHistory();
+        if (qrCodeUrl) {
+          renderScanHistory();
+        }
+        button.disabled = false;
+        return;
+      }
+
+      if (action === 'save-qr') {
+        button.disabled = true;
+        const qrCodeUrl = entry.qrCodeUrl || await ensureQrCodeImage(entry);
+        if (qrCodeUrl) {
+          downloadUrl(qrCodeUrl, `scan-${id}-qr.png`);
+          persistHistory();
+          renderScanHistory();
+        }
+        button.disabled = false;
+        return;
+      }
+
+      if (action === 'delete-entry') {
+        button.disabled = true;
+        scanHistory = scanHistory.filter((item) => item.id !== id);
+        Object.keys(urlToHistoryId).forEach((requestId) => {
+          if (urlToHistoryId[requestId] === id) {
+            delete urlToHistoryId[requestId];
+          }
+        });
+        persistHistory();
+        renderScanHistory();
+        return;
+      }
+    });
+    elements.clearHistoryButton.addEventListener('click', clearScanHistory);
+    elements.cameraButton.addEventListener('click', handleScanButtonClick);
+    elements.downloadHistoryZipButton.addEventListener('click', exportHistoryZip);
+
+    scanHistory = loadHistoryFromStorage();
+    renderScanHistory();
     updateScanModeUi();
 
     elements.urlButton.addEventListener('click', async () => {
@@ -1385,7 +2084,6 @@
       }
     });
     elements.imageUrl.addEventListener('keydown', (event) => { if (event.key === 'Enter') elements.urlButton.click(); });
-    elements.cameraButton.addEventListener('click', startCamera);
     elements.stopCameraButton.addEventListener('click', stopCamera);
     document.querySelectorAll('.url-menu-button').forEach((button) => button.addEventListener('click', () => {
       showUrlActions(button.dataset.urlKind === 'final' ? resolvedText : decodedText);
