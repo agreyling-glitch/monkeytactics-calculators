@@ -70,6 +70,15 @@ web_modules/
 .env.*
 !.env.example
 
+# Sensitive credentials and private keys
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.*
+secrets/
+.secret/
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
