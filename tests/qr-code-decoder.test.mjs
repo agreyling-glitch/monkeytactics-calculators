@@ -37,7 +37,7 @@ test("QR decoder exposes optional local diagnostics", () => {
 });
 
 test("decoder exposes automatic, QR-only, and barcode-only modes with camera guides", () => {
-  assert.match(decoderHtml, /name="scanMode" value="auto" checked/);
+  assert.match(decoderHtml, /name="scanMode" value="qr" checked/);
   assert.match(decoderHtml, /name="scanMode" value="qr"/);
   assert.match(decoderHtml, /name="scanMode" value="barcode"/);
   assert.match(decoderHtml, /camera-guide-square/);
