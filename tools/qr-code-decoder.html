@@ -1247,6 +1247,45 @@
       return false;
     }
 
+    async function canDecodeImageBlobDirectly(blob) {
+      if (!(blob instanceof Blob)) return false;
+
+      if (typeof createImageBitmap === 'function') {
+        try {
+          const bitmap = await createImageBitmap(blob);
+          if (bitmap && typeof bitmap.close === 'function') {
+            bitmap.close();
+          }
+          return true;
+        } catch (_) {}
+      }
+
+      if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
+        return false;
+      }
+
+      const testUrl = URL.createObjectURL(blob);
+      const canDecode = await new Promise((resolve) => {
+        const probeImage = new Image();
+        const timeoutId = window.setTimeout(() => {
+          URL.revokeObjectURL(testUrl);
+          resolve(false);
+        }, 2500);
+        probeImage.onload = () => {
+          clearTimeout(timeoutId);
+          URL.revokeObjectURL(testUrl);
+          resolve(true);
+        };
+        probeImage.onerror = () => {
+          clearTimeout(timeoutId);
+          URL.revokeObjectURL(testUrl);
+          resolve(false);
+        };
+        probeImage.src = testUrl;
+      });
+      return canDecode;
+    }
+
     async function normalizeImageBlobForDecode(blob) {
       if (!isHeicLikeBlob(blob)) return blob;
       if (typeof heic2any !== 'function') {
@@ -1917,7 +1956,10 @@
       let normalizedBlob = blob;
       if (isHeicLikeBlob(blob)) {
         try {
-          normalizedBlob = await normalizeImageBlobForDecode(blob);
+          const canDecodeNatively = await canDecodeImageBlobDirectly(blob);
+          if (!canDecodeNatively) {
+            normalizedBlob = await normalizeImageBlobForDecode(blob);
+          }
         } catch (_) {
           showStatus('This HEIC/HEIF file could not be converted for decoding in this browser.', 'error');
           return;
