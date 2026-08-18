@@ -502,9 +502,9 @@
             <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-controls="fileInput">
               <span class="dropzone-icon" aria-hidden="true">↥</span>
               <strong>Drop an image here or click to browse</strong>
-              <span>PNG, JPG, GIF, WebP, or another browser-supported image</span>
+              <span>PNG, JPG, GIF, WebP, HEIC/HEIF, or another browser-supported image</span>
             </div>
-            <input id="fileInput" type="file" accept="image/*" hidden>
+            <input id="fileInput" type="file" accept="image/*,.heic,.heif" hidden>
           </section>
 
           <section id="paste-panel" class="method-panel" role="tabpanel"
@@ -783,6 +783,7 @@
   <!-- qrcode 1.1.0 is MIT licensed; see /third-party-notices. -->
   <!-- QRCode regenerates a clean preview from camera-decoded content locally. -->
   <script src="/assets/js/vendor/qrcode-1.1.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <!-- zxing-wasm 2.2.2 bundles ZXing-C++ under Apache-2.0; see /third-party-notices. -->
   <script src="/assets/wasm/qr-code-decoder/zxing/reader.js?v=20260813-2"></script>
@@ -1225,6 +1226,23 @@
     function showStatus(message, type) {
       elements.status.textContent = message;
       elements.status.className = 'status ' + type;
+    }
+
+    function isHeicLikeBlob(blob) {
+      if (!(blob instanceof Blob)) return false;
+      const type = String(blob.type || '').toLowerCase();
+      const name = String(blob.name || '').toLowerCase();
+      return type === 'image/heic' || type === 'image/heif' || type === 'image/heic-sequence' || type === 'image/heif-sequence' || type === 'image/x-heic' || type === 'image/x-heif'
+        || name.endsWith('.heic') || name.endsWith('.heif');
+    }
+
+    async function normalizeImageBlobForDecode(blob) {
+      if (!isHeicLikeBlob(blob)) return blob;
+      if (typeof heic2any !== 'function') {
+        throw new Error('HEIC/HEIF conversion support is not available right now.');
+      }
+      const result = await heic2any({ blob, toType: 'image/png', quality: 1 });
+      return Array.isArray(result) ? result[0] : result;
     }
 
     function hideStatus() {
@@ -1879,13 +1897,22 @@
       return decodeCanvas(showNotFound, showFullPreview, { width, height });
     }
 
-    function decodeBlob(blob) {
+    async function decodeBlob(blob) {
       if (!blob || !blob.type || !blob.type.startsWith('image/')) {
         showStatus('Please choose or paste a valid image file.', 'error');
         return;
       }
       hideStatus();
-      const objectUrl = URL.createObjectURL(blob);
+      let normalizedBlob = blob;
+      if (isHeicLikeBlob(blob)) {
+        try {
+          normalizedBlob = await normalizeImageBlobForDecode(blob);
+        } catch (_) {
+          showStatus('This HEIC/HEIF file could not be converted for decoding in this browser.', 'error');
+          return;
+        }
+      }
+      const objectUrl = URL.createObjectURL(normalizedBlob);
       const image = new Image();
       image.onload = async function () {
         URL.revokeObjectURL(objectUrl);
