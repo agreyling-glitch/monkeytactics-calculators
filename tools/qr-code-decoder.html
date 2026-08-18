@@ -833,6 +833,7 @@
     let zxingConfigured = false;
     const urlToHistoryId = {};
     const HISTORY_STORAGE_KEY = 'qr-decoder-history:v1';
+    const MAX_DECODED_RESULTS = 10;
     const MAX_HISTORY_ENTRIES = 10;
     const HISTORY_EXPORT_JSON_VERSION = '1';
     const HISTORY_EXPORT_NAME = 'qr-code-decoder-history';
@@ -956,6 +957,25 @@
 
     function formatHistoryDate(timestamp) {
       return new Date(timestamp).toLocaleString();
+    }
+
+    function dedupeDecodedResults(rawResults, limit) {
+      const max = Number.isInteger(limit) ? Math.max(1, Math.min(limit, MAX_DECODED_RESULTS)) : MAX_DECODED_RESULTS;
+      const normalized = [];
+      const seen = new Set();
+      const items = Array.isArray(rawResults) ? rawResults : [];
+      for (const item of items) {
+        if (!item || typeof item.text !== 'string') continue;
+        const text = item.text.trim();
+        if (!text) continue;
+        const format = typeof item.format === 'string' && item.format ? item.format : 'Unknown';
+        const key = `${format}::${text}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        normalized.push({ text, format });
+        if (normalized.length >= max) break;
+      }
+      return normalized;
     }
 
     function setFailedScanCaptureState(imageUrl, reason) {
@@ -1568,12 +1588,72 @@
       elements.resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function showDecodedResult(result, showFullPreview, sourceImageUrl) {
-      if (!showFullPreview && isQrFormat(result.format)) {
-        showGeneratedQrResult(result.text, result.format, sourceImageUrl);
-      } else {
-        showResult(result.text, showFullPreview ? elements.canvas.toDataURL('image/png') : '', result.format, '', sourceImageUrl);
+    function recordDecodedBatchForHistory(results, sourceImageUrl) {
+      const ids = [];
+      results.forEach((result) => {
+        if (!result || typeof result.text !== 'string') return;
+        const id = recordDecodedResultForHistory(result.text, result.format, sourceImageUrl || elements.canvas.toDataURL('image/png'));
+        if (!id) return;
+        ids.push(id);
+        if (isSafeWebUrl(result.text)) {
+          const requestId = ++resolveRequestId;
+          urlToHistoryId[requestId] = id;
+          resolveFinalUrl(result.text, requestId);
+        }
+      });
+      return ids;
+    }
+
+    function showDecodedResults(results, showFullPreview, sourceImageUrl) {
+      const normalized = dedupeDecodedResults(results, MAX_DECODED_RESULTS);
+      if (!normalized.length) return false;
+
+      const primary = normalized[0];
+      if (normalized.length === 1) {
+        if (!showFullPreview && isQrFormat(primary.format)) {
+          showGeneratedQrResult(primary.text, primary.format, sourceImageUrl);
+          return true;
+        }
+
+        showResult(
+          primary.text,
+          showFullPreview ? elements.canvas.toDataURL('image/png') : '',
+          primary.format,
+          '',
+          sourceImageUrl
+        );
+        return true;
       }
+
+      decodedText = normalized.map((result, index) => `${index + 1}. [${formatLabel(result.format)}] ${result.text}`).join('\n');
+      resolvedText = '';
+      resultImageUrl = showFullPreview ? elements.canvas.toDataURL('image/png') : '';
+      resultImageSvg = '';
+      const historyIds = recordDecodedBatchForHistory(normalized, sourceImageUrl || resultImageUrl);
+      currentHistoryId = historyIds[0] || '';
+      clearRedirectTrace();
+
+      elements.resultFormat.textContent = `${normalized.length} decoded result${normalized.length === 1 ? '' : 's'}`;
+      elements.resultType.hidden = false;
+      elements.resultPreview.removeAttribute('src');
+      elements.resultPreview.hidden = !showFullPreview;
+      if (showFullPreview) elements.resultPreview.src = resultImageUrl;
+      elements.decodedResultLabel.hidden = false;
+      elements.resultValue.hidden = false;
+      elements.copyButton.hidden = false;
+      elements.urlResultTableWrap.hidden = true;
+      elements.decodedUrlText.textContent = '';
+      elements.finalUrlText.textContent = '';
+      elements.finalUrlMenuButton.disabled = true;
+      elements.resultValue.textContent = decodedText;
+      hideStatus();
+      elements.resultPanel.style.display = 'block';
+      elements.resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return true;
+    }
+
+    function showDecodedResult(result, showFullPreview, sourceImageUrl) {
+      return showDecodedResults(result ? [result] : [], showFullPreview, sourceImageUrl);
     }
 
     function updateDebug(details) {
@@ -1594,9 +1674,23 @@
         }
         if (!requestedFormats.length) return { status: 'unsupported' };
         const detector = new window.BarcodeDetector({ formats: requestedFormats });
-        const results = await detector.detect(canvas);
-        const result = results.find((item) => item && item.rawValue);
-        return { status: result ? 'decoded' : 'not-found', text: result && result.rawValue, format: result && result.format };
+        const results = await detector.detect(canvas) || [];
+        const decoded = [];
+        for (const item of results) {
+          if (!item || !item.rawValue) continue;
+          const text = String(item.rawValue).trim();
+          if (!text) continue;
+          const format = item.format || 'Unknown';
+          if (mode !== 'barcode' && format !== 'qr_code' && !isPlausibleNativeBarcodeValue(text, format)) {
+            continue;
+          }
+          if (mode === 'barcode' && format === 'qr_code') {
+            continue;
+          }
+          decoded.push({ text, format });
+          if (decoded.length >= MAX_DECODED_RESULTS) break;
+        }
+        return { status: decoded.length ? 'decoded' : 'not-found', results: decoded };
       } catch (error) {
         return { status: 'error', error: error && error.message ? error.message : String(error) };
       }
@@ -1604,7 +1698,7 @@
 
     async function decodeWithZxing(pixels, mode) {
       if (!window.ZXingWASM || typeof window.ZXingWASM.readBarcodes !== 'function') {
-        return { status: 'unavailable' };
+        return { status: 'unavailable', results: [] };
       }
       try {
         if (!zxingConfigured) {
@@ -1621,10 +1715,21 @@
           tryHarder: true,
           tryRotate: true,
           tryInvert: true,
-          maxNumberOfSymbols: 1
+          maxNumberOfSymbols: MAX_DECODED_RESULTS
         });
-        const result = results.find((item) => item && item.text);
-        return { status: result ? 'decoded' : 'not-found', text: result && result.text, format: result && result.format };
+        const decoded = [];
+        const normalizedResults = Array.isArray(results) ? results : [];
+        for (const item of normalizedResults) {
+          if (!item || !item.text) continue;
+          const text = String(item.text).trim();
+          if (!text) continue;
+          if (mode === 'barcode' && item.format && isPlausibleNativeBarcodeValue(text, item.format) === false) {
+            continue;
+          }
+          decoded.push({ text, format: item.format || 'Unknown' });
+          if (decoded.length >= MAX_DECODED_RESULTS) break;
+        }
+        return { status: decoded.length ? 'decoded' : 'not-found', results: decoded };
       } catch (error) {
         return { status: 'error', error: error && error.message ? error.message : String(error) };
       }
@@ -1646,6 +1751,8 @@
       try {
         const pixels = context.getImageData(0, 0, elements.canvas.width, elements.canvas.height);
 
+        const decodedResults = [];
+
         const nativeStarted = performance.now();
         const nativeResult = await decodeWithBarcodeDetector(elements.canvas, mode);
         diagnostics.attempts.push({
@@ -1654,21 +1761,8 @@
           outcome: nativeResult.status,
           error: nativeResult.error
         });
-        if (nativeResult.text) {
-          if (mode !== 'qr' && nativeResult.format !== 'qr_code' && !isPlausibleNativeBarcodeValue(nativeResult.text, nativeResult.format)) {
-            diagnostics.attempts.push({
-              engine: 'native-barcode-filter',
-              durationMs: 0,
-              outcome: 'filtered'
-            });
-          } else {
-            diagnostics.selectedEngine = 'native-barcode-detector';
-            diagnostics.detectedFormat = nativeResult.format;
-            diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
-            updateDebug(diagnostics);
-            showDecodedResult(nativeResult, showFullPreview, sourceImageUrl);
-            return true;
-          }
+        if (nativeResult.results && nativeResult.results.length) {
+          decodedResults.push(...nativeResult.results);
         }
 
         if (mode !== 'barcode') {
@@ -1682,13 +1776,7 @@
             passes: rustResult.attempts || []
           });
           if (rustResult.text) {
-            diagnostics.selectedEngine = rustResult.engine;
-            diagnostics.selectedPass = rustResult.pass;
-            diagnostics.detectedFormat = 'QRCode';
-            diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
-            updateDebug(diagnostics);
-            showDecodedResult({ text: rustResult.text, format: 'QRCode' }, showFullPreview, sourceImageUrl);
-            return true;
+            decodedResults.push({ text: rustResult.text, format: 'QRCode' });
           }
         }
 
@@ -1700,13 +1788,8 @@
           outcome: zxingResult.status,
           error: zxingResult.error
         });
-        if (zxingResult.text) {
-          diagnostics.selectedEngine = 'zxing-cpp-wasm';
-          diagnostics.detectedFormat = zxingResult.format;
-          diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
-          updateDebug(diagnostics);
-          showDecodedResult(zxingResult, showFullPreview, sourceImageUrl);
-          return true;
+        if (zxingResult.results && zxingResult.results.length) {
+          decodedResults.push(...zxingResult.results);
         }
 
         if (showFullPreview && mode !== 'barcode') {
@@ -1715,6 +1798,7 @@
           const dimensions = [29, 21, 25, 33, 37, 41, 45, 49, 53, 57];
           for (const dimension of dimensions) {
             for (const shrink of [1, 4, 7]) {
+              if (decodedResults.length >= MAX_DECODED_RESULTS) break;
               const normalized = normalizeQrCandidate(pixels.data, pixels.width, pixels.height, dimension, shrink);
               const size = (dimension + 8) * 8;
               const pass = { name: `module-grid-v${(dimension - 17) / 4}-shrink${shrink}`, width: size, height: size };
@@ -1727,30 +1811,34 @@
               const normalizedResult = await decodeWithZxing(normalizedPixels, 'qr');
               pass.outcome = normalizedResult.status;
               normalizedPasses.push(pass);
-              if (normalizedResult.text) {
-                diagnostics.attempts.push({
-                  engine: 'rust-module-normalizer + zxing-cpp-wasm',
-                  durationMs: Number((performance.now() - normalizedStarted).toFixed(2)),
-                  outcome: 'decoded',
-                  passes: normalizedPasses
-                });
-                diagnostics.selectedEngine = 'rust-module-normalizer + zxing-cpp-wasm';
-                diagnostics.selectedPass = pass.name;
-                diagnostics.detectedFormat = normalizedResult.format;
-                diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
-                updateDebug(diagnostics);
-                showDecodedResult(normalizedResult, true, sourceImageUrl);
-                return true;
+              if (normalizedResult.results && normalizedResult.results.length) {
+                decodedResults.push(...normalizedResult.results);
               }
             }
+            if (decodedResults.length >= MAX_DECODED_RESULTS) break;
           }
           diagnostics.attempts.push({
             engine: 'rust-module-normalizer + zxing-cpp-wasm',
             durationMs: Number((performance.now() - normalizedStarted).toFixed(2)),
-            outcome: 'not-found',
+            outcome: decodedResults.length ? 'decoded' : 'not-found',
             passes: normalizedPasses
           });
         }
+
+        const dedupedResults = dedupeDecodedResults(decodedResults, MAX_DECODED_RESULTS);
+        if (dedupedResults.length) {
+          diagnostics.detectedCount = dedupedResults.length;
+          diagnostics.detectedFormat = dedupedResults[0].format;
+          diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
+          updateDebug(diagnostics);
+          if (dedupedResults.length > 1) {
+            showDecodedResults(dedupedResults, showFullPreview, sourceImageUrl);
+            return true;
+          }
+          showDecodedResult(dedupedResults[0], showFullPreview, sourceImageUrl);
+          return true;
+        }
+
         diagnostics.totalDurationMs = Number((performance.now() - started).toFixed(2));
         updateDebug(diagnostics);
       } catch (error) {
