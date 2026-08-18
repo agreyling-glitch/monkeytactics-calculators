@@ -1270,7 +1270,7 @@
         const timeoutId = window.setTimeout(() => {
           URL.revokeObjectURL(testUrl);
           resolve(false);
-        }, 2500);
+        }, 8000);
         probeImage.onload = () => {
           clearTimeout(timeoutId);
           URL.revokeObjectURL(testUrl);
@@ -1291,8 +1291,38 @@
       if (typeof heic2any !== 'function') {
         throw new Error('HEIC/HEIF conversion support is not available right now.');
       }
-      const result = await heic2any({ blob, toType: 'image/png', quality: 1 });
-      return Array.isArray(result) ? result[0] : result;
+      const outputTypes = ['image/png', 'image/jpeg', 'image/webp'];
+      let lastError;
+      for (const toType of outputTypes) {
+        try {
+          const result = await heic2any({ blob, toType, quality: 1 });
+          const normalized = Array.isArray(result) ? result[0] : result;
+          if (normalized instanceof Blob) return normalized;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      if (lastError) throw lastError;
+      throw new Error('No HEIC/HEIF conversion output was produced.');
+    }
+
+    async function decodeImageBlob(blob) {
+      const objectUrl = URL.createObjectURL(blob);
+      return await new Promise((resolve) => {
+        const image = new Image();
+        image.onload = async function () {
+          URL.revokeObjectURL(objectUrl);
+          try {
+            await drawAndDecode(image, true, true);
+          } catch (_) {}
+          resolve(true);
+        };
+        image.onerror = function () {
+          URL.revokeObjectURL(objectUrl);
+          resolve(false);
+        };
+        image.src = objectUrl;
+      });
     }
 
     function hideStatus() {
@@ -1953,29 +1983,34 @@
         return;
       }
       hideStatus();
+      let conversionAttempted = false;
+      let conversionSucceeded = false;
       let normalizedBlob = blob;
       if (isHeicLikeBlob(blob)) {
-        try {
-          const canDecodeNatively = await canDecodeImageBlobDirectly(blob);
-          if (!canDecodeNatively) {
-            normalizedBlob = await normalizeImageBlobForDecode(blob);
+        const canDecodeNatively = await canDecodeImageBlobDirectly(blob);
+        if (!canDecodeNatively) {
+          conversionAttempted = true;
+          try {
+            const converted = await normalizeImageBlobForDecode(blob);
+            conversionSucceeded = true;
+            normalizedBlob = converted;
+          } catch (_) {
+            normalizedBlob = blob;
           }
-        } catch (_) {
-          showStatus('This HEIC/HEIF file could not be converted for decoding in this browser.', 'error');
-          return;
         }
       }
-      const objectUrl = URL.createObjectURL(normalizedBlob);
-      const image = new Image();
-      image.onload = async function () {
-        URL.revokeObjectURL(objectUrl);
-        await drawAndDecode(image, true, true);
-      };
-      image.onerror = function () {
-        URL.revokeObjectURL(objectUrl);
-        showStatus('This image is invalid or uses an unsupported format.', 'error');
-      };
-      image.src = objectUrl;
+
+      const decodeSucceeded = await decodeImageBlob(normalizedBlob);
+      if (!decodeSucceeded && isHeicLikeBlob(blob) && conversionAttempted && conversionSucceeded) {
+        const fallbackSucceeded = await decodeImageBlob(blob);
+        if (fallbackSucceeded) return;
+      }
+      if (!decodeSucceeded) {
+        const heicFailureMessage = conversionAttempted && isHeicLikeBlob(blob)
+          ? 'This HEIC/HEIF file could not be converted for decoding in this browser.'
+          : 'This image is invalid or uses an unsupported format.';
+        showStatus(heicFailureMessage, 'error');
+      }
     }
 
     function stopCamera() {
