@@ -25,6 +25,7 @@
     "react-dom": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "heic-to": "1.5.2",
     "zxing-wasm": "2.2.2"
   },
   "devDependencies": {}

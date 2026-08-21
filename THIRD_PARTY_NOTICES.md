@@ -73,6 +73,15 @@ SOFTWARE.
 - License: Apache License 2.0
 - Full license: [Apache License 2.0](licenses/apache-2.0.txt)
 
+### heic-to
+
+- Version: `1.5.2`
+- Purpose: Browser-local HEIC/HEIF conversion for the QR Code Decoder
+- Distribution: Self-hosted JavaScript bundle
+- Source: <https://github.com/hoppergee/heic-to>
+- License: GNU Lesser General Public License 3.0 or later
+- Full license: [heic-to LGPL notice](licenses/heic-to-LGPL-3.0.txt)
+
 ### node-qrcode
 
 - npm package: `qrcode`
