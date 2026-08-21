@@ -111,7 +111,8 @@ test("site directories and privacy disclosures describe password checks and QR l
   assert.match(directory, /password generator analyzer checker breach pwned entropy/);
   assert.match(directory, /Generate, analyze, and check breach exposure/);
 
-  assert.match(decoder, /Web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review/);
+  assert.match(decoder, /A single decoded web link is sent to the MonkeyTactics privacy proxy/);
+  assert.match(decoder, /Links in multi-code results remain unchecked until you choose an action/);
   assert.match(decoder, /The proxy uses header-only requests/);
   const decoderStructuredData = JSON.parse(decoder.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   assert.match(JSON.stringify(decoderStructuredData), /MonkeyTactics privacy proxy/);

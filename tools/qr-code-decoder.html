@@ -9,13 +9,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Free QR Code &amp; Barcode Decoder — Images &amp; Camera</title>
-  <meta name="description" content="Decode QR codes and common barcodes locally from images or a camera. Images stay in your browser; decoded web links can be privately resolved for review.">
+  <meta name="description" content="Decode up to 10 QR codes and common barcodes locally from one image or camera frame. Images stay in your browser; decoded web links can be privately reviewed.">
   <link rel="canonical" href="https://monkeytactics.com/tools/qr-code-decoder">
   <meta name="robots" content="index, follow">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-08-13">
+  <meta name="date" content="2026-08-21">
   <meta property="og:title" content="Free QR Code &amp; Barcode Decoder — Images &amp; Camera">
-  <meta property="og:description" content="Automatically detect QR codes and common barcode formats locally from images, screenshots, URLs, or a camera.">
+  <meta property="og:description" content="Automatically detect up to 10 QR codes and common barcodes locally from one image, screenshot, URL, or camera frame.">
   <meta property="og:url" content="https://monkeytactics.com/tools/qr-code-decoder">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MonkeyTactics">
@@ -28,14 +28,14 @@
         "@id": "https://monkeytactics.com/tools/qr-code-decoder#app",
         "name": "QR Code and Barcode Decoder",
         "url": "https://monkeytactics.com/tools/qr-code-decoder",
-        "description": "Automatically decode QR codes and common barcode formats locally without uploading images. Optional QR-only and barcode-only modes narrow detection.",
+        "description": "Automatically decode up to 10 QR codes and common barcodes from one image or camera frame without uploading images. Optional QR-only and barcode-only modes narrow detection.",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
         "browserRequirements": "Requires JavaScript and WebAssembly; camera scanning requires camera permission.",
         "isAccessibleForFree": true,
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
-        "dateModified": "2026-08-13"
+        "dateModified": "2026-08-21"
       },
       {
         "@type": "BreadcrumbList",
@@ -51,12 +51,12 @@
           {
             "@type": "Question",
             "name": "How do I decode a QR code from an image?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Upload or drag an image into the decoder, paste a screenshot, or enter a public image URL. The tool draws the image to a browser canvas and displays the decoded QR content." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Upload or drag an image into the decoder, paste a screenshot, or enter a public image URL. The tool scans the image locally and displays up to 10 detected QR codes and barcodes together." }
           },
           {
             "@type": "Question",
             "name": "Can I scan a QR code with my computer camera?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select Scan QR, allow camera access, and hold the complete QR code clearly in the preview. Camera access requires HTTPS or a localhost address." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Choose a detection mode, allow camera access, and hold one or more complete codes clearly in the preview. The decoder captures up to 10 detected codes from the frame. Camera access requires HTTPS or a localhost address." }
           },
           {
             "@type": "Question",
@@ -76,7 +76,7 @@
           {
             "@type": "Question",
             "name": "How can I check whether a decoded QR link is safe?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Decoded web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review; the tool never opens them automatically. You can then use Check Link Safely to open the final URL's VirusTotal analysis page before visiting it." }
+            "acceptedAnswer": { "@type": "Answer", "text": "A single decoded web link is sent to the MonkeyTactics privacy proxy only to resolve its final destination for review. Links in multi-code results remain unchecked until you choose an action. The tool never opens links automatically." }
           }
         ]
       }
@@ -319,6 +319,19 @@
       font-weight:700;
     }
     .history-item-body { display:grid; gap:.45rem; }
+    .history-codes { display:grid; gap:.7rem; }
+    .history-code {
+      display:grid;
+      grid-template-columns:minmax(96px,132px) minmax(0,1fr);
+      gap:.75rem;
+      padding:.75rem;
+      border:1px solid rgba(148,163,184,.2);
+      border-radius:.7rem;
+      background:rgba(255,255,255,.018);
+    }
+    .history-code-details { display:grid; align-content:start; gap:.4rem; min-width:0; }
+    .history-code-header { display:flex; align-items:center; justify-content:space-between; gap:.5rem; }
+    .history-code-title { margin:0; color:var(--text); font-size:.82rem; font-weight:700; }
     .history-title {
       display:flex;
       flex-wrap:wrap;
@@ -362,10 +375,20 @@
     .action-dialog::backdrop { background:rgba(2,6,23,.78); backdrop-filter:blur(3px); }
     .action-dialog-content { position:relative; padding:1.25rem; }
     .action-dialog-content h2 { margin:0 2.25rem .85rem 0; font-size:1.05rem; }
+    #url-actions-heading { overflow-wrap:anywhere; }
     .action-dialog-options { display:flex; flex-wrap:wrap; gap:.55rem; }
     .action-dialog-options button { width:auto; min-width:0; padding:.5rem .75rem; text-align:center; }
     .action-dialog-close { position:absolute; top:.7rem; right:.7rem; display:grid; width:2rem; height:2rem; padding:0; place-items:center; border:1px solid var(--border); border-radius:50%; background:rgba(255,255,255,.04); color:var(--muted); font-size:1.15rem; line-height:1; cursor:pointer; }
     .action-dialog-close:hover { border-color:rgba(56,189,248,.55); color:var(--text); }
+    .decode-progress-dialog { width:min(440px,calc(100% - 2rem)); padding:0; border:1px solid rgba(34,197,94,.45); border-radius:1rem; background:#0f172a; color:var(--text); box-shadow:0 24px 70px rgba(0,0,0,.6); }
+    .decode-progress-dialog::backdrop { background:rgba(2,6,23,.82); backdrop-filter:blur(3px); }
+    .decode-progress-content { display:grid; gap:.8rem; padding:1.35rem; }
+    .decode-progress-content h2 { margin:0; font-size:1.05rem; }
+    .decode-progress-content p { margin:0; color:var(--muted); font-size:.84rem; }
+    .decode-progress-bar { width:100%; height:.8rem; overflow:hidden; border:0; border-radius:999px; background:rgba(148,163,184,.18); accent-color:#22c55e; }
+    .decode-progress-bar::-webkit-progress-bar { border-radius:999px; background:rgba(148,163,184,.18); }
+    .decode-progress-bar::-webkit-progress-value { border-radius:999px; background:linear-gradient(90deg,#16a34a,#22c55e); transition:width .2s ease; }
+    .decode-progress-bar::-moz-progress-bar { border-radius:999px; background:linear-gradient(90deg,#16a34a,#22c55e); }
     .link-warning-dialog {
       width:min(460px,calc(100% - 2rem)); padding:0; border:1px solid rgba(248,113,113,.4);
       border-radius:1rem; background:#0f172a; color:var(--text); box-shadow:0 24px 70px rgba(0,0,0,.55);
@@ -429,7 +452,7 @@
       .method-panel { min-height:0; }
       .url-row, .button-row, .result-actions, .link-warning-actions { flex-direction:column; }
       .history-item { grid-template-columns:1fr; }
-      .history-image-stack { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .history-code { grid-template-columns:1fr; }
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260813-12">
@@ -451,7 +474,7 @@
         <div>
           <p class="premium-eyebrow">Private, deliberate QR inspection</p>
           <h1 id="tool-heading">QR Code &amp; Barcode Decoder</h1>
-          <p class="premium-hero-copy">Decode QR codes and common barcodes from an upload, screenshot, image URL, or camera without uploading the image. Auto detection identifies the format, while optional QR-only and barcode-only modes narrow the scan.</p>
+          <p class="premium-hero-copy">Decode up to 10 QR codes and common barcodes from a single upload, screenshot, image URL, or camera frame without uploading the image. Auto detection identifies each format, while optional QR-only and barcode-only modes narrow the scan.</p>
           <div class="premium-hero-pills" aria-label="Code decoder features"><span>QR &amp; barcode detection</span><span>Local image processing</span><span>Private link resolution</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>Inspect before you follow</span><strong>Speed <i>meets</i> caution</strong><small>Decode locally. Decide what opens.</small></div>
@@ -460,8 +483,8 @@
 
     <section class="qr-decoder-section" aria-labelledby="decoder-heading">
       <div class="tool-widget">
-        <div class="premium-app-title decoder-app-title"><div class="premium-section-kicker">01 / Decode</div><h2 id="decoder-heading">Choose how to scan</h2><p>Provide a QR code or barcode image using the method that fits your situation. The same private decoding pipeline handles every option.</p></div>
-        <p class="privacy-note">Images are processed locally and are never uploaded. If decoded content is a web link, the link is sent to the MonkeyTactics privacy proxy only to resolve its final destination for your review.</p>
+        <div class="premium-app-title decoder-app-title"><div class="premium-section-kicker">01 / Decode</div><h2 id="decoder-heading">Choose how to scan</h2><p>Provide an image containing one or more QR codes or barcodes using the method that fits your situation. The same private decoding pipeline handles every option.</p></div>
+        <p class="privacy-note">Images are processed locally and are never uploaded. A single decoded web link is sent to the MonkeyTactics privacy proxy only to resolve its final destination for review. Links in multi-code results remain unchecked until you choose an action.</p>
 
         <fieldset class="scan-mode-fieldset">
           <legend>Code type</legend>
@@ -537,7 +560,7 @@
                 <div class="camera-guide-square"></div>
                 <div class="camera-guide-bar"></div>
                 <div class="camera-guide-line"></div>
-                <div id="cameraGuideLabel" class="camera-guide-label">Center a QR code or barcode in the frame</div>
+                <div id="cameraGuideLabel" class="camera-guide-label">Keep up to 10 QR codes or barcodes visible in the frame</div>
               </div>
             </div>
             <div class="button-row">
@@ -559,11 +582,11 @@
           <p class="input-hint">When enabled, dimensions, local decoder timings, and preprocessing attempts appear here. Image pixels never leave this browser.</p>
           <pre id="debugOutput" class="decoder-debug-output">Debug recording is off.</pre>
         </details>
-        <div id="resultPanel" class="result-panel" role="region" aria-label="Decoded code result" aria-live="polite">
+        <div id="resultPanel" class="result-panel" role="region" aria-label="Decoded code results" aria-live="polite">
           <div class="result-card">
             <div id="resultType" class="result-type" hidden><span class="result-label">Type</span><strong id="resultFormat" class="result-format"></strong></div>
             <img id="resultPreview" class="result-preview" alt="Preview of the decoded source image" role="button" tabindex="0" aria-label="Open image actions" hidden>
-            <div id="decodedResultLabel" class="result-label">Decoded result</div>
+            <div id="decodedResultLabel" class="result-label">Decoded results</div>
             <p id="resultValue" class="result-value"></p>
             <div id="urlResultTableWrap" class="url-result-table-wrap" hidden>
               <table class="url-result-table">
@@ -621,6 +644,14 @@
       </div>
     </dialog>
 
+    <dialog id="decodeProgressDialog" class="decode-progress-dialog" aria-labelledby="decode-progress-heading" aria-describedby="decodeProgressMessage">
+      <div class="decode-progress-content">
+        <h2 id="decode-progress-heading">Processing image</h2>
+        <progress id="decodeProgressBar" class="decode-progress-bar" max="100" value="0">0%</progress>
+        <p id="decodeProgressMessage" aria-live="polite">Preparing image…</p>
+      </div>
+    </dialog>
+
     <dialog id="urlActionsDialog" class="action-dialog" aria-labelledby="url-actions-heading">
       <div class="action-dialog-content">
         <button id="urlActionsCloseButton" class="action-dialog-close" type="button" aria-label="Close URL actions" title="Close">×</button>
@@ -647,7 +678,7 @@
 
     <div class="seo-section">
       <h2>How to decode a QR code or barcode</h2>
-      <p>Choose Auto detect, QR only, or Barcode only, then upload an image, paste a screenshot, enter a public image URL, or scan with your camera. For the most reliable result, keep the complete code visible with a clear border around it.</p>
+      <p>Choose Auto detect, QR only, or Barcode only, then upload an image, paste a screenshot, enter a public image URL, or scan with your camera. The decoder returns up to 10 distinct codes from one image or camera frame. For the most reliable results, keep every code complete, sharp, and surrounded by a clear border.</p>
     </div>
 
     <div class="seo-section" aria-labelledby="supported-formats-heading">
@@ -696,12 +727,12 @@
     <div class="seo-section">
       <h2>Local QR image scanning with private link resolution</h2>
       <p>This free QR code reader performs decoding locally with Rust/WebAssembly, the browser Barcode Detector when available, and a local ZXing/WebAssembly fallback. Uploaded files, pasted screenshots, and camera frames are not uploaded to MonkeyTactics or stored by this utility.</p>
-      <p>If a QR code contains a website address, that decoded web link is sent to the MonkeyTactics privacy proxy to show each redirect hop, HTTP status, timing, and final destination for your review. The proxy uses header-only requests; it does not send the QR image, read page content, or automatically open the destination in your browser. You can optionally check the final link using VirusTotal before visiting it.</p>
+      <p>When a scan returns one website address, that decoded link is sent to the MonkeyTactics privacy proxy to show each redirect hop, HTTP status, timing, and final destination for your review. Links in multi-code results remain unchecked until you choose an action. The proxy uses header-only requests; it does not send the QR image, read page content, or automatically open the destination in your browser. You can optionally check a link using VirusTotal before visiting it.</p>
     </div>
 
     <div class="seo-section">
       <h2>Is This QR Code Safe?</h2>
-       <p><strong>Safety Notice:</strong> This tool will never open or navigate to a decoded link automatically. Web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review. Review unfamiliar destinations before choosing to open them.</p>
+       <p><strong>Safety Notice:</strong> This tool will never open or navigate to a decoded link automatically. A single decoded web link is sent to the MonkeyTactics privacy proxy to resolve its final destination for review; links in multi-code results remain unchecked until you choose an action. Review unfamiliar destinations before choosing to open them.</p>
     </div>
 
     <section class="faq-section" aria-labelledby="faq-heading">
@@ -714,11 +745,11 @@
           <ul class="faq-list">
             <li class="faq-item">
               <h3>How do I decode a QR code from an image?</h3>
-              <p>Upload or drag an image into the decoder, paste a screenshot, or enter a public image URL. The tool draws the image to a browser canvas, scans it locally, and displays the decoded QR content.</p>
+              <p>Upload or drag an image into the decoder, paste a screenshot, or enter a public image URL. The tool scans the image locally and displays up to 10 detected QR codes and barcodes together.</p>
             </li>
             <li class="faq-item">
               <h3>Can I scan a QR code with my computer camera?</h3>
-              <p>Yes. Choose Auto detect, QR only, or Barcode only, allow camera access, and align the code with the mode-aware camera guide. Camera access requires HTTPS or a localhost address and may be disabled by managed browser policies.</p>
+              <p>Yes. Choose Auto detect, QR only, or Barcode only, allow camera access, and keep one or more complete codes visible in the mode-aware camera guide. The decoder captures up to 10 detected codes from the frame. Camera access requires HTTPS or a localhost address and may be disabled by managed browser policies.</p>
             </li>
             <li class="faq-item">
               <h3>Which QR code and barcode formats are supported?</h3>
@@ -783,7 +814,7 @@
   <!-- qrcode 1.1.0 is MIT licensed; see /third-party-notices. -->
   <!-- QRCode regenerates a clean preview from camera-decoded content locally. -->
   <script src="/assets/js/vendor/qrcode-1.1.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+  <script src="/assets/js/vendor/heic-to-1.5.2.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <!-- zxing-wasm 2.2.2 bundles ZXing-C++ under Apache-2.0; see /third-party-notices. -->
   <script src="/assets/wasm/qr-code-decoder/zxing/reader.js?v=20260813-2"></script>
@@ -813,10 +844,11 @@
       debugPanel: $('debugPanel'), debugToggle: $('debugToggle'), debugOutput: $('debugOutput'),
       linkWarningDialog: $('linkWarningDialog'), linkWarningUrl: $('linkWarningUrl'),
       confirmLinkButton: $('confirmLinkButton'), cancelLinkButton: $('cancelLinkButton'),
-      urlActionsDialog: $('urlActionsDialog'), urlCopyButton: $('urlCopyButton'), urlOpenButton: $('urlOpenButton'),
+      urlActionsDialog: $('urlActionsDialog'), urlActionsHeading: $('url-actions-heading'), urlCopyButton: $('urlCopyButton'), urlOpenButton: $('urlOpenButton'),
       urlCheckButton: $('urlCheckButton'), urlActionsCloseButton: $('urlActionsCloseButton'),
       imageActionsDialog: $('imageActionsDialog'), imageCopyButton: $('imageCopyButton'), imagePngButton: $('imagePngButton'),
-      imageSvgButton: $('imageSvgButton'), imageActionsCloseButton: $('imageActionsCloseButton')
+      imageSvgButton: $('imageSvgButton'), imageActionsCloseButton: $('imageActionsCloseButton'),
+      decodeProgressDialog: $('decodeProgressDialog'), decodeProgressBar: $('decodeProgressBar'), decodeProgressMessage: $('decodeProgressMessage')
     };
     const context = elements.canvas.getContext('2d', { willReadFrequently: true });
     const methodTabs = Array.from(document.querySelectorAll('.method-tab'));
@@ -836,7 +868,7 @@
     const HISTORY_STORAGE_KEY = 'qr-decoder-history:v1';
     const MAX_DECODED_RESULTS = 10;
     const MAX_HISTORY_ENTRIES = 10;
-    const HISTORY_EXPORT_JSON_VERSION = '1';
+    const HISTORY_EXPORT_JSON_VERSION = '2';
     const HISTORY_EXPORT_NAME = 'qr-code-decoder-history';
     let scanHistory = [];
     let currentHistoryId = '';
@@ -915,17 +947,25 @@
 
     function normalizeHistoryRecord(raw) {
       if (!raw || typeof raw !== 'object') return null;
-      const text = typeof raw.payload === 'string' ? raw.payload : '';
-      const format = typeof raw.format === 'string' ? raw.format : 'Unknown';
-      if (!text && !format) return null;
+      const legacyCode = {
+        format: typeof raw.format === 'string' ? raw.format : 'Unknown',
+        payload: typeof raw.payload === 'string' ? raw.payload : '',
+        destination: typeof raw.destination === 'string' ? raw.destination : '',
+        qrCodeUrl: typeof raw.qrCodeUrl === 'string' ? raw.qrCodeUrl : ''
+      };
+      const rawCodes = Array.isArray(raw.codes) && raw.codes.length ? raw.codes : [legacyCode];
+      const codes = rawCodes.slice(0, MAX_DECODED_RESULTS).map((code) => ({
+        format: code && typeof code.format === 'string' ? code.format : 'Unknown',
+        payload: code && typeof code.payload === 'string' ? code.payload : '',
+        destination: code && typeof code.destination === 'string' ? code.destination : '',
+        qrCodeUrl: code && typeof code.qrCodeUrl === 'string' ? code.qrCodeUrl : ''
+      })).filter((code) => code.payload || code.format);
+      if (!codes.length) return null;
       return {
         id: typeof raw.id === 'string' ? raw.id : `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         timestamp: Number.isFinite(raw.timestamp) ? raw.timestamp : Date.now(),
-        format,
-        payload: text,
-        destination: typeof raw.destination === 'string' ? raw.destination : '',
         screenshotUrl: typeof raw.screenshotUrl === 'string' ? raw.screenshotUrl : '',
-        qrCodeUrl: typeof raw.qrCodeUrl === 'string' ? raw.qrCodeUrl : ''
+        codes
       };
     }
 
@@ -1002,11 +1042,13 @@
       const entry = {
         id,
         timestamp: Date.now(),
-        format: 'Unresolved',
-        payload: '[No payload decoded]',
-        destination: decodeReason ? `Could not decode ${decodeReason}` : 'Could not decode',
         screenshotUrl: imageUrl,
-        qrCodeUrl: '',
+        codes: [{
+          format: 'Unresolved',
+          payload: '[No payload decoded]',
+          destination: decodeReason ? `Could not decode ${decodeReason}` : 'Could not decode',
+          qrCodeUrl: ''
+        }],
         note: 'Unresolved scan captured for review'
       };
       addScanToHistory(entry);
@@ -1032,12 +1074,14 @@
       });
     }
 
-    async function ensureQrCodeImage(record) {
-      if (record.qrCodeUrl) return record.qrCodeUrl;
-      if (!record.payload || !window.QRCode || typeof window.QRCode.toDataURL !== 'function') return '';
-      const qrCodeUrl = await createQrPreviewImage(record.payload);
+    async function ensureQrCodeImage(record, codeIndex) {
+      const code = record && Array.isArray(record.codes) ? record.codes[codeIndex] : null;
+      if (!code) return '';
+      if (code.qrCodeUrl) return code.qrCodeUrl;
+      if (!code.payload || !window.QRCode || typeof window.QRCode.toDataURL !== 'function') return '';
+      const qrCodeUrl = await createQrPreviewImage(code.payload);
       if (qrCodeUrl) {
-        record.qrCodeUrl = qrCodeUrl;
+        code.qrCodeUrl = qrCodeUrl;
         persistHistory();
       }
       return qrCodeUrl;
@@ -1067,21 +1111,14 @@
         const item = document.createElement('li');
         const imageStack = document.createElement('div');
         const screenshot = document.createElement('img');
-        const qrPlaceholder = document.createElement('span');
-        const qrCode = document.createElement('img');
         const body = document.createElement('div');
         const title = document.createElement('p');
         const time = document.createElement('time');
         const type = document.createElement('span');
-        const payloadLabel = document.createElement('p');
-        const payloadText = document.createElement('p');
-        const destinationLabel = document.createElement('p');
-        const destinationText = document.createElement('p');
-        const actions = document.createElement('div');
-      const saveScreenshotButton = document.createElement('button');
-      const saveQrButton = document.createElement('button');
-      const generateQrButton = document.createElement('button');
-      const deleteEntryButton = document.createElement('button');
+        const codes = document.createElement('div');
+        const scanActions = document.createElement('div');
+        const saveScreenshotButton = document.createElement('button');
+        const deleteEntryButton = document.createElement('button');
 
         item.className = 'history-item';
         imageStack.className = 'history-image-stack';
@@ -1090,36 +1127,87 @@
         screenshot.alt = 'Scanned code screenshot';
         screenshot.src = record.screenshotUrl || '';
         screenshot.loading = 'lazy';
-        qrCode.className = 'history-qr';
-        qrCode.alt = 'Generated QR PNG for payload';
-        qrCode.loading = 'lazy';
-        if (record.qrCodeUrl) {
-          qrCode.src = record.qrCodeUrl;
-        } else {
-          qrCode.style.display = 'none';
-          qrPlaceholder.className = 'history-qr-placeholder';
-          qrPlaceholder.textContent = 'QR not ready';
-        }
 
         body.className = 'history-item-body';
 
         title.className = 'history-title';
-        type.textContent = formatLabel(record.format) || 'Unknown format';
+        const codeCount = Array.isArray(record.codes) ? record.codes.length : 0;
+        type.textContent = `${codeCount} code${codeCount === 1 ? '' : 's'}`;
         time.dateTime = new Date(record.timestamp).toISOString();
         time.textContent = formatHistoryDate(record.timestamp);
         title.append(type, time);
+        codes.className = 'history-codes';
 
-        payloadLabel.className = 'history-payload-label';
-        payloadLabel.textContent = 'Payload';
-        payloadText.className = 'history-payload';
-        payloadText.textContent = record.payload ? truncatePayload(record.payload) : 'No payload text was decoded.';
+        record.codes.forEach((code, codeIndex) => {
+          const codeCard = document.createElement('section');
+          const codeVisual = code.qrCodeUrl ? document.createElement('img') : document.createElement('span');
+          const codeDetails = document.createElement('div');
+          const codeHeader = document.createElement('div');
+          const codeTitle = document.createElement('p');
+          const urlMenuButton = document.createElement('button');
+          const payloadLabel = document.createElement('p');
+          const payloadText = document.createElement('p');
+          const destinationLabel = document.createElement('p');
+          const destinationText = document.createElement('p');
+          const actions = document.createElement('div');
+          const saveQrButton = document.createElement('button');
+          const generateQrButton = document.createElement('button');
 
-        destinationLabel.className = 'history-payload-label';
-        destinationLabel.textContent = 'Destination';
-        destinationText.className = 'history-destination';
-        destinationText.textContent = record.destination || 'Not available';
+          codeCard.className = 'history-code';
+          if (code.qrCodeUrl) {
+            codeVisual.className = 'history-qr';
+            codeVisual.alt = `Generated QR PNG for code ${codeIndex + 1}`;
+            codeVisual.loading = 'lazy';
+            codeVisual.src = code.qrCodeUrl;
+          } else {
+            codeVisual.className = 'history-qr-placeholder';
+            codeVisual.textContent = 'QR not ready';
+          }
+          codeDetails.className = 'history-code-details';
+          codeHeader.className = 'history-code-header';
+          codeTitle.className = 'history-code-title';
+          codeTitle.textContent = `Code ${codeIndex + 1} · ${formatLabel(code.format) || 'Unknown format'}`;
+          urlMenuButton.type = 'button';
+          urlMenuButton.className = 'url-menu-button';
+          urlMenuButton.dataset.action = 'history-url-menu';
+          urlMenuButton.dataset.id = record.id;
+          urlMenuButton.dataset.codeIndex = String(codeIndex);
+          urlMenuButton.setAttribute('aria-label', `URL actions for code ${codeIndex + 1}`);
+          urlMenuButton.title = isSafeWebUrl(code.payload) ? code.payload : 'URL actions unavailable';
+          urlMenuButton.textContent = '☰';
+          urlMenuButton.disabled = !isSafeWebUrl(code.payload);
+          codeHeader.append(codeTitle, urlMenuButton);
+          payloadLabel.className = 'history-payload-label';
+          payloadLabel.textContent = 'Payload';
+          payloadText.className = 'history-payload';
+          payloadText.textContent = code.payload ? truncatePayload(code.payload) : 'No payload text was decoded.';
+          destinationLabel.className = 'history-payload-label';
+          destinationLabel.textContent = 'Destination';
+          destinationText.className = 'history-destination';
+          destinationText.textContent = code.destination || 'Not available';
+          actions.className = 'history-actions';
 
-        actions.className = 'history-actions';
+          saveQrButton.type = 'button';
+          saveQrButton.className = 'btn-secondary';
+          saveQrButton.dataset.action = 'save-qr';
+          saveQrButton.dataset.id = record.id;
+          saveQrButton.dataset.codeIndex = String(codeIndex);
+          saveQrButton.textContent = 'Save QR PNG';
+          saveQrButton.disabled = !code.qrCodeUrl;
+
+          generateQrButton.type = 'button';
+          generateQrButton.className = 'btn-secondary';
+          generateQrButton.dataset.action = 'refresh-qr';
+          generateQrButton.dataset.id = record.id;
+          generateQrButton.dataset.codeIndex = String(codeIndex);
+          generateQrButton.textContent = 'Generate QR PNG';
+          actions.append(saveQrButton, generateQrButton);
+          codeDetails.append(codeHeader, payloadLabel, payloadText, destinationLabel, destinationText, actions);
+          codeCard.append(codeVisual, codeDetails);
+          codes.appendChild(codeCard);
+        });
+
+        scanActions.className = 'history-actions';
         saveScreenshotButton.type = 'button';
         saveScreenshotButton.className = 'btn-secondary';
         saveScreenshotButton.dataset.action = 'save-screenshot';
@@ -1127,28 +1215,15 @@
         saveScreenshotButton.textContent = 'Save screenshot PNG';
         if (!record.screenshotUrl) saveScreenshotButton.disabled = true;
 
-        saveQrButton.type = 'button';
-        saveQrButton.className = 'btn-secondary';
-        saveQrButton.dataset.action = 'save-qr';
-        saveQrButton.dataset.id = record.id;
-        saveQrButton.textContent = 'Save QR PNG';
-        saveQrButton.disabled = !record.qrCodeUrl;
-
-        generateQrButton.type = 'button';
-        generateQrButton.className = 'btn-secondary';
-        generateQrButton.dataset.action = 'refresh-qr';
-        generateQrButton.dataset.id = record.id;
-        generateQrButton.textContent = 'Generate QR PNG';
         deleteEntryButton.type = 'button';
         deleteEntryButton.className = 'btn-secondary history-action-delete';
         deleteEntryButton.dataset.action = 'delete-entry';
         deleteEntryButton.dataset.id = record.id;
         deleteEntryButton.textContent = 'Clear this entry';
-        actions.append(saveScreenshotButton, saveQrButton, generateQrButton, deleteEntryButton);
+        scanActions.append(saveScreenshotButton, deleteEntryButton);
 
-        body.append(title, payloadLabel, payloadText, destinationLabel, destinationText, actions);
+        body.append(title, codes, scanActions);
         imageStack.append(screenshot);
-        imageStack.append(record.qrCodeUrl ? qrCode : qrPlaceholder);
         item.append(imageStack, body);
         elements.historyList.appendChild(item);
       });
@@ -1165,10 +1240,10 @@
         elements.cameraButton.disabled = false;
       }
       elements.cameraGuideLabel.textContent = mode === 'qr'
-        ? 'Center the QR code inside the square'
+        ? 'Keep up to 10 QR codes visible inside the square'
         : mode === 'barcode'
-          ? 'Align the barcode across the horizontal guide'
-          : 'Center a QR code or barcode in the frame';
+          ? 'Align up to 10 barcodes across the horizontal guide'
+          : 'Keep up to 10 QR codes or barcodes visible in the frame';
     }
 
     function saveFailedScanFromButton() {
@@ -1228,6 +1303,32 @@
       elements.status.className = 'status ' + type;
     }
 
+    function updateDecodeProgress(value, message) {
+      const progress = Math.max(0, Math.min(100, Number(value) || 0));
+      elements.decodeProgressBar.value = progress;
+      elements.decodeProgressBar.textContent = `${progress}%`;
+      elements.decodeProgressMessage.textContent = message;
+    }
+
+    async function openDecodeProgress() {
+      updateDecodeProgress(5, 'Preparing image…');
+      if (!elements.decodeProgressDialog.open) elements.decodeProgressDialog.showModal();
+      await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+    }
+
+    function closeDecodeProgress() {
+      updateDecodeProgress(100, 'Complete');
+      if (elements.decodeProgressDialog.open) elements.decodeProgressDialog.close();
+    }
+
+    function updateHistoryCode(id, codeIndex, changes) {
+      const record = scanHistory.find((item) => item.id === id);
+      if (!record || !Array.isArray(record.codes) || !record.codes[codeIndex]) return;
+      record.codes[codeIndex] = { ...record.codes[codeIndex], ...changes };
+      persistHistory();
+      renderScanHistory();
+    }
+
     function isHeicLikeBlob(blob) {
       if (!(blob instanceof Blob)) return false;
       const type = String(blob.type || '').toLowerCase();
@@ -1245,6 +1346,21 @@
         return /\.(png|jpe?g|gif|webp|bmp|tiff?|heic|heif|avif|svg|ico|pjpeg|jfif)$/.test(name);
       }
       return false;
+    }
+
+    function imageBlobFromClipboard(clipboardData) {
+      if (!clipboardData) return null;
+      const files = Array.from(clipboardData.files || []);
+      const clipboardFile = files.find((file) => isLikelyImageBlob(file));
+      if (clipboardFile) return clipboardFile;
+
+      const items = Array.from(clipboardData.items || []);
+      for (const item of items) {
+        if (!item || item.kind !== 'file' || typeof item.getAsFile !== 'function') continue;
+        const file = item.getAsFile();
+        if (isLikelyImageBlob(file)) return file;
+      }
+      return null;
     }
 
     async function canDecodeImageBlobDirectly(blob) {
@@ -1288,15 +1404,14 @@
 
     async function normalizeImageBlobForDecode(blob) {
       if (!isHeicLikeBlob(blob)) return blob;
-      if (typeof heic2any !== 'function') {
+      if (typeof window.HeicTo !== 'function') {
         throw new Error('HEIC/HEIF conversion support is not available right now.');
       }
       const outputTypes = ['image/png', 'image/jpeg', 'image/webp'];
       let lastError;
       for (const toType of outputTypes) {
         try {
-          const result = await heic2any({ blob, toType, quality: 1 });
-          const normalized = Array.isArray(result) ? result[0] : result;
+          const normalized = await window.HeicTo({ blob, type: toType, quality: 1 });
           if (normalized instanceof Blob) return normalized;
         } catch (error) {
           lastError = error;
@@ -1348,6 +1463,7 @@
     function showUrlActions(url) {
       if (!isSafeWebUrl(url)) return;
       actionUrl = url;
+      elements.urlActionsHeading.textContent = url;
       elements.urlActionsDialog.showModal();
     }
 
@@ -1434,7 +1550,7 @@
         const entry = {
           ...record,
           screenshotFile: '',
-          qrCodeFile: ''
+          codes: record.codes.map((code) => ({ ...code, qrCodeFile: '' }))
         };
 
         if (record.screenshotUrl) {
@@ -1447,16 +1563,17 @@
             }
           })());
         }
-        if (record.qrCodeUrl) {
-          const qrCodeName = `${prefix}-qr.png`;
+        record.codes.forEach((code, codeIndex) => {
+          if (!code.qrCodeUrl) return;
+          const qrCodeName = `${prefix}-code-${codeIndex + 1}-qr.png`;
           blobTasks.push((async () => {
-            const blob = await urlToBlob(record.qrCodeUrl);
+            const blob = await urlToBlob(code.qrCodeUrl);
             if (blob) {
-              entry.qrCodeFile = `images/${qrCodeName}`;
-              zip.file(entry.qrCodeFile, blob);
+              entry.codes[codeIndex].qrCodeFile = `images/${qrCodeName}`;
+              zip.file(entry.codes[codeIndex].qrCodeFile, blob);
             }
           })());
-        }
+        });
         exportEntries.push(entry);
       });
 
@@ -1565,9 +1682,11 @@
     }
 
     async function resolveFinalUrl(url, requestId) {
-      clearRedirectTrace();
-      elements.finalUrlText.textContent = 'Resolving final destination\u2026';
-      elements.finalUrlMenuButton.disabled = true;
+      if (requestId === resolveRequestId) {
+        clearRedirectTrace();
+        elements.finalUrlText.textContent = 'Resolving final destination\u2026';
+        elements.finalUrlMenuButton.disabled = true;
+      }
 
       try {
         const endpoint = new URL(qrProxyUrl);
@@ -1582,23 +1701,24 @@
 
         if (!response.ok) throw new Error(payload.error || 'HTTP ' + response.status);
         if (!payload.finalUrl || !isSafeWebUrl(payload.finalUrl)) throw new TypeError('Invalid proxy response');
-        if (requestId !== resolveRequestId) return;
-
-        resolvedText = payload.finalUrl;
         if (urlToHistoryId[requestId]) {
-          updateHistoryEntry(urlToHistoryId[requestId], { destination: payload.finalUrl });
+          const target = urlToHistoryId[requestId];
+          updateHistoryCode(target.id, target.codeIndex, { destination: payload.finalUrl });
           delete urlToHistoryId[requestId];
         }
+        if (requestId !== resolveRequestId) return;
+        resolvedText = payload.finalUrl;
         elements.finalUrlText.textContent = resolvedText;
         elements.finalUrlMenuButton.disabled = false;
         renderRedirectTrace(payload);
       } catch (_) {
-        if (requestId !== resolveRequestId) return;
-        resolvedText = '';
         if (urlToHistoryId[requestId]) {
-          updateHistoryEntry(urlToHistoryId[requestId], { destination: 'Final destination could not be resolved.' });
+          const target = urlToHistoryId[requestId];
+          updateHistoryCode(target.id, target.codeIndex, { destination: 'Final destination could not be resolved.' });
           delete urlToHistoryId[requestId];
         }
+        if (requestId !== resolveRequestId) return;
+        resolvedText = '';
         elements.finalUrlText.textContent = 'Final destination could not be resolved.';
         elements.finalUrlMenuButton.disabled = true;
       }
@@ -1610,11 +1730,13 @@
       const entry = {
         id,
         timestamp: Date.now(),
-        format: format || 'Unknown',
-        payload: String(text),
-        destination: isSafeWebUrl(String(text)) ? 'Resolving final destination...' : 'N/A',
         screenshotUrl: sourceImageUrl || '',
-        qrCodeUrl: ''
+        codes: [{
+          format: format || 'Unknown',
+          payload: String(text),
+          destination: isSafeWebUrl(String(text)) ? 'Resolving final destination...' : 'N/A',
+          qrCodeUrl: ''
+        }]
       };
       currentHistoryId = id;
       addScanToHistory(entry);
@@ -1647,7 +1769,7 @@
       const requestId = ++resolveRequestId;
       currentHistoryId = recordDecodedResultForHistory(text, format, sourceImageUrl || previewUrl || '');
       if (currentHistoryId) {
-        urlToHistoryId[requestId] = currentHistoryId;
+        urlToHistoryId[requestId] = { id: currentHistoryId, codeIndex: 0 };
       }
       if (previewUrl) {
         elements.resultPreview.src = previewUrl;
@@ -1687,19 +1809,22 @@
     }
 
     function recordDecodedBatchForHistory(results, sourceImageUrl) {
-      const ids = [];
-      results.forEach((result) => {
-        if (!result || typeof result.text !== 'string') return;
-        const id = recordDecodedResultForHistory(result.text, result.format, sourceImageUrl || elements.canvas.toDataURL('image/png'));
-        if (!id) return;
-        ids.push(id);
-        if (isSafeWebUrl(result.text)) {
-          const requestId = ++resolveRequestId;
-          urlToHistoryId[requestId] = id;
-          resolveFinalUrl(result.text, requestId);
-        }
-      });
-      return ids;
+      const normalized = dedupeDecodedResults(results, MAX_DECODED_RESULTS);
+      if (!normalized.length) return '';
+      const id = createHistoryEntryId();
+      const entry = {
+        id,
+        timestamp: Date.now(),
+        screenshotUrl: sourceImageUrl || elements.canvas.toDataURL('image/png'),
+        codes: normalized.map((result) => ({
+          format: result.format || 'Unknown',
+          payload: result.text,
+          destination: isSafeWebUrl(result.text) ? 'Final destination not checked' : 'N/A',
+          qrCodeUrl: ''
+        }))
+      };
+      addScanToHistory(entry);
+      return id;
     }
 
     function showDecodedResults(results, showFullPreview, sourceImageUrl) {
@@ -1727,8 +1852,7 @@
       resolvedText = '';
       resultImageUrl = showFullPreview ? elements.canvas.toDataURL('image/png') : '';
       resultImageSvg = '';
-      const historyIds = recordDecodedBatchForHistory(normalized, sourceImageUrl || resultImageUrl);
-      currentHistoryId = historyIds[0] || '';
+      currentHistoryId = recordDecodedBatchForHistory(normalized, sourceImageUrl || resultImageUrl);
       clearRedirectTrace();
 
       elements.resultFormat.textContent = `${normalized.length} decoded result${normalized.length === 1 ? '' : 's'}`;
@@ -1982,34 +2106,44 @@
         showStatus('Please choose or paste a valid image file.', 'error');
         return;
       }
-      hideStatus();
-      let conversionAttempted = false;
-      let conversionSucceeded = false;
-      let normalizedBlob = blob;
-      if (isHeicLikeBlob(blob)) {
-        const canDecodeNatively = await canDecodeImageBlobDirectly(blob);
-        if (!canDecodeNatively) {
-          conversionAttempted = true;
-          try {
-            const converted = await normalizeImageBlobForDecode(blob);
-            conversionSucceeded = true;
-            normalizedBlob = converted;
-          } catch (_) {
-            normalizedBlob = blob;
+      await openDecodeProgress();
+      try {
+        hideStatus();
+        let conversionAttempted = false;
+        let conversionSucceeded = false;
+        let normalizedBlob = blob;
+        updateDecodeProgress(15, 'Reading image format…');
+        if (isHeicLikeBlob(blob)) {
+          updateDecodeProgress(25, 'Checking HEIC compatibility…');
+          const canDecodeNatively = await canDecodeImageBlobDirectly(blob);
+          if (!canDecodeNatively) {
+            conversionAttempted = true;
+            updateDecodeProgress(40, 'Converting HEIC image locally…');
+            try {
+              const converted = await normalizeImageBlobForDecode(blob);
+              conversionSucceeded = true;
+              normalizedBlob = converted;
+            } catch (_) {
+              normalizedBlob = blob;
+            }
           }
         }
-      }
 
-      const decodeSucceeded = await decodeImageBlob(normalizedBlob);
-      if (!decodeSucceeded && isHeicLikeBlob(blob) && conversionAttempted && conversionSucceeded) {
-        const fallbackSucceeded = await decodeImageBlob(blob);
-        if (fallbackSucceeded) return;
-      }
-      if (!decodeSucceeded) {
-        const heicFailureMessage = conversionAttempted && isHeicLikeBlob(blob)
-          ? 'This HEIC/HEIF file could not be converted for decoding in this browser.'
-          : 'This image is invalid or uses an unsupported format.';
-        showStatus(heicFailureMessage, 'error');
+        updateDecodeProgress(65, 'Scanning for QR codes and barcodes…');
+        const decodeSucceeded = await decodeImageBlob(normalizedBlob);
+        updateDecodeProgress(92, 'Finalizing results…');
+        if (!decodeSucceeded && isHeicLikeBlob(blob) && conversionAttempted && conversionSucceeded) {
+          const fallbackSucceeded = await decodeImageBlob(blob);
+          if (fallbackSucceeded) return;
+        }
+        if (!decodeSucceeded) {
+          const heicFailureMessage = conversionAttempted && isHeicLikeBlob(blob)
+            ? 'This HEIC/HEIF file could not be converted for decoding in this browser.'
+            : 'This image is invalid or uses an unsupported format.';
+          showStatus(heicFailureMessage, 'error');
+        }
+      } finally {
+        closeDecodeProgress();
       }
     }
 
@@ -2179,14 +2313,17 @@
     elements.uploadAnotherButton.addEventListener('click', openFilePicker);
 
     elements.paste.addEventListener('paste', (event) => {
-      const items = Array.from((event.clipboardData && event.clipboardData.items) || []);
-      const imageItem = items.find((item) => item.type.startsWith('image/'));
-      if (!imageItem) {
-        showStatus(items.length ? 'The clipboard does not contain an image.' : 'The clipboard is empty or image pasting is unsupported.', 'error');
+      const clipboardImage = imageBlobFromClipboard(event.clipboardData);
+      if (!clipboardImage) {
+        const hasClipboardContent = Boolean(event.clipboardData
+          && (Array.from(event.clipboardData.items || []).length || Array.from(event.clipboardData.files || []).length));
+        showStatus(hasClipboardContent
+          ? 'Windows did not provide this clipboard item to the browser as an image file. Try dragging the HEIC file here or use Choose file.'
+          : 'The clipboard is empty or image pasting is unsupported.', 'error');
         return;
       }
       event.preventDefault();
-      decodeBlob(imageItem.getAsFile());
+      decodeBlob(clipboardImage);
     });
 
     elements.scanModeInputs.forEach((input) => input.addEventListener('change', () => {
@@ -2206,6 +2343,7 @@
       const { action, id } = button.dataset;
       const entry = scanHistory.find((item) => item.id === id);
       if (!entry) return;
+      const codeIndex = Number.parseInt(button.dataset.codeIndex || '0', 10);
 
       if (action === 'save-screenshot') {
         if (!entry.screenshotUrl) return;
@@ -2213,11 +2351,17 @@
         return;
       }
 
+      if (action === 'history-url-menu') {
+        const code = entry.codes[codeIndex];
+        if (code && isSafeWebUrl(code.payload)) showUrlActions(code.payload);
+        return;
+      }
+
       if (action === 'refresh-qr') {
         button.disabled = true;
         const originalLabel = button.textContent;
         button.textContent = 'Generating...';
-        const qrCodeUrl = await ensureQrCodeImage(entry);
+        const qrCodeUrl = await ensureQrCodeImage(entry, codeIndex);
         if (!qrCodeUrl) {
           button.textContent = originalLabel;
           button.disabled = false;
@@ -2235,9 +2379,10 @@
 
       if (action === 'save-qr') {
         button.disabled = true;
-        const qrCodeUrl = entry.qrCodeUrl || await ensureQrCodeImage(entry);
+        const code = entry.codes[codeIndex];
+        const qrCodeUrl = code && (code.qrCodeUrl || await ensureQrCodeImage(entry, codeIndex));
         if (qrCodeUrl) {
-          downloadUrl(qrCodeUrl, `scan-${id}-qr.png`);
+          downloadUrl(qrCodeUrl, `scan-${id}-code-${codeIndex + 1}-qr.png`);
           persistHistory();
           renderScanHistory();
         }
@@ -2249,7 +2394,7 @@
         button.disabled = true;
         scanHistory = scanHistory.filter((item) => item.id !== id);
         Object.keys(urlToHistoryId).forEach((requestId) => {
-          if (urlToHistoryId[requestId] === id) {
+          if (urlToHistoryId[requestId] && urlToHistoryId[requestId].id === id) {
             delete urlToHistoryId[requestId];
           }
         });
@@ -2261,6 +2406,7 @@
     elements.clearHistoryButton.addEventListener('click', clearScanHistory);
     elements.cameraButton.addEventListener('click', handleScanButtonClick);
     elements.downloadHistoryZipButton.addEventListener('click', exportHistoryZip);
+    elements.decodeProgressDialog.addEventListener('cancel', (event) => event.preventDefault());
 
     scanHistory = loadHistoryFromStorage();
     renderScanHistory();
