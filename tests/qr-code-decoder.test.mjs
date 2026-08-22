@@ -28,6 +28,13 @@ test("QR decoder ships the Rust and ZXing WASM pipeline", () => {
   }
 });
 
+test("QR decoder ships a current, self-hosted HEIC conversion fallback", () => {
+  assert.match(decoderHtml, /assets\/js\/vendor\/heic-to-1\.5\.2\.js/);
+  assert.match(decoderHtml, /window\.HeicTo\(\{ blob, type: toType, quality: 1 \}\)/);
+  assert.doesNotMatch(decoderHtml, /heic2any/);
+  assert.ok(fs.statSync(path.join(siteRoot, "assets", "js", "vendor", "heic-to-1.5.2.js")).size > 0);
+});
+
 test("QR decoder exposes optional local diagnostics", () => {
   assert.match(decoderHtml, /id="debugToggle"/);
   assert.match(decoderHtml, /sourceDimensions/);
@@ -42,7 +49,8 @@ test("decoder exposes automatic, QR-only, and barcode-only modes with camera gui
   assert.match(decoderHtml, /name="scanMode" value="barcode"/);
   assert.match(decoderHtml, /camera-guide-square/);
   assert.match(decoderHtml, /camera-guide-bar/);
-  assert.match(decoderHtml, /format: result && result\.format/);
+  assert.match(decoderHtml, /Keep up to 10 QR codes visible inside the square/);
+  assert.match(decoderHtml, /Align up to 10 barcodes across the horizontal guide/);
   assert.ok(fs.statSync(barcodeFixture).size > 0);
 });
 
@@ -74,6 +82,52 @@ test("decoded type precedes the preview and another image can replace the result
   assert.match(decoderHtml, /id="uploadAnotherButton"[^>]*>Upload another image<\/button>/);
   assert.match(decoderHtml, /function openFilePicker\(\) \{\s*elements\.file\.value = '';\s*elements\.file\.click\(\);/);
   assert.match(decoderHtml, /const selectedFile = elements\.file\.files\[0\];\s*elements\.file\.value = '';\s*decodeBlob\(selectedFile\);/);
+});
+
+test("history groups up to ten decoded codes into one scan entry", () => {
+  assert.match(decoderHtml, /const MAX_DECODED_RESULTS = 10;/);
+  assert.match(decoderHtml, /function recordDecodedBatchForHistory\(results, sourceImageUrl\)[\s\S]*codes: normalized\.map/);
+  assert.match(decoderHtml, /type\.textContent = `\$\{codeCount\} code/);
+  assert.match(decoderHtml, /record\.codes\.forEach\(\(code, codeIndex\) =>/);
+  assert.match(decoderHtml, /dataset\.codeIndex = String\(codeIndex\)/);
+  assert.match(decoderHtml, /HISTORY_EXPORT_JSON_VERSION = '2'/);
+  assert.doesNotMatch(decoderHtml, /const historyIds = recordDecodedBatchForHistory/);
+});
+
+test("multi-code history bypasses proxy checks and exposes per-code URL menus", () => {
+  const batchHistorySource = decoderHtml.match(/function recordDecodedBatchForHistory\(results, sourceImageUrl\) \{([\s\S]*?)\n    \}/)?.[1] || '';
+  assert.match(batchHistorySource, /Final destination not checked/);
+  assert.doesNotMatch(batchHistorySource, /resolveFinalUrl/);
+  assert.match(decoderHtml, /dataset\.action = 'history-url-menu'/);
+  assert.match(decoderHtml, /aria-label', `URL actions for code \$\{codeIndex \+ 1\}`/);
+  assert.match(decoderHtml, /if \(action === 'history-url-menu'\)/);
+  assert.match(decoderHtml, /showUrlActions\(code\.payload\)/);
+  assert.match(decoderHtml, /urlMenuButton\.title = isSafeWebUrl\(code\.payload\) \? code\.payload/);
+  assert.match(decoderHtml, /elements\.urlActionsHeading\.textContent = url/);
+});
+
+test("history migrates legacy single-code records to the grouped code model", () => {
+  assert.match(decoderHtml, /const rawCodes = Array\.isArray\(raw\.codes\) && raw\.codes\.length \? raw\.codes : \[legacyCode\]/);
+  assert.match(decoderHtml, /updateHistoryCode\(target\.id, target\.codeIndex/);
+  assert.match(decoderHtml, /ensureQrCodeImage\(entry, codeIndex\)/);
+});
+
+test("image uploads display a modal decode progress bar", () => {
+  assert.match(decoderHtml, /id="decodeProgressDialog" class="decode-progress-dialog"/);
+  assert.match(decoderHtml, /<progress id="decodeProgressBar"[^>]*max="100" value="0"/);
+  assert.match(decoderHtml, /async function openDecodeProgress\(\)/);
+  assert.match(decoderHtml, /await openDecodeProgress\(\);[\s\S]*finally \{\s*closeDecodeProgress\(\);/);
+  assert.match(decoderHtml, /Scanning for QR codes and barcodes/);
+  assert.match(decoderHtml, /decodeProgressDialog\.addEventListener\('cancel', \(event\) => event\.preventDefault\(\)\)/);
+});
+
+test("clipboard paste accepts Windows Photos HEIC file entries", () => {
+  assert.match(decoderHtml, /function imageBlobFromClipboard\(clipboardData\)/);
+  assert.match(decoderHtml, /Array\.from\(clipboardData\.files \|\| \[\]\)/);
+  assert.match(decoderHtml, /item\.kind !== 'file'/);
+  assert.match(decoderHtml, /if \(isLikelyImageBlob\(file\)\) return file/);
+  assert.match(decoderHtml, /const clipboardImage = imageBlobFromClipboard\(event\.clipboardData\)/);
+  assert.match(decoderHtml, /decodeBlob\(clipboardImage\)/);
 });
 
 test("decoded web links display a safe header-only redirect trace", () => {
