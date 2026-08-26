@@ -3025,6 +3025,158 @@
         return bestPosition;
       }
 
+      function fitBoundaryLine(points, dependentKey, independentKey) {
+        if (points.length < 8) return null;
+        const fit = function (items) {
+          let sumIndependent = 0, sumDependent = 0, sumProduct = 0, sumSquare = 0;
+          items.forEach(function (point) {
+            const independent = point[independentKey];
+            const dependent = point[dependentKey];
+            sumIndependent += independent;
+            sumDependent += dependent;
+            sumProduct += independent * dependent;
+            sumSquare += independent * independent;
+          });
+          const denominator = (items.length * sumSquare) - (sumIndependent * sumIndependent);
+          const slope = Math.abs(denominator) < 0.001 ? 0 : ((items.length * sumProduct) - (sumIndependent * sumDependent)) / denominator;
+          return { slope: slope, intercept: (sumDependent - (slope * sumIndependent)) / items.length };
+        };
+        let line = fit(points);
+        const rankedResiduals = points.map(function (point) {
+          return Math.abs(point[dependentKey] - ((line.slope * point[independentKey]) + line.intercept));
+        }).sort(function (a, b) { return a - b; });
+        const cutoff = Math.max(3, rankedResiduals[Math.floor(rankedResiduals.length * 0.72)] || 3);
+        const inliers = points.filter(function (point) {
+          return Math.abs(point[dependentKey] - ((line.slope * point[independentKey]) + line.intercept)) <= cutoff;
+        });
+        if (inliers.length >= 8) line = fit(inliers);
+        line.support = inliers.length / points.length;
+        return line;
+      }
+
+      function intersectDocumentLines(vertical, horizontal) {
+        const denominator = 1 - (horizontal.slope * vertical.slope);
+        if (Math.abs(denominator) < 0.01) return null;
+        const y = ((horizontal.slope * vertical.intercept) + horizontal.intercept) / denominator;
+        return { x: (vertical.slope * y) + vertical.intercept, y: y };
+      }
+
+      function quadrilateralArea(corners) {
+        let twiceArea = 0;
+        corners.forEach(function (point, index) {
+          const next = corners[(index + 1) % corners.length];
+          twiceArea += (point.x * next.y) - (next.x * point.y);
+        });
+        return Math.abs(twiceArea) / 2;
+      }
+
+      function detectDocumentBoundary() {
+        const width = elements.cropCanvas.width;
+        const height = elements.cropCanvas.height;
+        if (width < 60 || height < 60) return false;
+        const scratch = document.createElement("canvas");
+        scratch.width = width;
+        scratch.height = height;
+        const context = scratch.getContext("2d", { willReadFrequently: true });
+        context.drawImage(elements.cameraCaptureCanvas, 0, 0, width, height);
+        const pixels = context.getImageData(0, 0, width, height).data;
+        const patch = Math.max(3, Math.round(Math.min(width, height) * 0.035));
+        const channels = [[], [], []];
+        [[0, 0], [width - patch, 0], [0, height - patch], [width - patch, height - patch]].forEach(function (origin) {
+          for (let y = origin[1]; y < origin[1] + patch; y += 2) {
+            for (let x = origin[0]; x < origin[0] + patch; x += 2) {
+              const offset = ((y * width) + x) * 4;
+              channels[0].push(pixels[offset]);
+              channels[1].push(pixels[offset + 1]);
+              channels[2].push(pixels[offset + 2]);
+            }
+          }
+        });
+        const background = channels.map(function (values) {
+          values.sort(function (a, b) { return a - b; });
+          return values[Math.floor(values.length / 2)];
+        });
+        const cornerDifferences = channels[0].map(function (_, index) {
+          return Math.max(
+            Math.abs(channels[0][index] - background[0]),
+            Math.abs(channels[1][index] - background[1]),
+            Math.abs(channels[2][index] - background[2])
+          );
+        }).sort(function (a, b) { return a - b; });
+        const threshold = Math.max(28, (cornerDifferences[Math.floor(cornerDifferences.length * 0.9)] || 0) + 18);
+        const differsFromBackground = function (x, y) {
+          const offset = ((y * width) + x) * 4;
+          return Math.max(
+            Math.abs(pixels[offset] - background[0]),
+            Math.abs(pixels[offset + 1] - background[1]),
+            Math.abs(pixels[offset + 2] - background[2])
+          ) > threshold;
+        };
+        const findRun = function (fixed, start, end, step, horizontal) {
+          let run = 0;
+          for (let position = start; step > 0 ? position <= end : position >= end; position += step) {
+            const foreground = horizontal ? differsFromBackground(position, fixed) : differsFromBackground(fixed, position);
+            run = foreground ? run + 1 : 0;
+            if (run >= 4) return position - (step * 3);
+          }
+          return null;
+        };
+        const leftPoints = [], rightPoints = [], topPoints = [], bottomPoints = [];
+        const xMargin = Math.max(2, Math.round(width * 0.01));
+        const yMargin = Math.max(2, Math.round(height * 0.01));
+        for (let y = yMargin; y < height - yMargin; y += 2) {
+          const left = findRun(y, xMargin, Math.round(width * 0.7), 1, true);
+          const right = findRun(y, width - xMargin - 1, Math.round(width * 0.3), -1, true);
+          if (left !== null && right !== null && right - left > width * 0.25) {
+            leftPoints.push({ x: left, y: y });
+            rightPoints.push({ x: right, y: y });
+          }
+        }
+        for (let x = xMargin; x < width - xMargin; x += 2) {
+          const top = findRun(x, yMargin, Math.round(height * 0.7), 1, false);
+          const bottom = findRun(x, height - yMargin - 1, Math.round(height * 0.3), -1, false);
+          if (top !== null && bottom !== null && bottom - top > height * 0.25) {
+            topPoints.push({ x: x, y: top });
+            bottomPoints.push({ x: x, y: bottom });
+          }
+        }
+        const minimumVerticalSupport = Math.max(18, height * 0.18);
+        const minimumHorizontalSupport = Math.max(18, width * 0.18);
+        if (leftPoints.length < minimumVerticalSupport || rightPoints.length < minimumVerticalSupport
+          || topPoints.length < minimumHorizontalSupport || bottomPoints.length < minimumHorizontalSupport) return false;
+        const leftLine = fitBoundaryLine(leftPoints, "x", "y");
+        const rightLine = fitBoundaryLine(rightPoints, "x", "y");
+        const topLine = fitBoundaryLine(topPoints, "y", "x");
+        const bottomLine = fitBoundaryLine(bottomPoints, "y", "x");
+        if (!leftLine || !rightLine || !topLine || !bottomLine) return false;
+        const corners = [
+          intersectDocumentLines(leftLine, topLine),
+          intersectDocumentLines(rightLine, topLine),
+          intersectDocumentLines(rightLine, bottomLine),
+          intersectDocumentLines(leftLine, bottomLine)
+        ];
+        if (corners.some(function (point) { return !point; }) || !isConvexQuad(corners)) return false;
+        const toleranceX = width * 0.08, toleranceY = height * 0.08;
+        if (corners.some(function (point) {
+          return point.x < -toleranceX || point.x > width + toleranceX || point.y < -toleranceY || point.y > height + toleranceY;
+        })) return false;
+        corners.forEach(function (point) {
+          point.x = Math.max(0, Math.min(width, point.x));
+          point.y = Math.max(0, Math.min(height, point.y));
+        });
+        const areaRatio = quadrilateralArea(corners) / (width * height);
+        if (areaRatio < 0.18 || areaRatio > 0.985) return false;
+        perspectiveCorners = corners;
+        cropSelection = selectionFromCorners(corners);
+        perspectiveEnabled = true;
+        elements.perspectiveButton.setAttribute("aria-pressed", "true");
+        elements.cropAspectSelect.value = "free";
+        elements.cropAspectSelect.disabled = true;
+        recordCropHistory();
+        renderCropCanvas();
+        return true;
+      }
+
       function snapCropToEdges() {
         if (!cropSelection) return;
         const scratch = document.createElement("canvas");
@@ -3186,11 +3338,14 @@
         elements.cropCanvas.focus();
         if (isMobileCropMode() && !preserveOriginal) {
           window.requestAnimationFrame(function () {
-            const trimmed = autoTrimBorders(true);
-            snapCropToEdges();
-            elements.mobileScanStatus.textContent = trimmed
-              ? "Document ready — borders removed; deskew and cleanup are automatic."
-              : "Scan ready — deskew and cleanup will be applied automatically.";
+            const documentFound = detectDocumentBoundary();
+            const trimmed = documentFound ? false : autoTrimBorders(true);
+            if (!documentFound) snapCropToEdges();
+            elements.mobileScanStatus.textContent = documentFound
+              ? "Document found — corners and perspective corrected automatically."
+              : (trimmed
+                ? "Document ready — borders removed; deskew and cleanup are automatic."
+                : "No clear page outline found. The full image is ready; tap Adjust to refine it.");
           });
         } else if (isMobileCropMode()) {
           elements.mobileScanStatus.textContent = "Scan ready — deskew and cleanup are automatic.";
@@ -3392,9 +3547,14 @@
         source.getContext("2d").drawImage(rotated, 0, 0);
         prepareCropEditor(cropSourceKind, cropSourceName, true);
         if (isMobileCropMode()) {
-          autoTrimBorders(true);
-          snapCropToEdges();
-          elements.mobileScanStatus.textContent = "Scan rotated and document edges refreshed.";
+          const documentFound = detectDocumentBoundary();
+          if (!documentFound) {
+            autoTrimBorders(true);
+            snapCropToEdges();
+          }
+          elements.mobileScanStatus.textContent = documentFound
+            ? "Document found — corners and perspective corrected automatically."
+            : "Scan rotated. Tap Adjust if the page outline needs refinement.";
         }
         setStatus("Image rotated " + (degrees > 0 ? "+" : "") + degrees + "°. Adjust the crop when ready.", "success");
       }
