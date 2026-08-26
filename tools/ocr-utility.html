@@ -829,6 +829,9 @@
     .crop-primary-actions { grid-column: 2; justify-content: center; }
     .crop-bottom-bar > .toolbar-button { grid-column: 3; justify-self: end; }
 
+    .mobile-scan-status,
+    .mobile-scan-actions { display: none; }
+
     .toolbar-button,
     .sidebar-control,
     .nudge-controls button,
@@ -1630,6 +1633,43 @@
       }
     }
 
+    @media (max-width: 720px) {
+      .crop-editor-pro { width: 100%; height: 100dvh; overflow: hidden; border: 0; border-radius: 0; }
+      .crop-topbar { grid-template-columns: auto 1fr; padding: 9px 10px; }
+      .crop-toolbar-left { justify-content: space-between; grid-column: 1 / -1; }
+      .crop-toolbar-left .toolbar-button { min-height: 40px; }
+      .crop-toolbar-zoom, .crop-toolbar-right { display: none; }
+      .pdf-page-controls { grid-column: 1 / -1; grid-row: 2; }
+      .crop-workspace { position: relative; display: block; min-height: 0; overflow: hidden; }
+      .crop-stage { height: 100%; min-height: 0; padding: 10px; }
+      .crop-stage-heading { display: block; }
+      .crop-stage-heading h3 { font-size: 1rem; }
+      .crop-instructions { margin: 2px 0 7px; font-size: 0.72rem; }
+      .crop-stage-heading .detect-text-status { display: none; }
+      .crop-shortcut-panel { display: none !important; }
+      .mobile-scan-status {
+        display: flex; align-items: center; gap: 8px; margin: 0 0 9px; padding: 8px 10px;
+        border: 1px solid rgba(74, 222, 128, 0.28); border-radius: 0.55rem;
+        background: rgba(34, 197, 94, 0.08); color: #bbf7d0; font-size: 0.72rem;
+      }
+      .mobile-scan-status::before {
+        content: "✓"; display: grid; width: 20px; height: 20px; flex: 0 0 20px; place-items: center;
+        border-radius: 999px; background: var(--green); color: #031009; font-weight: 800;
+      }
+      .crop-editor-pro .crop-canvas-viewport { min-height: 0; max-height: none; }
+      .crop-sidebar {
+        display: none; position: absolute; inset: 0; z-index: 8; overflow: auto;
+        grid-template-columns: 1fr; padding: 12px; border: 0; background: #07100b;
+      }
+      .crop-editor-pro.mobile-adjusting .crop-sidebar { display: block; }
+      .crop-editor-pro.mobile-adjusting .crop-stage { visibility: hidden; }
+      .crop-bottom-bar { display: block; padding: 10px; }
+      .crop-bottom-bar > .crop-primary-actions, .crop-bottom-bar > #beforeAfterButton { display: none; }
+      .mobile-scan-actions { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 8px; }
+      .mobile-scan-actions .button { width: auto; min-height: 44px; padding-inline: 13px; }
+      .mobile-scan-actions .mobile-use-scan { width: 100%; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html {
         scroll-behavior: auto;
@@ -1798,6 +1838,7 @@
                   <div><h3 id="cropModalTitle">Crop image</h3><p class="crop-instructions" id="cropInstructions">Drag to crop. Hold Space and drag to pan. Arrow keys nudge by one pixel.</p></div>
                   <p class="detect-text-status" id="detectTextStatus" role="status" aria-live="polite"></p>
                 </div>
+                <div class="mobile-scan-status" id="mobileScanStatus" role="status" aria-live="polite">Finding the document edges…</div>
                 <div class="crop-shortcut-panel" id="cropShortcutPanel" hidden>
                   <span><kbd>C</kbd> Crop</span><span><kbd>H</kbd> Hand mode</span><span><kbd>Space</kbd> Hold to pan</span><span><kbd>R</kbd> Rotate</span><span><kbd>Z</kbd> Zoom</span><span><kbd>Esc</kbd> Reset crop</span><span><kbd>↑↓←→</kbd> Nudge</span>
                 </div>
@@ -1870,6 +1911,11 @@
                 <button class="button button-secondary" id="downloadCropButton" type="button">Download Cropped Image</button>
               </div>
               <button class="toolbar-button" id="beforeAfterButton" type="button" aria-pressed="false">Before / After</button>
+              <div class="mobile-scan-actions" aria-label="Mobile scan actions">
+                <button class="button button-secondary" id="mobileRotateButton" type="button" aria-label="Rotate image 90 degrees">Rotate</button>
+                <button class="button button-secondary" id="mobileAdjustButton" type="button" aria-expanded="false">Adjust</button>
+                <button class="button button-primary mobile-use-scan" id="mobileUseScanButton" type="button">Use Scan</button>
+              </div>
             </footer>
           </div>
         </div>
@@ -2138,6 +2184,11 @@
         imageProgressBar: $("imageProgressBar"),
         cropModal: $("cropModal"),
         cropEditor: $("cropEditor"),
+        cropInstructions: $("cropInstructions"),
+        mobileScanStatus: $("mobileScanStatus"),
+        mobileRotateButton: $("mobileRotateButton"),
+        mobileAdjustButton: $("mobileAdjustButton"),
+        mobileUseScanButton: $("mobileUseScanButton"),
         closeCropButton: $("closeCropButton"),
         cropCanvasViewport: $("cropCanvasViewport"),
         cropCanvas: $("cropCanvas"),
@@ -2245,6 +2296,18 @@
       let isDetectingRegions = false;
       let detectionRequestId = 0;
       const aspectButtons = Array.from(document.querySelectorAll("button[data-crop-ratio]"));
+
+      function isMobileCropMode() {
+        return window.matchMedia("(max-width: 720px)").matches;
+      }
+
+      function setMobileAdjusting(enabled) {
+        const active = Boolean(enabled && isMobileCropMode());
+        elements.cropEditor.classList.toggle("mobile-adjusting", active);
+        elements.mobileAdjustButton.setAttribute("aria-expanded", String(active));
+        elements.mobileAdjustButton.textContent = active ? "Done" : "Adjust";
+        if (!active && !elements.cropEditor.hidden) elements.cropCanvas.focus();
+      }
 
       function setStatus(message, type) {
         elements.status.textContent = message;
@@ -3111,11 +3174,27 @@
         elements.cropEditor.hidden = false;
         elements.cropModal.hidden = false;
         document.body.classList.add("has-crop-modal");
+        setMobileAdjusting(false);
+        elements.cropInstructions.textContent = isMobileCropMode()
+          ? "We found the document automatically. Drag an edge only if it needs adjustment."
+          : "Drag to crop. Hold Space and drag to pan. Arrow keys nudge by one pixel.";
+        elements.mobileScanStatus.textContent = "Finding the document edges…";
         setCropZoom(1);
         snapEdgesEnabled = false;
         elements.snapEdgesButton.setAttribute("aria-pressed", "false");
         renderCropCanvas();
         elements.cropCanvas.focus();
+        if (isMobileCropMode() && !preserveOriginal) {
+          window.requestAnimationFrame(function () {
+            const trimmed = autoTrimBorders(true);
+            snapCropToEdges();
+            elements.mobileScanStatus.textContent = trimmed
+              ? "Document ready — borders removed; deskew and cleanup are automatic."
+              : "Scan ready — deskew and cleanup will be applied automatically.";
+          });
+        } else if (isMobileCropMode()) {
+          elements.mobileScanStatus.textContent = "Scan ready — deskew and cleanup are automatic.";
+        }
       }
 
       function collectDetectedBoxes(blocks) {
@@ -3312,10 +3391,15 @@
         source.height = rotated.height;
         source.getContext("2d").drawImage(rotated, 0, 0);
         prepareCropEditor(cropSourceKind, cropSourceName, true);
+        if (isMobileCropMode()) {
+          autoTrimBorders(true);
+          snapCropToEdges();
+          elements.mobileScanStatus.textContent = "Scan rotated and document edges refreshed.";
+        }
         setStatus("Image rotated " + (degrees > 0 ? "+" : "") + degrees + "°. Adjust the crop when ready.", "success");
       }
 
-      function autoTrimBorders() {
+      function autoTrimBorders(silent) {
         const width = elements.cropCanvas.width;
         const height = elements.cropCanvas.height;
         const scratch = document.createElement("canvas");
@@ -3360,8 +3444,8 @@
           }
         }
         if (right <= left || bottom <= top) {
-          elements.detectTextStatus.textContent = "No removable uniform border found.";
-          return;
+          if (!silent) elements.detectTextStatus.textContent = "No removable uniform border found.";
+          return false;
         }
         const margin = 4;
         cropSelection = {
@@ -3372,7 +3456,8 @@
         if (perspectiveEnabled) perspectiveCorners = cornersFromSelection(cropSelection);
         recordCropHistory();
         renderCropCanvas();
-        elements.detectTextStatus.textContent = borderName + " borders trimmed automatically.";
+        if (!silent) elements.detectTextStatus.textContent = borderName + " borders trimmed automatically.";
+        return true;
       }
 
       function createCurrentCropCanvas() {
@@ -4466,6 +4551,11 @@
       });
       elements.applyCropButton.addEventListener("click", applyCrop);
       elements.runCropOcrButton.addEventListener("click", function () { if (applyCrop()) runOcr(); });
+      elements.mobileUseScanButton.addEventListener("click", function () { if (applyCrop()) runOcr(); });
+      elements.mobileRotateButton.addEventListener("click", function () { rotateCropSource(90); });
+      elements.mobileAdjustButton.addEventListener("click", function () {
+        setMobileAdjusting(!elements.cropEditor.classList.contains("mobile-adjusting"));
+      });
       elements.downloadCropButton.addEventListener("click", downloadCurrentCrop);
       elements.zoomOutButton.addEventListener("click", function () { setCropZoom(cropZoom - 0.25); });
       elements.zoomInButton.addEventListener("click", function () { setCropZoom(cropZoom + 0.25); });
@@ -4533,7 +4623,7 @@
         recordCropHistory();
         renderCropCanvas();
       });
-      elements.autoTrimButton.addEventListener("click", autoTrimBorders);
+      elements.autoTrimButton.addEventListener("click", function () { autoTrimBorders(false); });
       elements.cropAutoDeskew.addEventListener("change", function () { elements.deskewToggle.checked = elements.cropAutoDeskew.checked; });
       Array.from(document.querySelectorAll("[data-nudge]")).forEach(function (button) {
         button.addEventListener("click", function () {
