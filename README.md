@@ -107,7 +107,13 @@ The checked-in bridge initializes the generated module before enabling the form:
 
 Dictionary shards remain lazy-loaded by the existing UI and are passed to `init_engine` as arrays of `word\\tmembership` records. The WASM module authorizes `monkeytactics.com`, the Cloudflare Pages production and preview hosts under `monkeytactics-calculators.pages.dev`, and the local Wrangler host `127.0.0.1`.
 
-The OCR Utility uses Tesseract.js v5 and WebAssembly to recognize English text entirely in the browser. Uploaded PNG and JPG images are preprocessed with canvas grayscale and contrast enhancement, then passed to a dedicated OCR worker. Images and extracted text are never uploaded to MonkeyTactics.
+#### OCR Utility integration
+
+The [OCR Utility](https://monkeytactics.com/tools/ocr-utility) is browser-local but is not one of the repository's first-party Rust crates. Tesseract.js v5 supplies its own WebAssembly OCR core and dedicated English-language worker. PDF.js renders selected PDF pages to canvas, while `heic-to` converts HEIC and HEIF images locally in JavaScript.
+
+The utility accepts PNG, JPG, JPEG, HEIC, HEIF, and PDF files, along with clipboard images, direct image URLs, and camera captures. Its canvas pipeline provides freeform and aspect-locked cropping, zoom and pan, pixel nudging, edge snapping, grid guides, rotation, automatic deskew, four-corner perspective correction, uniform black or white border trimming, and grayscale or adaptive-threshold preprocessing. Automatic text-region detection can retain any number of detected blocks, and multi-region OCR recognizes each selected region independently before combining the results in order.
+
+Uploaded files, converted document pages, camera captures, intermediate canvases, and extracted text remain in the browser and are not sent to a MonkeyTactics application server. PDF.js is self-hosted with the site; Tesseract.js loads its runtime and English language data for local execution in the browser.
 
 
 ---
