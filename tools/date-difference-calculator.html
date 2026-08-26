@@ -7,16 +7,20 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>Date Difference Calculator: Business Days &amp; Dates</title>
+  <title>Date Difference &amp; Business Days Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Date difference calculator: business days, exact calendar spans, holidays, deadlines, and recurring schedules. Print or export results." />
+        content="Calculate date differences, add business days, plan project phases with holidays and dependencies, and create recurring schedules. Free and private." />
 
   <!-- Open Graph -->
-  <meta property="og:title"       content="Date Difference Calculator: Business Days — MonkeyTactics" />
-  <meta property="og:description" content="Count business days between dates with weekends and holidays excluded, calculate exact date spans, plan deadlines, and export recurring schedules." />
+  <meta property="og:title"       content="Date Difference &amp; Business Days Calculator — MonkeyTactics" />
+  <meta property="og:description" content="Count working days, add days to a date, plan project phases and dependencies, and generate holiday-aware recurring schedules." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/date-difference-calculator" />
+  <meta property="og:site_name"   content="MonkeyTactics" />
+  <meta name="twitter:card"        content="summary" />
+  <meta name="twitter:title"       content="Date Difference &amp; Business Days Calculator" />
+  <meta name="twitter:description" content="Add business days, plan project phases, and create holiday-aware recurring dates privately in your browser." />
 
   <!-- Canonical -->
   <link rel="canonical" href="https://monkeytactics.com/tools/date-difference-calculator" />
@@ -42,6 +46,11 @@
     "mainEntity": [
       {
         "@type": "Question",
+        "name": "How do I add calendar days or business days to a start date?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter a start date and select Calculate beside the end date. Choose the number of days and whether to add calendar days or business days. Business-day calculations skip weekends and holidays from the selected calendar." }
+      },
+      {
+        "@type": "Question",
         "name": "How do I calculate the exact number of years, months, and days between two dates?",
         "acceptedAnswer": { "@type": "Answer", "text": "Choose Date Difference, enter the start and end dates, select Exact (years, months, days), and calculate. This calendar-aware result is useful for ages, anniversaries, contracts, and other spans normally described in years, months, and days." }
       },
@@ -53,7 +62,7 @@
       {
         "@type": "Question",
         "name": "Are the start and end dates included?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Exact, total-day, hour, and minute results measure elapsed time between the dates. Business Day and Work Planning modes count both the start and end dates when they are eligible workdays. Recurring Dates includes the start date as occurrence number one." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Exact, total-day, hour, and minute results measure elapsed time between the dates. Business Day and Work Planning modes count both eligible boundary dates. Fixed recurring intervals begin on the start date unless a holiday or weekend adjustment moves or skips it; advanced rules begin with the first matching date on or after the start date." }
       },
       {
         "@type": "Question",
@@ -63,7 +72,17 @@
       {
         "@type": "Question",
         "name": "What does Work Planning mode calculate?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Work Planning counts business days through a target date, adds an optional business-day buffer, estimates the buffered deadline, and displays a timeline that distinguishes workdays, weekends, holidays, and buffer time." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Work Planning calculates project and phase-level business days, calendar days, weekends, holidays, buffered deadlines, risk, and slack. Phases can use dependencies, calendar overrides, colors, templates, a Gantt-style timeline, and local CSV, TXT, or ICS exports." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I create recurring dates such as every third Thursday or the last business day of the month?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Recurring Dates supports fixed day intervals, every third Thursday, the last business day of each month, and the 15th of each quarter. Dates can skip holidays or shift from weekends to the next business day." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I export or share a project phase plan?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Export phases as CSV, an ASCII timeline as TXT, or phase events as an ICS calendar file. Bookmarkable links can include phase dates, colors, buffers, dependencies, holiday settings, and risk thresholds." }
       },
       {
         "@type": "Question",
@@ -159,6 +178,7 @@
 
     .input-group input[type="number"],
     .input-group input[type="date"],
+    .input-group input[type="text"],
     .input-group select,
     .input-group textarea {
       width: 100%;
@@ -185,6 +205,23 @@
     }
 
     .input-hint { font-size: 0.775rem; color: var(--muted); margin-top: 0.3rem; }
+    .schedule-check { display: flex !important; align-items: flex-start; gap: 0.55rem; margin: 0 0 0.55rem !important; color: var(--muted) !important; font-weight: 500 !important; line-height: 1.4; cursor: pointer; }
+    .schedule-check input { width: 1rem; height: 1rem; margin: 0.1rem 0 0; accent-color: var(--accent); flex: 0 0 auto; }
+
+    .date-input-action { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: stretch; }
+    .btn-date-action { padding: 0.65rem 0.9rem; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.4); border-radius: 0.5rem; color: var(--accent); font-family: inherit; font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-date-action:hover { background: rgba(34,197,94,0.17); }
+    .btn-date-action:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .date-add-dialog { width: min(440px, calc(100% - 2rem)); padding: 0; background: var(--card-bg); border: 1px solid var(--border); border-radius: 1rem; color: var(--text); box-shadow: 0 24px 70px rgba(0,0,0,0.55); }
+    .date-add-dialog::backdrop { background: rgba(2,6,23,0.78); backdrop-filter: blur(3px); }
+    .date-add-form { padding: 1.5rem; }
+    .date-add-form h2 { margin: 0 0 0.4rem; font-size: 1.15rem; }
+    .date-add-form > p { margin: 0 0 1.25rem; color: var(--muted); font-size: 0.875rem; line-height: 1.55; }
+    .date-add-actions { display: flex; justify-content: flex-end; gap: 0.65rem; margin-top: 1.25rem; }
+    .date-add-actions button { font-family: inherit; font-weight: 700; cursor: pointer; border-radius: 999px; padding: 0.65rem 1rem; }
+    .btn-dialog-cancel { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-dialog-apply { background: linear-gradient(135deg, #22c55e, #16a34a); border: 0; color: #022c22; }
+    .date-add-error { display: none; margin: 0.65rem 0 0; color: #fca5a5; font-size: 0.8rem; }
 
     /* ── Precision mode radio cards ── */
     .precision-fieldset {
@@ -582,6 +619,47 @@
     .gantt-legend .dot.holiday { background: #f87171; }
     .gantt-legend .dot.buffer  { background: #eab308; }
 
+    /* ── Project phases ── */
+    .phase-planner { margin: 1.4rem 0 0; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+    .phase-planner-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem; }
+    .phase-planner-head h3 { margin: 0; font-size: 1rem; }
+    .phase-planner-head p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.78rem; }
+    .phase-toolbar { display: flex; gap: 0.55rem; flex-wrap: wrap; align-items: end; margin-bottom: 0.8rem; }
+    .phase-toolbar .input-group { min-width: 180px; margin: 0; }
+    .btn-phase { padding: 0.55rem 0.8rem; border: 1px solid rgba(34,197,94,0.35); border-radius: 0.5rem; background: rgba(34,197,94,0.08); color: var(--accent); font: 700 0.78rem inherit; cursor: pointer; }
+    .phase-list { display: grid; gap: 0.75rem; }
+    .phase-card { padding: 0.9rem; border: 1px solid var(--border); border-left: 4px solid var(--phase-color, var(--accent)); border-radius: 0.7rem; background: rgba(255,255,255,0.025); }
+    .phase-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.7rem; }
+    .phase-card-head strong { font-size: 0.82rem; color: var(--muted); }
+    .phase-remove { border: 0; background: transparent; color: #fca5a5; font: 700 0.75rem inherit; cursor: pointer; }
+    .phase-grid { display: grid; grid-template-columns: 1.3fr repeat(3, 1fr); gap: 0.65rem; }
+    .phase-grid .input-group { margin: 0; }
+    .phase-grid label { font-size: 0.72rem; }
+    .phase-dependency { grid-column: 1 / -1; display: grid; grid-template-columns: 1.2fr 1.4fr 0.8fr; gap: 0.65rem; }
+    .phase-color-input { min-height: 42px; padding: 0.3rem !important; }
+    .phase-results { display: grid; gap: 0.7rem; margin-top: 1.2rem; }
+    .phase-result { padding: 0.85rem; border: 1px solid var(--border); border-radius: 0.65rem; background: rgba(255,255,255,0.025); }
+    .phase-result-top { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+    .phase-result-name { font-weight: 700; }
+    .phase-metrics { margin-top: 0.45rem; color: var(--muted); font-size: 0.75rem; line-height: 1.55; }
+    .phase-health { padding: 0.25rem 0.55rem; border-radius: 999px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; }
+    .phase-health.low { color: #86efac; background: rgba(34,197,94,0.12); }
+    .phase-health.risk, .phase-health.compressed { color: #fde68a; background: rgba(234,179,8,0.12); }
+    .phase-health.behind { color: #fca5a5; background: rgba(248,113,113,0.12); }
+    .slack-track { height: 7px; margin-top: 0.55rem; overflow: hidden; border-radius: 99px; background: rgba(148,163,184,0.18); }
+    .slack-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #eab308); }
+    .phase-timeline { position: relative; display: grid; gap: 0.45rem; margin-top: 1.2rem; padding: 0.75rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
+    .phase-timeline-row { display: grid; grid-template-columns: 115px minmax(0,1fr); gap: 0.65rem; align-items: center; min-height: 30px; }
+    .phase-timeline-label { overflow: hidden; color: var(--muted); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+    .phase-timeline-track { position: relative; height: 24px; border-radius: 4px; background: rgba(148,163,184,0.08); }
+    .phase-block { position: absolute; top: 3px; height: 18px; min-width: 3px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2); }
+    .phase-buffer-block { position: absolute; top: 7px; height: 10px; min-width: 2px; border: 1px dashed #eab308; border-left: 0; border-radius: 0 4px 4px 0; background: rgba(234,179,8,0.22); }
+    .phase-holiday-marker { position: absolute; top: 5px; width: 9px; height: 9px; border-radius: 50%; background: #fff; color: #ef4444; font-size: 8px; line-height: 9px; text-align: center; transform: translateX(-50%); z-index: 2; }
+    .timeline-line { position: absolute; top: 0; bottom: 0; width: 2px; z-index: 4; pointer-events: none; }
+    .timeline-line.today { background: #60a5fa; }
+    .timeline-line.deadline { background: #eab308; }
+    .phase-exports { display: none; gap: 0.55rem; flex-wrap: wrap; margin-top: 1rem; }
+
     /* ── Recurring table ── */
     .recur-wrap { margin-top: 1.5rem; overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
     .recur-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 380px; }
@@ -748,6 +826,9 @@
       .holiday-options { grid-template-columns: 1fr; }
       .result-card.primary { grid-column: span 1; }
       .result-card.primary .result-value { font-size: 1.75rem; }
+      .phase-grid { grid-template-columns: 1fr 1fr; }
+      .phase-dependency { grid-template-columns: 1fr; }
+      .phase-timeline-row { grid-template-columns: 82px minmax(0,1fr); }
     }
     @media (min-width: 601px) and (max-width: 900px) {
       .holiday-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -756,7 +837,7 @@
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-6" />
   <script src="/assets/js/shared/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-07-22" />
+  <meta name="date" content="2026-08-26" />
 
   <script type="application/ld+json">
 {
@@ -765,10 +846,21 @@
     {
       "@type": "WebApplication",
       "@id": "https://monkeytactics.com/tools/date-difference-calculator#app",
-      "name": "Date Difference Calculator: Business Days",
+      "name": "Date Difference & Business Days Calculator",
       "url": "https://monkeytactics.com/tools/date-difference-calculator",
-      "description": "Calculate exact date differences, calendar days, business days with holiday exclusions, buffered deadlines, and recurring date schedules with print and export options.",
+      "description": "Calculate exact date differences, add calendar or business days, plan holiday-aware project phases and dependencies, and generate advanced recurring schedules.",
       "applicationCategory": "UtilitiesApplication",
+      "featureList": [
+        "Exact date difference in years, months, and days",
+        "Calendar-day and business-day addition",
+        "Weekend and holiday exclusions",
+        "Project phases with dependencies, buffers, risk, and slack",
+        "Gantt-style project timeline",
+        "Advanced recurring date rules",
+        "CSV, TXT, and ICS exports",
+        "Bookmarkable configurations",
+        "Private in-browser calculations"
+      ],
       "operatingSystem": "Any",
       "isAccessibleForFree": true,
       "offers": {
@@ -785,7 +877,7 @@
       "reviewedBy": {
         "@id": "https://monkeytactics.com/#organization"
       },
-      "dateModified": "2026-08-11"
+      "dateModified": "2026-08-26"
     }
   ]
 }
@@ -813,8 +905,8 @@
         <div>
           <p class="premium-eyebrow">Calendar-aware planning</p>
           <h1 id="tool-heading">Date Difference &amp; Business Days Calculator</h1>
-          <p class="premium-hero-copy">Measure exact calendar spans, count working days, forecast buffered deadlines, and build recurring schedules. Every calculation stays private in your browser.</p>
-          <div class="premium-hero-pills" aria-label="Date calculator features"><span>Holiday-aware counts</span><span>Three planning modes</span></div>
+          <p class="premium-hero-copy">Calculate date differences, add calendar or business days, plan project phases, and build holiday-aware recurring schedules. Everything runs privately in your browser.</p>
+          <div class="premium-hero-pills" aria-label="Date calculator features"><span>Holiday-aware calculations</span><span>Project phase planner</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>From dates to decisions</span><strong>Time <i>meets</i> clarity</strong><small>Count precisely. Plan with confidence.</small></div>
       </div>
@@ -842,7 +934,10 @@
             </div>
             <div class="input-group">
               <label for="diffEnd">End Date</label>
-              <input type="date" id="diffEnd" aria-label="End date" />
+              <div class="date-input-action">
+                <input type="date" id="diffEnd" aria-label="End date" />
+                <button class="btn-date-action" type="button" data-date-target="diff" aria-haspopup="dialog">Calculate</button>
+              </div>
             </div>
           </div>
 
@@ -999,7 +1094,10 @@
             </div>
             <div class="input-group">
               <label for="workEnd">Target End Date</label>
-              <input type="date" id="workEnd" aria-label="Target end date" />
+              <div class="date-input-action">
+                <input type="date" id="workEnd" aria-label="Target end date" />
+                <button class="btn-date-action" type="button" data-date-target="work" aria-haspopup="dialog">Calculate</button>
+              </div>
             </div>
           </div>
 
@@ -1068,6 +1166,31 @@
             <p class="custom-holiday-validation" id="workCustomHolidayValidation" role="status" aria-live="polite">0 / 40 holidays</p>
           </div>
 
+          <section class="phase-planner" aria-labelledby="phasesHeading">
+            <div class="phase-planner-head">
+              <div><h3 id="phasesHeading">Project Phases</h3><p>Add optional phases, dependencies, buffers, and calendar overrides.</p></div>
+              <button class="btn-phase" id="addPhaseBtn" type="button">+ Add Phase</button>
+            </div>
+            <div class="phase-toolbar">
+              <div class="input-group">
+                <label for="phaseTemplate">Phase Template</label>
+                <select id="phaseTemplate">
+                  <option value="">Choose a template…</option>
+                  <option value="software">Software project</option>
+                  <option value="marketing">Marketing campaign</option>
+                  <option value="construction">Construction</option>
+                  <option value="academic">Academic</option>
+                </select>
+              </div>
+              <button class="btn-phase" id="applyPhaseTemplateBtn" type="button">Apply Template</button>
+              <div class="input-group">
+                <label for="phaseRiskThreshold">At-risk threshold</label>
+                <input type="number" id="phaseRiskThreshold" min="1" max="60" value="5" aria-label="At-risk business-day threshold" />
+              </div>
+            </div>
+            <div class="phase-list" id="phaseList" aria-live="polite"></div>
+          </section>
+
           <div class="calc-error" id="workError" role="alert">
             ⚠️ Please enter a valid start date and a target end date on or after the start date.
           </div>
@@ -1079,7 +1202,7 @@
             <div class="results-grid" id="workResultsGrid"></div>
 
             <div class="gantt-wrap">
-              <h4>Mini Timeline</h4>
+              <h4>Project Timeline</h4>
               <div class="gantt-bar" id="ganttBar"></div>
               <div class="gantt-labels">
                 <span id="ganttStartLabel">—</span>
@@ -1090,7 +1213,15 @@
                 <span><span class="dot weekend"></span>Weekend</span>
                 <span><span class="dot holiday"></span>Holiday</span>
                 <span><span class="dot buffer"></span>Buffer</span>
+                <span>● Holiday</span><span style="color:#60a5fa;">│ Today</span><span style="color:#eab308;">│ Buffered deadline</span>
               </div>
+            </div>
+            <div class="phase-results" id="phaseResults"></div>
+            <div class="phase-timeline" id="phaseTimeline" aria-label="Project phase timeline"></div>
+            <div class="phase-exports" id="phaseExports">
+              <a class="btn-recur-action" id="phaseCsvLink" download>Download phases CSV</a>
+              <a class="btn-recur-action" id="phaseTxtLink" download>Download timeline TXT</a>
+              <a class="btn-recur-action" id="phaseIcsLink" download>Download calendar ICS</a>
             </div>
           </div>
 
@@ -1104,25 +1235,51 @@
         <!-- ══════════════════════ MODE 3: RECURRING DATES ══════════════════════ -->
         <div class="mode-panel" id="panel-recur">
 
+          <div class="input-group">
+            <label for="recurRule">Recurrence Rule</label>
+            <select id="recurRule">
+              <option value="interval">Fixed interval (days)</option>
+              <option value="third-thursday">Every 3rd Thursday</option>
+              <option value="last-business-day">Last business day of each month</option>
+              <option value="quarterly-15th">Every quarter on the 15th</option>
+            </select>
+          </div>
+
           <div class="input-row">
             <div class="input-group">
               <label for="recurStart">Start Date</label>
               <input type="date" id="recurStart" aria-label="Recurring start date" />
             </div>
-            <div class="input-group">
+            <div class="input-group" id="recurIntervalGroup">
               <label for="recurInterval">Interval (days)</label>
               <input type="number" id="recurInterval" min="1" max="3650" step="1" value="17" aria-label="Interval in days" />
+            </div>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label for="recurHolidayRegion">Holiday Calendar</label>
+              <select id="recurHolidayRegion">
+                <option value="none">None</option>
+                <option value="us">United States</option>
+                <option value="eu">European Union</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Schedule Adjustments</label>
+              <label class="schedule-check"><input type="checkbox" id="recurSkipHolidays" /> Skip holidays automatically</label>
+              <label class="schedule-check"><input type="checkbox" id="recurShiftWeekend" /> Shift weekend dates to the next business day</label>
             </div>
           </div>
 
           <div class="input-group">
             <label for="recurCount">Number of Occurrences</label>
             <input type="number" id="recurCount" min="1" max="200" step="1" value="20" aria-label="Number of occurrences" />
-            <p class="input-hint">How many upcoming dates to list, starting from the start date itself.</p>
+            <p class="input-hint">How many upcoming dates to list, beginning with the first eligible date on or after the start date.</p>
           </div>
 
           <div class="calc-error" id="recurError" role="alert">
-            ⚠️ Please enter a valid start date, an interval of at least 1 day, and at least 1 occurrence.
+            ⚠️ Please enter a valid start date, valid recurrence settings, and at least 1 occurrence.
           </div>
 
           <button class="btn-calculate" id="recurBtn" type="button">List Occurrences</button>
@@ -1169,7 +1326,8 @@
       <h2>Date difference calculator: business days and calendar dates</h2>
       <p>This free date difference calculator handles more than a basic day count. Use it to find
          an exact calendar difference, count elapsed calendar days, calculate business days with
-         holiday exclusions, plan a buffered deadline, or generate a recurring date schedule.</p>
+         holiday exclusions, add days to a date, plan project phases and dependencies, or generate
+         an advanced recurring date schedule.</p>
       <ol>
         <li>Choose <strong>Date Difference</strong>, <strong>Work Planning</strong>, or
             <strong>Recurring Dates</strong>.</li>
@@ -1177,6 +1335,18 @@
         <li>Calculate the result, then copy its bookmarkable link or use the available print and
             download tools.</li>
       </ol>
+    </div>
+
+    <!-- ADD DAYS TO A DATE -->
+    <div class="seo-section">
+      <h2>Add calendar days or business days to a date</h2>
+      <p>To calculate a future end date, enter a start date and select <strong>Calculate</strong>
+         beside the End Date or Target End Date field. Enter up to 10,000 days and choose calendar
+         days or business days. Calendar days include every day; business days skip weekends and
+         holidays from the selected US, EU, or custom calendar.</p>
+      <p>This date-addition feature is useful for payment terms, delivery estimates, filing windows,
+         contract deadlines, project milestones, and any schedule expressed as a number of working
+         days from a known start date.</p>
     </div>
 
     <!-- PRECISION MODES -->
@@ -1226,34 +1396,49 @@
 
     <!-- WORK PLANNING -->
     <div class="seo-section">
-      <h2>Plan project deadlines with business-day buffers</h2>
+      <h2>Plan project phases, dependencies, and business-day deadlines</h2>
       <p>Work Planning mode combines a working-day count with deadline forecasting. Enter a
          project start date and target end date, choose the appropriate holiday calendar, and add
          optional buffer days for reviews, approvals, shipping delays, or other schedule risk.</p>
       <p>Buffer days are added as business days, so weekends and selected holidays do not consume
          the buffer. Results show the business-day total, total calendar days, and buffered
-         deadline. A mini timeline separates workdays, weekends, holidays, and buffer time, while
-         making the full schedule easier to scan.</p>
+         deadline. The project timeline separates workdays, weekends, holidays, and buffer time.</p>
+      <h3>Project phase calculator</h3>
+      <p>Add phases with individual names, start and end dates, business-day buffers, holiday
+         calendar overrides, and colors. Each phase automatically reports business days, calendar
+         days, weekends, holidays, its buffer-adjusted end date, deadline risk, and available slack.</p>
+      <h3>Phase dependencies and Gantt-style timeline</h3>
+      <p>Dependencies can start one phase after another phase ends, a chosen number of business
+         days later, or on the next business day. The lightweight Gantt-style timeline displays
+         colored phase bars, holiday markers, today, phase buffers, and the overall buffered
+         deadline. Built-in software, marketing, construction, and academic templates provide a
+         quick starting point without requiring an account or project-management backend.</p>
+      <h3>Export and share a phase plan</h3>
+      <p>Download phase metrics as CSV, export an ASCII timeline as TXT, or create an ICS calendar
+         containing one all-day event per phase. Bookmarkable links preserve phase dates, colors,
+         buffers, dependencies, holiday settings, and the risk threshold.</p>
     </div>
 
     <!-- RECURRING DATES -->
     <div class="seo-section">
       <h2>Generate, print, and export recurring dates</h2>
-      <p>Recurring Dates mode builds a schedule by repeatedly adding a fixed interval to a start
-         date. The start date is occurrence number one. Choose an interval in days and generate
-         up to 200 occurrences for billing cycles, maintenance plans, medication reminders,
-         inspections, appointments, or follow-up schedules.</p>
+      <p>Recurring Dates mode can add a fixed interval or follow calendar rules such as every third
+         Thursday, the last business day of each month, or the 15th of each quarter. Generate up to
+         200 occurrences and optionally skip selected holidays or move weekend dates to the next
+         business day.</p>
       <p>The Upcoming Occurrences table includes the sequence number, formatted date, weekday,
          and number of days from the start. Print a clean copy or download the schedule as CSV
-         for spreadsheet use or as an aligned TXT file for notes and plain-text records.</p>
+         for spreadsheet use or as an aligned TXT file for notes and plain-text records. The
+         selected advanced recurrence rule and holiday adjustments are also preserved in a
+         bookmarkable link.</p>
     </div>
 
     <!-- PRIVACY AND SHARING -->
     <div class="seo-section">
       <h2>Private calculations and bookmarkable results</h2>
-      <p>Calculations, custom holiday validation, and file imports run in your browser; no account
-         or sign-up is required. <strong>Copy bookmarkable link</strong> creates a URL containing
-         the current configuration so you can save or share a calculation.
+      <p>Calculations, phase planning, exports, custom holiday validation, and file imports run in
+         your browser; no account or sign-up is required. <strong>Copy bookmarkable link</strong>
+         creates a URL containing the current configuration so you can save or share a calculation.
          Because that URL contains the selected settings, review it before sharing dates or a
          custom holiday list.</p>
     </div>
@@ -1264,6 +1449,13 @@
         <summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Date Difference Calculator FAQs</h2></summary>
         <div class="faq-content">
           <ul class="faq-list">
+
+        <li class="faq-item">
+          <h3>How do I add calendar days or business days to a start date?</h3>
+          <p>Enter a start date and select Calculate beside the end date. Choose the number of days
+             and whether to add calendar days or business days. Business-day calculations skip
+             weekends and holidays from the selected calendar.</p>
+        </li>
 
         <li class="faq-item">
           <h3>How do I calculate the exact number of years, months, and days between two dates?</h3>
@@ -1284,7 +1476,9 @@
           <h3>Are the start and end dates included?</h3>
           <p>Exact, total-day, hour, and minute results measure elapsed time between the dates.
              Business Day and Work Planning modes count both the start and end dates when they
-             are eligible workdays. Recurring Dates includes the start date as occurrence number one.</p>
+             are eligible workdays. Fixed recurring intervals begin on the start date unless an
+             enabled holiday or weekend adjustment changes it. Advanced rules begin with the first
+             matching date on or after the start date.</p>
         </li>
 
         <li class="faq-item">
@@ -1296,9 +1490,24 @@
 
         <li class="faq-item">
           <h3>What does Work Planning mode calculate?</h3>
-          <p>Work Planning counts business days through a target date, adds an optional
-             business-day buffer, estimates the buffered deadline, and displays a timeline that
-             distinguishes workdays, weekends, holidays, and buffer time.</p>
+          <p>Work Planning calculates project and phase-level business days, calendar days,
+             weekends, holidays, buffered deadlines, risk, and slack. Phases can use dependencies,
+             calendar overrides, colors, templates, a Gantt-style timeline, and local CSV, TXT,
+             or ICS exports.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Can I create recurring dates such as every third Thursday or the last business day of the month?</h3>
+          <p>Yes. Recurring Dates supports fixed day intervals, every third Thursday, the last
+             business day of each month, and the 15th of each quarter. Dates can skip holidays or
+             shift from weekends to the next business day.</p>
+        </li>
+
+        <li class="faq-item">
+          <h3>Can I export or share a project phase plan?</h3>
+          <p>Yes. Export phases as CSV, an ASCII timeline as TXT, or phase events as an ICS calendar
+             file. Bookmarkable links can include phase dates, colors, buffers, dependencies,
+             holiday settings, and risk thresholds.</p>
         </li>
 
         <li class="faq-item">
@@ -1367,6 +1576,30 @@
       <a href="/sitemap">Sitemap</a>
     </nav>
   </footer>
+
+  <dialog class="date-add-dialog" id="dateAddDialog" aria-labelledby="dateAddTitle" aria-describedby="dateAddDescription">
+    <form class="date-add-form" id="dateAddForm" method="dialog">
+      <h2 id="dateAddTitle">Calculate end date</h2>
+      <p id="dateAddDescription">Choose how many days to add to the start date.</p>
+      <div class="input-group">
+        <label for="dateAddDays">Number of days</label>
+        <input type="number" id="dateAddDays" min="0" max="10000" step="1" value="30" inputmode="numeric" required />
+      </div>
+      <div class="input-group">
+        <label for="dateAddType">Day type</label>
+        <select id="dateAddType">
+          <option value="calendar">Calendar days</option>
+          <option value="business">Business days</option>
+        </select>
+        <p class="input-hint">Business days skip weekends and holidays in the selected calendar.</p>
+      </div>
+      <p class="date-add-error" id="dateAddError" role="alert"></p>
+      <div class="date-add-actions">
+        <button class="btn-dialog-cancel" id="dateAddCancel" type="button">Cancel</button>
+        <button class="btn-dialog-apply" type="submit">Set end date</button>
+      </div>
+    </form>
+  </dialog>
 
   <!-- CALCULATOR SCRIPT -->
   <script>
@@ -1832,6 +2065,23 @@
   const ganttBar           = document.getElementById('ganttBar');
   const ganttStartLabel    = document.getElementById('ganttStartLabel');
   const ganttEndLabel      = document.getElementById('ganttEndLabel');
+  const phaseList          = document.getElementById('phaseList');
+  const phaseResults       = document.getElementById('phaseResults');
+  const phaseTimeline      = document.getElementById('phaseTimeline');
+  const phaseExports       = document.getElementById('phaseExports');
+  const phaseRiskThreshold = document.getElementById('phaseRiskThreshold');
+  let workPhases = [];
+  let calculatedPhases = [];
+  let phaseIdCounter = 0;
+  let phaseDownloadUrls = [];
+
+  const PHASE_COLORS = ['#22c55e', '#38bdf8', '#a78bfa', '#f59e0b', '#f472b6', '#14b8a6'];
+  const PHASE_TEMPLATES = {
+    software: [['Design', 10], ['Build', 20], ['QA', 10], ['Launch', 2]],
+    marketing: [['Research', 7], ['Creative', 10], ['Production', 12], ['Launch', 3]],
+    construction: [['Planning', 10], ['Permits', 15], ['Build', 30], ['Inspection', 5]],
+    academic: [['Research', 15], ['Draft', 12], ['Review', 7], ['Submission', 2]]
+  };
 
   wireCustomHolidayValidation(workCustomHolidays, 'workCustomHolidayValidation');
   wireHolidayFileUpload('workHolidayFile', workCustomHolidays, 'workHolidayFileStatus');
@@ -1841,8 +2091,259 @@
   }
 
   workHolidayRegion.addEventListener('change', function () {
-    workCustomGroup.style.display = getWorkHolidayRegion() === 'custom' ? 'block' : 'none';
+    workCustomGroup.style.display = (getWorkHolidayRegion() === 'custom' || workPhases.some(phase => phase.region === 'custom')) ? 'block' : 'none';
   });
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>'"]/g, function (char) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char];
+    });
+  }
+
+  function newPhase(values) {
+    const start = values && values.start ? values.start : workStart.value;
+    return Object.assign({
+      id: 'phase-' + (++phaseIdCounter), name: 'Phase ' + (workPhases.length + 1), start: start,
+      end: dateStr(addDays(parseDateInput(start) || today, 6)), buffer: 0, region: 'inherit',
+      color: PHASE_COLORS[workPhases.length % PHASE_COLORS.length], dependencyId: '', dependencyRule: 'none', gap: 1
+    }, values || {});
+  }
+
+  function renderPhaseEditor() {
+    phaseList.innerHTML = workPhases.map(function (phase, index) {
+      const dependencies = workPhases.slice(0, index).map(function (candidate) {
+        return '<option value="' + candidate.id + '"' + (phase.dependencyId === candidate.id ? ' selected' : '') + '>' + escapeHTML(candidate.name) + '</option>';
+      }).join('');
+      return '<article class="phase-card" data-phase-id="' + phase.id + '" style="--phase-color:' + phase.color + '">' +
+        '<div class="phase-card-head"><strong>Phase ' + (index + 1) + '</strong><button class="phase-remove" type="button" data-remove-phase="' + phase.id + '">Remove</button></div>' +
+        '<div class="phase-grid">' +
+          '<div class="input-group"><label>Phase name</label><input type="text" data-phase-field="name" value="' + escapeHTML(phase.name) + '" maxlength="60"></div>' +
+          '<div class="input-group"><label>Start date</label><input type="date" data-phase-field="start" value="' + phase.start + '"></div>' +
+          '<div class="input-group"><label>End date</label><input type="date" data-phase-field="end" value="' + phase.end + '"></div>' +
+          '<div class="input-group"><label>Business-day buffer</label><input type="number" min="0" max="90" data-phase-field="buffer" value="' + phase.buffer + '"></div>' +
+          '<div class="input-group"><label>Holiday override</label><select data-phase-field="region"><option value="inherit">Use project calendar</option><option value="none">None</option><option value="us">United States</option><option value="eu">European Union</option><option value="custom">Custom list</option></select></div>' +
+          '<div class="input-group"><label>Color</label><input class="phase-color-input" type="color" data-phase-field="color" value="' + phase.color + '"></div>' +
+          '<div class="phase-dependency"><div class="input-group"><label>Depends on</label><select data-phase-field="dependencyId"><option value="">No dependency</option>' + dependencies + '</select></div>' +
+          '<div class="input-group"><label>Dependency rule</label><select data-phase-field="dependencyRule"><option value="none">Use entered start date</option><option value="after-end">Start after phase ends</option><option value="business-gap">Start X business days after</option><option value="next-business">Start next business day after</option></select></div>' +
+          '<div class="input-group"><label>Business-day gap</label><input type="number" min="1" max="90" data-phase-field="gap" value="' + phase.gap + '"></div></div>' +
+        '</div></article>';
+    }).join('');
+
+    workPhases.forEach(function (phase) {
+      const card = phaseList.querySelector('[data-phase-id="' + phase.id + '"]');
+      card.querySelector('[data-phase-field="region"]').value = phase.region;
+      card.querySelector('[data-phase-field="dependencyRule"]').value = phase.dependencyRule;
+    });
+  }
+
+  phaseList.addEventListener('input', function (event) {
+    const field = event.target.dataset.phaseField;
+    if (!field) return;
+    const card = event.target.closest('[data-phase-id]');
+    const phase = workPhases.find(item => item.id === card.dataset.phaseId);
+    phase[field] = ['buffer', 'gap'].includes(field) ? Number(event.target.value) : event.target.value;
+    if (field === 'color') card.style.setProperty('--phase-color', phase.color);
+    if (field === 'region') workCustomGroup.style.display = (getWorkHolidayRegion() === 'custom' || workPhases.some(item => item.region === 'custom')) ? 'block' : 'none';
+  });
+  phaseList.addEventListener('change', function (event) {
+    if (event.target.dataset.phaseField) phaseList.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  phaseList.addEventListener('click', function (event) {
+    const id = event.target.dataset.removePhase;
+    if (!id) return;
+    workPhases = workPhases.filter(phase => phase.id !== id);
+    workPhases.forEach(phase => { if (phase.dependencyId === id) { phase.dependencyId = ''; phase.dependencyRule = 'none'; } });
+    renderPhaseEditor();
+  });
+  document.getElementById('addPhaseBtn').addEventListener('click', function () {
+    workPhases.push(newPhase()); renderPhaseEditor();
+  });
+  document.getElementById('applyPhaseTemplateBtn').addEventListener('click', function () {
+    const template = PHASE_TEMPLATES[document.getElementById('phaseTemplate').value];
+    if (!template) return;
+    workPhases = [];
+    let start = parseDateInput(workStart.value) || today;
+    template.forEach(function (item, index) {
+      const phase = newPhase({ name: item[0], start: dateStr(start), end: dateStr(addDays(start, item[1] - 1)), buffer: index === template.length - 1 ? 2 : 1, color: PHASE_COLORS[index] });
+      if (index) { phase.dependencyId = workPhases[index - 1].id; phase.dependencyRule = 'next-business'; }
+      workPhases.push(phase);
+      start = addDays(parseDateInput(phase.end), 1);
+    });
+    renderPhaseEditor();
+  });
+
+  /* ══════════════════════════════════════════════════
+     CALCULATE END DATE FROM START DATE
+  ══════════════════════════════════════════════════ */
+  const dateAddDialog = document.getElementById('dateAddDialog');
+  const dateAddForm = document.getElementById('dateAddForm');
+  const dateAddDays = document.getElementById('dateAddDays');
+  const dateAddType = document.getElementById('dateAddType');
+  const dateAddError = document.getElementById('dateAddError');
+  let dateAddMode = 'diff';
+
+  function showDateAddError(message) {
+    dateAddError.textContent = message;
+    dateAddError.style.display = 'block';
+  }
+
+  document.querySelectorAll('[data-date-target]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      dateAddMode = this.dataset.dateTarget;
+      dateAddError.style.display = 'none';
+      document.getElementById('dateAddTitle').textContent = dateAddMode === 'work' ? 'Calculate target end date' : 'Calculate end date';
+      dateAddDialog.showModal();
+      dateAddDays.select();
+    });
+  });
+
+  document.getElementById('dateAddCancel').addEventListener('click', function () { dateAddDialog.close(); });
+  dateAddDialog.addEventListener('click', function (event) {
+    if (event.target === dateAddDialog) dateAddDialog.close();
+  });
+
+  dateAddForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    dateAddError.style.display = 'none';
+    const startInput = dateAddMode === 'work' ? workStart : diffStart;
+    const endInput = dateAddMode === 'work' ? workEnd : diffEnd;
+    const start = parseDateInput(startInput.value);
+    const days = Number(dateAddDays.value);
+    if (!start) {
+      showDateAddError('Enter a valid start date before calculating the end date.');
+      return;
+    }
+    if (!Number.isInteger(days) || days < 0 || days > 10000) {
+      showDateAddError('Enter a whole number from 0 to 10,000.');
+      dateAddDays.focus();
+      return;
+    }
+
+    let end;
+    if (dateAddType.value === 'calendar') {
+      end = addDays(start, days);
+    } else {
+      const region = dateAddMode === 'work' ? getWorkHolidayRegion() : getDiffHolidayRegion();
+      const customTextarea = dateAddMode === 'work' ? workCustomHolidays : diffCustomHolidays;
+      if (region === 'custom') {
+        const status = document.getElementById(dateAddMode === 'work' ? 'workCustomHolidayValidation' : 'diffCustomHolidayValidation');
+        if (!updateCustomHolidayValidation(customTextarea, status).isValid) {
+          showDateAddError('Fix the custom holiday list before adding business days.');
+          return;
+        }
+      }
+      const searchEnd = addDays(start, Math.max(370, Math.ceil(days * 2.2) + 30));
+      const holidays = buildHolidaySet(region, start, searchEnd, customTextarea.value);
+      end = addBusinessDays(start, days, holidays);
+    }
+
+    endInput.value = dateStr(end);
+    endInput.dispatchEvent(new Event('change', { bubbles: true }));
+    dateAddDialog.close();
+    endInput.focus();
+  });
+
+  function calculatePhaseData() {
+    const threshold = Math.max(1, Number(phaseRiskThreshold.value) || 5);
+    const resolved = [];
+    for (const phase of workPhases) {
+      let start = parseDateInput(phase.start);
+      let end = parseDateInput(phase.end);
+      if (!start || !end || end < start || !phase.name.trim()) throw new Error('Every phase needs a name and valid start/end dates.');
+      const originalSpan = Math.round((end - start) / DAY_MS);
+      const dependency = resolved.find(item => item.id === phase.dependencyId);
+      const region = phase.region === 'inherit' ? getWorkHolidayRegion() : phase.region;
+      const custom = region === 'custom' ? workCustomHolidays.value : '';
+      let holidaySet = buildHolidaySet(region, addDays(start, -30), addDays(end, 200), custom);
+      if (dependency && phase.dependencyRule !== 'none') {
+        if (phase.dependencyRule === 'after-end') start = addDays(dependency.end, 1);
+        if (phase.dependencyRule === 'next-business') start = addBusinessDays(dependency.end, 1, holidaySet);
+        if (phase.dependencyRule === 'business-gap') start = addBusinessDays(dependency.end, Math.max(1, Number(phase.gap) || 1), holidaySet);
+        end = addDays(start, originalSpan);
+        phase.start = dateStr(start); phase.end = dateStr(end);
+        holidaySet = buildHolidaySet(region, addDays(start, -30), addDays(end, 200), custom);
+      }
+      const buffer = Math.max(0, Number(phase.buffer) || 0);
+      const bufferedEnd = buffer ? addBusinessDays(end, buffer, holidaySet) : new Date(end);
+      const calendarDays = Math.round((end - start) / DAY_MS) + 1;
+      const businessDays = countBusinessDays(start, end, holidaySet);
+      let weekendCount = 0;
+      const holidays = [];
+      for (let d = new Date(start); d <= end; d = addDays(d, 1)) {
+        if (isWeekend(d)) weekendCount++;
+        if (holidaySet.has(dateStr(d)) && !isWeekend(d)) holidays.push(new Date(d));
+      }
+      const remainingStart = today > start ? today : start;
+      const remaining = today > end ? 0 : countBusinessDays(remainingStart, end, holidaySet);
+      const businessDaysToEnd = today > end ? 0 : countBusinessDays(today, end, holidaySet);
+      const slack = remaining + buffer;
+      const slackPercent = Math.min(100, Math.round(slack / Math.max(1, businessDays + buffer) * 100));
+      let health = 'low', healthLabel = 'On track';
+      if (today > end) { health = 'behind'; healthLabel = 'Behind schedule'; }
+      else if (businessDaysToEnd <= threshold) { health = 'risk'; healthLabel = 'At risk'; }
+      else if (today >= start && buffer > 0 && weekendCount + holidays.length >= buffer) { health = 'compressed'; healthLabel = 'Compressed'; }
+      resolved.push(Object.assign({}, phase, { start, end, bufferedEnd, region, holidaySet, buffer, calendarDays, businessDays, weekendCount, holidays, remaining, slack, slackPercent, health, healthLabel }));
+    }
+    return resolved;
+  }
+
+  function renderPhaseOutputs(projectStart, projectBufferedEnd) {
+    phaseResults.innerHTML = calculatedPhases.map(function (phase) {
+      const holidayText = phase.holidays.length ? phase.holidays.map(fmtDateShort).join(', ') : 'None';
+      return '<article class="phase-result" style="border-left:4px solid ' + phase.color + '"><div class="phase-result-top"><span class="phase-result-name">' + escapeHTML(phase.name) + '</span><span class="phase-health ' + phase.health + '">' + phase.healthLabel + '</span></div>' +
+        '<div class="phase-metrics">' + phase.businessDays + ' business days · ' + phase.calendarDays + ' calendar days · ' + phase.weekendCount + ' weekend days · ' + phase.holidays.length + ' holidays · buffered end ' + fmtDateShort(phase.bufferedEnd) + '<br>Holiday preview: ' + escapeHTML(holidayText) + '<br>Slack: ' + phase.slack + ' days (' + phase.slackPercent + '% available, ' + (100 - phase.slackPercent) + '% consumed)</div>' +
+        '<div class="slack-track" title="' + phase.slackPercent + '% slack available"><div class="slack-fill" style="width:' + phase.slackPercent + '%"></div></div></article>';
+    }).join('');
+
+    if (!calculatedPhases.length) { phaseTimeline.innerHTML = ''; phaseTimeline.style.display = 'none'; return; }
+    phaseTimeline.style.display = 'grid';
+    const minDate = calculatedPhases.reduce((min, p) => p.start < min ? p.start : min, projectStart);
+    const maxDate = calculatedPhases.reduce((max, p) => p.bufferedEnd > max ? p.bufferedEnd : max, projectBufferedEnd);
+    const total = Math.max(1, Math.round((maxDate - minDate) / DAY_MS) + 1);
+    const pct = date => Math.max(0, Math.min(100, Math.round((date - minDate) / DAY_MS) / total * 100));
+    let html = '';
+    calculatedPhases.forEach(function (phase) {
+      const left = pct(phase.start);
+      const width = Math.max(0.6, pct(addDays(phase.end, 1)) - left);
+      const bufferLeft = pct(addDays(phase.end, 1));
+      const bufferWidth = Math.max(0, pct(addDays(phase.bufferedEnd, 1)) - bufferLeft);
+      const markers = phase.holidays.map(function (holiday) {
+        return '<span class="phase-holiday-marker" style="left:' + pct(holiday) + '%" title="' + fmtDateLong(holiday) + ' reduces available work time">★</span>';
+      }).join('');
+      html += '<div class="phase-timeline-row"><span class="phase-timeline-label" title="' + escapeHTML(phase.name) + '">' + escapeHTML(phase.name) + '</span><div class="phase-timeline-track"><span class="phase-block" style="left:' + left + '%;width:' + width + '%;background:' + phase.color + '" title="' + escapeHTML(phase.name) + ': ' + phase.businessDays + ' business days"></span>' +
+        (bufferWidth ? '<span class="phase-buffer-block" style="left:' + bufferLeft + '%;width:' + bufferWidth + '%" title="' + phase.buffer + ' business-day buffer"></span>' : '') + markers + '</div></div>';
+    });
+    if (today >= minDate && today <= maxDate) html += '<span class="timeline-line today" style="left:calc(115px + (100% - 115px) * ' + (pct(today) / 100) + ')" title="Today"></span>';
+    html += '<span class="timeline-line deadline" style="left:calc(115px + (100% - 115px) * ' + (pct(projectBufferedEnd) / 100) + ')" title="Buffered project deadline"></span>';
+    phaseTimeline.innerHTML = html;
+  }
+
+  function clearPhaseDownloads() {
+    phaseDownloadUrls.forEach(URL.revokeObjectURL); phaseDownloadUrls = [];
+  }
+  function escapeIcs(value) { return String(value).replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n'); }
+  function icsDate(date) { return dateStr(date).replace(/-/g, ''); }
+  function preparePhaseDownloads() {
+    clearPhaseDownloads();
+    if (!calculatedPhases.length) { phaseExports.style.display = 'none'; return; }
+    const csvRows = ['Name,Start,End,Business Days,Calendar Days,Weekends,Holidays,Buffer,Buffered End,Health,Slack'];
+    calculatedPhases.forEach(p => csvRows.push([p.name, dateStr(p.start), dateStr(p.end), p.businessDays, p.calendarDays, p.weekendCount, p.holidays.length, p.buffer, dateStr(p.bufferedEnd), p.healthLabel, p.slack].map(escapeCsv).join(',')));
+    const min = calculatedPhases[0].start;
+    const max = calculatedPhases.reduce((d,p) => p.bufferedEnd > d ? p.bufferedEnd : d, calculatedPhases[0].bufferedEnd);
+    const span = Math.max(1, Math.round((max - min) / DAY_MS));
+    const txt = ['PROJECT PHASE TIMELINE', dateStr(min) + ' to ' + dateStr(max), ''].concat(calculatedPhases.map(function (p) {
+      const left = Math.round((p.start - min) / DAY_MS / span * 40);
+      const width = Math.max(1, Math.round((p.end - p.start) / DAY_MS / span * 40));
+      const bufferWidth = Math.max(0, Math.round((p.bufferedEnd - p.end) / DAY_MS / span * 40));
+      return p.name.padEnd(18).slice(0,18) + ' ' + ' '.repeat(left) + '█'.repeat(width) + '░'.repeat(bufferWidth) + '  ' + p.healthLabel;
+    })).join('\r\n');
+    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//MonkeyTactics//Project Phases//EN'].concat(calculatedPhases.flatMap(function (p) {
+      return ['BEGIN:VEVENT','UID:' + p.id + '-' + dateStr(p.start) + '@monkeytactics.com','DTSTART;VALUE=DATE:' + icsDate(p.start),'DTEND;VALUE=DATE:' + icsDate(addDays(p.end,1)),'SUMMARY:' + escapeIcs(p.name),'DESCRIPTION:' + escapeIcs(p.businessDays + ' business days; buffered end ' + dateStr(p.bufferedEnd)),'END:VEVENT'];
+    }), ['END:VCALENDAR']).join('\r\n');
+    const files = [[csvRows.join('\r\n'),'text/csv','phaseCsvLink','.csv'],[txt,'text/plain','phaseTxtLink','.txt'],[ics,'text/calendar','phaseIcsLink','.ics']];
+    files.forEach(function (file) { const url = URL.createObjectURL(new Blob([file[0]], {type:file[1]})); phaseDownloadUrls.push(url); const link = document.getElementById(file[2]); link.href = url; link.download = 'project-phases-' + workStart.value + file[3]; });
+    phaseExports.style.display = 'flex';
+  }
 
   function renderGantt(start, end, bufferEnd) {
     ganttBar.innerHTML = '';
@@ -1901,7 +2402,7 @@
       return;
     }
 
-    if (getWorkHolidayRegion() === 'custom') {
+    if (getWorkHolidayRegion() === 'custom' || workPhases.some(phase => phase.region === 'custom')) {
       const customValidation = updateCustomHolidayValidation(
         workCustomHolidays,
         document.getElementById('workCustomHolidayValidation')
@@ -1919,6 +2420,14 @@
     const totalCalendarDays = Math.round((e - s) / DAY_MS) + 1;
     const bufferedEnd = buffer > 0 ? addBusinessDays(e, buffer, holidaySet) : e;
 
+    try {
+      calculatedPhases = calculatePhaseData();
+    } catch (error) {
+      workError.textContent = '⚠️ ' + error.message;
+      workError.style.display = 'block';
+      return;
+    }
+
     let html = '';
     html += resultCardHTML('Business Days', businessDays.toLocaleString(), 'excl. weekends + holidays', true);
     html += resultCardHTML('Total Calendar Days', totalCalendarDays.toLocaleString());
@@ -1929,6 +2438,9 @@
     workShareLine.style.display = 'flex';
 
     renderGantt(s, e, bufferedEnd);
+    renderPhaseEditor();
+    renderPhaseOutputs(s, bufferedEnd);
+    preparePhaseDownloads();
 
     workResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -1939,7 +2451,12 @@
      MODE 3: RECURRING DATES
   ══════════════════════════════════════════════════ */
   const recurStart    = document.getElementById('recurStart');
+  const recurRule     = document.getElementById('recurRule');
   const recurInterval = document.getElementById('recurInterval');
+  const recurIntervalGroup = document.getElementById('recurIntervalGroup');
+  const recurHolidayRegion = document.getElementById('recurHolidayRegion');
+  const recurSkipHolidays = document.getElementById('recurSkipHolidays');
+  const recurShiftWeekend = document.getElementById('recurShiftWeekend');
   const recurCount    = document.getElementById('recurCount');
   const recurError    = document.getElementById('recurError');
   const recurBtn      = document.getElementById('recurBtn');
@@ -1954,6 +2471,18 @@
   const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   let recurringOccurrences = [];
   let recurringDownloadUrls = [];
+
+  const RECUR_RULE_LABELS = {
+    interval: 'Fixed interval',
+    'third-thursday': 'Every 3rd Thursday',
+    'last-business-day': 'Last business day of each month',
+    'quarterly-15th': 'Every quarter on the 15th'
+  };
+
+  function updateRecurringDependencies() {
+    recurIntervalGroup.style.display = recurRule.value === 'interval' ? 'block' : 'none';
+  }
+  recurRule.addEventListener('change', updateRecurringDependencies);
 
   function escapeCsv(value) {
     return '"' + String(value).replace(/"/g, '""') + '"';
@@ -1987,7 +2516,11 @@
     const lines = [
       'Upcoming Occurrences',
       'Start Date: ' + recurStart.value,
-      'Interval: ' + recurInterval.value + ' day' + (recurInterval.value === '1' ? '' : 's'),
+      'Rule: ' + RECUR_RULE_LABELS[recurRule.value],
+      ...(recurRule.value === 'interval' ? ['Interval: ' + recurInterval.value + ' day' + (recurInterval.value === '1' ? '' : 's')] : []),
+      'Holiday Calendar: ' + recurHolidayRegion.options[recurHolidayRegion.selectedIndex].text,
+      'Skip Holidays: ' + (recurSkipHolidays.checked ? 'Yes' : 'No'),
+      'Shift Weekends: ' + (recurShiftWeekend.checked ? 'Yes' : 'No'),
       'Occurrences: ' + recurringOccurrences.length,
       '',
       formatRow(headers),
@@ -2026,6 +2559,31 @@
     window.print();
   }
 
+  function recurrenceCandidate(start, rule, index, interval, holidaySet) {
+    if (rule === 'interval') return addDays(start, index * interval);
+
+    if (rule === 'third-thursday' || rule === 'last-business-day') {
+      const month = new Date(start.getFullYear(), start.getMonth() + index, 1);
+      if (rule === 'third-thursday') return nthWeekdayOfMonth(month.getFullYear(), month.getMonth(), 4, 3);
+      let d = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+      while (isWeekend(d) || holidaySet.has(dateStr(d))) d = addDays(d, -1);
+      return d;
+    }
+
+    const quarterMonths = [0, 3, 6, 9];
+    const initialQuarter = quarterMonths.findIndex(month => new Date(start.getFullYear(), month, 15) >= start);
+    const offset = initialQuarter < 0 ? index : initialQuarter + index;
+    const year = start.getFullYear() + Math.floor(offset / 4) + (initialQuarter < 0 ? 1 : 0);
+    return new Date(year, quarterMonths[offset % 4], 15);
+  }
+
+  function recurringRuleDescription(rule, interval) {
+    if (rule === 'interval') return 'every ' + interval + ' day' + (interval === 1 ? '' : 's');
+    if (rule === 'third-thursday') return 'on every 3rd Thursday';
+    if (rule === 'last-business-day') return 'on the last business day of each month';
+    return 'quarterly on the 15th';
+  }
+
   function runRecurCalculation() {
     recurError.style.display = 'none';
     recurResults.style.display = 'none';
@@ -2033,31 +2591,41 @@
     clearRecurringDownloads();
 
     const s = parseDateInput(recurStart.value);
+    const rule = recurRule.value;
     const interval = parseInt(recurInterval.value, 10);
     const count = parseInt(recurCount.value, 10);
 
-    if (!s || isNaN(interval) || interval < 1 || isNaN(count) || count < 1) {
+    if (!s || (rule === 'interval' && (isNaN(interval) || interval < 1 || interval > 3650)) || isNaN(count) || count < 1 || count > 200) {
       recurError.style.display = 'block';
       return;
     }
 
+    const holidayEnd = addDays(s, Math.max(730, count * (rule === 'quarterly-15th' ? 100 : rule === 'interval' ? interval * 2 : 40)));
+    const holidaySet = buildHolidaySet(recurHolidayRegion.value, s, holidayEnd, '');
     let rows = '';
-    let d = new Date(s);
-    for (let i = 0; i < count; i++) {
+    let candidateIndex = 0;
+    while (recurringOccurrences.length < count && candidateIndex < count * 4 + 24) {
+      let d = recurrenceCandidate(s, rule, candidateIndex, interval, holidaySet);
+      candidateIndex++;
+      if (d < s) continue;
+      if (recurShiftWeekend.checked && isWeekend(d)) {
+        do { d = addDays(d, 1); } while (isWeekend(d) || (recurSkipHolidays.checked && holidaySet.has(dateStr(d))));
+      }
+      if (recurSkipHolidays.checked && holidaySet.has(dateStr(d))) continue;
+      if (recurringOccurrences.some(item => item.date === dateStr(d))) continue;
       const occurrence = {
-        number: i + 1,
+        number: recurringOccurrences.length + 1,
         date: dateStr(d),
         displayDate: fmtDateLong(d),
         weekday: WEEKDAY_NAMES[d.getDay()],
-        daysFromStart: i * interval
+        daysFromStart: Math.round((d - s) / DAY_MS)
       };
       recurringOccurrences.push(occurrence);
       rows += '<tr><td>' + occurrence.number + '</td><td>' + occurrence.displayDate + '</td><td>' + occurrence.weekday + '</td><td>' + occurrence.daysFromStart + '</td></tr>';
-      d = addDays(d, interval);
     }
 
     recurBody.innerHTML = rows;
-    recurSummary.textContent = count + ' occurrence' + (count === 1 ? '' : 's') + ' every ' + interval + ' day' + (interval === 1 ? '' : 's') + ', starting ' + fmtDateLong(s) + '.';
+    recurSummary.textContent = count + ' occurrence' + (count === 1 ? '' : 's') + ' ' + recurringRuleDescription(rule, interval) + ', on or after ' + fmtDateLong(s) + '.';
     prepareRecurringDownloads();
     recurResults.style.display = 'block';
     recurShareLine.style.display = 'flex';
@@ -2086,22 +2654,41 @@
     }
     if (params.has('custom')) { diffCustomHolidays.value = params.get('custom'); workCustomHolidays.value = params.get('custom'); }
     if (params.has('buffer')) workBuffer.value = params.get('buffer');
+    if (params.has('phasethreshold')) phaseRiskThreshold.value = params.get('phasethreshold');
+    if (params.has('phases')) {
+      try {
+        const savedPhases = JSON.parse(params.get('phases'));
+        if (Array.isArray(savedPhases) && savedPhases.length <= 20) {
+          workPhases = savedPhases.map(function (phase) { return newPhase(phase); });
+          workPhases.forEach(function (phase, index) {
+            const oldDependencyIndex = Number(phase.dependencyIndex);
+            phase.dependencyId = Number.isInteger(oldDependencyIndex) && oldDependencyIndex >= 0 && oldDependencyIndex < index ? workPhases[oldDependencyIndex].id : '';
+          });
+        }
+      } catch (error) { workPhases = []; }
+    }
 
     if (params.has('rstart'))    recurStart.value    = params.get('rstart');
+    if (params.has('rrule'))     recurRule.value     = params.get('rrule');
     if (params.has('rinterval')) recurInterval.value = params.get('rinterval');
     if (params.has('rcount'))    recurCount.value     = params.get('rcount');
+    if (params.has('rregion'))   recurHolidayRegion.value = params.get('rregion');
+    recurSkipHolidays.checked = params.get('rskip') === '1';
+    recurShiftWeekend.checked = params.get('rshift') === '1';
 
     updatePrecisionDependencies();
     diffCustomGroup.style.display = (getDiffPrecision() === 'business' && getDiffHolidayRegion() === 'custom') ? 'block' : 'none';
-    workCustomGroup.style.display = getWorkHolidayRegion() === 'custom' ? 'block' : 'none';
+    workCustomGroup.style.display = (getWorkHolidayRegion() === 'custom' || workPhases.some(phase => phase.region === 'custom')) ? 'block' : 'none';
     updateCustomHolidayValidation(diffCustomHolidays, document.getElementById('diffCustomHolidayValidation'));
     updateCustomHolidayValidation(workCustomHolidays, document.getElementById('workCustomHolidayValidation'));
+    updateRecurringDependencies();
+    renderPhaseEditor();
 
     setActiveTab(mode);
 
     if (mode === 'diff' && params.has('start') && params.has('end')) runDiffCalculation();
     if (mode === 'work' && params.has('start') && params.has('end')) runWorkCalculation();
-    if (mode === 'recur' && params.has('rstart') && params.has('rinterval')) runRecurCalculation();
+    if (mode === 'recur' && params.has('rstart') && (params.has('rrule') || params.has('rinterval'))) runRecurCalculation();
   }
 
   /* ══════════════════════════════════════════════════
@@ -2126,12 +2713,26 @@
     if (activeMode === 'work') {
       params.set('region', getWorkHolidayRegion());
       params.set('buffer', workBuffer.value);
+      params.set('phasethreshold', phaseRiskThreshold.value);
+      if (workPhases.length) {
+        const savedPhases = workPhases.map(function (phase) {
+          const copy = Object.assign({}, phase);
+          copy.dependencyIndex = workPhases.findIndex(item => item.id === phase.dependencyId);
+          delete copy.id; delete copy.dependencyId;
+          return copy;
+        });
+        params.set('phases', JSON.stringify(savedPhases));
+      }
       if (getWorkHolidayRegion() === 'custom' && workCustomHolidays.value.trim()) params.set('custom', workCustomHolidays.value.trim());
     }
     if (activeMode === 'recur') {
       params.set('rstart', recurStart.value);
+      params.set('rrule', recurRule.value);
       params.set('rinterval', recurInterval.value);
       params.set('rcount', recurCount.value);
+      params.set('rregion', recurHolidayRegion.value);
+      if (recurSkipHolidays.checked) params.set('rskip', '1');
+      if (recurShiftWeekend.checked) params.set('rshift', '1');
     }
 
     const bookmarkableURL = new URL(window.location.href);

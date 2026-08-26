@@ -172,7 +172,17 @@ test("the Date Difference Calculator uses the premium planning presentation", ()
   assert.match(html, /class="premium-tool-hero"/);
   assert.match(html, /class="date-calculator-section"/);
   assert.match(html, /01 \/ Plan/);
-  assert.match(html, /Holiday-aware counts/);
+  assert.match(html, /Holiday-aware calculations/);
+  assert.match(html, /<title>Date Difference &amp; Business Days Calculator<\/title>/);
+  assert.match(html, /Add calendar days or business days to a date/);
+  assert.match(html, /Plan project phases, dependencies, and business-day deadlines/);
+  assert.match(html, /"featureList"/);
+  assert.match(html, /id="phaseList"/);
+  assert.match(html, /Software project/);
+  assert.match(html, /data-phase-field="dependencyRule"/);
+  assert.match(html, /Download phases CSV/);
+  assert.match(html, /Download calendar ICS/);
+  assert.match(html, /params\.set\('phases'/);
   assert.doesNotMatch(html, /Top Display Ad/);
   assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
 });
