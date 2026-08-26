@@ -254,6 +254,13 @@ test("the OCR Utility uses the premium private recognition presentation", () => 
   assert.match(html, /id="textWeight"/);
   assert.match(html, /id="deskewToggle"/);
   assert.match(html, /class="quality-settings"/);
+  assert.match(html, /id="mobileScanStatus"/);
+  assert.match(html, /id="mobileAdjustButton"/);
+  assert.match(html, /id="mobileUseScanButton"[^>]*>Use Scan</);
+  assert.match(html, /isMobileCropMode\(\) && !preserveOriginal/);
+  assert.match(html, /function detectDocumentBoundary\(\)/);
+  assert.match(html, /corners and perspective corrected automatically/);
+  assert.match(html, /autoTrimBorders\(true\);\s*snapCropToEdges\(\);/);
   assert.match(html, /Advanced OCR settings/);
   assert.match(html, /id="pasteTab"/);
   assert.match(html, /id="urlTab"/);
