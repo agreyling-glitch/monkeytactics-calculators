@@ -4,17 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f172a">
-  <meta name="description" content="Extract text from PNG and JPG images privately in your browser with the free MonkeyTactics OCR Utility.">
+  <meta name="description" content="Extract text from images and PDFs with free private browser OCR. Supports PNG, JPG, HEIC, PDF, camera capture, precision cropping, and multi-region OCR.">
   <meta name="robots" content="index, follow">
-  <title>OCR Utility — Extract Text from Images | MonkeyTactics</title>
+  <title>Free Online OCR for Images &amp; PDFs | MonkeyTactics</title>
   <link rel="canonical" href="https://monkeytactics.com/tools/ocr-utility">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MonkeyTactics">
+  <meta property="og:url" content="https://monkeytactics.com/tools/ocr-utility">
+  <meta property="og:title" content="Free Online OCR for Images &amp; PDFs">
+  <meta property="og:description" content="Convert images, scans, HEIC files, and PDFs to editable text privately in your browser with advanced cropping and multi-region OCR.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Free Online OCR for Images &amp; PDFs">
+  <meta name="twitter:description" content="Private browser OCR with PDF and HEIC support, precision cropping, perspective correction, and multi-region text extraction.">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://monkeytactics.com/" },
-      { "@type": "ListItem", "position": 2, "name": "Productivity", "item": "https://monkeytactics.com/tools/productivity" },
+      { "@type": "ListItem", "position": 2, "name": "Utilities", "item": "https://monkeytactics.com/tools/#utilities" },
       { "@type": "ListItem", "position": 3, "name": "OCR Utility", "item": "https://monkeytactics.com/tools/ocr-utility" }
     ]
   }
@@ -23,13 +31,66 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "OCR Utility",
+    "name": "Free Online OCR Utility",
+    "alternateName": "Image and PDF to Text Converter",
     "url": "https://monkeytactics.com/tools/ocr-utility",
+    "description": "Private browser-based OCR that extracts editable English text from PNG, JPG, HEIC, HEIF, PDF, clipboard, URL, and camera images.",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Any",
-    "browserRequirements": "Requires JavaScript",
-    "dateModified": "2026-08-05",
-    "isAccessibleForFree": true
+    "browserRequirements": "Requires a modern browser with JavaScript and WebAssembly",
+    "dateModified": "2026-08-26",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": [
+      "Local image-to-text OCR",
+      "PNG, JPG, HEIC, HEIF, and PDF input",
+      "Clipboard, image URL, and camera input",
+      "Freeform and aspect-ratio cropping",
+      "Perspective correction and rotation",
+      "Automatic text-region detection",
+      "Independent multi-region OCR",
+      "Border trimming, deskew, and adaptive thresholding"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is my uploaded image private?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Uploaded, pasted, camera, HEIC, and PDF content is processed locally in the browser and is not sent to or stored by a MonkeyTactics application server."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What image formats can the OCR utility read?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The OCR utility accepts PNG, JPG, JPEG, HEIC, HEIF, and PDF files up to 20 MB, plus pasted images, direct HTTPS image URLs, and camera captures."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can OCR extract text from multiple parts of an image?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. Automatic text-region detection finds text blocks, and Multi-Region Mode recognizes every retained region independently before combining the extracted text in order."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I straighten a photographed receipt or document?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The crop editor includes manual rotation, automatic deskew, four-corner perspective correction, edge snapping, grid guides, and automatic border trimming."
+        }
+      }
+    ]
   }
   </script>
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -224,7 +285,7 @@
     .mode-switcher {
       display: grid;
       grid-column: 1 / -1;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 6px;
       padding: 8px;
       border-bottom: 1px solid var(--line);
@@ -398,6 +459,51 @@
       font-size: 0.78rem;
     }
 
+    .source-option {
+      display: grid;
+      min-height: 238px;
+      align-content: center;
+      gap: 14px;
+      padding: 28px;
+      border: 1.5px dashed rgba(157, 179, 165, 0.4);
+      border-radius: var(--radius);
+      background: rgba(34, 197, 94, 0.025);
+      text-align: center;
+    }
+
+    .source-option strong {
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .source-option p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .url-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .url-controls input {
+      min-width: 0;
+      min-height: 46px;
+      flex: 1;
+      border: 1px solid var(--line);
+      border-radius: 0.65rem;
+      outline: none;
+      background: #07111f;
+      color: var(--text);
+      padding: 0 12px;
+    }
+
+    .url-controls input:focus-visible {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.12);
+    }
+
     .camera-frame[hidden],
     .camera-controls[hidden],
     .crop-editor[hidden] {
@@ -405,16 +511,92 @@
     }
 
     .crop-editor {
-      margin-top: 16px;
-      padding: 14px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      width: min(920px, 100%);
+      max-height: calc(100vh - 40px);
+      max-height: calc(100dvh - 40px);
+      overflow: hidden;
+      padding: 22px;
       border: 1px solid rgba(34, 197, 94, 0.24);
-      border-radius: var(--radius);
-      background: rgba(34, 197, 94, 0.045);
+      border-radius: 1rem;
+      background: #07110c;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
+    }
+
+    .crop-modal {
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      display: grid;
+      overflow: auto;
+      padding: 20px;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+    }
+
+    .crop-modal[hidden] {
+      display: none;
+    }
+
+    body.has-crop-modal {
+      overflow: hidden;
+    }
+
+    .image-progress-modal {
+      position: fixed;
+      z-index: 1100;
+      inset: 0;
+      display: grid;
+      padding: 20px;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.76);
+      backdrop-filter: blur(8px);
+    }
+
+    .image-progress-modal[hidden] { display: none; }
+
+    .image-progress-card {
+      width: min(430px, 100%);
+      padding: 24px;
+      border: 1px solid rgba(74, 222, 128, 0.28);
+      border-radius: 1rem;
+      background: #07110c;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
+    }
+
+    .image-progress-card h3 { margin: 0 0 7px; }
+    .image-progress-card p { margin: 0 0 18px; color: var(--muted); }
+    .image-progress-card .progress-meta { margin-bottom: 9px; }
+
+    .crop-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.045);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+
+    .crop-modal-close:hover,
+    .crop-modal-close:focus-visible {
+      border-color: var(--green);
+      color: var(--text);
+      outline: none;
     }
 
     .crop-editor h3 {
-      margin: 0 0 4px;
-      font-size: 0.92rem;
+      margin: 0 44px 4px 0;
+      font-size: 1.05rem;
     }
 
     .crop-instructions {
@@ -423,12 +605,174 @@
       font-size: 0.78rem;
     }
 
-    .crop-canvas {
-      display: block;
+    .crop-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .aspect-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .aspect-button,
+    .detect-text-button {
+      min-height: 36px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.76rem;
+    }
+
+    .aspect-button:hover,
+    .aspect-button:focus-visible,
+    .aspect-button[aria-pressed="true"] { border-color: var(--green); color: var(--text); outline: none; }
+    .aspect-button[aria-pressed="true"] { background: rgba(74, 222, 128, 0.12); }
+
+    .detect-text-button {
+      flex: 0 0 auto;
+      border-color: rgba(96, 165, 250, 0.5);
+      background: rgba(59, 130, 246, 0.1);
+      color: #bfdbfe;
+    }
+
+    .detect-text-button:hover,
+    .detect-text-button:focus-visible { border-color: #60a5fa; outline: none; }
+    .detect-text-button:disabled { cursor: wait; opacity: 0.65; }
+
+    .detect-text-status {
+      min-height: 1.2em;
+      margin: -5px 0 10px;
+      color: #93c5fd;
+      font-size: 0.74rem;
+    }
+
+    .detected-region-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .detected-region-controls:empty { display: none; }
+
+    .precision-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: -5px 0 10px;
+    }
+
+    .precision-button {
+      min-height: 34px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.74rem;
+    }
+
+    .precision-button:hover,
+    .precision-button:focus-visible,
+    .precision-button[aria-pressed="true"] { border-color: var(--green); color: var(--text); outline: none; }
+    .precision-button[aria-pressed="true"] { background: rgba(74, 222, 128, 0.12); }
+    .zoom-value { min-width: 42px; color: var(--muted); font-size: 0.74rem; text-align: center; }
+
+    .crop-canvas-viewport {
+      display: flex;
       width: 100%;
-      height: auto;
+      max-height: calc(100dvh - 350px);
+      overflow: auto;
       border: 1px solid var(--line);
       border-radius: 0.55rem;
+      background: #020617;
+    }
+
+    .crop-canvas-viewport::-webkit-scrollbar {
+      width: 0;
+      height: 8px;
+    }
+
+    .crop-canvas-viewport::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .crop-canvas-viewport::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.55);
+    }
+
+    .crop-canvas-viewport.is-pan-ready,
+    .crop-canvas-viewport.is-pan-ready .crop-canvas { cursor: grab; }
+
+    .crop-canvas-viewport.is-panning,
+    .crop-canvas-viewport.is-panning .crop-canvas { cursor: grabbing; }
+
+    .region-button {
+      min-height: 34px;
+      padding: 6px 28px 6px 10px;
+      border: 1px solid #60a5fa;
+      border-radius: 0.55rem;
+      background: rgba(37, 99, 235, 0.15);
+      color: #dbeafe;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.74rem;
+    }
+
+    .region-button:hover,
+    .region-button:focus-visible,
+    .region-button[aria-pressed="true"] {
+      background: #2563eb;
+      color: #ffffff;
+      outline: none;
+    }
+
+    .region-chip {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .region-remove {
+      position: absolute;
+      z-index: 1;
+      top: -5px;
+      right: -5px;
+      display: grid;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      place-items: center;
+      border: 1px solid #fca5a5;
+      border-radius: 999px;
+      background: #7f1d1d;
+      color: #ffffff;
+      cursor: pointer;
+      font: 700 13px/1 system-ui, sans-serif;
+    }
+
+    .region-remove:hover,
+    .region-remove:focus-visible {
+      background: #dc2626;
+      outline: 2px solid rgba(252, 165, 165, 0.45);
+      outline-offset: 1px;
+    }
+
+    .crop-canvas {
+      display: block;
+      flex: 0 0 auto;
+      width: 100%;
+      max-width: none;
+      height: auto;
+      align-self: flex-start;
+      border: 0;
       outline: none;
       background: #020617;
       cursor: crosshair;
@@ -448,6 +792,167 @@
 
     .crop-actions .button-primary {
       flex: 1;
+    }
+
+    .crop-editor-pro {
+      width: min(1240px, 100%);
+      height: min(820px, calc(100dvh - 32px));
+      padding: 0;
+      border-color: rgba(148, 163, 184, 0.22);
+      border-radius: 0.85rem;
+    }
+
+    .crop-topbar,
+    .crop-bottom-bar {
+      display: grid;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(2, 10, 7, 0.96);
+    }
+
+    .crop-topbar {
+      grid-template-columns: 1fr auto 1fr;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .crop-bottom-bar {
+      grid-template-columns: 1fr auto 1fr;
+      border-top: 1px solid var(--line);
+    }
+
+    .crop-toolbar-group,
+    .crop-primary-actions { display: flex; align-items: center; gap: 7px; }
+    .crop-toolbar-right { justify-content: flex-end; }
+    .crop-toolbar-zoom { justify-content: center; }
+    .pdf-page-controls { grid-column: 2; grid-row: 2; justify-content: center; color: var(--muted); font-size: 0.74rem; }
+    .crop-primary-actions { grid-column: 2; justify-content: center; }
+    .crop-bottom-bar > .toolbar-button { grid-column: 3; justify-self: end; }
+
+    .toolbar-button,
+    .sidebar-control,
+    .nudge-controls button,
+    .rotate-controls button {
+      min-height: 34px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 0.45rem;
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.74rem;
+    }
+
+    .toolbar-button:hover,
+    .toolbar-button:focus-visible,
+    .sidebar-control:hover,
+    .sidebar-control:focus-visible,
+    .sidebar-control[aria-pressed="true"],
+    .nudge-controls button:hover,
+    .rotate-controls button:hover {
+      border-color: var(--green);
+      color: var(--text);
+      outline: none;
+    }
+
+    .toolbar-button:disabled { cursor: default; opacity: 0.38; }
+    .icon-button { min-width: 34px; padding-inline: 8px; }
+
+    .crop-workspace {
+      display: grid;
+      min-height: 0;
+      flex: 1;
+      grid-template-columns: minmax(0, 1fr) 300px;
+    }
+
+    .crop-stage {
+      display: flex;
+      min-width: 0;
+      min-height: 0;
+      flex-direction: column;
+      padding: 14px;
+      background: #111513;
+    }
+
+    .crop-stage-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; }
+    .crop-stage-heading h3 { margin: 0 0 3px; }
+    .crop-stage-heading .detect-text-status { margin: 0 0 8px; text-align: right; }
+
+    .crop-shortcut-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin: 0 0 10px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      background: rgba(0, 0, 0, 0.24);
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+    .crop-shortcut-panel[hidden] { display: none; }
+    .crop-shortcut-panel kbd { color: var(--green); font-weight: 700; }
+
+    .crop-editor-pro .crop-canvas-viewport {
+      max-height: none;
+      min-height: 0;
+      flex: 1;
+      place-content: center;
+      border-color: rgba(148, 163, 184, 0.2);
+      border-radius: 0.4rem;
+      background: #181c1a;
+    }
+
+    .crop-sidebar {
+      overflow: auto;
+      padding: 12px;
+      border-left: 1px solid var(--line);
+      background: #09100c;
+      scrollbar-width: none;
+    }
+
+    .crop-sidebar::-webkit-scrollbar { width: 0; }
+
+    .crop-control-card {
+      margin-bottom: 10px;
+      padding: 11px;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 0.6rem;
+      background: rgba(255, 255, 255, 0.025);
+      box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
+    }
+    .crop-control-card h4 { margin: 0 0 9px; font-size: 0.8rem; }
+    .crop-control-subsection {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+    .crop-control-subsection h5 { margin: 0 0 8px; color: var(--muted); font-size: 0.72rem; }
+    .crop-control-card p { margin: 7px 0 0; color: var(--muted); font-size: 0.68rem; }
+    .sidebar-control { width: 100%; margin-bottom: 7px; text-align: left; }
+    .sidebar-label { display: grid; gap: 5px; margin-bottom: 7px; color: var(--muted); font-size: 0.7rem; }
+    .sidebar-label select { min-height: 34px; border: 1px solid var(--line); border-radius: 0.45rem; background: #0b1510; color: var(--text); }
+    .sidebar-check { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; color: var(--muted); font-size: 0.72rem; }
+    .nudge-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 0.7rem; }
+    .nudge-keypad { display: grid; grid-template-columns: repeat(3, 32px); grid-template-rows: repeat(2, 30px); gap: 4px; }
+    .nudge-keypad button { min-height: 30px; padding: 3px; }
+    .nudge-keypad [data-nudge="up"] { grid-column: 2; grid-row: 1; }
+    .nudge-keypad [data-nudge="left"] { grid-column: 1; grid-row: 2; }
+    .nudge-keypad [data-nudge="down"] { grid-column: 2; grid-row: 2; }
+    .nudge-keypad [data-nudge="right"] { grid-column: 3; grid-row: 2; }
+    .rotate-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+    .rotate-controls button { min-height: 30px; padding: 3px; }
+
+    @media (max-width: 900px) {
+      .crop-editor-pro { height: calc(100dvh - 20px); overflow: auto; }
+      .crop-topbar { grid-template-columns: 1fr auto; }
+      .crop-toolbar-zoom { grid-column: 1 / -1; grid-row: 2; }
+      .crop-toolbar-right { grid-column: 2; grid-row: 1; flex-wrap: wrap; }
+      .crop-workspace { grid-template-columns: 1fr; overflow: visible; }
+      .crop-stage { min-height: 430px; }
+      .crop-sidebar { display: grid; overflow: visible; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; border: 0; }
+      .crop-control-card { margin: 0; }
     }
 
     .crop-editor + .preview {
@@ -500,6 +1005,106 @@
 
     .preprocess-note strong {
       color: #cfe1d5;
+    }
+
+    .quality-controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 14px 16px 16px;
+      border-top: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .quality-settings {
+      overflow: hidden;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(2, 6, 23, 0.35);
+    }
+
+    .quality-settings summary {
+      display: flex;
+      min-height: 46px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      color: #d9e7dd;
+      cursor: pointer;
+      list-style: none;
+      font-size: 0.8rem;
+      font-weight: 750;
+    }
+
+    .quality-settings summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .quality-settings summary::before {
+      color: var(--green);
+      content: "+";
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .quality-settings[open] summary::before {
+      content: "−";
+    }
+
+    .quality-settings summary:focus-visible {
+      outline: 3px solid rgba(74, 222, 128, 0.2);
+      outline-offset: -3px;
+    }
+
+    .quality-summary-value {
+      margin-left: auto;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.08);
+      color: #86efac;
+      padding: 3px 9px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .quality-control {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .quality-control select {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 0.55rem;
+      outline: none;
+      background: #07111f;
+      color: var(--text);
+      padding: 0 34px 0 10px;
+    }
+
+    .quality-control select:focus-visible {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.12);
+    }
+
+    .quality-toggle {
+      display: flex;
+      grid-column: 1 / -1;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .quality-toggle input {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--green);
     }
 
     .actions {
@@ -693,6 +1298,25 @@
     .faq-section {
       max-width: 740px;
       margin-top: 2rem;
+    }
+
+    .ocr-capabilities {
+      margin-top: 2rem;
+      padding: clamp(1.2rem, 3vw, 2rem);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .ocr-capabilities > h2 { margin: 0 0 0.5rem; }
+    .ocr-capabilities > p { max-width: 780px; margin: 0; color: var(--muted); }
+    .capability-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 1.2rem; }
+    .capability-card { padding: 1rem; border: 1px solid rgba(148, 163, 184, 0.16); border-radius: 0.65rem; background: rgba(2, 6, 23, 0.3); }
+    .capability-card h3 { margin: 0 0 0.4rem; font-size: 0.9rem; }
+    .capability-card p { margin: 0; color: var(--muted); font-size: 0.78rem; }
+
+    @media (max-width: 720px) {
+      .capability-grid { grid-template-columns: 1fr; }
     }
 
     .faq-section details {
@@ -901,6 +1525,10 @@
     }
 
     @media (max-width: 560px) {
+      .mode-switcher {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .site-header {
         align-items: flex-start;
         flex-direction: column;
@@ -948,12 +1576,41 @@
         width: 100%;
       }
 
+      .url-controls {
+        flex-direction: column;
+      }
+
+      .crop-tools {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .detect-text-button {
+        width: 100%;
+      }
+
+      .crop-canvas {
+        min-width: 100%;
+      }
+
+      .crop-canvas-viewport {
+        max-height: max(140px, calc(100dvh - 535px));
+      }
+
       #output {
         min-height: 280px;
       }
 
       .trust-row {
         grid-template-columns: 1fr;
+      }
+
+      .quality-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .quality-toggle {
+        grid-column: auto;
       }
 
       .site-footer {
@@ -1005,20 +1662,22 @@
       </nav>
       <div class="premium-hero-grid">
         <div>
-          <p class="premium-eyebrow">Private image-to-text recognition</p>
-          <h1 id="page-title">OCR Utility</h1>
-          <p class="premium-hero-copy">Turn screenshots, scanned pages, receipts, and photos into editable text. Crop to the important area, recognize it locally in your browser, then copy or refine the result.</p>
-          <div class="premium-hero-pills" aria-label="OCR Utility features"><span>Local WASM recognition</span><span>Upload or camera capture</span></div>
+          <p class="premium-eyebrow">Free private image and PDF to text converter</p>
+          <h1 id="page-title">Online OCR for Images and PDFs</h1>
+          <p class="premium-hero-copy">Extract editable text from screenshots, scanned PDFs, receipts, photos, PNG, JPG, HEIC, and HEIF files. Correct the crop, rotation, perspective, and text regions before private in-browser recognition.</p>
+          <div class="premium-hero-pills" aria-label="OCR Utility features"><span>Local Tesseract.js OCR</span><span>PDF &amp; HEIC support</span><span>Precision multi-region cropping</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>From pixels to language</span><strong>Images <i>meet</i> editable text</strong><small>Focus the frame. Extract what matters.</small></div>
       </div>
     </section>
 
     <section class="workspace" aria-labelledby="ocr-workspace-heading">
-      <div class="ocr-workspace-intro"><div class="premium-section-kicker">01 / Extract</div><h2 id="ocr-workspace-heading">Choose an image and recover its text</h2><p>Import a file or capture a frame, refine the crop, and review the recognized text alongside the source.</p></div>
+      <div class="ocr-workspace-intro"><div class="premium-section-kicker">01 / Extract</div><h2 id="ocr-workspace-heading">Convert an image or PDF to editable text</h2><p>Upload a file, paste a screenshot, enter an image URL, or use your camera. Refine one or more text regions, then review and copy the locally recognized result.</p></div>
       <div class="mode-switcher" role="tablist" aria-label="Choose an image source">
-        <button class="mode-tab" id="uploadTab" type="button" role="tab" aria-selected="true" aria-controls="uploadPanel">Upload an Image</button>
-        <button class="mode-tab" id="cameraTab" type="button" role="tab" aria-selected="false" aria-controls="cameraPanel" tabindex="-1">Camera Scanner</button>
+        <button class="mode-tab" id="uploadTab" type="button" role="tab" aria-selected="true" aria-controls="uploadPanel">Upload</button>
+        <button class="mode-tab" id="pasteTab" type="button" role="tab" aria-selected="false" aria-controls="pastePanel" tabindex="-1">Paste</button>
+        <button class="mode-tab" id="urlTab" type="button" role="tab" aria-selected="false" aria-controls="urlPanel" tabindex="-1">Image URL</button>
+        <button class="mode-tab" id="cameraTab" type="button" role="tab" aria-selected="false" aria-controls="cameraPanel" tabindex="-1">Camera</button>
       </div>
 
       <div class="panel">
@@ -1028,17 +1687,45 @@
           <span class="step">Step 01</span>
         </div>
 
-        <input class="visually-hidden" id="fileInput" type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg">
+        <input class="visually-hidden" id="fileInput" type="file" accept="image/png,image/jpeg,image/heic,image/heif,application/pdf,.png,.jpg,.jpeg,.heic,.heif,.pdf">
 
-        <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-controls="fileInput" aria-label="Choose a PNG or JPG image, or drag and drop one here">
+        <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-controls="fileInput" aria-label="Choose a PNG, JPG, HEIC, HEIF, or PDF file, or drag and drop one here">
           <div>
             <div class="upload-icon" aria-hidden="true">↑</div>
             <strong>Drop your image here</strong>
             <span>or <em class="choose-text">browse your files</em></span><br>
-            <span>PNG or JPG · up to 20 MB</span>
+            <span>PNG, JPG, HEIC, HEIF, or PDF · up to 20 MB</span>
           </div>
         </div>
 
+        </div>
+
+        <div id="pastePanel" role="tabpanel" aria-labelledby="pasteTab" hidden>
+          <div class="panel-heading">
+            <h2>Paste an image</h2>
+            <span class="step">Step 01</span>
+          </div>
+          <div class="source-option">
+            <strong>Use an image from your clipboard</strong>
+            <p>Copy an image or screenshot, then paste it here with Ctrl+V or use the button.</p>
+            <button class="button button-primary" id="pasteButton" type="button">Paste image</button>
+          </div>
+        </div>
+
+        <div id="urlPanel" role="tabpanel" aria-labelledby="urlTab" hidden>
+          <div class="panel-heading">
+            <h2>Load an image URL</h2>
+            <span class="step">Step 01</span>
+          </div>
+          <div class="source-option">
+            <strong>Use a public image link</strong>
+            <p>Enter a direct HTTPS link to a PNG or JPEG. The image host must allow browser access.</p>
+            <div class="url-controls">
+              <label class="visually-hidden" for="imageUrl">Image URL</label>
+              <input id="imageUrl" type="url" inputmode="url" placeholder="https://example.com/image.jpg" autocomplete="url">
+              <button class="button button-primary" id="loadUrlButton" type="button">Load image</button>
+            </div>
+          </div>
         </div>
 
         <div id="cameraPanel" role="tabpanel" aria-labelledby="cameraTab" hidden>
@@ -1065,13 +1752,125 @@
 
         </div>
 
-        <div class="crop-editor" id="cropEditor" hidden>
-          <h3>Crop image</h3>
-          <p class="crop-instructions" id="cropInstructions">Drag across the image to select the text you want OCR to read. Arrow keys move the crop; Shift + arrow keys resize it.</p>
-          <canvas class="crop-canvas" id="cropCanvas" tabindex="0" aria-label="Image crop area" aria-describedby="cropInstructions"></canvas>
-          <div class="crop-actions">
-            <button class="button button-primary" id="applyCropButton" type="button">Use crop</button>
-            <button class="button button-secondary" id="retakeButton" type="button">Retake</button>
+        <div class="image-progress-modal" id="imageProgressModal" role="dialog" aria-modal="true" aria-labelledby="imageProgressTitle" aria-describedby="imageProgressMessage" hidden>
+          <div class="image-progress-card">
+            <h3 id="imageProgressTitle">Preparing image</h3>
+            <p id="imageProgressMessage">Reading the selected file locally…</p>
+            <div class="progress-meta">
+              <span id="imageProgressLabel">Starting…</span>
+              <span id="imageProgressValue">0%</span>
+            </div>
+            <div class="progress-track" id="imageProgressTrack" role="progressbar" aria-label="Image preparation progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="progress-bar" id="imageProgressBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="crop-modal" id="cropModal" role="dialog" aria-modal="true" aria-labelledby="cropModalTitle" aria-describedby="cropInstructions" hidden>
+          <div class="crop-editor crop-editor-pro" id="cropEditor" hidden>
+            <header class="crop-topbar">
+              <div class="crop-toolbar-group crop-toolbar-left">
+                <button class="toolbar-button" id="closeCropButton" type="button">← Back</button>
+                <button class="toolbar-button" id="retakeButton" type="button">Upload / Replace Image</button>
+              </div>
+              <div class="crop-toolbar-group crop-toolbar-zoom" aria-label="Zoom controls">
+                <button class="toolbar-button icon-button" id="zoomOutButton" type="button" aria-label="Zoom out">−</button>
+                <span class="zoom-value" id="zoomValue">100%</span>
+                <button class="toolbar-button" id="resetZoomButton" type="button">Fit</button>
+                <button class="toolbar-button icon-button" id="zoomInButton" type="button" aria-label="Zoom in">+</button>
+              </div>
+              <div class="crop-toolbar-group pdf-page-controls" id="pdfPageControls" aria-label="PDF page navigation" hidden>
+                <button class="toolbar-button icon-button" id="previousPdfPageButton" type="button" aria-label="Previous PDF page">←</button>
+                <span id="pdfPageLabel">Page 1 of 1</span>
+                <button class="toolbar-button icon-button" id="nextPdfPageButton" type="button" aria-label="Next PDF page">→</button>
+              </div>
+              <div class="crop-toolbar-group crop-toolbar-right">
+                <button class="toolbar-button" id="undoCropButton" type="button" disabled>Undo</button>
+                <button class="toolbar-button" id="redoCropButton" type="button" disabled>Redo</button>
+                <button class="toolbar-button" id="resetCropButton" type="button">Reset All</button>
+                <button class="toolbar-button icon-button" id="cropHelpButton" type="button" aria-expanded="false" aria-controls="cropShortcutPanel">?</button>
+              </div>
+            </header>
+
+            <div class="crop-workspace">
+              <section class="crop-stage" aria-labelledby="cropModalTitle">
+                <div class="crop-stage-heading">
+                  <div><h3 id="cropModalTitle">Crop image</h3><p class="crop-instructions" id="cropInstructions">Drag to crop. Hold Space and drag to pan. Arrow keys nudge by one pixel.</p></div>
+                  <p class="detect-text-status" id="detectTextStatus" role="status" aria-live="polite"></p>
+                </div>
+                <div class="crop-shortcut-panel" id="cropShortcutPanel" hidden>
+                  <span><kbd>C</kbd> Crop</span><span><kbd>H</kbd> Hand mode</span><span><kbd>Space</kbd> Hold to pan</span><span><kbd>R</kbd> Rotate</span><span><kbd>Z</kbd> Zoom</span><span><kbd>Esc</kbd> Reset crop</span><span><kbd>↑↓←→</kbd> Nudge</span>
+                </div>
+                <div class="crop-canvas-viewport" id="cropCanvasViewport">
+                  <canvas class="crop-canvas" id="cropCanvas" tabindex="0" aria-label="Image crop area" aria-describedby="cropInstructions"></canvas>
+                </div>
+              </section>
+
+              <aside class="crop-sidebar" aria-label="Cropping and preprocessing controls">
+                <section class="crop-control-card">
+                  <h4>Cropping modes</h4>
+                  <button class="sidebar-control active" type="button" data-crop-ratio="free" aria-pressed="true">Freeform Crop</button>
+                  <label class="sidebar-label">Aspect Ratio
+                    <select id="cropAspectSelect">
+                      <option value="free">Freeform</option><option value="1" data-crop-ratio="1">1:1</option><option value="1.333333" data-crop-ratio="1.333333">4:3</option><option value="1.777778" data-crop-ratio="1.777778">16:9</option><option value="1.5" data-crop-ratio="1.5">3:2</option><option value="1.25" data-crop-ratio="1.25">5:4</option>
+                    </select>
+                  </label>
+                  <button class="sidebar-control detect-text-button" id="detectTextButton" type="button">Auto-Detect Text Region</button>
+                  <div class="crop-control-subsection">
+                    <h5>Regions</h5>
+                    <button class="sidebar-control" id="multiRegionButton" type="button" aria-pressed="false">Multi-Region Mode</button>
+                    <div class="detected-region-controls" id="detectedRegionControls" aria-label="Detected text regions"></div>
+                    <button class="sidebar-control" id="addRegionButton" type="button">+ Add Region</button>
+                  </div>
+                </section>
+
+                <section class="crop-control-card">
+                  <h4>Precision tools</h4>
+                  <button class="sidebar-control" id="zoomCropToggle" type="button" aria-pressed="true">Zoom While Cropping</button>
+                  <button class="sidebar-control" id="snapEdgesButton" type="button" aria-pressed="false">Snap to Edges</button>
+                  <button class="sidebar-control" id="gridToggleButton" type="button" aria-pressed="false">Grid Overlay</button>
+                  <div class="nudge-controls" aria-label="Pixel nudging">
+                    <span>Pixel Nudging</span>
+                    <div class="nudge-keypad">
+                      <button type="button" data-nudge="up" aria-label="Nudge up">↑</button>
+                      <button type="button" data-nudge="left" aria-label="Nudge left">←</button>
+                      <button type="button" data-nudge="down" aria-label="Nudge down">↓</button>
+                      <button type="button" data-nudge="right" aria-label="Nudge right">→</button>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="crop-control-card">
+                  <h4>Rotation &amp; deskew</h4>
+                  <label class="sidebar-check"><input id="cropAutoDeskew" type="checkbox" checked> Auto Deskew</label>
+                  <div class="rotate-controls">
+                    <button type="button" data-rotate-angle="-90">−90°</button><button type="button" data-rotate-angle="-45">−45°</button><button type="button" data-rotate-angle="-1">−1°</button><button type="button" data-rotate-angle="1">+1°</button><button type="button" data-rotate-angle="45">+45°</button><button id="rotateButton" type="button" data-rotate-angle="90">+90°</button>
+                  </div>
+                </section>
+
+                <section class="crop-control-card">
+                  <h4>Perspective correction</h4>
+                  <button class="sidebar-control" id="perspectiveButton" type="button" aria-pressed="false">Enable Perspective Correction</button>
+                  <p>Drag the diamond corner handles on the crop box.</p>
+                </section>
+
+                <section class="crop-control-card">
+                  <h4>Smart trim</h4>
+                  <button class="sidebar-control" id="autoTrimButton" type="button">Auto Trim Borders</button>
+                  <p>Detects white, black, and other uniform outer borders.</p>
+                </section>
+
+              </aside>
+            </div>
+
+            <footer class="crop-bottom-bar">
+              <div class="crop-primary-actions">
+                <button class="button button-secondary" id="applyCropButton" type="button">Preview</button>
+                <button class="button button-primary" id="runCropOcrButton" type="button">Run OCR</button>
+                <button class="button button-secondary" id="downloadCropButton" type="button">Download Cropped Image</button>
+              </div>
+              <button class="toolbar-button" id="beforeAfterButton" type="button" aria-pressed="false">Before / After</button>
+            </footer>
           </div>
         </div>
 
@@ -1084,10 +1883,51 @@
           <span id="fileSize"></span>
         </div>
 
-        <p class="preprocess-note"><strong>Automatic cleanup:</strong> grayscale and contrast enhancement are applied before recognition.</p>
+        <p class="preprocess-note"><strong>Automatic cleanup:</strong> text is resized, straightened, contrasted, and thresholded as needed before recognition.</p>
+
+        <details class="quality-settings">
+          <summary>Advanced OCR settings <span class="quality-summary-value" id="qualitySummary">Automatic</span></summary>
+          <div class="quality-controls" aria-label="OCR quality options">
+          <label class="quality-control" for="preprocessMode">Image cleanup
+            <select id="preprocessMode">
+              <option value="auto">Automatic (recommended)</option>
+              <option value="grayscale">Grayscale</option>
+              <option value="threshold">Adaptive black &amp; white</option>
+              <option value="original">Original colors</option>
+            </select>
+          </label>
+          <label class="quality-control" for="layoutMode">Text layout
+            <select id="layoutMode">
+              <option value="auto">Automatic page</option>
+              <option value="block">Text block</option>
+              <option value="sparse">Sparse text</option>
+              <option value="line">Single line</option>
+              <option value="word">Single word</option>
+            </select>
+          </label>
+          <label class="quality-control" for="contentMode">Content
+            <select id="contentMode">
+              <option value="text">Normal text</option>
+              <option value="receipt">Receipt or columns</option>
+              <option value="code">Code or serial number</option>
+              <option value="numbers">Numbers only</option>
+            </select>
+          </label>
+          <label class="quality-control" for="textWeight">Character weight
+            <select id="textWeight">
+              <option value="auto">Automatic</option>
+              <option value="normal">No adjustment</option>
+              <option value="thin">Faint or thin text</option>
+              <option value="bold">Heavy or bleeding text</option>
+            </select>
+          </label>
+            <label class="quality-toggle"><input id="deskewToggle" type="checkbox" checked> Automatically straighten slightly tilted text</label>
+          </div>
+        </details>
 
         <div class="actions">
           <button class="button button-primary" id="runButton" type="button" disabled>Extract text</button>
+          <button class="button button-secondary" id="recropButton" type="button" disabled>Crop again</button>
           <button class="button button-secondary" id="resetButton" type="button" disabled>Reset</button>
         </div>
 
@@ -1128,6 +1968,37 @@
       </div>
     </section>
 
+    <section class="ocr-capabilities" aria-labelledby="capabilities-heading">
+      <h2 id="capabilities-heading">Private OCR with document-grade cropping tools</h2>
+      <p>This free OCR converter prepares difficult scans before recognition and processes the source locally in your browser. Use it for receipts, invoices, labels, forms, ID cards, screenshots, and scanned document pages.</p>
+      <div class="capability-grid">
+        <article class="capability-card">
+          <h3>Convert images, HEIC, and PDF pages</h3>
+          <p>Open PNG, JPG, JPEG, HEIC, HEIF, or PDF files up to 20 MB. You can also paste a screenshot, load a direct image URL, or capture text with a camera.</p>
+        </article>
+        <article class="capability-card">
+          <h3>Crop, rotate, deskew, and correct perspective</h3>
+          <p>Use freeform or aspect-locked cropping, zoom and pan, keyboard pixel nudging, edge snapping, grid guides, border trimming, manual rotation, and four-corner perspective correction.</p>
+        </article>
+        <article class="capability-card">
+          <h3>Extract several text regions in one run</h3>
+          <p>Automatically detect text blocks, remove unwanted regions, or add manual crops. Multi-region mode recognizes every retained region independently and combines the text in order.</p>
+        </article>
+        <article class="capability-card">
+          <h3>Improve difficult text automatically</h3>
+          <p>Automatic preprocessing can resize small text, normalize contrast, deskew slight tilts, and retry grayscale, adaptive threshold, or original-color inputs when confidence is low.</p>
+        </article>
+        <article class="capability-card">
+          <h3>Choose the document layout</h3>
+          <p>Recognition presets cover automatic pages, text blocks, sparse text, single lines, single words, receipts and columns, serial numbers, code, and numeric content.</p>
+        </article>
+        <article class="capability-card">
+          <h3>Keep uploaded documents private</h3>
+          <p>Image preparation and OCR run locally with JavaScript and WebAssembly. Uploaded, pasted, camera, HEIC, and PDF content is not sent to a MonkeyTactics application server.</p>
+        </article>
+      </div>
+    </section>
+
     <section class="faq-section" aria-labelledby="faq-heading">
       <details open>
         <summary>
@@ -1138,15 +2009,15 @@
           <ul class="faq-list">
             <li class="faq-item">
               <h3>Is my uploaded image private?</h3>
-              <p>Yes. Your image is processed locally in your browser and is never uploaded to MonkeyTactics or stored in a database. See our <a href="/privacy">Privacy Policy</a> for more information.</p>
+              <p>Yes. Uploaded, pasted, and camera images are processed locally and are never sent to MonkeyTactics or stored in a database. When you use an image URL, your browser retrieves it directly from that image host. See our <a href="/privacy">Privacy Policy</a> for more information.</p>
             </li>
             <li class="faq-item">
               <h3>What image formats can the OCR utility read?</h3>
-              <p>The utility accepts PNG, JPG, and JPEG images up to 20 MB. Clear screenshots and sharp, evenly lit photos generally produce the best results.</p>
+              <p>The utility accepts uploaded PNG, JPG, JPEG, HEIC, HEIF, and PDF files up to 20 MB, plus pasted images and direct HTTPS image URLs whose hosts permit browser access. HEIC, HEIF, and PDF files are converted locally before OCR. Clear screenshots and sharp, evenly lit scans generally produce the best results.</p>
             </li>
             <li class="faq-item">
               <h3>How accurate is browser-based OCR?</h3>
-              <p>Accuracy depends on image quality, font clarity, text size, orientation, and contrast. The utility automatically converts the image to grayscale and boosts contrast before recognition, but handwritten or highly stylized text may still be difficult to read.</p>
+              <p>Accuracy depends on image quality, font clarity, text size, orientation, and contrast. Automatic cleanup can resize small text, correct slight skew, normalize dark backgrounds, and retry adaptive thresholding when confidence is low. Handwritten or highly stylized text may still be difficult to read.</p>
             </li>
             <li class="faq-item">
               <h3>Why does the first OCR scan take longer?</h3>
@@ -1158,7 +2029,15 @@
             </li>
             <li class="faq-item">
               <h3>How can I improve an inaccurate result?</h3>
-              <p>Crop the image around the text, straighten tilted pages, avoid shadows and glare, and use the highest-resolution original available. Larger dark text on a light background is typically recognized most reliably.</p>
+              <p>Crop the image with a little space around the text, trim uniform black or white borders, correct sideways pages or perspective distortion, and choose the closest layout and content presets. For difficult photos, try Adaptive black &amp; white; larger dark text on a light background is typically recognized most reliably.</p>
+            </li>
+            <li class="faq-item">
+              <h3>Can OCR extract text from multiple parts of an image?</h3>
+              <p>Yes. Auto-Detect Text Region finds text blocks without an eight-region limit, and each detected region can be edited or removed. Enable Multi-Region Mode to recognize every retained region independently and combine the extracted text in region order.</p>
+            </li>
+            <li class="faq-item">
+              <h3>Can I straighten a photographed receipt or document?</h3>
+              <p>Yes. Rotate the source when it is sideways, use Auto Deskew for slight text angles, or enable Perspective Correction and drag the four yellow corner handles onto the document corners. Preview shows the corrected rectangular image before OCR.</p>
             </li>
           </ul>
         </div>
@@ -1211,23 +2090,39 @@
     </nav>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="/assets/js/vendor/heic-to-1.5.2.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
   <script>
     (function () {
       "use strict";
 
       const MAX_FILE_BYTES = 20 * 1024 * 1024;
       const MAX_CANVAS_EDGE = 2600;
-      const ACCEPTED_TYPES = new Set(["image/png", "image/jpeg"]);
+      const MAX_CANVAS_PIXELS = 12_000_000;
+      const MIN_CROP_ZOOM = 0.25;
+      const MAX_CROP_ZOOM = 4;
+      const OCR_BORDER = 16;
+      const RETRY_CONFIDENCE = 85;
+      const ACCEPTED_TYPES = new Set([
+        "image/png", "image/jpeg", "image/heic", "image/heif",
+        "image/heic-sequence", "image/heif-sequence", "image/x-heic", "image/x-heif", "application/pdf"
+      ]);
       const $ = (id) => document.getElementById(id);
 
       const elements = {
         uploadTab: $("uploadTab"),
+        pasteTab: $("pasteTab"),
+        urlTab: $("urlTab"),
         cameraTab: $("cameraTab"),
         uploadPanel: $("uploadPanel"),
+        pastePanel: $("pastePanel"),
+        urlPanel: $("urlPanel"),
         cameraPanel: $("cameraPanel"),
         fileInput: $("fileInput"),
         dropZone: $("dropZone"),
+        pasteButton: $("pasteButton"),
+        imageUrl: $("imageUrl"),
+        loadUrlButton: $("loadUrlButton"),
         cameraFrame: $("cameraFrame"),
         cameraControls: $("cameraControls"),
         cameraVideo: $("cameraVideo"),
@@ -1235,9 +2130,47 @@
         startCameraButton: $("startCameraButton"),
         captureButton: $("captureButton"),
         stopCameraButton: $("stopCameraButton"),
+        imageProgressModal: $("imageProgressModal"),
+        imageProgressMessage: $("imageProgressMessage"),
+        imageProgressLabel: $("imageProgressLabel"),
+        imageProgressValue: $("imageProgressValue"),
+        imageProgressTrack: $("imageProgressTrack"),
+        imageProgressBar: $("imageProgressBar"),
+        cropModal: $("cropModal"),
         cropEditor: $("cropEditor"),
+        closeCropButton: $("closeCropButton"),
+        cropCanvasViewport: $("cropCanvasViewport"),
         cropCanvas: $("cropCanvas"),
+        zoomOutButton: $("zoomOutButton"),
+        zoomInButton: $("zoomInButton"),
+        resetZoomButton: $("resetZoomButton"),
+        zoomValue: $("zoomValue"),
+        snapEdgesButton: $("snapEdgesButton"),
+        undoCropButton: $("undoCropButton"),
+        redoCropButton: $("redoCropButton"),
+        resetCropButton: $("resetCropButton"),
+        cropHelpButton: $("cropHelpButton"),
+        cropShortcutPanel: $("cropShortcutPanel"),
+        cropAspectSelect: $("cropAspectSelect"),
+        multiRegionButton: $("multiRegionButton"),
+        zoomCropToggle: $("zoomCropToggle"),
+        gridToggleButton: $("gridToggleButton"),
+        cropAutoDeskew: $("cropAutoDeskew"),
+        perspectiveButton: $("perspectiveButton"),
+        autoTrimButton: $("autoTrimButton"),
+        addRegionButton: $("addRegionButton"),
+        runCropOcrButton: $("runCropOcrButton"),
+        downloadCropButton: $("downloadCropButton"),
+        beforeAfterButton: $("beforeAfterButton"),
+        pdfPageControls: $("pdfPageControls"),
+        previousPdfPageButton: $("previousPdfPageButton"),
+        nextPdfPageButton: $("nextPdfPageButton"),
+        pdfPageLabel: $("pdfPageLabel"),
+        detectTextButton: $("detectTextButton"),
+        detectTextStatus: $("detectTextStatus"),
+        detectedRegionControls: $("detectedRegionControls"),
         applyCropButton: $("applyCropButton"),
+        rotateButton: $("rotateButton"),
         retakeButton: $("retakeButton"),
         cameraCaptureCanvas: $("cameraCaptureCanvas"),
         preview: $("preview"),
@@ -1246,6 +2179,7 @@
         fileName: $("fileName"),
         fileSize: $("fileSize"),
         runButton: $("runButton"),
+        recropButton: $("recropButton"),
         resetButton: $("resetButton"),
         status: $("status"),
         canvas: $("processingCanvas"),
@@ -1256,19 +2190,61 @@
         progressBar: $("progressBar"),
         output: $("output"),
         resultStat: $("resultStat"),
-        copyButton: $("copyButton")
+        copyButton: $("copyButton"),
+        preprocessMode: $("preprocessMode"),
+        layoutMode: $("layoutMode"),
+        contentMode: $("contentMode"),
+        textWeight: $("textWeight"),
+        deskewToggle: $("deskewToggle"),
+        qualitySummary: $("qualitySummary")
       };
 
       let objectUrl = "";
       let imageReady = false;
       let isRecognizing = false;
       let worker = null;
+      let workerDictionaryMode = "";
       let cameraStream = null;
       let activeMode = "upload";
       let cropSelection = null;
       let cropDragStart = null;
+      let cropDragMode = "select";
+      let cropMoveOffset = null;
+      let cropResizeHandle = "";
+      let cropResizeOrigin = null;
+      let cropMagnifierPoint = null;
       let cropSourceKind = "";
       let cropSourceName = "";
+      let originalCropSourceCanvas = null;
+      let ocrSourceCanvas = null;
+      let multiRegionOcrCanvases = [];
+      let cropAspectRatio = null;
+      let detectedRegions = [];
+      let selectedRegionIndex = -1;
+      let cropZoom = 1;
+      let snapEdgesEnabled = false;
+      let cropPanStart = null;
+      let cropSpacePressed = false;
+      let isRecropping = false;
+      let showCropGrid = false;
+      let showCropOverlay = true;
+      let cropHistory = [];
+      let cropHistoryIndex = -1;
+      let perspectiveEnabled = false;
+      let perspectiveCorners = null;
+      let activePerspectiveCorner = -1;
+      let perspectiveMoveOrigin = null;
+      let multiRegionEnabled = false;
+      let handModeEnabled = false;
+      let zoomWhileCroppingEnabled = true;
+      let cropPanTranslateX = 0;
+      let cropPanTranslateY = 0;
+      let pdfDocument = null;
+      let pdfPageNumber = 1;
+      let pdfFileName = "";
+      let isDetectingRegions = false;
+      let detectionRequestId = 0;
+      const aspectButtons = Array.from(document.querySelectorAll("button[data-crop-ratio]"));
 
       function setStatus(message, type) {
         elements.status.textContent = message;
@@ -1309,11 +2285,48 @@
       }
 
       function resetCropEditor() {
+        detectionRequestId += 1;
         cropSelection = null;
         cropDragStart = null;
+        cropDragMode = "select";
+        cropMoveOffset = null;
+        cropResizeHandle = "";
+        cropResizeOrigin = null;
+        cropMagnifierPoint = null;
+        cropAspectRatio = null;
+        detectedRegions = [];
+        selectedRegionIndex = -1;
+        multiRegionEnabled = false;
+        multiRegionOcrCanvases = [];
+        cropZoom = 1;
+        snapEdgesEnabled = false;
+        cropPanStart = null;
+        cropPanTranslateX = 0;
+        cropPanTranslateY = 0;
+        cropSpacePressed = false;
+        elements.cropCanvas.style.width = "100%";
+        elements.cropCanvas.style.minWidth = "100%";
+        elements.cropCanvas.style.transform = "translate(0, 0)";
+        elements.cropCanvasViewport.classList.remove("is-zoomed", "is-pan-ready", "is-panning");
+        elements.cropCanvasViewport.scrollLeft = 0;
+        elements.cropCanvasViewport.scrollTop = 0;
+        elements.zoomValue.textContent = "100%";
+        elements.snapEdgesButton.setAttribute("aria-pressed", "false");
+        elements.multiRegionButton.setAttribute("aria-pressed", "false");
+        isDetectingRegions = false;
+        elements.detectTextButton.disabled = false;
+        elements.detectTextButton.textContent = "Auto-Detect Text Region";
+        elements.detectTextStatus.textContent = "";
+        elements.detectedRegionControls.replaceChildren();
+        aspectButtons.forEach(function (button) {
+          button.setAttribute("aria-pressed", String(button.dataset.cropRatio === "free"));
+        });
         cropSourceKind = "";
         cropSourceName = "";
+        originalCropSourceCanvas = null;
+        elements.cropModal.hidden = true;
         elements.cropEditor.hidden = true;
+        document.body.classList.remove("has-crop-modal");
         elements.cameraFrame.hidden = false;
         elements.cameraControls.hidden = false;
         elements.cropCanvas.width = 1;
@@ -1335,80 +2348,729 @@
         elements.fileName.textContent = "";
         elements.fileSize.textContent = "";
         elements.runButton.disabled = true;
+        elements.recropButton.disabled = true;
         elements.resetButton.disabled = true;
         elements.canvas.width = 1;
         elements.canvas.height = 1;
+        ocrSourceCanvas = null;
+        if (pdfDocument && typeof pdfDocument.destroy === "function") pdfDocument.destroy();
+        pdfDocument = null;
+        pdfPageNumber = 1;
+        pdfFileName = "";
+        elements.pdfPageControls.hidden = true;
         resetCropEditor();
         resetOutput();
         setStatus("");
       }
 
-      function drawPreprocessedImage(image) {
+      function copyCanvas(image, scale, angle, border) {
         const naturalWidth = image.videoWidth || image.naturalWidth || image.width;
         const naturalHeight = image.videoHeight || image.naturalHeight || image.height;
-        const scale = Math.min(1, MAX_CANVAS_EDGE / Math.max(naturalWidth, naturalHeight));
-        const width = Math.max(1, Math.round(naturalWidth * scale));
-        const height = Math.max(1, Math.round(naturalHeight * scale));
-        const context = elements.canvas.getContext("2d", { willReadFrequently: true });
-
-        elements.canvas.width = width;
-        elements.canvas.height = height;
+        const radians = (angle || 0) * Math.PI / 180;
+        const scaledWidth = Math.max(1, Math.round(naturalWidth * scale));
+        const scaledHeight = Math.max(1, Math.round(naturalHeight * scale));
+        const rotatedWidth = Math.ceil(Math.abs(scaledWidth * Math.cos(radians)) + Math.abs(scaledHeight * Math.sin(radians)));
+        const rotatedHeight = Math.ceil(Math.abs(scaledWidth * Math.sin(radians)) + Math.abs(scaledHeight * Math.cos(radians)));
+        const canvas = document.createElement("canvas");
+        canvas.width = rotatedWidth + (border * 2);
+        canvas.height = rotatedHeight + (border * 2);
+        const context = canvas.getContext("2d", { willReadFrequently: true });
         context.fillStyle = "#ffffff";
-        context.fillRect(0, 0, width, height);
-        context.drawImage(image, 0, 0, width, height);
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = "high";
+        context.translate(canvas.width / 2, canvas.height / 2);
+        context.rotate(radians);
+        context.drawImage(image, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        return canvas;
+      }
 
-        const imageData = context.getImageData(0, 0, width, height);
+      function showImageProgress(label, percent) {
+        elements.imageProgressModal.hidden = false;
+        document.body.classList.add("has-crop-modal");
+        updateImageProgress(label || "Preparing image…", percent == null ? 0 : percent);
+      }
+
+      function updateImageProgress(label, percent) {
+        const value = Math.max(0, Math.min(100, Math.round(percent)));
+        elements.imageProgressLabel.textContent = label;
+        elements.imageProgressValue.textContent = value + "%";
+        elements.imageProgressBar.style.width = value + "%";
+        elements.imageProgressTrack.setAttribute("aria-valuenow", String(value));
+      }
+
+      function hideImageProgress() {
+        elements.imageProgressModal.hidden = true;
+        if (elements.cropModal.hidden) document.body.classList.remove("has-crop-modal");
+      }
+
+      function processingScale(image) {
+        const width = image.width;
+        const height = image.height;
+        const maxEdgeScale = MAX_CANVAS_EDGE / Math.max(width, height);
+        const pixelScale = Math.sqrt(MAX_CANVAS_PIXELS / (width * height));
+        const enlarge = Math.min(width, height) < 1100 ? 2 : 1;
+        return Math.max(0.1, Math.min(enlarge, maxEdgeScale, pixelScale));
+      }
+
+      function grayscaleData(canvas, contrast) {
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
         const pixels = imageData.data;
-        const contrast = 1.45;
-
+        let total = 0;
         for (let index = 0; index < pixels.length; index += 4) {
           const gray = (pixels[index] * 0.299) + (pixels[index + 1] * 0.587) + (pixels[index + 2] * 0.114);
-          const boosted = Math.max(0, Math.min(255, ((gray - 128) * contrast) + 128));
-          pixels[index] = boosted;
-          pixels[index + 1] = boosted;
-          pixels[index + 2] = boosted;
+          const adjusted = Math.max(0, Math.min(255, ((gray - 128) * contrast) + 128));
+          pixels[index] = adjusted;
+          pixels[index + 1] = adjusted;
+          pixels[index + 2] = adjusted;
+          pixels[index + 3] = 255;
+          total += adjusted;
         }
+        return { context, imageData, pixels, average: total / (pixels.length / 4) };
+      }
 
-        context.putImageData(imageData, 0, 0);
+      function otsuThreshold(pixels) {
+        const histogram = new Uint32Array(256);
+        for (let index = 0; index < pixels.length; index += 4) histogram[Math.round(pixels[index])]++;
+        const count = pixels.length / 4;
+        let sum = 0;
+        for (let value = 0; value < 256; value++) sum += value * histogram[value];
+        let backgroundCount = 0;
+        let backgroundSum = 0;
+        let bestVariance = -1;
+        let threshold = 127;
+        for (let value = 0; value < 256; value++) {
+          backgroundCount += histogram[value];
+          if (!backgroundCount) continue;
+          const foregroundCount = count - backgroundCount;
+          if (!foregroundCount) break;
+          backgroundSum += value * histogram[value];
+          const meanBackground = backgroundSum / backgroundCount;
+          const meanForeground = (sum - backgroundSum) / foregroundCount;
+          const variance = backgroundCount * foregroundCount * Math.pow(meanBackground - meanForeground, 2);
+          if (variance > bestVariance) {
+            bestVariance = variance;
+            threshold = value;
+          }
+        }
+        return threshold;
+      }
+
+      function adaptiveThreshold(canvas) {
+        const gray = grayscaleData(canvas, 1.12);
+        const width = canvas.width;
+        const height = canvas.height;
+        const integral = new Float64Array((width + 1) * (height + 1));
+        for (let y = 1; y <= height; y++) {
+          let row = 0;
+          for (let x = 1; x <= width; x++) {
+            row += gray.pixels[(((y - 1) * width) + x - 1) * 4];
+            integral[(y * (width + 1)) + x] = integral[((y - 1) * (width + 1)) + x] + row;
+          }
+        }
+        const radius = Math.max(8, Math.round(Math.min(width, height) / 45));
+        const invert = gray.average < 118;
+        for (let y = 0; y < height; y++) {
+          const top = Math.max(0, y - radius);
+          const bottom = Math.min(height - 1, y + radius);
+          for (let x = 0; x < width; x++) {
+            const left = Math.max(0, x - radius);
+            const right = Math.min(width - 1, x + radius);
+            const area = (right - left + 1) * (bottom - top + 1);
+            const sum = integral[((bottom + 1) * (width + 1)) + right + 1]
+              - integral[(top * (width + 1)) + right + 1]
+              - integral[((bottom + 1) * (width + 1)) + left]
+              + integral[(top * (width + 1)) + left];
+            const value = gray.pixels[((y * width) + x) * 4];
+            const dark = invert ? value > (sum / area) + 10 : value < (sum / area) - 10;
+            const output = dark ? 0 : 255;
+            const index = ((y * width) + x) * 4;
+            gray.pixels[index] = output;
+            gray.pixels[index + 1] = output;
+            gray.pixels[index + 2] = output;
+          }
+        }
+        removeIsolatedNoise(gray.pixels, width, height);
+        adjustCharacterWeight(gray.pixels, width, height, elements.textWeight.value);
+        gray.context.putImageData(gray.imageData, 0, 0);
+      }
+
+      function removeIsolatedNoise(pixels, width, height) {
+        const source = new Uint8ClampedArray(pixels);
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            const index = ((y * width) + x) * 4;
+            if (source[index] !== 0) continue;
+            let darkNeighbors = 0;
+            for (let offsetY = -1; offsetY <= 1; offsetY++) {
+              for (let offsetX = -1; offsetX <= 1; offsetX++) {
+                if ((offsetX || offsetY) && source[(((y + offsetY) * width) + x + offsetX) * 4] === 0) darkNeighbors++;
+              }
+            }
+            if (darkNeighbors <= 1) pixels[index] = pixels[index + 1] = pixels[index + 2] = 255;
+          }
+        }
+      }
+
+      function adjustCharacterWeight(pixels, width, height, requestedMode) {
+        let darkCount = 0;
+        for (let index = 0; index < pixels.length; index += 4) if (pixels[index] === 0) darkCount++;
+        let mode = requestedMode;
+        const darkRatio = darkCount / (width * height);
+        if (mode === "auto") mode = darkRatio < 0.025 ? "thin" : (darkRatio > 0.34 ? "bold" : "normal");
+        if (mode === "normal") return;
+        const source = new Uint8ClampedArray(pixels);
+        for (let y = 1; y < height - 1; y++) {
+          for (let x = 1; x < width - 1; x++) {
+            let darkNeighbors = 0;
+            for (let offsetY = -1; offsetY <= 1; offsetY++) {
+              for (let offsetX = -1; offsetX <= 1; offsetX++) {
+                if (source[(((y + offsetY) * width) + x + offsetX) * 4] === 0) darkNeighbors++;
+              }
+            }
+            const index = ((y * width) + x) * 4;
+            if (mode === "thin" && darkNeighbors >= 2) pixels[index] = pixels[index + 1] = pixels[index + 2] = 0;
+            if (mode === "bold" && darkNeighbors <= 4) pixels[index] = pixels[index + 1] = pixels[index + 2] = 255;
+          }
+        }
+      }
+
+      function estimateDeskew(image) {
+        const scale = Math.min(1, 700 / Math.max(image.width, image.height));
+        const sample = copyCanvas(image, scale, 0, 0);
+        const gray = grayscaleData(sample, 1);
+        const threshold = otsuThreshold(gray.pixels);
+        let bestAngle = 0;
+        let bestScore = -1;
+        let zeroScore = 0;
+        for (let angle = -5; angle <= 5; angle += 0.5) {
+          const rotated = copyCanvas(sample, 1, angle, 4);
+          const data = rotated.getContext("2d").getImageData(0, 0, rotated.width, rotated.height).data;
+          let score = 0;
+          let previous = 0;
+          for (let y = 0; y < rotated.height; y++) {
+            let dark = 0;
+            for (let x = 0; x < rotated.width; x += 2) {
+              const index = ((y * rotated.width) + x) * 4;
+              const value = (data[index] * 0.299) + (data[index + 1] * 0.587) + (data[index + 2] * 0.114);
+              if (value < threshold) dark++;
+            }
+            score += Math.pow(dark - previous, 2);
+            previous = dark;
+          }
+          if (angle === 0) zeroScore = score;
+          if (score > bestScore) {
+            bestScore = score;
+            bestAngle = angle;
+          }
+        }
+        return bestScore > zeroScore * 1.06 && Math.abs(bestAngle) >= 0.5 ? bestAngle : 0;
+      }
+
+      function createProcessedCanvas(image, mode) {
+        const angle = elements.deskewToggle.checked ? estimateDeskew(image) : 0;
+        const canvas = copyCanvas(image, processingScale(image), angle, OCR_BORDER);
+        if (mode === "original") return canvas;
+        if (mode === "threshold") {
+          adaptiveThreshold(canvas);
+          return canvas;
+        }
+        const gray = grayscaleData(canvas, 1.28);
+        if (gray.average < 118) {
+          for (let index = 0; index < gray.pixels.length; index += 4) {
+            const value = 255 - gray.pixels[index];
+            gray.pixels[index] = gray.pixels[index + 1] = gray.pixels[index + 2] = value;
+          }
+        }
+        gray.context.putImageData(gray.imageData, 0, 0);
+        return canvas;
+      }
+
+      function drawPreprocessedImage(image, mode) {
+        const processed = createProcessedCanvas(image, mode || "grayscale");
+        elements.canvas.width = processed.width;
+        elements.canvas.height = processed.height;
+        elements.canvas.getContext("2d").drawImage(processed, 0, 0);
+      }
+
+      function refreshPreview() {
+        if (!ocrSourceCanvas || isRecognizing) return;
+        const previewMode = elements.preprocessMode.value === "auto" ? "grayscale" : elements.preprocessMode.value;
+        drawPreprocessedImage(ocrSourceCanvas, previewMode);
+        elements.previewImage.src = elements.canvas.toDataURL("image/jpeg", 0.92);
+        elements.fileSize.textContent = elements.canvas.width + " x " + elements.canvas.height + " px";
+      }
+
+      function updateQualitySummary() {
+        const isAutomatic = elements.preprocessMode.value === "auto"
+          && elements.layoutMode.value === "auto"
+          && elements.contentMode.value === "text"
+          && elements.textWeight.value === "auto"
+          && elements.deskewToggle.checked;
+        elements.qualitySummary.textContent = isAutomatic ? "Automatic" : "Customized";
+      }
+
+      function cornersFromSelection(selection) {
+        return [
+          { x: selection.x, y: selection.y },
+          { x: selection.x + selection.width, y: selection.y },
+          { x: selection.x + selection.width, y: selection.y + selection.height },
+          { x: selection.x, y: selection.y + selection.height }
+        ];
+      }
+
+      function selectionFromCorners(corners) {
+        const xs = corners.map(function (point) { return point.x; });
+        const ys = corners.map(function (point) { return point.y; });
+        const left = Math.min.apply(null, xs);
+        const top = Math.min.apply(null, ys);
+        return { x: left, y: top, width: Math.max.apply(null, xs) - left, height: Math.max.apply(null, ys) - top };
+      }
+
+      function isConvexQuad(corners) {
+        if (!corners || corners.length !== 4) return false;
+        let sign = 0;
+        for (let index = 0; index < 4; index++) {
+          const a = corners[index];
+          const b = corners[(index + 1) % 4];
+          const c = corners[(index + 2) % 4];
+          const cross = ((b.x - a.x) * (c.y - b.y)) - ((b.y - a.y) * (c.x - b.x));
+          if (Math.abs(cross) < 4) return false;
+          if (!sign) sign = Math.sign(cross);
+          else if (Math.sign(cross) !== sign) return false;
+        }
+        return true;
+      }
+
+      function pointInPerspectiveQuad(point) {
+        if (!perspectiveCorners) return false;
+        let inside = false;
+        for (let current = 0, previous = 3; current < 4; previous = current++) {
+          const a = perspectiveCorners[current];
+          const b = perspectiveCorners[previous];
+          if (((a.y > point.y) !== (b.y > point.y))
+            && point.x < ((b.x - a.x) * (point.y - a.y) / (b.y - a.y)) + a.x) inside = !inside;
+        }
+        return inside;
+      }
+
+      function drawPerspectivePath(context, corners) {
+        context.beginPath();
+        context.moveTo(corners[0].x, corners[0].y);
+        corners.slice(1).forEach(function (point) { context.lineTo(point.x, point.y); });
+        context.closePath();
+      }
+
+      function perspectiveCornerAtPoint(point) {
+        if (!perspectiveCorners) return -1;
+        let match = -1;
+        let distance = 20;
+        perspectiveCorners.forEach(function (corner, index) {
+          const nextDistance = Math.hypot(point.x - corner.x, point.y - corner.y);
+          if (nextDistance <= distance) { distance = nextDistance; match = index; }
+        });
+        return match;
       }
 
       function renderCropCanvas() {
         const context = elements.cropCanvas.getContext("2d");
         const width = elements.cropCanvas.width;
         const height = elements.cropCanvas.height;
-        if (!cropSelection || width < 2 || height < 2) return;
+        if (width < 2 || height < 2) return;
 
         context.clearRect(0, 0, width, height);
         context.drawImage(elements.cameraCaptureCanvas, 0, 0, width, height);
+        if (!showCropOverlay) return;
         context.fillStyle = "rgba(2, 6, 23, 0.62)";
         context.fillRect(0, 0, width, height);
 
+        if (!cropSelection) return;
+
         const sourceScaleX = elements.cameraCaptureCanvas.width / width;
         const sourceScaleY = elements.cameraCaptureCanvas.height / height;
-        context.drawImage(
-          elements.cameraCaptureCanvas,
-          cropSelection.x * sourceScaleX,
-          cropSelection.y * sourceScaleY,
-          cropSelection.width * sourceScaleX,
-          cropSelection.height * sourceScaleY,
-          cropSelection.x,
-          cropSelection.y,
-          cropSelection.width,
-          cropSelection.height
-        );
-        context.strokeStyle = "#4ade80";
-        context.lineWidth = Math.max(2, Math.round(width / 450));
-        context.setLineDash([10, 6]);
-        context.strokeRect(
-          cropSelection.x + 1,
-          cropSelection.y + 1,
-          Math.max(0, cropSelection.width - 2),
-          Math.max(0, cropSelection.height - 2)
-        );
+        if (perspectiveEnabled && perspectiveCorners) {
+          context.save();
+          drawPerspectivePath(context, perspectiveCorners);
+          context.clip();
+          context.drawImage(elements.cameraCaptureCanvas, 0, 0, width, height);
+          context.restore();
+        } else {
+          context.drawImage(
+            elements.cameraCaptureCanvas,
+            cropSelection.x * sourceScaleX,
+            cropSelection.y * sourceScaleY,
+            cropSelection.width * sourceScaleX,
+            cropSelection.height * sourceScaleY,
+            cropSelection.x,
+            cropSelection.y,
+            cropSelection.width,
+            cropSelection.height
+          );
+        }
+
+        // Suggestions must be drawn after the bright crop image or that redraw
+        // will hide any region that sits inside the active selection.
+        detectedRegions.forEach(function (region, index) {
+          context.fillStyle = "rgba(37, 99, 235, 0.2)";
+          context.strokeStyle = "#60a5fa";
+          context.lineWidth = Math.max(3, Math.round(width / 400));
+          context.setLineDash([7, 4]);
+          context.fillRect(region.x, region.y, region.width, region.height);
+          context.strokeRect(region.x + 1, region.y + 1, Math.max(0, region.width - 2), Math.max(0, region.height - 2));
+          context.setLineDash([]);
+          context.fillStyle = "#2563eb";
+          context.fillRect(region.x + 4, region.y + 4, 20, 20);
+          context.fillStyle = "#ffffff";
+          context.font = "bold 12px system-ui";
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText(String(index + 1), region.x + 14, region.y + 14);
+        });
+        context.textAlign = "start";
+        context.textBaseline = "alphabetic";
+        context.strokeStyle = perspectiveEnabled ? "#facc15" : "#4ade80";
+        context.lineWidth = Math.max(4, Math.round(width / 300));
         context.setLineDash([]);
+        if (perspectiveEnabled && perspectiveCorners) {
+          drawPerspectivePath(context, perspectiveCorners);
+          context.stroke();
+        } else context.strokeRect(cropSelection.x + 1, cropSelection.y + 1, Math.max(0, cropSelection.width - 2), Math.max(0, cropSelection.height - 2));
+        const handleSize = Math.max(8, Math.round(width / 90));
+        context.fillStyle = perspectiveEnabled ? "#facc15" : "#4ade80";
+        const cropHandles = perspectiveEnabled && perspectiveCorners ? [] : [
+          [cropSelection.x, cropSelection.y],
+          [cropSelection.x + (cropSelection.width / 2), cropSelection.y],
+          [cropSelection.x + cropSelection.width, cropSelection.y],
+          [cropSelection.x, cropSelection.y + (cropSelection.height / 2)],
+          [cropSelection.x + cropSelection.width, cropSelection.y + (cropSelection.height / 2)],
+          [cropSelection.x, cropSelection.y + cropSelection.height],
+          [cropSelection.x + (cropSelection.width / 2), cropSelection.y + cropSelection.height],
+          [cropSelection.x + cropSelection.width, cropSelection.y + cropSelection.height]
+        ];
+        cropHandles.forEach(function (point) {
+          context.fillRect(point[0] - (handleSize / 2), point[1] - (handleSize / 2), handleSize, handleSize);
+        });
+        if (showCropGrid) {
+          const gridLines = [];
+          for (let part = 1; part < 3; part++) {
+            const ratio = part / 3;
+            if (perspectiveEnabled && perspectiveCorners) {
+              const top = { x: perspectiveCorners[0].x + (perspectiveCorners[1].x - perspectiveCorners[0].x) * ratio, y: perspectiveCorners[0].y + (perspectiveCorners[1].y - perspectiveCorners[0].y) * ratio };
+              const bottom = { x: perspectiveCorners[3].x + (perspectiveCorners[2].x - perspectiveCorners[3].x) * ratio, y: perspectiveCorners[3].y + (perspectiveCorners[2].y - perspectiveCorners[3].y) * ratio };
+              const left = { x: perspectiveCorners[0].x + (perspectiveCorners[3].x - perspectiveCorners[0].x) * ratio, y: perspectiveCorners[0].y + (perspectiveCorners[3].y - perspectiveCorners[0].y) * ratio };
+              const right = { x: perspectiveCorners[1].x + (perspectiveCorners[2].x - perspectiveCorners[1].x) * ratio, y: perspectiveCorners[1].y + (perspectiveCorners[2].y - perspectiveCorners[1].y) * ratio };
+              gridLines.push([top, bottom], [left, right]);
+            } else {
+              const gridX = cropSelection.x + (cropSelection.width * ratio);
+              const gridY = cropSelection.y + (cropSelection.height * ratio);
+              gridLines.push(
+                [{ x: gridX, y: cropSelection.y }, { x: gridX, y: cropSelection.y + cropSelection.height }],
+                [{ x: cropSelection.x, y: gridY }, { x: cropSelection.x + cropSelection.width, y: gridY }]
+              );
+            }
+          }
+          const strokeGridLines = function () {
+            gridLines.forEach(function (line) {
+              context.beginPath();
+              context.moveTo(line[0].x, line[0].y);
+              context.lineTo(line[1].x, line[1].y);
+              context.stroke();
+            });
+          };
+          context.strokeStyle = "rgba(2, 6, 23, 0.88)";
+          context.lineWidth = Math.max(4, Math.round(width / 260));
+          context.setLineDash([]);
+          strokeGridLines();
+          context.strokeStyle = "rgba(34, 211, 238, 0.96)";
+          context.lineWidth = Math.max(2, Math.round(width / 520));
+          context.setLineDash([8, 5]);
+          strokeGridLines();
+          context.setLineDash([]);
+        }
+        if (perspectiveEnabled && perspectiveCorners) {
+          context.fillStyle = "#facc15";
+          perspectiveCorners.forEach(function (point) {
+            context.save(); context.translate(point.x, point.y); context.rotate(Math.PI / 4); context.fillRect(-7, -7, 14, 14); context.restore();
+          });
+        }
+        if (cropMagnifierPoint && zoomWhileCroppingEnabled) {
+          const radius = 52;
+          const sampleSize = 42;
+          const sourceScaleX = elements.cameraCaptureCanvas.width / width;
+          const sourceScaleY = elements.cameraCaptureCanvas.height / height;
+          const bubbleX = Math.min(width - radius - 8, cropMagnifierPoint.x + radius + 18);
+          const bubbleY = Math.max(radius + 8, cropMagnifierPoint.y - radius - 18);
+          context.save();
+          context.beginPath(); context.arc(bubbleX, bubbleY, radius, 0, Math.PI * 2); context.clip();
+          context.drawImage(
+            elements.cameraCaptureCanvas,
+            (cropMagnifierPoint.x - sampleSize / 2) * sourceScaleX,
+            (cropMagnifierPoint.y - sampleSize / 2) * sourceScaleY,
+            sampleSize * sourceScaleX, sampleSize * sourceScaleY,
+            bubbleX - radius, bubbleY - radius, radius * 2, radius * 2
+          );
+          context.strokeStyle = "#4ade80"; context.lineWidth = 3;
+          context.beginPath(); context.arc(bubbleX, bubbleY, radius - 2, 0, Math.PI * 2); context.stroke();
+          context.restore();
+        }
       }
 
-      function prepareCropEditor(sourceKind, sourceName) {
+      function cropHandleAtPoint(point) {
+        if (!cropSelection) return "";
+        const radius = 14;
+        const handles = {
+          nw: [cropSelection.x, cropSelection.y], n: [cropSelection.x + cropSelection.width / 2, cropSelection.y], ne: [cropSelection.x + cropSelection.width, cropSelection.y],
+          w: [cropSelection.x, cropSelection.y + cropSelection.height / 2], e: [cropSelection.x + cropSelection.width, cropSelection.y + cropSelection.height / 2],
+          sw: [cropSelection.x, cropSelection.y + cropSelection.height], s: [cropSelection.x + cropSelection.width / 2, cropSelection.y + cropSelection.height], se: [cropSelection.x + cropSelection.width, cropSelection.y + cropSelection.height]
+        };
+        return Object.keys(handles).find(function (name) {
+          return Math.hypot(point.x - handles[name][0], point.y - handles[name][1]) <= radius;
+        }) || "";
+      }
+
+      function resizeCropFromHandle(point) {
+        const origin = cropResizeOrigin;
+        let left = origin.x, top = origin.y, right = origin.x + origin.width, bottom = origin.y + origin.height;
+        if (cropResizeHandle.includes("w")) left = Math.min(point.x, right - 12);
+        if (cropResizeHandle.includes("e")) right = Math.max(point.x, left + 12);
+        if (cropResizeHandle.includes("n")) top = Math.min(point.y, bottom - 12);
+        if (cropResizeHandle.includes("s")) bottom = Math.max(point.y, top + 12);
+        cropSelection = { x: Math.max(0, left), y: Math.max(0, top), width: Math.min(elements.cropCanvas.width, right) - Math.max(0, left), height: Math.min(elements.cropCanvas.height, bottom) - Math.max(0, top) };
+        if (cropAspectRatio) cropSelection = fitSelectionToAspect(cropSelection, cropAspectRatio);
+      }
+
+      function updateHistoryButtons() {
+        elements.undoCropButton.disabled = cropHistoryIndex <= 0;
+        elements.redoCropButton.disabled = cropHistoryIndex >= cropHistory.length - 1;
+      }
+
+      function recordCropHistory() {
+        if (!cropSelection) return;
+        const state = {
+          x: cropSelection.x, y: cropSelection.y, width: cropSelection.width, height: cropSelection.height,
+          perspective: perspectiveEnabled,
+          corners: perspectiveCorners ? perspectiveCorners.map(function (point) { return { x: point.x, y: point.y }; }) : null
+        };
+        const current = cropHistory[cropHistoryIndex];
+        if (current && JSON.stringify(current) === JSON.stringify(state)) return;
+        cropHistory = cropHistory.slice(0, cropHistoryIndex + 1);
+        cropHistory.push(state);
+        cropHistoryIndex = cropHistory.length - 1;
+        updateHistoryButtons();
+      }
+
+      function moveCropHistory(direction) {
+        const nextIndex = cropHistoryIndex + direction;
+        if (nextIndex < 0 || nextIndex >= cropHistory.length) return;
+        cropHistoryIndex = nextIndex;
+        const state = cropHistory[cropHistoryIndex];
+        cropSelection = { x: state.x, y: state.y, width: state.width, height: state.height };
+        perspectiveEnabled = Boolean(state.perspective);
+        perspectiveCorners = state.corners ? state.corners.map(function (point) { return { x: point.x, y: point.y }; }) : null;
+        elements.perspectiveButton.setAttribute("aria-pressed", String(perspectiveEnabled));
+        elements.cropAspectSelect.disabled = perspectiveEnabled;
+        updateHistoryButtons();
+        renderCropCanvas();
+      }
+
+      function fitSelectionToAspect(selection, ratio) {
+        if (!ratio || !selection) return selection;
+        const centerX = selection.x + (selection.width / 2);
+        const centerY = selection.y + (selection.height / 2);
+        let width = selection.width;
+        let height = width / ratio;
+        if (height > selection.height) {
+          height = selection.height;
+          width = height * ratio;
+        }
+        const maxWidth = Math.min(elements.cropCanvas.width, centerX * 2, (elements.cropCanvas.width - centerX) * 2);
+        const maxHeight = Math.min(elements.cropCanvas.height, centerY * 2, (elements.cropCanvas.height - centerY) * 2);
+        if (width > maxWidth) { width = maxWidth; height = width / ratio; }
+        if (height > maxHeight) { height = maxHeight; width = height * ratio; }
+        return { x: centerX - (width / 2), y: centerY - (height / 2), width: width, height: height };
+      }
+
+      function setCropAspectRatio(value) {
+        if (perspectiveEnabled) return;
+        cropAspectRatio = value === "free" ? null : Number(value);
+        aspectButtons.forEach(function (button) {
+          button.setAttribute("aria-pressed", String(button.dataset.cropRatio === value));
+        });
+        if (cropAspectRatio && cropSelection) cropSelection = fitSelectionToAspect(cropSelection, cropAspectRatio);
+        elements.cropAspectSelect.value = value;
+        recordCropHistory();
+        renderCropCanvas();
+      }
+
+      function setCropZoom(nextZoom) {
+        cropZoom = Math.max(MIN_CROP_ZOOM, Math.min(MAX_CROP_ZOOM, nextZoom));
+        cropPanTranslateX = 0;
+        cropPanTranslateY = 0;
+        elements.cropCanvas.style.transform = "translate(0, 0)";
+        elements.cropCanvas.style.width = (cropZoom * 100) + "%";
+        elements.cropCanvas.style.minWidth = cropZoom < 1 ? "0" : "100%";
+        elements.cropCanvasViewport.classList.toggle("is-zoomed", cropZoom > 1);
+        elements.cropCanvasViewport.classList.toggle("is-pan-ready", cropSpacePressed || handModeEnabled);
+        elements.zoomValue.textContent = Math.round(cropZoom * 100) + "%";
+        elements.zoomOutButton.disabled = cropZoom <= MIN_CROP_ZOOM;
+        elements.zoomInButton.disabled = cropZoom >= MAX_CROP_ZOOM;
+        if (cropZoom === 1) {
+          elements.cropCanvasViewport.scrollLeft = 0;
+          elements.cropCanvasViewport.scrollTop = 0;
+        }
+      }
+
+      function zoomCropAtPoint(nextZoom, clientX, clientY) {
+        const oldZoom = cropZoom;
+        const bounds = elements.cropCanvasViewport.getBoundingClientRect();
+        const offsetX = clientX - bounds.left;
+        const offsetY = clientY - bounds.top;
+        const contentX = elements.cropCanvasViewport.scrollLeft + offsetX;
+        const contentY = elements.cropCanvasViewport.scrollTop + offsetY;
+        setCropZoom(nextZoom);
+        const scaleChange = cropZoom / oldZoom;
+        elements.cropCanvasViewport.scrollLeft = (contentX * scaleChange) - offsetX;
+        elements.cropCanvasViewport.scrollTop = (contentY * scaleChange) - offsetY;
+      }
+
+      function edgeLuminance(data, width, x, y) {
+        const clampedX = Math.max(0, Math.min(width - 1, Math.round(x)));
+        const height = data.length / 4 / width;
+        const clampedY = Math.max(0, Math.min(height - 1, Math.round(y)));
+        const offset = ((clampedY * width) + clampedX) * 4;
+        return (data[offset] * 0.299) + (data[offset + 1] * 0.587) + (data[offset + 2] * 0.114);
+      }
+
+      function strongestEdge(data, width, axis, position, rangeStart, rangeEnd) {
+        let bestPosition = position;
+        let bestScore = 24;
+        const sampleCount = 50;
+        for (let candidate = Math.round(position - 14); candidate <= Math.round(position + 14); candidate++) {
+          if (candidate < 1 || candidate >= (axis === "x" ? width - 1 : (data.length / 4 / width) - 1)) continue;
+          let score = 0;
+          for (let sample = 0; sample < sampleCount; sample++) {
+            const along = rangeStart + ((rangeEnd - rangeStart) * sample / Math.max(1, sampleCount - 1));
+            score += axis === "x"
+              ? Math.abs(edgeLuminance(data, width, candidate - 1, along) - edgeLuminance(data, width, candidate + 1, along))
+              : Math.abs(edgeLuminance(data, width, along, candidate - 1) - edgeLuminance(data, width, along, candidate + 1));
+          }
+          score /= sampleCount;
+          if (score > bestScore) { bestScore = score; bestPosition = candidate; }
+        }
+        return bestPosition;
+      }
+
+      function snapCropToEdges() {
+        if (!cropSelection) return;
+        const scratch = document.createElement("canvas");
+        scratch.width = elements.cropCanvas.width;
+        scratch.height = elements.cropCanvas.height;
+        const context = scratch.getContext("2d", { willReadFrequently: true });
+        context.drawImage(elements.cameraCaptureCanvas, 0, 0, scratch.width, scratch.height);
+        const imageData = context.getImageData(0, 0, scratch.width, scratch.height).data;
+        const left = strongestEdge(imageData, scratch.width, "x", cropSelection.x, cropSelection.y, cropSelection.y + cropSelection.height);
+        const right = strongestEdge(imageData, scratch.width, "x", cropSelection.x + cropSelection.width, cropSelection.y, cropSelection.y + cropSelection.height);
+        const top = strongestEdge(imageData, scratch.width, "y", cropSelection.y, cropSelection.x, cropSelection.x + cropSelection.width);
+        const bottom = strongestEdge(imageData, scratch.width, "y", cropSelection.y + cropSelection.height, cropSelection.x, cropSelection.x + cropSelection.width);
+        if (right - left >= 12 && bottom - top >= 12) {
+          cropSelection = { x: left, y: top, width: right - left, height: bottom - top };
+          if (cropAspectRatio) cropSelection = fitSelectionToAspect(cropSelection, cropAspectRatio);
+          recordCropHistory();
+          renderCropCanvas();
+          elements.detectTextStatus.textContent = "Crop snapped to nearby high-contrast edges.";
+        }
+      }
+
+      function toggleSnapEdges() {
+        snapEdgesEnabled = !snapEdgesEnabled;
+        elements.snapEdgesButton.setAttribute("aria-pressed", String(snapEdgesEnabled));
+        if (snapEdgesEnabled) snapCropToEdges();
+        else elements.detectTextStatus.textContent = "Edge snapping off.";
+      }
+
+      function selectionFromPoints(start, end) {
+        if (!cropAspectRatio) {
+          return { x: Math.min(start.x, end.x), y: Math.min(start.y, end.y), width: Math.abs(end.x - start.x), height: Math.abs(end.y - start.y) };
+        }
+        const directionX = end.x < start.x ? -1 : 1;
+        const directionY = end.y < start.y ? -1 : 1;
+        let width = Math.abs(end.x - start.x);
+        let height = Math.abs(end.y - start.y);
+        if (width / Math.max(1, height) > cropAspectRatio) height = width / cropAspectRatio;
+        else width = height * cropAspectRatio;
+        const maxWidth = directionX < 0 ? start.x : elements.cropCanvas.width - start.x;
+        const maxHeight = directionY < 0 ? start.y : elements.cropCanvas.height - start.y;
+        if (width > maxWidth) { width = maxWidth; height = width / cropAspectRatio; }
+        if (height > maxHeight) { height = maxHeight; width = height * cropAspectRatio; }
+        return { x: directionX < 0 ? start.x - width : start.x, y: directionY < 0 ? start.y - height : start.y, width: width, height: height };
+      }
+
+      function resetCropAdjustments() {
+        if (originalCropSourceCanvas) {
+          elements.cameraCaptureCanvas.width = originalCropSourceCanvas.width;
+          elements.cameraCaptureCanvas.height = originalCropSourceCanvas.height;
+          elements.cameraCaptureCanvas.getContext("2d").drawImage(originalCropSourceCanvas, 0, 0);
+          const restoredScale = Math.min(1, 900 / Math.max(originalCropSourceCanvas.width, originalCropSourceCanvas.height));
+          elements.cropCanvas.width = Math.max(1, Math.round(originalCropSourceCanvas.width * restoredScale));
+          elements.cropCanvas.height = Math.max(1, Math.round(originalCropSourceCanvas.height * restoredScale));
+        }
+        const width = elements.cropCanvas.width;
+        const height = elements.cropCanvas.height;
+        const insetX = Math.max(8, Math.round(width * 0.04));
+        const insetY = Math.max(8, Math.round(height * 0.04));
+        cropSelection = {
+          x: insetX,
+          y: insetY,
+          width: Math.max(12, width - (insetX * 2)),
+          height: Math.max(12, height - (insetY * 2))
+        };
+        showCropGrid = false;
+        showCropOverlay = true;
+        perspectiveEnabled = false;
+        perspectiveCorners = null;
+        activePerspectiveCorner = -1;
+        perspectiveMoveOrigin = null;
+        handModeEnabled = false;
+        elements.gridToggleButton.setAttribute("aria-pressed", "false");
+        elements.beforeAfterButton.setAttribute("aria-pressed", "false");
+        elements.perspectiveButton.setAttribute("aria-pressed", "false");
+        elements.cropAspectSelect.disabled = false;
+        detectedRegions = [];
+        selectedRegionIndex = -1;
+        multiRegionEnabled = false;
+        elements.multiRegionButton.setAttribute("aria-pressed", "false");
+        elements.detectedRegionControls.replaceChildren();
+        setCropAspectRatio("free");
+        cropHistory = [];
+        cropHistoryIndex = -1;
+        recordCropHistory();
+        setCropZoom(1);
+        snapEdgesEnabled = false;
+        elements.snapEdgesButton.setAttribute("aria-pressed", "false");
+        cropSpacePressed = false;
+        cropPanStart = null;
+        elements.cropCanvasViewport.classList.remove("is-pan-ready", "is-panning");
+        elements.detectTextStatus.textContent = "Crop controls and rotation reset.";
+        renderCropCanvas();
+        elements.cropCanvas.focus();
+      }
+
+      function cycleCropZoom() {
+        const zoomSteps = [1, 1.5, 2, 3, 4];
+        const nextZoom = zoomSteps.find(function (value) { return value > cropZoom; }) || 1;
+        setCropZoom(nextZoom);
+        elements.detectTextStatus.textContent = "Zoom " + Math.round(cropZoom * 100) + "%.";
+      }
+
+      function prepareCropEditor(sourceKind, sourceName, preserveOriginal) {
+        if (!preserveOriginal) {
+          originalCropSourceCanvas = document.createElement("canvas");
+          originalCropSourceCanvas.width = elements.cameraCaptureCanvas.width;
+          originalCropSourceCanvas.height = elements.cameraCaptureCanvas.height;
+          originalCropSourceCanvas.getContext("2d").drawImage(elements.cameraCaptureCanvas, 0, 0);
+        }
         const sourceWidth = elements.cameraCaptureCanvas.width;
         const sourceHeight = elements.cameraCaptureCanvas.height;
         const scale = Math.min(1, 900 / Math.max(sourceWidth, sourceHeight));
@@ -1421,20 +3083,160 @@
         elements.cropCanvas.height = height;
         cropSourceKind = sourceKind;
         cropSourceName = sourceName || "";
-        elements.retakeButton.textContent = sourceKind === "camera" ? "Retake" : "Choose another";
+        elements.pdfPageControls.hidden = sourceKind !== "pdf" || !pdfDocument;
+        detectedRegions = [];
+        selectedRegionIndex = -1;
+        elements.detectTextStatus.textContent = "";
+        elements.detectedRegionControls.replaceChildren();
+        elements.retakeButton.textContent = sourceKind === "camera" ? "Retake / Replace Image" : "Upload / Replace Image";
         cropSelection = {
           x: insetX,
           y: insetY,
           width: Math.max(12, width - (insetX * 2)),
           height: Math.max(12, height - (insetY * 2))
         };
+        perspectiveEnabled = false;
+        perspectiveCorners = null;
+        activePerspectiveCorner = -1;
+        perspectiveMoveOrigin = null;
+        elements.perspectiveButton.setAttribute("aria-pressed", "false");
+        elements.cropAspectSelect.disabled = false;
+        cropHistory = [];
+        cropHistoryIndex = -1;
+        recordCropHistory();
         if (sourceKind === "camera") {
           elements.cameraFrame.hidden = true;
           elements.cameraControls.hidden = true;
         }
         elements.cropEditor.hidden = false;
+        elements.cropModal.hidden = false;
+        document.body.classList.add("has-crop-modal");
+        setCropZoom(1);
+        snapEdgesEnabled = false;
+        elements.snapEdgesButton.setAttribute("aria-pressed", "false");
         renderCropCanvas();
         elements.cropCanvas.focus();
+      }
+
+      function collectDetectedBoxes(blocks) {
+        const valid = (blocks || []).filter(function (item) {
+          return item && item.bbox && item.bbox.x1 > item.bbox.x0 && item.bbox.y1 > item.bbox.y0;
+        });
+        if (valid.length === 1 && Array.isArray(valid[0].paragraphs) && valid[0].paragraphs.length > 1) {
+          return valid[0].paragraphs.filter(function (item) { return item.bbox; });
+        }
+        return valid;
+      }
+
+      function selectDetectedRegion(index) {
+        const region = detectedRegions[index];
+        if (!region) return;
+        selectedRegionIndex = index;
+        cropSelection = fitSelectionToAspect(Object.assign({}, region), cropAspectRatio);
+        if (perspectiveEnabled) perspectiveCorners = cornersFromSelection(cropSelection);
+        Array.from(elements.detectedRegionControls.querySelectorAll(".region-button[data-region-index]")).forEach(function (button) {
+          button.setAttribute("aria-pressed", String(Number(button.dataset.regionIndex) === index));
+        });
+        elements.detectTextStatus.textContent = "Region " + (index + 1) + " selected. Drag the green crop to reposition it, or choose \"Use crop\".";
+        recordCropHistory();
+        renderCropCanvas();
+      }
+
+      function syncSelectedRegion() {
+        if (!multiRegionEnabled || selectedRegionIndex < 0 || !detectedRegions[selectedRegionIndex] || !cropSelection) return;
+        detectedRegions[selectedRegionIndex] = {
+          x: cropSelection.x,
+          y: cropSelection.y,
+          width: cropSelection.width,
+          height: cropSelection.height
+        };
+      }
+
+      function renderDetectedRegionControls() {
+        elements.detectedRegionControls.replaceChildren();
+        detectedRegions.forEach(function (_, index) {
+          const chip = document.createElement("div");
+          chip.className = "region-chip";
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "region-button";
+          button.dataset.regionIndex = String(index);
+          button.textContent = "Region " + (index + 1);
+          button.setAttribute("aria-label", "Select detected text region " + (index + 1));
+          button.setAttribute("aria-pressed", String(selectedRegionIndex === index));
+          button.addEventListener("click", function () { selectDetectedRegion(index); });
+          chip.appendChild(button);
+          const deleteButton = document.createElement("button");
+          deleteButton.type = "button";
+          deleteButton.className = "region-remove";
+          deleteButton.textContent = "×";
+          deleteButton.setAttribute("aria-label", "Delete region " + (index + 1));
+          deleteButton.title = "Delete region " + (index + 1);
+          deleteButton.addEventListener("click", function () {
+            detectedRegions.splice(index, 1);
+            if (selectedRegionIndex === index) selectedRegionIndex = -1;
+            else if (selectedRegionIndex > index) selectedRegionIndex -= 1;
+            renderDetectedRegionControls();
+            renderCropCanvas();
+            elements.detectTextStatus.textContent = detectedRegions.length
+              ? detectedRegions.length + " text region" + (detectedRegions.length === 1 ? " remains." : "s remain.")
+              : "All detected text regions removed. You can crop manually or detect again.";
+          });
+          chip.appendChild(deleteButton);
+          elements.detectedRegionControls.appendChild(chip);
+        });
+      }
+
+      async function detectTextRegions() {
+        if (isDetectingRegions || elements.cropEditor.hidden) return;
+        const requestId = ++detectionRequestId;
+        isDetectingRegions = true;
+        elements.detectTextButton.disabled = true;
+        elements.detectTextButton.textContent = "Detecting…";
+        elements.detectTextStatus.textContent = "Scanning for text blocks…";
+        try {
+          const source = elements.cameraCaptureCanvas;
+          const detectionScale = Math.min(1, 1400 / Math.max(source.width, source.height));
+          const detectionCanvas = copyCanvas(source, detectionScale, 0, 0);
+          const activeWorker = await getWorker();
+          await activeWorker.setParameters({ tessedit_pageseg_mode: window.Tesseract.PSM.AUTO, user_defined_dpi: "300" });
+          const result = await activeWorker.recognize(detectionCanvas, {}, { text: false, blocks: true });
+          if (requestId !== detectionRequestId || elements.cropEditor.hidden) return;
+          const boxes = collectDetectedBoxes(result.data.blocks);
+          const scaleX = elements.cropCanvas.width / detectionCanvas.width;
+          const scaleY = elements.cropCanvas.height / detectionCanvas.height;
+          detectedRegions = boxes.map(function (item) {
+            const margin = 6;
+            const x = Math.max(0, (item.bbox.x0 * scaleX) - margin);
+            const y = Math.max(0, (item.bbox.y0 * scaleY) - margin);
+            return {
+              x: x,
+              y: y,
+              width: Math.min(elements.cropCanvas.width - x, ((item.bbox.x1 - item.bbox.x0) * scaleX) + (margin * 2)),
+              height: Math.min(elements.cropCanvas.height - y, ((item.bbox.y1 - item.bbox.y0) * scaleY) + (margin * 2))
+            };
+          }).filter(function (region) { return region.width >= 12 && region.height >= 12; });
+          if (!detectedRegions.length) {
+            elements.detectTextStatus.textContent = "No distinct text regions found. Try a manual crop.";
+          } else {
+            const x0 = Math.min.apply(null, detectedRegions.map(function (region) { return region.x; }));
+            const y0 = Math.min.apply(null, detectedRegions.map(function (region) { return region.y; }));
+            const x1 = Math.max.apply(null, detectedRegions.map(function (region) { return region.x + region.width; }));
+            const y1 = Math.max.apply(null, detectedRegions.map(function (region) { return region.y + region.height; }));
+            cropSelection = fitSelectionToAspect({ x: x0, y: y0, width: x1 - x0, height: y1 - y0 }, cropAspectRatio);
+            renderDetectedRegionControls();
+            elements.detectTextStatus.textContent = detectedRegions.length + " text region" + (detectedRegions.length === 1 ? "" : "s") + " found. Choose a region below or click its blue outline.";
+          }
+          renderCropCanvas();
+        } catch (_) {
+          if (requestId === detectionRequestId) elements.detectTextStatus.textContent = "Text detection could not run. You can still crop manually.";
+        } finally {
+          if (requestId === detectionRequestId) {
+            isDetectingRegions = false;
+            elements.detectTextButton.disabled = false;
+            elements.detectTextButton.textContent = "Auto-Detect Text Region";
+          }
+        }
       }
 
       function cropPointFromEvent(event) {
@@ -1448,57 +3250,258 @@
       function applyCrop() {
         if (!cropSelection || cropSelection.width < 12 || cropSelection.height < 12) {
           setStatus("Select a larger crop area around the text.", "error");
-          return;
+          return false;
         }
 
-        const sourceScaleX = elements.cameraCaptureCanvas.width / elements.cropCanvas.width;
-        const sourceScaleY = elements.cameraCaptureCanvas.height / elements.cropCanvas.height;
-        const sourceX = Math.max(0, Math.floor(cropSelection.x * sourceScaleX));
-        const sourceY = Math.max(0, Math.floor(cropSelection.y * sourceScaleY));
-        const sourceWidth = Math.min(
-          elements.cameraCaptureCanvas.width - sourceX,
-          Math.max(1, Math.round(cropSelection.width * sourceScaleX))
-        );
-        const sourceHeight = Math.min(
-          elements.cameraCaptureCanvas.height - sourceY,
-          Math.max(1, Math.round(cropSelection.height * sourceScaleY))
-        );
-        const croppedCanvas = document.createElement("canvas");
-        croppedCanvas.width = sourceWidth;
-        croppedCanvas.height = sourceHeight;
-        croppedCanvas.getContext("2d").drawImage(
-          elements.cameraCaptureCanvas,
-          sourceX,
-          sourceY,
-          sourceWidth,
-          sourceHeight,
-          0,
-          0,
-          sourceWidth,
-          sourceHeight
-        );
+        if (perspectiveEnabled && (!perspectiveCorners || !isConvexQuad(perspectiveCorners))) {
+          setStatus("Keep the four perspective corners in a valid document shape.", "error");
+          return false;
+        }
+        multiRegionOcrCanvases = multiRegionEnabled && detectedRegions.length
+          ? createMultiRegionSourceCanvases()
+          : [];
+        const croppedCanvas = createCurrentCropCanvas();
+        if (!croppedCanvas) return false;
 
-        drawPreprocessedImage(croppedCanvas);
-        elements.previewImage.src = elements.canvas.toDataURL("image/jpeg", 0.92);
+        ocrSourceCanvas = croppedCanvas;
+        refreshPreview();
         elements.preview.style.display = "block";
-        elements.fileName.textContent = cropSourceKind === "camera"
+        elements.fileName.textContent = multiRegionEnabled && detectedRegions.length
+          ? detectedRegions.length + " combined OCR regions"
+          : cropSourceKind === "camera"
           ? "Cropped camera capture"
           : (cropSourceName || "Cropped uploaded image");
         elements.fileSize.textContent = elements.canvas.width + " x " + elements.canvas.height + " px";
         elements.fileMeta.hidden = false;
+        elements.cropModal.hidden = true;
         elements.cropEditor.hidden = true;
+        detectionRequestId += 1;
+        document.body.classList.remove("has-crop-modal");
         elements.cameraFrame.hidden = true;
         elements.cameraControls.hidden = true;
         elements.cropCanvas.width = 1;
         elements.cropCanvas.height = 1;
-        elements.cameraCaptureCanvas.width = 1;
-        elements.cameraCaptureCanvas.height = 1;
         cropSelection = null;
         imageReady = true;
+        isRecropping = false;
         elements.runButton.disabled = false;
+        elements.recropButton.disabled = false;
         elements.resetButton.disabled = false;
         resetOutput();
-        setStatus("Crop ready. Select \"Extract text\" to begin.", "success");
+        setStatus(multiRegionEnabled && detectedRegions.length
+          ? detectedRegions.length + " regions combined and ready for OCR."
+          : "Crop ready. Select \"Extract text\" to begin.", "success");
+        return true;
+      }
+
+      function rotateCropSource(angle) {
+        if (elements.cropEditor.hidden || !elements.cameraCaptureCanvas.width) return;
+        const degrees = Number(angle) || 90;
+        const source = elements.cameraCaptureCanvas;
+        const rotated = document.createElement("canvas");
+        const radians = degrees * Math.PI / 180;
+        rotated.width = Math.ceil(Math.abs(source.width * Math.cos(radians)) + Math.abs(source.height * Math.sin(radians)));
+        rotated.height = Math.ceil(Math.abs(source.width * Math.sin(radians)) + Math.abs(source.height * Math.cos(radians)));
+        const context = rotated.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, rotated.width, rotated.height);
+        context.translate(rotated.width / 2, rotated.height / 2);
+        context.rotate(radians);
+        context.drawImage(source, -source.width / 2, -source.height / 2);
+        source.width = rotated.width;
+        source.height = rotated.height;
+        source.getContext("2d").drawImage(rotated, 0, 0);
+        prepareCropEditor(cropSourceKind, cropSourceName, true);
+        setStatus("Image rotated " + (degrees > 0 ? "+" : "") + degrees + "°. Adjust the crop when ready.", "success");
+      }
+
+      function autoTrimBorders() {
+        const width = elements.cropCanvas.width;
+        const height = elements.cropCanvas.height;
+        const scratch = document.createElement("canvas");
+        scratch.width = width; scratch.height = height;
+        const context = scratch.getContext("2d", { willReadFrequently: true });
+        context.drawImage(elements.cameraCaptureCanvas, 0, 0, width, height);
+        const pixels = context.getImageData(0, 0, width, height).data;
+        const cornerSize = Math.max(2, Math.round(Math.min(width, height) * 0.025));
+        const samples = [[], [], []];
+        const sampleCorner = function (startX, startY) {
+          for (let y = startY; y < startY + cornerSize; y++) {
+            for (let x = startX; x < startX + cornerSize; x++) {
+              const offset = ((y * width) + x) * 4;
+              samples[0].push(pixels[offset]);
+              samples[1].push(pixels[offset + 1]);
+              samples[2].push(pixels[offset + 2]);
+            }
+          }
+        };
+        sampleCorner(0, 0);
+        sampleCorner(width - cornerSize, 0);
+        sampleCorner(0, height - cornerSize);
+        sampleCorner(width - cornerSize, height - cornerSize);
+        const borderColor = samples.map(function (channel) {
+          channel.sort(function (a, b) { return a - b; });
+          return channel[Math.floor(channel.length / 2)];
+        });
+        const borderLuminance = (borderColor[0] * 0.2126) + (borderColor[1] * 0.7152) + (borderColor[2] * 0.0722);
+        const borderName = borderLuminance < 72 ? "Black" : (borderLuminance > 210 ? "White" : "Uniform");
+        let left = width, top = height, right = -1, bottom = -1;
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const offset = ((y * width) + x) * 4;
+            const difference = Math.max(
+              Math.abs(pixels[offset] - borderColor[0]),
+              Math.abs(pixels[offset + 1] - borderColor[1]),
+              Math.abs(pixels[offset + 2] - borderColor[2])
+            );
+            if (difference > 32) {
+              left = Math.min(left, x); right = Math.max(right, x); top = Math.min(top, y); bottom = Math.max(bottom, y);
+            }
+          }
+        }
+        if (right <= left || bottom <= top) {
+          elements.detectTextStatus.textContent = "No removable uniform border found.";
+          return;
+        }
+        const margin = 4;
+        cropSelection = {
+          x: Math.max(0, left - margin), y: Math.max(0, top - margin),
+          width: Math.min(width, right + margin) - Math.max(0, left - margin),
+          height: Math.min(height, bottom + margin) - Math.max(0, top - margin)
+        };
+        if (perspectiveEnabled) perspectiveCorners = cornersFromSelection(cropSelection);
+        recordCropHistory();
+        renderCropCanvas();
+        elements.detectTextStatus.textContent = borderName + " borders trimmed automatically.";
+      }
+
+      function createCurrentCropCanvas() {
+        if (!cropSelection) return null;
+        if (multiRegionEnabled && detectedRegions.length) return createMultiRegionCropCanvas();
+        if (perspectiveEnabled && perspectiveCorners && isConvexQuad(perspectiveCorners)) return createPerspectiveCropCanvas();
+        const scaleX = elements.cameraCaptureCanvas.width / elements.cropCanvas.width;
+        const scaleY = elements.cameraCaptureCanvas.height / elements.cropCanvas.height;
+        const x = Math.max(0, Math.floor(cropSelection.x * scaleX));
+        const y = Math.max(0, Math.floor(cropSelection.y * scaleY));
+        const width = Math.min(elements.cameraCaptureCanvas.width - x, Math.max(1, Math.round(cropSelection.width * scaleX)));
+        const height = Math.min(elements.cameraCaptureCanvas.height - y, Math.max(1, Math.round(cropSelection.height * scaleY)));
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        canvas.getContext("2d").drawImage(elements.cameraCaptureCanvas, x, y, width, height, 0, 0, width, height);
+        return canvas;
+      }
+
+      function createMultiRegionCropCanvas() {
+        const regionCanvases = createMultiRegionSourceCanvases();
+        if (!regionCanvases.length) return null;
+
+        const sourceGap = 24;
+        const naturalWidth = Math.max.apply(null, regionCanvases.map(function (canvas) { return canvas.width; }));
+        const naturalHeight = regionCanvases.reduce(function (total, canvas) { return total + canvas.height; }, 0) + (sourceGap * (regionCanvases.length - 1));
+        const outputScale = Math.min(1, MAX_CANVAS_EDGE / Math.max(naturalWidth, naturalHeight), Math.sqrt(MAX_CANVAS_PIXELS / (naturalWidth * naturalHeight)));
+        const output = document.createElement("canvas");
+        output.width = Math.max(1, Math.round(naturalWidth * outputScale));
+        output.height = Math.max(1, Math.round(naturalHeight * outputScale));
+        const context = output.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, output.width, output.height);
+        let targetY = 0;
+        regionCanvases.forEach(function (regionCanvas) {
+          const targetWidth = Math.max(1, Math.round(regionCanvas.width * outputScale));
+          const targetHeight = Math.max(1, Math.round(regionCanvas.height * outputScale));
+          context.drawImage(regionCanvas, 0, targetY, targetWidth, targetHeight);
+          targetY += targetHeight + Math.round(sourceGap * outputScale);
+        });
+        return output;
+      }
+
+      function createMultiRegionSourceCanvases() {
+        const source = elements.cameraCaptureCanvas;
+        const scaleX = source.width / elements.cropCanvas.width;
+        const scaleY = source.height / elements.cropCanvas.height;
+        return detectedRegions.map(function (region) {
+          const x = Math.max(0, Math.floor(region.x * scaleX));
+          const y = Math.max(0, Math.floor(region.y * scaleY));
+          const width = Math.min(source.width - x, Math.max(1, Math.round(region.width * scaleX)));
+          const height = Math.min(source.height - y, Math.max(1, Math.round(region.height * scaleY)));
+          if (width < 1 || height < 1) return null;
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext("2d").drawImage(source, x, y, width, height, 0, 0, width, height);
+          return canvas;
+        }).filter(Boolean);
+      }
+
+      function createPerspectiveCropCanvas() {
+        const source = elements.cameraCaptureCanvas;
+        const scaleX = source.width / elements.cropCanvas.width;
+        const scaleY = source.height / elements.cropCanvas.height;
+        const corners = perspectiveCorners.map(function (point) { return { x: point.x * scaleX, y: point.y * scaleY }; });
+        const distance = function (a, b) { return Math.hypot(b.x - a.x, b.y - a.y); };
+        let outputWidth = Math.max(1, Math.round((distance(corners[0], corners[1]) + distance(corners[3], corners[2])) / 2));
+        let outputHeight = Math.max(1, Math.round((distance(corners[0], corners[3]) + distance(corners[1], corners[2])) / 2));
+        const outputScale = Math.min(1, MAX_CANVAS_EDGE / Math.max(outputWidth, outputHeight), Math.sqrt(MAX_CANVAS_PIXELS / (outputWidth * outputHeight)));
+        outputWidth = Math.max(1, Math.round(outputWidth * outputScale));
+        outputHeight = Math.max(1, Math.round(outputHeight * outputScale));
+
+        const p0 = corners[0], p1 = corners[1], p2 = corners[2], p3 = corners[3];
+        const dx1 = p1.x - p2.x, dx2 = p3.x - p2.x, dx3 = p0.x - p1.x + p2.x - p3.x;
+        const dy1 = p1.y - p2.y, dy2 = p3.y - p2.y, dy3 = p0.y - p1.y + p2.y - p3.y;
+        const denominator = (dx1 * dy2) - (dx2 * dy1);
+        let g = 0, h = 0;
+        if ((Math.abs(dx3) > 0.0001 || Math.abs(dy3) > 0.0001) && Math.abs(denominator) > 0.0001) {
+          g = ((dx3 * dy2) - (dx2 * dy3)) / denominator;
+          h = ((dx1 * dy3) - (dx3 * dy1)) / denominator;
+        }
+        const a = p1.x - p0.x + (g * p1.x);
+        const b = p3.x - p0.x + (h * p3.x);
+        const c = p0.x;
+        const d = p1.y - p0.y + (g * p1.y);
+        const e = p3.y - p0.y + (h * p3.y);
+        const f = p0.y;
+
+        const sourceContext = source.getContext("2d", { willReadFrequently: true });
+        const sourceData = sourceContext.getImageData(0, 0, source.width, source.height).data;
+        const output = document.createElement("canvas");
+        output.width = outputWidth;
+        output.height = outputHeight;
+        const outputContext = output.getContext("2d");
+        const outputImage = outputContext.createImageData(outputWidth, outputHeight);
+        const pixels = outputImage.data;
+        for (let y = 0; y < outputHeight; y++) {
+          const v = outputHeight === 1 ? 0 : y / (outputHeight - 1);
+          for (let x = 0; x < outputWidth; x++) {
+            const u = outputWidth === 1 ? 0 : x / (outputWidth - 1);
+            const divisor = (g * u) + (h * v) + 1;
+            const sourceX = Math.max(0, Math.min(source.width - 1, ((a * u) + (b * v) + c) / divisor));
+            const sourceY = Math.max(0, Math.min(source.height - 1, ((d * u) + (e * v) + f) / divisor));
+            const x0 = Math.floor(sourceX), y0 = Math.floor(sourceY);
+            const x1 = Math.min(source.width - 1, x0 + 1), y1 = Math.min(source.height - 1, y0 + 1);
+            const tx = sourceX - x0, ty = sourceY - y0;
+            const topLeft = ((y0 * source.width) + x0) * 4;
+            const topRight = ((y0 * source.width) + x1) * 4;
+            const bottomLeft = ((y1 * source.width) + x0) * 4;
+            const bottomRight = ((y1 * source.width) + x1) * 4;
+            const target = ((y * outputWidth) + x) * 4;
+            for (let channel = 0; channel < 4; channel++) {
+              const top = sourceData[topLeft + channel] + ((sourceData[topRight + channel] - sourceData[topLeft + channel]) * tx);
+              const bottom = sourceData[bottomLeft + channel] + ((sourceData[bottomRight + channel] - sourceData[bottomLeft + channel]) * tx);
+              pixels[target + channel] = top + ((bottom - top) * ty);
+            }
+          }
+        }
+        outputContext.putImageData(outputImage, 0, 0);
+        return output;
+      }
+
+      function downloadCurrentCrop() {
+        const canvas = createCurrentCropCanvas();
+        if (!canvas) return;
+        const link = document.createElement("a");
+        link.download = "ocr-crop.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
       }
 
       function restartCropSource() {
@@ -1506,8 +3509,44 @@
           startCamera();
           return;
         }
+        if (cropSourceKind === "paste" || cropSourceKind === "url") {
+          clearImage();
+          setStatus(cropSourceKind === "paste" ? "Paste another image when ready." : "Enter another image URL.");
+          return;
+        }
         clearImage();
         elements.fileInput.click();
+      }
+
+      function openRecropEditor() {
+        if (isRecognizing || !imageReady || elements.cameraCaptureCanvas.width < 2) return;
+        isRecropping = true;
+        elements.runButton.disabled = true;
+        elements.recropButton.disabled = true;
+        prepareCropEditor(cropSourceKind, cropSourceName, true);
+        setStatus("Choose a different crop from the original image.", "success");
+      }
+
+      function cancelCrop() {
+        if (elements.cropModal.hidden || isRecognizing) return;
+        if (isRecropping) {
+          detectionRequestId += 1;
+          isRecropping = false;
+          cropSelection = null;
+          elements.cropModal.hidden = true;
+          elements.cropEditor.hidden = true;
+          document.body.classList.remove("has-crop-modal");
+          elements.cropCanvas.width = 1;
+          elements.cropCanvas.height = 1;
+          elements.runButton.disabled = false;
+          elements.recropButton.disabled = false;
+          setStatus("Kept the current crop.", "success");
+          return;
+        }
+        clearImage();
+        if (activeMode === "paste") setStatus("Paste another image when ready.");
+        if (activeMode === "url") setStatus("Enter another image URL.");
+        if (activeMode === "camera") setStatus("Capture another image when ready.");
       }
 
       function stopCamera() {
@@ -1592,6 +3631,7 @@
         if (!cameraStream || elements.cameraVideo.readyState < 2 || isRecognizing) return;
 
         try {
+          showImageProgress("Processing camera image…", 30);
           const videoWidth = elements.cameraVideo.videoWidth;
           const videoHeight = elements.cameraVideo.videoHeight;
           const scale = Math.min(1, MAX_CANVAS_EDGE / Math.max(videoWidth, videoHeight));
@@ -1609,7 +3649,10 @@
           elements.resetButton.disabled = false;
           resetOutput();
           stopCamera();
+          updateImageProgress("Opening crop editor…", 92);
           prepareCropEditor("camera", "Camera capture");
+          updateImageProgress("Camera image ready", 100);
+          hideImageProgress();
           setStatus("Image captured. Adjust the crop, then select \"Use crop\".", "success");
         } catch (_) {
           setStatus("The camera image could not be captured. Try again with the text fully visible.", "error");
@@ -1622,35 +3665,29 @@
         stopCamera();
         clearImage();
         activeMode = mode;
-        const isUpload = mode === "upload";
-        elements.uploadTab.setAttribute("aria-selected", String(isUpload));
-        elements.cameraTab.setAttribute("aria-selected", String(!isUpload));
-        elements.uploadTab.tabIndex = isUpload ? 0 : -1;
-        elements.cameraTab.tabIndex = isUpload ? -1 : 0;
-        elements.uploadPanel.hidden = !isUpload;
-        elements.cameraPanel.hidden = isUpload;
-        if (shouldFocus) (isUpload ? elements.uploadTab : elements.cameraTab).focus();
+        const tabs = {
+          upload: elements.uploadTab,
+          paste: elements.pasteTab,
+          url: elements.urlTab,
+          camera: elements.cameraTab
+        };
+        const panels = {
+          upload: elements.uploadPanel,
+          paste: elements.pastePanel,
+          url: elements.urlPanel,
+          camera: elements.cameraPanel
+        };
+        Object.keys(tabs).forEach(function (name) {
+          const selected = name === mode;
+          tabs[name].setAttribute("aria-selected", String(selected));
+          tabs[name].tabIndex = selected ? 0 : -1;
+          panels[name].hidden = !selected;
+        });
+        if (shouldFocus) tabs[mode].focus();
       }
 
-      function loadFile(file) {
-        if (isRecognizing || !file) return;
-
-        const extensionLooksValid = /\.(png|jpe?g)$/i.test(file.name || "");
-        if (!ACCEPTED_TYPES.has(file.type) && !extensionLooksValid) {
-          setStatus("Please choose a PNG, JPG, or JPEG image.", "error");
-          return;
-        }
-        if (file.size > MAX_FILE_BYTES) {
-          setStatus("That image is larger than 20 MB. Choose a smaller file and try again.", "error");
-          return;
-        }
-        if (!file.size) {
-          setStatus("That image is empty or could not be read.", "error");
-          return;
-        }
-
-        if (objectUrl) URL.revokeObjectURL(objectUrl);
-        objectUrl = URL.createObjectURL(file);
+      function loadImageSource(source, name, sizeLabel, sourceKind, useCors) {
+        showImageProgress("Decoding image…", 55);
         imageReady = false;
         elements.runButton.disabled = true;
         elements.resetButton.disabled = false;
@@ -1658,8 +3695,10 @@
         setStatus("Preparing image…");
 
         const image = new Image();
+        if (useCors) image.crossOrigin = "anonymous";
         image.onload = function () {
           try {
+            updateImageProgress("Drawing image locally…", 82);
             const scale = Math.min(1, MAX_CANVAS_EDGE / Math.max(image.naturalWidth, image.naturalHeight));
             elements.cameraCaptureCanvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
             elements.cameraCaptureCanvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -1671,25 +3710,234 @@
               elements.cameraCaptureCanvas.height
             );
             elements.dropZone.style.display = "none";
-            elements.fileName.textContent = file.name || "Uploaded image";
-            elements.fileSize.textContent = formatBytes(file.size);
+            elements.fileName.textContent = name;
+            elements.fileSize.textContent = sizeLabel || (image.naturalWidth + " x " + image.naturalHeight + " px");
             elements.fileMeta.hidden = false;
-            prepareCropEditor("upload", file.name || "Uploaded image");
+            updateImageProgress("Opening crop editor…", 96);
+            prepareCropEditor(sourceKind, name);
+            updateImageProgress("Image ready", 100);
+            hideImageProgress();
             setStatus("Image ready. Adjust the crop, then select \"Use crop\".", "success");
-          } catch (error) {
+          } catch (_) {
+            hideImageProgress();
             clearImage();
-            setStatus("This image is too large for your browser to process. Try a smaller image.", "error");
+            setStatus(sourceKind === "url"
+              ? "This image host does not allow browser access. Download the image and upload it instead."
+              : "This image is too large for your browser to process. Try a smaller image.", "error");
           }
         };
         image.onerror = function () {
+          hideImageProgress();
           clearImage();
-          setStatus("The selected file is not a valid PNG or JPG image.", "error");
+          setStatus(sourceKind === "url"
+            ? "The image could not be loaded. Check the direct URL and make sure the host permits cross-origin image access."
+            : (sourceKind === "paste" ? "The supplied clipboard image is not a valid image." : "The selected file could not be loaded as an image."), "error");
         };
-        image.src = objectUrl;
+        image.src = source;
+      }
+
+      function isHeicLikeBlob(blob) {
+        if (!(blob instanceof Blob)) return false;
+        const type = String(blob.type || "").toLowerCase();
+        const name = String(blob.name || "").toLowerCase();
+        return type === "image/heic" || type === "image/heif"
+          || type === "image/heic-sequence" || type === "image/heif-sequence"
+          || type === "image/x-heic" || type === "image/x-heif"
+          || name.endsWith(".heic") || name.endsWith(".heif");
+      }
+
+      async function normalizeHeicBlob(blob) {
+        if (!isHeicLikeBlob(blob)) return blob;
+        if (typeof window.HeicTo !== "function") throw new Error("HEIC converter unavailable");
+        let lastError;
+        for (const type of ["image/png", "image/jpeg"]) {
+          try {
+            const converted = await window.HeicTo({ blob, type, quality: 1 });
+            if (converted instanceof Blob) return converted;
+          } catch (error) {
+            lastError = error;
+          }
+        }
+        throw lastError || new Error("HEIC conversion produced no image");
+      }
+
+      function isSupportedImageFile(file) {
+        if (!(file instanceof Blob)) return false;
+        const name = String(file.name || "");
+        return ACCEPTED_TYPES.has(file.type) || /\.(png|jpe?g|heic|heif|pdf)$/i.test(name);
+      }
+
+      async function isPdfFile(file) {
+        if (!file) return false;
+        if (file.type === "application/pdf" || /\.pdf$/i.test(String(file.name || ""))) return true;
+        try {
+          const signature = new Uint8Array(await file.slice(0, 5).arrayBuffer());
+          return String.fromCharCode.apply(null, signature) === "%PDF-";
+        } catch (_) {
+          hideImageProgress();
+          return false;
+        }
+      }
+
+      async function renderPdfPage(pageNumber) {
+        if (!pdfDocument) return;
+        showImageProgress("Preparing PDF page…", 58);
+        pdfPageNumber = Math.max(1, Math.min(pdfDocument.numPages, pageNumber));
+        elements.pdfPageLabel.textContent = "Page " + pdfPageNumber + " of " + pdfDocument.numPages;
+        elements.previousPdfPageButton.disabled = pdfPageNumber <= 1;
+        elements.nextPdfPageButton.disabled = pdfPageNumber >= pdfDocument.numPages;
+        setStatus("Rendering PDF page " + pdfPageNumber + " locally…");
+        const page = await pdfDocument.getPage(pdfPageNumber);
+        updateImageProgress("Rendering PDF page " + pdfPageNumber + "…", 72);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const scale = Math.min(3, MAX_CANVAS_EDGE / Math.max(baseViewport.width, baseViewport.height));
+        const viewport = page.getViewport({ scale: scale });
+        elements.cameraCaptureCanvas.width = Math.max(1, Math.floor(viewport.width));
+        elements.cameraCaptureCanvas.height = Math.max(1, Math.floor(viewport.height));
+        const context = elements.cameraCaptureCanvas.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, elements.cameraCaptureCanvas.width, elements.cameraCaptureCanvas.height);
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+        updateImageProgress("Opening crop editor…", 94);
+        imageReady = false;
+        elements.runButton.disabled = true;
+        elements.recropButton.disabled = true;
+        elements.resetButton.disabled = false;
+        resetOutput();
+        prepareCropEditor("pdf", pdfFileName + " · page " + pdfPageNumber);
+        elements.pdfPageControls.hidden = false;
+        updateImageProgress("PDF page ready", 100);
+        hideImageProgress();
+        setStatus("PDF page " + pdfPageNumber + " rendered. Adjust the crop or choose another page.", "success");
+      }
+
+      async function loadPdfFile(file) {
+        try {
+          showImageProgress("Reading PDF locally…", 12);
+          setStatus("Loading PDF locally…");
+          const pdfjs = await import("/assets/js/vendor/pdfjs/pdf.min.mjs");
+          updateImageProgress("Loading PDF document…", 32);
+          pdfjs.GlobalWorkerOptions.workerSrc = "/assets/js/vendor/pdfjs/pdf.worker.min.mjs";
+          const pdfBytes = new Uint8Array(await file.arrayBuffer());
+          updateImageProgress("Converting PDF page to an image…", 48);
+          pdfDocument = await pdfjs.getDocument({ data: pdfBytes }).promise;
+          pdfFileName = file.name || "PDF document";
+          pdfPageNumber = 1;
+          await renderPdfPage(1);
+        } catch (error) {
+          hideImageProgress();
+          console.error("PDF rendering failed:", error);
+          pdfDocument = null;
+          elements.pdfPageControls.hidden = true;
+          setStatus("This PDF could not be rendered. It may be encrypted, damaged, or use an unsupported feature.", "error");
+        }
+      }
+
+      async function loadFile(file) {
+        if (isRecognizing || !file) return;
+        showImageProgress("Reading selected file…", 8);
+
+        const pdfInput = await isPdfFile(file);
+        if (!pdfInput && !isSupportedImageFile(file)) {
+          hideImageProgress();
+          setStatus("Please choose a PNG, JPG, JPEG, HEIC, HEIF, or PDF file.", "error");
+          return;
+        }
+        if (file.size > MAX_FILE_BYTES) {
+          hideImageProgress();
+          setStatus("That image is larger than 20 MB. Choose a smaller file and try again.", "error");
+          return;
+        }
+        if (!file.size) {
+          hideImageProgress();
+          setStatus("That image is empty or could not be read.", "error");
+          return;
+        }
+        if (pdfInput) {
+          await loadPdfFile(file);
+          return;
+        }
+
+        const sourceKind = activeMode === "paste" ? "paste" : (activeMode === "url" ? "url" : "upload");
+        const name = file.name || (sourceKind === "paste" ? "Pasted image" : "Uploaded image");
+        let normalized = file;
+        if (isHeicLikeBlob(file)) {
+          updateImageProgress("Converting HEIC image locally…", 28);
+          setStatus("Converting HEIC image locally…");
+          elements.runButton.disabled = true;
+          elements.resetButton.disabled = false;
+          try {
+            normalized = await normalizeHeicBlob(file);
+            updateImageProgress("HEIC conversion complete", 52);
+          } catch (_) {
+            hideImageProgress();
+            setStatus("This HEIC or HEIF image could not be converted in this browser.", "error");
+            return;
+          }
+        }
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+        objectUrl = URL.createObjectURL(normalized);
+        loadImageSource(objectUrl, name, formatBytes(file.size), sourceKind, false);
+      }
+
+      async function pasteImage() {
+        if (!navigator.clipboard || typeof navigator.clipboard.read !== "function") {
+          setStatus("Clipboard image access is unavailable. Press Ctrl+V on this page instead.", "error");
+          return;
+        }
+
+        try {
+          const items = await navigator.clipboard.read();
+          for (const item of items) {
+            const type = item.types.find(function (candidate) { return candidate.startsWith("image/"); });
+            if (!type) continue;
+            const blob = await item.getType(type);
+            const extension = type.includes("heic") ? "heic" : (type.includes("heif") ? "heif" : (type.includes("png") ? "png" : "jpg"));
+            loadFile(new File([blob], "Pasted image." + extension, { type }));
+            return;
+          }
+          setStatus("No image was found on the clipboard. Copy an image and try again.", "error");
+        } catch (_) {
+          setStatus("Clipboard access was blocked. Press Ctrl+V on this page or allow clipboard permission.", "error");
+        }
+      }
+
+      async function loadImageUrl() {
+        const value = elements.imageUrl.value.trim();
+        let parsed;
+        try {
+          parsed = new URL(value);
+        } catch (_) {
+          setStatus("Enter a complete HTTPS image URL.", "error");
+          return;
+        }
+        if (parsed.protocol !== "https:") {
+          setStatus("Use an HTTPS image URL so the browser can load it securely.", "error");
+          return;
+        }
+        const name = decodeURIComponent(parsed.pathname.split("/").pop() || "Linked image");
+        if (/\.(heic|heif)$/i.test(parsed.pathname)) {
+          showImageProgress("Downloading linked HEIC image…", 10);
+          setStatus("Downloading HEIC image for local conversion…");
+          try {
+            const response = await fetch(parsed.href, { mode: "cors", credentials: "omit" });
+            if (!response.ok) throw new Error("Image request failed");
+            const blob = await response.blob();
+            await loadFile(new File([blob], name, { type: blob.type || "image/heic" }));
+          } catch (_) {
+            hideImageProgress();
+            setStatus("The HEIC image could not be downloaded. Make sure the host permits cross-origin browser access.", "error");
+          }
+          return;
+        }
+        loadImageSource(parsed.href, name, "Image URL", "url", true);
       }
 
       async function getWorker() {
-        if (worker) return worker;
+        const content = elements.contentMode.value;
+        const dictionaryMode = content === "code" || content === "numbers" ? "disabled" : "enabled";
+        if (worker && workerDictionaryMode === dictionaryMode) return worker;
+        if (worker) await worker.terminate();
         if (!window.Tesseract || typeof window.Tesseract.createWorker !== "function") {
           throw new Error("Tesseract.js did not load");
         }
@@ -1699,8 +3947,53 @@
             const progress = typeof message.progress === "number" ? message.progress : 0;
             updateProgress(progress, friendlyStage(message.status));
           }
-        });
+        }, dictionaryMode === "disabled" ? {
+          load_system_dawg: "0",
+          load_freq_dawg: "0"
+        } : {});
+        workerDictionaryMode = dictionaryMode;
         return worker;
+      }
+
+      async function configureWorker(activeWorker) {
+        const pageModes = {
+          auto: window.Tesseract.PSM.AUTO,
+          block: window.Tesseract.PSM.SINGLE_BLOCK,
+          sparse: window.Tesseract.PSM.SPARSE_TEXT,
+          line: window.Tesseract.PSM.SINGLE_LINE,
+          word: window.Tesseract.PSM.SINGLE_WORD
+        };
+        const content = elements.contentMode.value;
+        let pageMode = pageModes[elements.layoutMode.value] || window.Tesseract.PSM.AUTO;
+        if (content === "receipt" && elements.layoutMode.value === "auto") pageMode = window.Tesseract.PSM.SPARSE_TEXT;
+        if (content === "code" && elements.layoutMode.value === "auto") pageMode = window.Tesseract.PSM.SINGLE_LINE;
+        await activeWorker.setParameters({
+          tessedit_pageseg_mode: pageMode,
+          tessedit_char_whitelist: content === "numbers" ? "0123456789.,$%+-/:()" : "",
+          preserve_interword_spaces: content === "receipt" ? "1" : "0",
+          user_defined_dpi: "300"
+        });
+      }
+
+      async function recognizeBestCandidate(activeWorker, sourceCanvas, updatePreview) {
+        const selectedMode = elements.preprocessMode.value;
+        const modes = selectedMode === "auto" ? ["grayscale", "threshold", "original"] : [selectedMode];
+        let best = null;
+        for (let index = 0; index < modes.length; index++) {
+          const candidate = createProcessedCanvas(sourceCanvas || ocrSourceCanvas, modes[index]);
+          if (index > 0) setStatus("Trying an alternate cleanup method to improve confidence…");
+          const result = await activeWorker.recognize(candidate);
+          const confidence = Number(result.data.confidence) || 0;
+          if (!best || confidence > best.confidence) best = { result, confidence, canvas: candidate, mode: modes[index] };
+          if (selectedMode !== "auto" || confidence >= RETRY_CONFIDENCE) break;
+        }
+        if (updatePreview !== false) {
+          elements.canvas.width = best.canvas.width;
+          elements.canvas.height = best.canvas.height;
+          elements.canvas.getContext("2d").drawImage(best.canvas, 0, 0);
+          elements.previewImage.src = elements.canvas.toDataURL("image/jpeg", 0.92);
+        }
+        return best;
       }
 
       async function runOcr() {
@@ -1708,10 +4001,18 @@
 
         isRecognizing = true;
         elements.uploadTab.disabled = true;
+        elements.pasteTab.disabled = true;
+        elements.urlTab.disabled = true;
         elements.cameraTab.disabled = true;
         elements.runButton.disabled = true;
+        elements.recropButton.disabled = true;
         elements.resetButton.disabled = true;
         elements.fileInput.disabled = true;
+        elements.preprocessMode.disabled = true;
+        elements.layoutMode.disabled = true;
+        elements.contentMode.disabled = true;
+        elements.textWeight.disabled = true;
+        elements.deskewToggle.disabled = true;
         elements.output.value = "";
         elements.output.readOnly = true;
         elements.copyButton.disabled = true;
@@ -1722,8 +4023,26 @@
 
         try {
           const activeWorker = await getWorker();
-          const result = await activeWorker.recognize(elements.canvas);
-          const text = (result.data.text || "").trim();
+          await configureWorker(activeWorker);
+          let text = "";
+          let confidence = 0;
+          if (multiRegionOcrCanvases.length > 1) {
+            const regionResults = [];
+            for (let index = 0; index < multiRegionOcrCanvases.length; index++) {
+              setStatus("Recognizing region " + (index + 1) + " of " + multiRegionOcrCanvases.length + " locally…");
+              const regionBest = await recognizeBestCandidate(activeWorker, multiRegionOcrCanvases[index], false);
+              regionResults.push(regionBest);
+            }
+            const readableResults = regionResults.filter(function (item) { return (item.result.data.text || "").trim(); });
+            text = readableResults.map(function (item) { return item.result.data.text.trim(); }).join("\n\n");
+            confidence = readableResults.length
+              ? readableResults.reduce(function (total, item) { return total + item.confidence; }, 0) / readableResults.length
+              : 0;
+          } else {
+            const best = await recognizeBestCandidate(activeWorker, ocrSourceCanvas, true);
+            text = (best.result.data.text || "").trim();
+            confidence = best.confidence;
+          }
 
           updateProgress(1, "Recognition complete");
           elements.output.value = text;
@@ -1731,9 +4050,11 @@
 
           if (text) {
             const wordCount = text.split(/\s+/).filter(Boolean).length;
-            elements.resultStat.textContent = wordCount + (wordCount === 1 ? " word" : " words") + " extracted";
+            elements.resultStat.textContent = wordCount + (wordCount === 1 ? " word" : " words") + " extracted · " + Math.round(confidence) + "% confidence";
             elements.copyButton.disabled = false;
-            setStatus("Text extracted successfully.", "success");
+            setStatus(multiRegionOcrCanvases.length > 1
+              ? "Text extracted from " + multiRegionOcrCanvases.length + " regions successfully."
+              : "Text extracted successfully.", "success");
           } else {
             elements.resultStat.textContent = "No readable text found";
             setStatus("No readable text was found. Try a sharper, well-lit image with larger text.", "error");
@@ -1750,13 +4071,22 @@
               // The worker may already be unavailable.
             }
             worker = null;
+            workerDictionaryMode = "";
           }
         } finally {
           isRecognizing = false;
           elements.uploadTab.disabled = false;
+          elements.pasteTab.disabled = false;
+          elements.urlTab.disabled = false;
           elements.cameraTab.disabled = false;
           elements.fileInput.disabled = false;
+          elements.preprocessMode.disabled = false;
+          elements.layoutMode.disabled = false;
+          elements.contentMode.disabled = false;
+          elements.textWeight.disabled = false;
+          elements.deskewToggle.disabled = false;
           elements.runButton.disabled = !imageReady;
+          elements.recropButton.disabled = !imageReady;
           elements.resetButton.disabled = !imageReady;
         }
       }
@@ -1812,17 +4142,57 @@
       elements.uploadTab.addEventListener("click", function () {
         setMode("upload", false);
       });
+      elements.pasteTab.addEventListener("click", function () {
+        setMode("paste", false);
+      });
+      elements.urlTab.addEventListener("click", function () {
+        setMode("url", false);
+      });
       elements.cameraTab.addEventListener("click", function () {
         setMode("camera", false);
       });
 
-      [elements.uploadTab, elements.cameraTab].forEach(function (tab) {
+      const sourceModes = ["upload", "paste", "url", "camera"];
+      const sourceTabs = [elements.uploadTab, elements.pasteTab, elements.urlTab, elements.cameraTab];
+      sourceTabs.forEach(function (tab, index) {
         tab.addEventListener("keydown", function (event) {
           if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
             event.preventDefault();
-            setMode(activeMode === "upload" ? "camera" : "upload", true);
+            const direction = event.key === "ArrowRight" ? 1 : -1;
+            setMode(sourceModes[(index + direction + sourceModes.length) % sourceModes.length], true);
           }
         });
+      });
+
+      elements.pasteButton.addEventListener("click", pasteImage);
+      document.addEventListener("paste", function (event) {
+        if (activeMode !== "paste" || isRecognizing) return;
+        const files = Array.from((event.clipboardData && event.clipboardData.files) || []);
+        let pastedFile = files.find(isSupportedImageFile);
+        if (!pastedFile) {
+          const items = Array.from((event.clipboardData && event.clipboardData.items) || []);
+          for (const item of items) {
+            if (item.kind !== "file" || typeof item.getAsFile !== "function") continue;
+            const candidate = item.getAsFile();
+            if (isSupportedImageFile(candidate)) {
+              pastedFile = candidate;
+              break;
+            }
+          }
+        }
+        if (!pastedFile) {
+          setStatus("The pasted clipboard content does not contain an image.", "error");
+          return;
+        }
+        event.preventDefault();
+        loadFile(pastedFile);
+      });
+      elements.loadUrlButton.addEventListener("click", loadImageUrl);
+      elements.imageUrl.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          loadImageUrl();
+        }
       });
 
       elements.startCameraButton.addEventListener("click", startCamera);
@@ -1831,10 +4201,169 @@
         stopCamera();
         setStatus("Camera stopped.");
       });
+      document.addEventListener("keydown", function (event) {
+        if (event.code !== "Space" || elements.cropModal.hidden) return;
+        event.preventDefault();
+        cropSpacePressed = true;
+        elements.cropCanvasViewport.classList.add("is-pan-ready");
+      });
+      document.addEventListener("keyup", function (event) {
+        if (event.code !== "Space") return;
+        cropSpacePressed = false;
+        cropPanStart = null;
+        elements.cropCanvasViewport.classList.remove("is-pan-ready", "is-panning");
+      });
+      window.addEventListener("blur", function () {
+        cropSpacePressed = false;
+        cropPanStart = null;
+        elements.cropCanvasViewport.classList.remove("is-pan-ready", "is-panning");
+      });
+      elements.cropCanvasViewport.addEventListener("wheel", function (event) {
+        if (!zoomWhileCroppingEnabled) return;
+        event.preventDefault();
+        const direction = event.deltaY < 0 ? 0.25 : -0.25;
+        zoomCropAtPoint(cropZoom + direction, event.clientX, event.clientY);
+        elements.detectTextStatus.textContent = "Zoom " + Math.round(cropZoom * 100) + "%. Hold Space and drag to pan.";
+      }, { passive: false });
+      elements.cropCanvasViewport.addEventListener("pointerdown", function (event) {
+        if ((!cropSpacePressed && !handModeEnabled) || event.button !== 0) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        cropPanStart = {
+          clientX: event.clientX,
+          clientY: event.clientY,
+          scrollLeft: elements.cropCanvasViewport.scrollLeft,
+          scrollTop: elements.cropCanvasViewport.scrollTop,
+          translateX: cropPanTranslateX,
+          translateY: cropPanTranslateY
+        };
+        elements.cropCanvasViewport.classList.add("is-panning");
+        elements.cropCanvasViewport.setPointerCapture(event.pointerId);
+      }, true);
+      elements.cropCanvasViewport.addEventListener("pointermove", function (event) {
+        if (!cropPanStart || !elements.cropCanvasViewport.hasPointerCapture(event.pointerId)) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        elements.cropCanvasViewport.scrollLeft = cropPanStart.scrollLeft - (event.clientX - cropPanStart.clientX);
+        elements.cropCanvasViewport.scrollTop = cropPanStart.scrollTop - (event.clientY - cropPanStart.clientY);
+        if (elements.cropCanvasViewport.scrollWidth <= elements.cropCanvasViewport.clientWidth) {
+          cropPanTranslateX = cropPanStart.translateX + (event.clientX - cropPanStart.clientX);
+        }
+        if (elements.cropCanvasViewport.scrollHeight <= elements.cropCanvasViewport.clientHeight) {
+          cropPanTranslateY = cropPanStart.translateY + (event.clientY - cropPanStart.clientY);
+        }
+        elements.cropCanvas.style.transform = "translate(" + cropPanTranslateX + "px, " + cropPanTranslateY + "px)";
+      }, true);
+      ["pointerup", "pointercancel"].forEach(function (eventName) {
+        elements.cropCanvasViewport.addEventListener(eventName, function (event) {
+          if (!cropPanStart) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          if (elements.cropCanvasViewport.hasPointerCapture(event.pointerId)) {
+            elements.cropCanvasViewport.releasePointerCapture(event.pointerId);
+          }
+          cropPanStart = null;
+          elements.cropCanvasViewport.classList.remove("is-panning");
+        }, true);
+      });
+      // Mouse fallbacks keep grab-to-pan reliable in browsers that do not
+      // dispatch pointer capture consistently for a canvas inside a scroller.
+      elements.cropCanvasViewport.addEventListener("mousedown", function (event) {
+        if ((!cropSpacePressed && !handModeEnabled) || event.button !== 0 || cropPanStart) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        cropPanStart = {
+          clientX: event.clientX,
+          clientY: event.clientY,
+          scrollLeft: elements.cropCanvasViewport.scrollLeft,
+          scrollTop: elements.cropCanvasViewport.scrollTop,
+          translateX: cropPanTranslateX,
+          translateY: cropPanTranslateY
+        };
+        elements.cropCanvasViewport.classList.add("is-panning");
+      }, true);
+      document.addEventListener("mousemove", function (event) {
+        if (!cropPanStart || !elements.cropCanvasViewport.classList.contains("is-panning")) return;
+        event.preventDefault();
+        elements.cropCanvasViewport.scrollLeft = cropPanStart.scrollLeft - (event.clientX - cropPanStart.clientX);
+        elements.cropCanvasViewport.scrollTop = cropPanStart.scrollTop - (event.clientY - cropPanStart.clientY);
+        if (elements.cropCanvasViewport.scrollWidth <= elements.cropCanvasViewport.clientWidth) {
+          cropPanTranslateX = cropPanStart.translateX + (event.clientX - cropPanStart.clientX);
+        }
+        if (elements.cropCanvasViewport.scrollHeight <= elements.cropCanvasViewport.clientHeight) {
+          cropPanTranslateY = cropPanStart.translateY + (event.clientY - cropPanStart.clientY);
+        }
+        elements.cropCanvas.style.transform = "translate(" + cropPanTranslateX + "px, " + cropPanTranslateY + "px)";
+      });
+      document.addEventListener("mouseup", function () {
+        if (!cropPanStart) return;
+        cropPanStart = null;
+        elements.cropCanvasViewport.classList.remove("is-panning");
+      });
       elements.cropCanvas.addEventListener("pointerdown", function (event) {
         if (elements.cropEditor.hidden) return;
         event.preventDefault();
         cropDragStart = cropPointFromEvent(event);
+        if (perspectiveEnabled && perspectiveCorners) {
+          activePerspectiveCorner = perspectiveCornerAtPoint(cropDragStart);
+          if (activePerspectiveCorner >= 0) {
+            cropDragMode = "perspective-corner";
+            cropMagnifierPoint = cropDragStart;
+            elements.cropCanvas.setPointerCapture(event.pointerId);
+            renderCropCanvas();
+            return;
+          }
+          if (pointInPerspectiveQuad(cropDragStart)) {
+            cropDragMode = "perspective-move";
+            perspectiveMoveOrigin = {
+              point: cropDragStart,
+              corners: perspectiveCorners.map(function (point) { return { x: point.x, y: point.y }; })
+            };
+            elements.cropCanvas.setPointerCapture(event.pointerId);
+            return;
+          }
+          cropDragStart = null;
+          elements.detectTextStatus.textContent = "Drag a yellow corner to match the document, or drag inside the shape to move it.";
+          return;
+        }
+        cropResizeHandle = cropHandleAtPoint(cropDragStart);
+        if (cropResizeHandle) {
+          cropDragMode = "resize";
+          cropResizeOrigin = Object.assign({}, cropSelection);
+          cropMagnifierPoint = cropDragStart;
+          elements.cropCanvas.setPointerCapture(event.pointerId);
+          renderCropCanvas();
+          return;
+        }
+        let suggestedRegionIndex = -1;
+        for (let index = detectedRegions.length - 1; index >= 0; index--) {
+          const region = detectedRegions[index];
+          if (
+            cropDragStart.x >= region.x && cropDragStart.x <= region.x + region.width
+            && cropDragStart.y >= region.y && cropDragStart.y <= region.y + region.height
+          ) {
+            suggestedRegionIndex = index;
+            break;
+          }
+        }
+        const suggestedRegion = detectedRegions[suggestedRegionIndex];
+        if (suggestedRegion) {
+          selectDetectedRegion(suggestedRegionIndex);
+          cropDragMode = "move";
+          cropMoveOffset = {
+            x: cropDragStart.x - cropSelection.x,
+            y: cropDragStart.y - cropSelection.y
+          };
+          elements.cropCanvas.setPointerCapture(event.pointerId);
+          elements.detectTextStatus.textContent = "Region " + (suggestedRegionIndex + 1) + " selected. Drag to reposition it, or choose \"Use crop\".";
+          return;
+        }
+        cropDragMode = "select";
+        cropMoveOffset = null;
+        selectedRegionIndex = -1;
+        Array.from(elements.detectedRegionControls.children).forEach(function (button) {
+          button.setAttribute("aria-pressed", "false");
+        });
         cropSelection = {
           x: cropDragStart.x,
           y: cropDragStart.y,
@@ -1848,12 +4377,31 @@
         if (!cropDragStart || !elements.cropCanvas.hasPointerCapture(event.pointerId)) return;
         event.preventDefault();
         const point = cropPointFromEvent(event);
-        cropSelection = {
-          x: Math.min(cropDragStart.x, point.x),
-          y: Math.min(cropDragStart.y, point.y),
-          width: Math.abs(point.x - cropDragStart.x),
-          height: Math.abs(point.y - cropDragStart.y)
-        };
+        if (cropDragMode === "perspective-corner" && activePerspectiveCorner >= 0) {
+          const candidate = perspectiveCorners.map(function (corner) { return { x: corner.x, y: corner.y }; });
+          candidate[activePerspectiveCorner] = point;
+          if (isConvexQuad(candidate)) {
+            perspectiveCorners = candidate;
+            cropSelection = selectionFromCorners(perspectiveCorners);
+          }
+          cropMagnifierPoint = point;
+        } else if (cropDragMode === "perspective-move" && perspectiveMoveOrigin) {
+          let dx = point.x - perspectiveMoveOrigin.point.x;
+          let dy = point.y - perspectiveMoveOrigin.point.y;
+          const bounds = selectionFromCorners(perspectiveMoveOrigin.corners);
+          dx = Math.max(-bounds.x, Math.min(elements.cropCanvas.width - bounds.x - bounds.width, dx));
+          dy = Math.max(-bounds.y, Math.min(elements.cropCanvas.height - bounds.y - bounds.height, dy));
+          perspectiveCorners = perspectiveMoveOrigin.corners.map(function (corner) { return { x: corner.x + dx, y: corner.y + dy }; });
+          cropSelection = selectionFromCorners(perspectiveCorners);
+        } else if (cropDragMode === "resize" && cropResizeOrigin) {
+          cropMagnifierPoint = point;
+          resizeCropFromHandle(point);
+        } else if (cropDragMode === "move" && cropMoveOffset) {
+          cropSelection.x = Math.max(0, Math.min(elements.cropCanvas.width - cropSelection.width, point.x - cropMoveOffset.x));
+          cropSelection.y = Math.max(0, Math.min(elements.cropCanvas.height - cropSelection.height, point.y - cropMoveOffset.y));
+        } else {
+          cropSelection = selectionFromPoints(cropDragStart, point);
+        }
         renderCropCanvas();
       });
       ["pointerup", "pointercancel"].forEach(function (eventName) {
@@ -1863,6 +4411,16 @@
             elements.cropCanvas.releasePointerCapture(event.pointerId);
           }
           cropDragStart = null;
+          cropDragMode = "select";
+          cropMoveOffset = null;
+          cropResizeHandle = "";
+          cropResizeOrigin = null;
+          activePerspectiveCorner = -1;
+          perspectiveMoveOrigin = null;
+          cropMagnifierPoint = null;
+          if (snapEdgesEnabled && cropSelection && cropSelection.width >= 12 && cropSelection.height >= 12) snapCropToEdges();
+          syncSelectedRegion();
+          recordCropHistory();
           if (!cropSelection || cropSelection.width < 12 || cropSelection.height < 12) {
             setStatus("Drag across a larger area to select the text.", "error");
           } else {
@@ -1873,25 +4431,193 @@
       elements.cropCanvas.addEventListener("keydown", function (event) {
         if (!cropSelection || !event.key.startsWith("Arrow")) return;
         event.preventDefault();
-        const step = 5;
-        if (event.shiftKey) {
-          if (event.key === "ArrowLeft") cropSelection.width = Math.max(12, cropSelection.width - step);
-          if (event.key === "ArrowRight") cropSelection.width = Math.min(elements.cropCanvas.width - cropSelection.x, cropSelection.width + step);
-          if (event.key === "ArrowUp") cropSelection.height = Math.max(12, cropSelection.height - step);
-          if (event.key === "ArrowDown") cropSelection.height = Math.min(elements.cropCanvas.height - cropSelection.y, cropSelection.height + step);
+        const stepX = elements.cropCanvas.width / elements.cameraCaptureCanvas.width;
+        const stepY = elements.cropCanvas.height / elements.cameraCaptureCanvas.height;
+        if (perspectiveEnabled && perspectiveCorners) {
+          const dx = event.key === "ArrowLeft" ? -stepX : event.key === "ArrowRight" ? stepX : 0;
+          const dy = event.key === "ArrowUp" ? -stepY : event.key === "ArrowDown" ? stepY : 0;
+          const bounds = selectionFromCorners(perspectiveCorners);
+          const safeDx = Math.max(-bounds.x, Math.min(elements.cropCanvas.width - bounds.x - bounds.width, dx));
+          const safeDy = Math.max(-bounds.y, Math.min(elements.cropCanvas.height - bounds.y - bounds.height, dy));
+          perspectiveCorners = perspectiveCorners.map(function (corner) { return { x: corner.x + safeDx, y: corner.y + safeDy }; });
+          cropSelection = selectionFromCorners(perspectiveCorners);
+        } else if (event.shiftKey) {
+          if (cropAspectRatio) {
+            const grow = event.key === "ArrowRight" || event.key === "ArrowDown" ? stepX : -stepX;
+            const maxWidth = Math.min(elements.cropCanvas.width - cropSelection.x, (elements.cropCanvas.height - cropSelection.y) * cropAspectRatio);
+            cropSelection.width = Math.max(12, Math.min(maxWidth, cropSelection.width + grow));
+            cropSelection.height = cropSelection.width / cropAspectRatio;
+          } else {
+            if (event.key === "ArrowLeft") cropSelection.width = Math.max(12, cropSelection.width - stepX);
+            if (event.key === "ArrowRight") cropSelection.width = Math.min(elements.cropCanvas.width - cropSelection.x, cropSelection.width + stepX);
+            if (event.key === "ArrowUp") cropSelection.height = Math.max(12, cropSelection.height - stepY);
+            if (event.key === "ArrowDown") cropSelection.height = Math.min(elements.cropCanvas.height - cropSelection.y, cropSelection.height + stepY);
+          }
         } else {
-          if (event.key === "ArrowLeft") cropSelection.x = Math.max(0, cropSelection.x - step);
-          if (event.key === "ArrowRight") cropSelection.x = Math.min(elements.cropCanvas.width - cropSelection.width, cropSelection.x + step);
-          if (event.key === "ArrowUp") cropSelection.y = Math.max(0, cropSelection.y - step);
-          if (event.key === "ArrowDown") cropSelection.y = Math.min(elements.cropCanvas.height - cropSelection.height, cropSelection.y + step);
+          if (event.key === "ArrowLeft") cropSelection.x = Math.max(0, cropSelection.x - stepX);
+          if (event.key === "ArrowRight") cropSelection.x = Math.min(elements.cropCanvas.width - cropSelection.width, cropSelection.x + stepX);
+          if (event.key === "ArrowUp") cropSelection.y = Math.max(0, cropSelection.y - stepY);
+          if (event.key === "ArrowDown") cropSelection.y = Math.min(elements.cropCanvas.height - cropSelection.height, cropSelection.y + stepY);
         }
         renderCropCanvas();
+        syncSelectedRegion();
+        recordCropHistory();
+        elements.detectTextStatus.textContent = event.shiftKey ? "Crop edge resized by 1 image pixel." : "Crop moved by 1 image pixel.";
       });
       elements.applyCropButton.addEventListener("click", applyCrop);
+      elements.runCropOcrButton.addEventListener("click", function () { if (applyCrop()) runOcr(); });
+      elements.downloadCropButton.addEventListener("click", downloadCurrentCrop);
+      elements.zoomOutButton.addEventListener("click", function () { setCropZoom(cropZoom - 0.25); });
+      elements.zoomInButton.addEventListener("click", function () { setCropZoom(cropZoom + 0.25); });
+      elements.resetZoomButton.addEventListener("click", function () { setCropZoom(1); });
+      elements.snapEdgesButton.addEventListener("click", toggleSnapEdges);
+      elements.detectTextButton.addEventListener("click", detectTextRegions);
+      elements.cropAspectSelect.addEventListener("change", function () { setCropAspectRatio(elements.cropAspectSelect.value); });
+      elements.undoCropButton.addEventListener("click", function () { moveCropHistory(-1); });
+      elements.redoCropButton.addEventListener("click", function () { moveCropHistory(1); });
+      elements.resetCropButton.addEventListener("click", resetCropAdjustments);
+      elements.cropHelpButton.addEventListener("click", function () {
+        const open = elements.cropShortcutPanel.hidden;
+        elements.cropShortcutPanel.hidden = !open;
+        elements.cropHelpButton.setAttribute("aria-expanded", String(open));
+      });
+      elements.gridToggleButton.addEventListener("click", function () {
+        showCropGrid = !showCropGrid;
+        elements.gridToggleButton.setAttribute("aria-pressed", String(showCropGrid));
+        elements.detectTextStatus.textContent = showCropGrid
+          ? "Grid overlay on. Cyan rule-of-thirds guides are shown inside the crop."
+          : "Grid overlay off.";
+        renderCropCanvas();
+      });
+      elements.beforeAfterButton.addEventListener("click", function () {
+        showCropOverlay = !showCropOverlay;
+        elements.beforeAfterButton.setAttribute("aria-pressed", String(!showCropOverlay));
+        renderCropCanvas();
+      });
+      elements.zoomCropToggle.addEventListener("click", function () {
+        zoomWhileCroppingEnabled = !zoomWhileCroppingEnabled;
+        elements.zoomCropToggle.setAttribute("aria-pressed", String(zoomWhileCroppingEnabled));
+      });
+      elements.multiRegionButton.addEventListener("click", function () {
+        multiRegionEnabled = !multiRegionEnabled;
+        elements.multiRegionButton.setAttribute("aria-pressed", String(multiRegionEnabled));
+        renderDetectedRegionControls();
+        elements.detectTextStatus.textContent = multiRegionEnabled
+          ? "Multi-region mode on. Every region listed below will be combined for Preview, OCR, and Download."
+          : "Multi-region mode off. Only the active crop will be used.";
+      });
+      elements.addRegionButton.addEventListener("click", function () {
+        if (!cropSelection) return;
+        multiRegionEnabled = true;
+        elements.multiRegionButton.setAttribute("aria-pressed", "true");
+        detectedRegions.push(Object.assign({}, cropSelection));
+        renderDetectedRegionControls();
+      });
+      elements.perspectiveButton.addEventListener("click", function () {
+        perspectiveEnabled = !perspectiveEnabled;
+        if (perspectiveEnabled) {
+          cropAspectRatio = null;
+          elements.cropAspectSelect.value = "free";
+          elements.cropAspectSelect.disabled = true;
+          perspectiveCorners = cornersFromSelection(cropSelection);
+          elements.detectTextStatus.textContent = "Drag each yellow diamond onto a document corner. Preview, OCR, and Download will straighten the result.";
+        } else {
+          if (perspectiveCorners) cropSelection = selectionFromCorners(perspectiveCorners);
+          perspectiveCorners = null;
+          activePerspectiveCorner = -1;
+          perspectiveMoveOrigin = null;
+          elements.cropAspectSelect.disabled = false;
+          elements.detectTextStatus.textContent = "Perspective correction off.";
+        }
+        elements.perspectiveButton.setAttribute("aria-pressed", String(perspectiveEnabled));
+        recordCropHistory();
+        renderCropCanvas();
+      });
+      elements.autoTrimButton.addEventListener("click", autoTrimBorders);
+      elements.cropAutoDeskew.addEventListener("change", function () { elements.deskewToggle.checked = elements.cropAutoDeskew.checked; });
+      Array.from(document.querySelectorAll("[data-nudge]")).forEach(function (button) {
+        button.addEventListener("click", function () {
+          const keys = { left: "ArrowLeft", right: "ArrowRight", up: "ArrowUp", down: "ArrowDown" };
+          elements.cropCanvas.dispatchEvent(new KeyboardEvent("keydown", { key: keys[button.dataset.nudge], bubbles: true }));
+        });
+      });
+      Array.from(document.querySelectorAll("[data-rotate-angle]")).forEach(function (button) {
+        button.addEventListener("click", function () { rotateCropSource(button.dataset.rotateAngle); });
+      });
+      aspectButtons.forEach(function (button) {
+        button.addEventListener("click", function () { setCropAspectRatio(button.dataset.cropRatio); });
+      });
       elements.retakeButton.addEventListener("click", restartCropSource);
+      elements.closeCropButton.addEventListener("click", cancelCrop);
+      elements.previousPdfPageButton.addEventListener("click", function () { renderPdfPage(pdfPageNumber - 1); });
+      elements.nextPdfPageButton.addEventListener("click", function () { renderPdfPage(pdfPageNumber + 1); });
+      document.addEventListener("keydown", function (event) {
+        if (elements.cropModal.hidden || event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.key === "Escape") {
+          event.preventDefault();
+          resetCropAdjustments();
+          return;
+        }
+        const shortcut = event.key.toLowerCase();
+        if (!event.repeat && shortcut === "c") {
+          event.preventDefault();
+          cropSpacePressed = false;
+          cropPanStart = null;
+          handModeEnabled = false;
+          elements.cropCanvasViewport.classList.remove("is-pan-ready", "is-panning");
+          elements.detectTextStatus.textContent = "Crop mode active. Drag to draw a crop.";
+          elements.cropCanvas.focus();
+          return;
+        }
+        if (!event.repeat && shortcut === "h") {
+          event.preventDefault();
+          handModeEnabled = !handModeEnabled;
+          elements.cropCanvasViewport.classList.toggle("is-pan-ready", handModeEnabled);
+          elements.detectTextStatus.textContent = handModeEnabled ? "Hand mode active. Drag to pan." : "Hand mode off. Crop mode active.";
+          return;
+        }
+        if (!event.repeat && shortcut === "r") {
+          event.preventDefault();
+          rotateCropSource();
+          return;
+        }
+        if (!event.repeat && shortcut === "z") {
+          event.preventDefault();
+          cycleCropZoom();
+          return;
+        }
+        if (event.key.startsWith("Arrow") && event.target !== elements.cropCanvas) {
+          event.preventDefault();
+          elements.cropCanvas.dispatchEvent(new KeyboardEvent("keydown", {
+            key: event.key,
+            shiftKey: event.shiftKey,
+            bubbles: true
+          }));
+          return;
+        }
+        if (event.key === "Tab") {
+          const focusable = Array.from(elements.cropModal.querySelectorAll("button:not(:disabled), canvas[tabindex]"));
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      });
       elements.runButton.addEventListener("click", runOcr);
+      elements.recropButton.addEventListener("click", openRecropEditor);
       elements.resetButton.addEventListener("click", clearImage);
       elements.copyButton.addEventListener("click", copyOutput);
+      [elements.preprocessMode, elements.layoutMode, elements.contentMode, elements.textWeight, elements.deskewToggle].forEach(function (control) {
+        control.addEventListener("change", updateQualitySummary);
+      });
+      elements.preprocessMode.addEventListener("change", refreshPreview);
+      elements.textWeight.addEventListener("change", refreshPreview);
+      elements.deskewToggle.addEventListener("change", refreshPreview);
 
       window.addEventListener("pagehide", function () {
         stopCamera();
