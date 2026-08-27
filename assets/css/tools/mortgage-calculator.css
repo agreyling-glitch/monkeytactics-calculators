@@ -76,7 +76,7 @@ form label{display:flex;justify-content:space-between;margin-bottom:.45rem;color
   body.print-report .print-report-brand strong{color:#176d39;font-size:12pt}
   body.print-report .print-report-heading{display:flex;justify-content:space-between;align-items:flex-end;margin:.22in 0 .18in}
   body.print-report .print-report-heading p{margin:0 0 .04in;color:#4f6257;font-size:8pt;text-transform:uppercase;letter-spacing:.1em}
-  body.print-report .print-report-heading h1{margin:0;color:#152019;font-family:Georgia,serif;font-size:24pt;font-weight:500}
+  body.print-report .print-report-heading h2{margin:0;color:#152019;font-family:Georgia,serif;font-size:24pt;font-weight:500}
   body.print-report .print-report-heading>span{color:#4f6257;font-size:8pt}
   body.print-report .print-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #b9c7bf;border-left:1px solid #b9c7bf}
   body.print-report .print-summary-grid>div{min-height:.5in;padding:.11in .13in;border-right:1px solid #b9c7bf;border-bottom:1px solid #b9c7bf;background:#f7faf8}
