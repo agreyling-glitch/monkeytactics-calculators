@@ -5,6 +5,8 @@ export function analyze_word(word: string): any;
 
 export function board_fit_analysis(rack: string, pattern: string, options: any): any;
 
+export function crossword_search(pattern: string, available_letters: string, options: any): any;
+
 export function find_hooks(word: string): any;
 
 export function find_hooks_for_dictionary(word: string, dictionary_bit: number): any;
@@ -29,6 +31,7 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly analyze_word: (a: number, b: number) => number;
     readonly board_fit_analysis: (a: number, b: number, c: number, d: number, e: number) => number;
+    readonly crossword_search: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly find_hooks: (a: number, b: number) => number;
     readonly find_hooks_for_dictionary: (a: number, b: number, c: number) => number;
     readonly init_engine: (a: number, b: number) => void;

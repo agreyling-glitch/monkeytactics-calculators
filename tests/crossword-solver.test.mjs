@@ -1,0 +1,83 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import test from "node:test";
+
+const html = fs.readFileSync(new URL("../tools/crossword-solver.html", import.meta.url), "utf8");
+const script = fs.readFileSync(new URL("../assets/js/tools/crossword-solver.js", import.meta.url), "utf8");
+const css = fs.readFileSync(new URL("../assets/css/tools/crossword-solver.css", import.meta.url), "utf8");
+
+test("crossword solver publishes distinct metadata and structured application data", () => {
+  assert.match(html, /<title>Free Crossword Solver &amp; Pattern Finder \| MonkeyTactics<\/title>/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/monkeytactics\.com\/tools\/crossword-solver">/);
+  assert.match(html, /"@type": "SoftwareApplication"/);
+  assert.match(html, /"@type": "FAQPage"/);
+});
+
+test("crossword solver currently omits advertising slots", () => {
+  assert.doesNotMatch(html, /class="ad-container"/);
+});
+
+test("crossword solver exposes pattern-first controls and an optional letter pool", () => {
+  assert.match(html, /id="crossword-pattern"/);
+  assert.match(html, /id="available-letters"/);
+  assert.match(html, /id="word-length"/);
+  assert.match(html, /name="dictionary" value="enable" checked/);
+  assert.match(html, /name="dictionary" value="sowpods"/);
+  assert.match(html, /name="dictionary" value="both"/);
+});
+
+test("crossword solver calls the shared WASM pattern search without inventing a rack", () => {
+  assert.match(script, /Engine\.crosswordSearch\(pattern, pool, options\)/);
+  assert.match(script, /loadForPattern\(pattern\)/);
+  assert.match(script, /pattern\.includes\("\*"\)/);
+});
+
+test("crossword results override the legacy hidden calculator panel rule", () => {
+  assert.match(css, /\.crossword-page \.results-panel \{ display: block;/);
+});
+
+test("pattern previews stay on one line", () => {
+  assert.match(css, /\.result-word \{[^}]*display: inline-flex;[^}]*white-space: nowrap;/);
+  assert.match(css, /\.pattern-table code \{[^}]*white-space: nowrap;/);
+  assert.match(css, /\.sample-row button \{[^}]*white-space: nowrap;/);
+});
+
+test("fixed-length results omit redundant length labels and cannot scroll sideways", () => {
+  assert.match(script, /const hasMixedLengths = new Set\(shown\.map\(\(word\) => word\.length\)\)\.size > 1;/);
+  assert.match(script, /if \(hasMixedLengths\) \{/);
+  assert.match(script, /meta\.textContent = `\$\{word\.length\}L`;/);
+  assert.match(css, /\.word-results \{[^}]*overflow-x: hidden;[^}]*overflow-y: auto;/);
+  assert.match(css, /\.word-results li \{[^}]*min-width: 0;[^}]*overflow: hidden;/);
+});
+
+test("solver inputs and results use a stacked adaptive layout", () => {
+  assert.match(css, /\.crossword-layout \{[^}]*grid-template-columns: minmax\(0, 1fr\);/);
+  assert.match(css, /\.word-results \{[^}]*repeat\(auto-fit, minmax\(10\.5rem, 1fr\)\)/);
+});
+
+test("tool panel aligns with the full-width page panels", () => {
+  assert.match(css, /\.crossword-page \.tool-widget \{ width: 100%; max-width: none; box-sizing: border-box;/);
+});
+
+test("result tiles keep breathing room beside the vertical scrollbar", () => {
+  assert.match(css, /\.word-results \{[^}]*padding: 0 \.75rem 0 0;[^}]*scrollbar-gutter: stable;/);
+});
+
+test("results use a thin branded scrollbar", () => {
+  assert.match(css, /\.word-results \{ scrollbar-width: thin; scrollbar-color: rgba\(74, 222, 128, \.42\)/);
+  assert.match(css, /\.word-results::\-webkit-scrollbar \{ width: 7px; \}/);
+  assert.match(css, /\.word-results::\-webkit-scrollbar-thumb:hover/);
+});
+
+test("secondary crossword filters live in a collapsed disclosure", () => {
+  assert.match(html, /<details class="filter-disclosure" id="filter-disclosure">/);
+  assert.match(html, /<strong>Filters <em id="active-filter-count">\(0 active\)<\/em><\/strong>/);
+  assert.doesNotMatch(html, /<details class="filter-disclosure"[^>]* open/);
+  assert.match(css, /\.filter-disclosure\[open\] summary i/);
+});
+
+test("collapsed filter summary reports the live number of narrowing criteria", () => {
+  assert.match(script, /function updateActiveFilterCount\(\)/);
+  assert.match(script, /activeFilterCount\.textContent = `\(\$\{active\} active\)`;/);
+  assert.match(script, /\[lengthInput, poolInput, startsInput, endsInput, includeInput, excludeInput\]/);
+});

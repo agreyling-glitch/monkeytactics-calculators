@@ -5,6 +5,7 @@ import test from "node:test";
 import init, {
   analyze_word,
   board_fit_analysis,
+  crossword_search,
   find_hooks_for_dictionary,
   init_engine,
   score_word,
@@ -57,6 +58,13 @@ test("searches, scores, and finds dictionary hooks through WASM", () => {
     fitting: 1,
     excluded: 2
   });
+});
+
+test("searches crossword patterns without requiring rack letters", () => {
+  const options = { dictionaryBit: 1, sortBy: "alpha" };
+  assert.deepEqual(crossword_search("???", "", options), ["ate", "eat", "tea"]);
+  assert.deepEqual(crossword_search("???", "ate", options), ["ate", "eat", "tea"]);
+  assert.deepEqual(crossword_search("???", "at", options), []);
 });
 
 test("returns analysis data in the bridge's expected shape", () => {

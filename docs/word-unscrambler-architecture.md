@@ -333,6 +333,7 @@ This separation keeps the existing UI independent of Rust implementation details
 | `verify_domain` | Used during `ready` | Authorize the browser hostname. |
 | `init_engine` | `initEngine` | Add decompressed dictionary records to indexes. |
 | `unscramble` | `unscramble` | Search, filter, and sort words. |
+| `crossword_search` | `crosswordSearch` | Search pattern-first without a rack constraint, or optionally enforce an available-letter pool. |
 | `score_word` | `scoreWord` | Return a word's base Scrabble score. |
 | `find_hooks` | Direct generated API | Find hooks against the dictionary union. |
 | `find_hooks_for_dictionary` | `findHooks` | Find hooks for the selected dictionary bit. |

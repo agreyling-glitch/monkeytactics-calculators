@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Free Crossword Solver &amp; Pattern Finder | MonkeyTactics</title>
+  <meta name="description" content="Solve crossword clues by pattern. Enter known letters and blanks to find matching words using ENABLE and SOWPODS dictionaries.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://monkeytactics.com/tools/crossword-solver">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Free Crossword Solver &amp; Pattern Finder">
+  <meta property="og:description" content="Enter known letters and blanks to find matching crossword answers by pattern and length.">
+  <meta property="og:url" content="https://monkeytactics.com/tools/crossword-solver">
+  <meta property="og:site_name" content="MonkeyTactics">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Free Crossword Solver &amp; Pattern Finder">
+  <meta name="twitter:description" content="Search crossword answers by known letters, blanks, length, and dictionary.">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://monkeytactics.com/tools/crossword-solver#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://monkeytactics.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://monkeytactics.com/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Crossword Solver", "item": "https://monkeytactics.com/tools/crossword-solver" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://monkeytactics.com/tools/crossword-solver#app",
+        "name": "Crossword Solver and Word Pattern Finder",
+        "url": "https://monkeytactics.com/tools/crossword-solver",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "description": "A private browser-based crossword answer finder that searches ENABLE and SOWPODS dictionaries by letter pattern, blanks, word length, and optional letter filters.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": ["Single-letter blank wildcard", "Flexible-length wildcard", "Word length filter", "ENABLE and SOWPODS dictionaries", "Optional available-letter pool", "Private in-browser matching"]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "How do I solve a crossword clue with this tool?", "acceptedAnswer": { "@type": "Answer", "text": "Enter the answer pattern using letters you know and question marks for blank squares. For example, C?A?E searches five-letter words with C, A, and E in those positions." } },
+          { "@type": "Question", "name": "How do I search by pattern only?", "acceptedAnswer": { "@type": "Answer", "text": "Enter a pattern and leave Available Letters empty. The solver searches the selected dictionary without limiting words to a letter rack." } },
+          { "@type": "Question", "name": "Can I limit results to a specific length?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. A pattern without an asterisk already fixes the answer length. You can also set Word Length, especially when using an asterisk for a flexible-length pattern." } },
+          { "@type": "Question", "name": "What do question marks and asterisks mean?", "acceptedAnswer": { "@type": "Answer", "text": "A question mark stands for exactly one unknown letter. An asterisk stands for zero or more letters." } },
+          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Dictionary matching runs locally in your browser and your pattern is not uploaded." } }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
+  <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
+  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260827-9">
+  <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
+  <script src="../assets/js/shared/ads.js" defer></script>
+</head>
+<body class="premium-tool-page crossword-page">
+  <main>
+    <div id="mt-header"></div>
+    <script type="module" src="/assets/wasm/menu/menu.js?v=20260812-menu-assets-v2"></script>
+
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span class="sep" aria-hidden="true">/</span>
+        <a href="/tools/#text-data">Text &amp; Data</a><span class="sep" aria-hidden="true">/</span>
+        <span aria-current="page">Crossword Solver</span>
+      </nav>
+      <div class="premium-hero-grid">
+        <div>
+          <p class="premium-eyebrow">Private, pattern-first word search</p>
+          <h1 id="tool-heading">Crossword Solver &amp; Word Pattern Finder</h1>
+          <p class="premium-hero-copy">Solve crossword clues by pattern—enter known letters and blanks to find matching words.</p>
+          <div class="premium-hero-pills" aria-label="Crossword solver features"><span>ENABLE &amp; SOWPODS</span><span>Searches stay local</span></div>
+        </div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>Known letters meet blanks</span><strong>C?A?E</strong><small>Turn the shape in your grid into a focused answer list.</small></div>
+      </div>
+    </section>
+
+    <section class="tool-widget" aria-labelledby="solver-heading">
+      <form id="crossword-form" novalidate>
+        <div class="solver-heading">
+          <div><div class="premium-section-kicker">01 / Find the fit</div><h2 id="solver-heading">Search Crossword Answers by Pattern</h2><p>Start with the squares you know, then narrow the answer list only as much as needed.</p></div>
+          <fieldset class="dictionary-selector">
+            <legend class="visually-hidden">Dictionary</legend>
+            <div class="segmented-control">
+              <label><input type="radio" name="dictionary" value="enable" checked><span>ENABLE</span></label>
+              <label><input type="radio" name="dictionary" value="sowpods"><span>SOWPODS</span></label>
+              <label><input type="radio" name="dictionary" value="both"><span>Both</span></label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="crossword-layout">
+          <div class="solver-panel">
+            <div class="pattern-label-row"><label for="crossword-pattern">Answer pattern</label><span id="pattern-length-preview">Use ? for one blank</span></div>
+            <input class="pattern-input" id="crossword-pattern" name="pattern" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" placeholder="C?A?E" aria-describedby="pattern-hint form-message" required>
+            <p class="pattern-hint" id="pattern-hint"><code>?</code> is one unknown letter. <code>*</code> is any number of letters. Dots, underscores, and hyphens also become <code>?</code>.</p>
+            <div class="sample-row" aria-label="Example searches">
+              <button type="button" data-pattern="C?A?E" data-length="5">Try C?A?E</button>
+              <button type="button" data-pattern="??ING" data-length="5">Try ??ING</button>
+              <button type="button" data-pattern="B*" data-length="0">Try B*</button>
+            </div>
+            <details class="filter-disclosure" id="filter-disclosure">
+              <summary><span><strong>Filters <em id="active-filter-count">(0 active)</em></strong><small>Length, sorting, letter pool, and extra filters</small></span><i aria-hidden="true"></i></summary>
+              <div class="field-grid">
+                <div class="field"><label for="word-length">Word length</label><input id="word-length" type="number" min="0" max="30" value="0" inputmode="numeric"><small>0 = automatic</small></div>
+                <div class="field"><label for="sort-results">Sort results</label><select id="sort-results"><option value="alpha">Alphabetical</option><option value="length-desc">Longest first</option><option value="length-asc">Shortest first</option><option value="pattern-strength">Strongest pattern</option></select></div>
+                <div class="field pool-field"><label for="available-letters">Available letters <span class="visually-hidden">optional</span></label><input id="available-letters" type="text" maxlength="30" autocomplete="off" spellcheck="false" placeholder="Optional letter pool, e.g. CRANEB??"><small>Leave empty for normal crossword search. Add a pool only when the puzzle limits which letters may be used.</small></div>
+                <div class="field"><label for="starts-with">Starts with</label><input id="starts-with" type="text" maxlength="30" autocomplete="off" spellcheck="false" placeholder="e.g. BR"></div>
+                <div class="field"><label for="ends-with">Ends with</label><input id="ends-with" type="text" maxlength="30" autocomplete="off" spellcheck="false" placeholder="e.g. ED"></div>
+                <div class="field"><label for="must-include">Must include</label><input id="must-include" type="text" maxlength="30" autocomplete="off" spellcheck="false" placeholder="e.g. QU"></div>
+                <div class="field"><label for="exclude-letters">Exclude letters</label><input id="exclude-letters" type="text" maxlength="30" autocomplete="off" spellcheck="false" placeholder="e.g. XZ"></div>
+              </div>
+            </details>
+            <div class="solver-actions"><button id="solve-button" type="submit" disabled><span id="solve-button-label">Loading dictionary…</span></button><button id="clear-search" type="button">Clear</button></div>
+            <p id="form-message" role="alert" hidden></p>
+          </div>
+
+          <section class="results-panel" id="results" aria-live="polite" aria-busy="false" aria-labelledby="results-heading">
+            <header><div><h2 id="results-heading">Your matches will appear here</h2><p id="results-summary">Known letters stay highlighted so you can scan answers quickly.</p></div><span class="result-legend"><i class="legend-cell"></i>known</span></header>
+            <ul class="word-results" id="word-results"></ul>
+          </section>
+        </div>
+      </form>
+    </section>
+
+    <section class="content-grid" aria-label="Crossword solver guide">
+      <article class="content-card">
+        <p class="premium-section-kicker">02 / Read the grid</p>
+        <h2>How to Use the Crossword Solver</h2>
+        <ol>
+          <li>Count the answer squares. Enter each known letter in its position and use <code>?</code> for every blank.</li>
+          <li>Select ENABLE for a broad general-English list, SOWPODS for international word-game vocabulary, or Both.</li>
+          <li>Set Word Length when your pattern uses <code>*</code>, or when you want an extra check against the grid.</li>
+          <li>Add Starts With, Ends With, Must Include, or Exclude Letters only when the clue or crossing answers support them.</li>
+          <li>Open a result to check its definition against the clue.</li>
+        </ol>
+        <p class="crossword-link-callout">Have a rack of letters instead of a grid pattern? Use the <a href="/tools/word-unscrambler">Word Unscrambler &amp; Scrabble Word Finder →</a></p>
+      </article>
+      <aside class="content-card">
+        <p class="premium-section-kicker">Pattern language</p>
+        <h2>Pattern Examples</h2>
+        <table class="pattern-table">
+          <thead><tr><th>Enter</th><th>Find</th></tr></thead>
+          <tbody>
+            <tr><td><code>C?A?E</code></td><td>Five letters with C, A, and E fixed</td></tr>
+            <tr><td><code>??ING</code></td><td>Any five-letter word ending in ING</td></tr>
+            <tr><td><code>B*</code></td><td>Any length beginning with B</td></tr>
+            <tr><td><code>*TION</code></td><td>Any length ending in TION</td></tr>
+          </tbody>
+        </table>
+      </aside>
+    </section>
+
+    <section class="content-card faq-section" aria-labelledby="faq-heading">
+      <p class="premium-section-kicker">03 / Common questions</p>
+      <h2 id="faq-heading">Crossword Solver FAQ</h2>
+      <details><summary>How do I solve a crossword clue with this?</summary><p>Combine the clue with the letter positions supplied by crossing answers. Enter known letters exactly where they appear and use <code>?</code> for each empty square. Then compare the matching words with the clue's meaning, tense, and wordplay.</p></details>
+      <details><summary>How do I search by pattern only?</summary><p>Enter the pattern and leave Available Letters empty. Unlike an unscrambler, this solver does not enforce rack-letter counts unless you deliberately provide a letter pool.</p></details>
+      <details><summary>Can I limit results to a specific length?</summary><p>Yes. Patterns without <code>*</code> already have a fixed length. You can also set Word Length, which is especially useful with flexible patterns such as <code>B*</code>.</p></details>
+      <details><summary>What is the difference between ? and *?</summary><p>A question mark matches exactly one letter—the equivalent of one empty grid square. An asterisk matches zero or more letters, so it is useful when you know an edge or fragment but not the total length.</p></details>
+      <details><summary>Which dictionary should I choose?</summary><p>ENABLE is a broad public-domain English word list suited to general searches. SOWPODS includes international word-game vocabulary. Both searches their deduplicated union, which is larger and may include obscure entries.</p></details>
+      <details><summary>Are my searches private?</summary><p>Yes. The dictionaries and matching engine run entirely in your browser. Your pattern and filters are not sent to a search service.</p></details>
+    </section>
+
+    <section class="related-tools" aria-labelledby="related-heading">
+      <h2 id="related-heading">Related Word Tools</h2>
+      <div class="related-grid">
+        <a href="/tools/word-unscrambler" class="related-card"><strong>Word Unscrambler</strong><span>Turn rack letters into playable words with wildcards and filters.</span></a>
+        <a href="/tools/word-character-counter" class="related-card"><strong>Word &amp; Character Counter</strong><span>Count words, characters, and reading time as you type.</span></a>
+        <a href="/tools/password-generator" class="related-card"><strong>Password Generator</strong><span>Create strong passwords and memorable passphrases.</span></a>
+      </div>
+    </section>
+  </main>
+
+  <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot"><div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div><a class="trustpilot-review-link" href="https://www.trustpilot.com/evaluate/monkeytactics.com" target="_blank" rel="noopener noreferrer"><img src="/assets/images/trustpilot-review.svg" width="360" height="52" alt="Review MonkeyTactics on Trustpilot"></a></section>
+  <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
+  <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-crossword-1" defer></script>
+  <script src="../assets/js/tools/crossword-solver.js?v=20260827-3" defer></script>
+</body>
+</html>

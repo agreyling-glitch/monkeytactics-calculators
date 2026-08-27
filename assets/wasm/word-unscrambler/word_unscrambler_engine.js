@@ -27,6 +27,21 @@ export function board_fit_analysis(rack, pattern, options) {
 }
 
 /**
+ * @param {string} pattern
+ * @param {string} available_letters
+ * @param {any} options
+ * @returns {any}
+ */
+export function crossword_search(pattern, available_letters, options) {
+    const ptr0 = passStringToWasm0(pattern, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(available_letters, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.crossword_search(ptr0, len0, ptr1, len1, addHeapObject(options));
+    return takeObject(ret);
+}
+
+/**
  * @param {string} word
  * @returns {any}
  */

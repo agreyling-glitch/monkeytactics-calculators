@@ -111,6 +111,20 @@ pub fn unscramble(rack: String, pattern: String, options: JsValue) -> JsValue {
 }
 
 #[wasm_bindgen]
+pub fn crossword_search(pattern: String, available_letters: String, options: JsValue) -> JsValue {
+    let options: SearchOptions = match serde_wasm_bindgen::from_value(options) {
+        Ok(options) => options,
+        Err(error) => return JsValue::from_str(&format!("Invalid search options: {error}")),
+    };
+    let matches = ENGINE.with(|engine| {
+        engine
+            .borrow_mut()
+            .find_crossword_matches(&pattern, &available_letters, &options)
+    });
+    serde_wasm_bindgen::to_value(&matches).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen]
 pub fn score_word(word: String) -> i32 {
     score(&word)
 }
@@ -243,6 +257,42 @@ impl Engine {
             }
         }
 
+        self.sort_matches(&mut matches, pattern, options);
+        matches
+    }
+
+    fn find_crossword_matches(
+        &mut self,
+        pattern: &str,
+        available_letters: &str,
+        options: &SearchOptions,
+    ) -> Vec<String> {
+        let minimum_pattern_length = pattern.bytes().filter(|byte| *byte != b'*').count();
+        let variable_pattern = pattern.contains('*');
+        if pattern.is_empty()
+            || (options.word_length > 0
+                && (options.word_length < minimum_pattern_length
+                    || (!variable_pattern && pattern.len() != options.word_length)))
+        {
+            return Vec::new();
+        }
+
+        let pool = (!available_letters.is_empty()).then(|| rack_counts(available_letters));
+        let mut matches = Vec::new();
+        for (word, info) in &self.metadata {
+            if word.len() < minimum_pattern_length
+                || (options.word_length > 0 && word.len() != options.word_length)
+                || (!variable_pattern && word.len() != pattern.len())
+                || pool.as_ref().is_some_and(|(letters, wildcards)| {
+                    !can_build(&signature(word), letters, *wildcards)
+                })
+            {
+                continue;
+            }
+            if self.word_matches(word, info, pattern, options) {
+                matches.push(word.clone());
+            }
+        }
         self.sort_matches(&mut matches, pattern, options);
         matches
     }
@@ -640,6 +690,29 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(engine.find_matches("a?e", "?a*", &options), vec!["eat"]);
+    }
+
+    #[test]
+    fn searches_crossword_patterns_without_a_rack() {
+        let mut engine = engine();
+        let options = SearchOptions {
+            dictionary_bit: ENABLE,
+            sort_by: "alpha".into(),
+            ..Default::default()
+        };
+        assert_eq!(
+            engine.find_crossword_matches("???", "", &options),
+            vec!["ate", "eat", "tea"]
+        );
+        assert_eq!(
+            engine.find_crossword_matches("???", "ate", &options),
+            vec!["ate", "eat", "tea"]
+        );
+        assert!(
+            engine
+                .find_crossword_matches("???", "at", &options)
+                .is_empty()
+        );
     }
 
     #[test]

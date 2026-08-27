@@ -100,7 +100,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 27);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 28);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -513,7 +513,7 @@ test("featured pages keep only the lower ad and top tools invite Trustpilot revi
     .map((name) => `tools/${name}`)
     .filter((name) => fs.readFileSync(path.join(siteRoot, name), "utf8").includes('class="review-collector"'));
 
-  assert.equal(reviewPages.length, 23, "all review prompts should be covered");
+  assert.equal(reviewPages.length, 24, "all review prompts should be covered");
 
   for (const name of reviewPages) {
     const html = fs.readFileSync(path.join(siteRoot, name), "utf8");

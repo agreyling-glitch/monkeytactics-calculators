@@ -3,6 +3,7 @@
 export const memory: WebAssembly.Memory;
 export const analyze_word: (a: number, b: number) => number;
 export const board_fit_analysis: (a: number, b: number, c: number, d: number, e: number) => number;
+export const crossword_search: (a: number, b: number, c: number, d: number, e: number) => number;
 export const find_hooks: (a: number, b: number) => number;
 export const find_hooks_for_dictionary: (a: number, b: number, c: number) => number;
 export const init_engine: (a: number, b: number) => void;
