@@ -5,6 +5,7 @@ import test from "node:test";
 
 const siteRoot = path.resolve(import.meta.dirname, "..");
 const decoderHtml = fs.readFileSync(path.join(siteRoot, "tools", "qr-code-decoder.html"), "utf8");
+const toolsSitemap = fs.readFileSync(path.join(siteRoot, "sitemap-tools.xml"), "utf8");
 const rustSource = fs.readFileSync(path.join(siteRoot, "wasm", "qr-code-decoder-engine", "src", "lib.rs"), "utf8");
 const fixture = path.join(siteRoot, "tests", "fixtures", "qr-code-decoder", "peter-schiff-stylized.png");
 const upscaledFixture = path.join(siteRoot, "tests", "fixtures", "qr-code-decoder", "peter-schiff-stylized-upscaled.jpg");
@@ -30,17 +31,50 @@ test("QR decoder ships the Rust and ZXing WASM pipeline", () => {
 
 test("QR decoder ships a current, self-hosted HEIC conversion fallback", () => {
   assert.match(decoderHtml, /assets\/js\/vendor\/heic-to-1\.5\.2\.js/);
-  assert.match(decoderHtml, /window\.HeicTo\(\{ blob, type: toType, quality: 1 \}\)/);
+  assert.match(decoderHtml, /const HeicTo = await loadHeicTo\(\)/);
+  assert.match(decoderHtml, /await HeicTo\(\{ blob, type: toType, quality: 1 \}\)/);
+  assert.doesNotMatch(decoderHtml, /<script src="\/assets\/js\/vendor\/heic-to-1\.5\.2\.js"><\/script>/);
   assert.doesNotMatch(decoderHtml, /heic2any/);
   assert.ok(fs.statSync(path.join(siteRoot, "assets", "js", "vendor", "heic-to-1.5.2.js")).size > 0);
 });
 
-test("QR decoder exposes optional local diagnostics", () => {
-  assert.match(decoderHtml, /id="debugToggle"/);
+test("QR decoder hides developer diagnostics and exposes decoded QR details", () => {
+  assert.match(decoderHtml, /id="debugPanel" class="decoder-debug-panel" hidden/);
+  assert.match(decoderHtml, /id="decodedDetails" class="decoded-details"/);
+  assert.match(decoderHtml, /id="decodedDetailsSelector"/);
+  assert.match(decoderHtml, /Decoded Details — Code/);
+  assert.match(decoderHtml, /data-result-index/);
+  assert.match(decoderHtml, /QR version/);
+  assert.match(decoderHtml, /Encoding mode/);
+  assert.match(decoderHtml, /Error correction/);
+  assert.match(decoderHtml, /Finder pattern centers/);
+  assert.match(decoderHtml, /Quiet zone/);
+  assert.match(decoderHtml, /Module count/);
+  assert.match(decoderHtml, /Symbol contrast/);
+  assert.match(decoderHtml, /Payload bytes/);
+  assert.match(decoderHtml, /Orientation/);
+  assert.match(decoderHtml, /Mirrored \/ inverted/);
+  assert.match(decoderHtml, /ECI encoding/);
+  assert.match(decoderHtml, /Structured append/);
+  assert.match(decoderHtml, /function assessSymbolContrast\(result, pixels, moduleCount\)/);
+  assert.match(decoderHtml, /luminance separation/);
   assert.match(decoderHtml, /sourceDimensions/);
   assert.match(decoderHtml, /canvasDimensions/);
   assert.match(decoderHtml, /durationMs/);
   assert.match(decoderHtml, /passes: rustResult\.attempts/);
+  assert.match(decoderHtml, /minimumMarginModules >= 3\.5/);
+  assert.match(decoderHtml, /Borderline — ≈/);
+  assert.doesNotMatch(decoderHtml, /Fail — less than 4 modules at image edge/);
+});
+
+test("decoder defers optional work and exposes consistent technical SEO metadata", () => {
+  assert.doesNotMatch(decoderHtml, /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/jszip/);
+  assert.match(decoderHtml, /if \(tab\.id === 'examples-tab'\) ensureExampleGallery\(\)/);
+  assert.doesNotMatch(decoderHtml, /updateScanModeUi\(\);\s*initializeExampleGallery\(\);/);
+  assert.match(decoderHtml, /property="og:image"/);
+  assert.match(decoderHtml, /name="twitter:card" content="summary"/);
+  assert.match(decoderHtml, /https:\/\/monkeytactics\.com\/tools\/#utilities/);
+  assert.match(toolsSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/qr-code-decoder<\/loc>\s*<lastmod>2026-08-27<\/lastmod>/);
 });
 
 test("decoder exposes automatic, QR-only, and barcode-only modes with camera guides", () => {
@@ -62,6 +96,87 @@ test("decoder presents visible code-type radios and a two-column supported-forma
   assert.match(decoderHtml, /Rectangular Micro QR Code \(rMQR\)/);
   assert.match(decoderHtml, /<span>Code 128<\/span>/);
   assert.match(decoderHtml, /<span>Data Matrix<\/span>/);
+});
+
+test("decoder includes a comprehensive QR scan troubleshooting guide", () => {
+  assert.match(decoderHtml, /id="qr-troubleshooting-heading">Why your QR code won’t scan/);
+  for (const topic of [
+    'Low contrast',
+    'Missing quiet zone',
+    'Blurry or low-resolution image',
+    'Overly large logo',
+    'Damaged finder patterns',
+    'Excessive rotation or perspective',
+  ]) {
+    assert.match(decoderHtml, new RegExp(topic));
+  }
+  assert.equal((decoderHtml.match(/class="troubleshooting-card"/g) || []).length, 6);
+});
+
+test("decoder presents structured fields for common QR content types", () => {
+  assert.match(decoderHtml, /id="structuredResults"/);
+  assert.match(decoderHtml, /function parseQrContent\(rawValue\)/);
+  assert.match(decoderHtml, /type: 'WiFi'/);
+  assert.match(decoderHtml, /type: 'vCard'/);
+  assert.match(decoderHtml, /type: 'MeCard'/);
+  assert.match(decoderHtml, /type: 'Calendar event'/);
+  assert.match(decoderHtml, /type: 'Email'/);
+  assert.match(decoderHtml, /type: 'Phone'/);
+  assert.match(decoderHtml, /type: 'SMS'/);
+  assert.match(decoderHtml, /renderStructuredResults\(normalized\)/);
+});
+
+test("decoder lists supported QR content for visitors and search engines", () => {
+  assert.match(decoderHtml, /id="supported-content-heading">What QR code content can this decoder read\?/);
+  for (const type of ['URL', 'Text', 'Email', 'Phone', 'SMS', 'WiFi', 'vCard', 'MeCard', 'Calendar events', 'Other formats']) {
+    assert.match(decoderHtml, new RegExp(`<strong>${type}<\\/strong>`));
+  }
+});
+
+test("decoder explains its five-stage local decoding pipeline", () => {
+  assert.match(decoderHtml, /id="how-decoder-works-heading">How QR code decoding works/);
+  for (const stage of ['Canvas extraction', 'Finder pattern detection', 'Module grid reconstruction', 'Error-correction decoding', 'Data segment parsing']) {
+    assert.match(decoderHtml, new RegExp(`<h3>${stage}<\\/h3>`));
+  }
+  assert.equal((decoderHtml.match(/class="decoder-pipeline-step"/g) || []).length, 5);
+  assert.match(decoderHtml, /MonkeyTactics uses its own Rust and ZXing WebAssembly pipeline/);
+});
+
+test("decoder clearly exposes camera scanning and every input method to search engines", () => {
+  assert.match(decoderHtml, /id="camera-scanner-heading">Scan QR codes using your camera/);
+  assert.match(decoderHtml, /webcam QR code scanner/);
+  assert.match(decoderHtml, /browser-based QR scanner/);
+  assert.match(decoderHtml, /id="input-methods-heading">Supported input methods/);
+  for (const method of ['Upload an image', 'Drag and drop', 'Paste an image', 'Image URL', 'Camera or webcam']) {
+    assert.match(decoderHtml, new RegExp(`<strong>${method}<\\/strong>`));
+  }
+  assert.match(decoderHtml, /aria-label="Scan QR codes and barcodes using your camera"/);
+});
+
+test("mobile and camera privacy FAQs match visible content and FAQ schema", () => {
+  for (const question of ['Does the QR scanner work on mobile devices?', 'Is browser camera scanning private?']) {
+    assert.equal((decoderHtml.match(new RegExp(question.replace(/[?]/g, '\\\?'), 'g')) || []).length, 2);
+  }
+});
+
+test("decoder exposes examples as a fifth input mode", () => {
+  assert.match(decoderHtml, /id="examples-tab"[\s\S]*aria-controls="examples-panel"/);
+  assert.match(decoderHtml, /id="examples-panel" class="method-panel" role="tabpanel"/);
+  assert.equal((decoderHtml.match(/class="method-tab"/g) || []).length, 5);
+  for (const example of ['url', 'text', 'wifi', 'vcard', 'calendar', 'multi', 'damaged', 'low-contrast']) {
+    assert.match(decoderHtml, new RegExp(`data-example="${example}"`));
+  }
+  assert.equal((decoderHtml.match(/class="example-card"/g) || []).length, 8);
+  assert.match(decoderHtml, /function buildMultiQrExample\(\)/);
+  assert.match(decoderHtml, /function buildDamagedExample\(\)/);
+});
+
+test("example QR destinations are stable first-party pages", () => {
+  for (const slug of ['url', 'text', 'wifi', 'vcard', 'calendar', 'multi', 'damaged', 'low-contrast']) {
+    const examplePage = path.join(siteRoot, 'examples', 'qr', slug, 'index.html');
+    assert.ok(fs.statSync(examplePage).size > 0, `${slug} example page should exist`);
+    assert.match(fs.readFileSync(examplePage, 'utf8'), /Return to the QR Code Decoder/);
+  }
 });
 
 test("supported-format table includes a generated sample for every decoder format", () => {
@@ -92,6 +207,12 @@ test("history groups up to ten decoded codes into one scan entry", () => {
   assert.match(decoderHtml, /dataset\.codeIndex = String\(codeIndex\)/);
   assert.match(decoderHtml, /HISTORY_EXPORT_JSON_VERSION = '2'/);
   assert.doesNotMatch(decoderHtml, /const historyIds = recordDecodedBatchForHistory/);
+  assert.match(decoderHtml, /elements\.historyList\.hidden = !hasItems;\s*elements\.historyList\.replaceChildren\(\);\s*if \(!hasItems\)/);
+});
+
+test("decoder merges equivalent native and ZXing format names so rich metadata survives", () => {
+  assert.match(decoderHtml, /const key = `\$\{formatLabel\(format\)\}::\$\{text\}`/);
+  assert.match(decoderHtml, /formatLabel\(result\.format\)/);
 });
 
 test("multi-code history bypasses proxy checks and exposes per-code URL menus", () => {

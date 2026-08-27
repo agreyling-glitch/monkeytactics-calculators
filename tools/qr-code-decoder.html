@@ -13,12 +13,19 @@
   <link rel="canonical" href="https://monkeytactics.com/tools/qr-code-decoder">
   <meta name="robots" content="index, follow">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-08-21">
+  <meta name="date" content="2026-08-27">
   <meta property="og:title" content="Free QR Code &amp; Barcode Decoder — Images &amp; Camera">
   <meta property="og:description" content="Automatically detect up to 10 QR codes and common barcodes locally from one image, screenshot, URL, or camera frame.">
   <meta property="og:url" content="https://monkeytactics.com/tools/qr-code-decoder">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MonkeyTactics">
+  <meta property="og:image" content="https://monkeytactics.com/assets/images/logo/monkeytactics-monkey-logo.png">
+  <meta property="og:image:alt" content="MonkeyTactics monkey logo">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Free QR Code &amp; Barcode Decoder — Images &amp; Camera">
+  <meta name="twitter:description" content="Automatically detect up to 10 QR codes and common barcodes locally from one image, screenshot, URL, or camera frame.">
+  <meta name="twitter:image" content="https://monkeytactics.com/assets/images/logo/monkeytactics-monkey-logo.png">
+  <meta name="twitter:image:alt" content="MonkeyTactics monkey logo">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -28,20 +35,20 @@
         "@id": "https://monkeytactics.com/tools/qr-code-decoder#app",
         "name": "QR Code and Barcode Decoder",
         "url": "https://monkeytactics.com/tools/qr-code-decoder",
-        "description": "Automatically decode up to 10 QR codes and common barcodes from one image or camera frame without uploading images. Optional QR-only and barcode-only modes narrow detection.",
+        "description": "Automatically decode up to 10 QR codes and common barcodes from uploads, pasted images, image URLs, camera frames, or built-in examples without uploading source images. Optional QR-only and barcode-only modes narrow detection.",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
         "browserRequirements": "Requires JavaScript and WebAssembly; camera scanning requires camera permission.",
         "isAccessibleForFree": true,
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
-        "dateModified": "2026-08-21"
+        "dateModified": "2026-08-27"
       },
       {
         "@type": "BreadcrumbList",
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://monkeytactics.com/" },
-          { "@type": "ListItem", "position": 2, "name": "Utilities", "item": "https://monkeytactics.com/tools/utilities" },
+          { "@type": "ListItem", "position": 2, "name": "Utilities", "item": "https://monkeytactics.com/tools/#utilities" },
           { "@type": "ListItem", "position": 3, "name": "QR Code & Barcode Decoder", "item": "https://monkeytactics.com/tools/qr-code-decoder" }
         ]
       },
@@ -57,6 +64,16 @@
             "@type": "Question",
             "name": "Can I scan a QR code with my computer camera?",
             "acceptedAnswer": { "@type": "Answer", "text": "Yes. Choose a detection mode, allow camera access, and hold one or more complete codes clearly in the preview. The decoder captures up to 10 detected codes from the frame. Camera access requires HTTPS or a localhost address." }
+          },
+          {
+            "@type": "Question",
+            "name": "Does the QR scanner work on mobile devices?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Open the decoder in a modern mobile browser, choose Camera, grant camera permission, and point the device at one or more QR codes. You can also upload or paste an image when those options are supported by the device." }
+          },
+          {
+            "@type": "Question",
+            "name": "Is browser camera scanning private?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Camera frames are processed locally in the browser and are not uploaded to MonkeyTactics or stored by the decoder. The camera stream stops when you stop scanning, switch input methods, leave the page, or successfully decode a frame." }
           },
           {
             "@type": "Question",
@@ -102,7 +119,7 @@
     .scan-mode-option input:checked + span { color:var(--accent); }
     .scan-mode-option input:focus-visible { outline:3px solid rgba(34,197,94,.25); outline-offset:2px; }
     .method-tabs {
-      display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.35rem; margin-bottom:1rem; padding:.35rem;
+      display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.35rem; margin-bottom:1rem; padding:.35rem;
       border:1px solid var(--border); border-radius:.8rem; background:rgba(255,255,255,.025);
     }
     .method-tab {
@@ -142,6 +159,15 @@
     .dropzone strong { color:var(--text); font-size:.9rem; }
     .dropzone span { font-size:.78rem; }
     .paste-zone { min-height:142px; resize:none; line-height:1.5; }
+    .example-gallery { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; }
+    .example-card { display:flex; min-width:0; flex-direction:column; align-items:stretch; gap:.5rem; padding:.7rem; border:1px solid var(--border); border-radius:.7rem; background:rgba(255,255,255,.025); color:var(--text); text-align:left; cursor:pointer; }
+    .example-card:hover { border-color:rgba(134,239,172,.45); background:rgba(34,197,94,.07); transform:translateY(-1px); }
+    .example-card img { width:100%; min-height:94px; max-height:118px; border-radius:.45rem; background:#fff; object-fit:contain; image-rendering:pixelated; }
+    .example-card strong { font-size:.82rem; }
+    .example-card span { color:var(--muted); font-size:.7rem; line-height:1.4; }
+    .more-examples { margin-top:.8rem; border-top:1px solid rgba(148,163,184,.15); }
+    .more-examples summary { padding:.75rem 0 0; color:var(--accent); font-size:.8rem; font-weight:800; cursor:pointer; }
+    .more-examples .example-gallery { margin-top:.7rem; grid-template-columns:repeat(2,minmax(0,1fr)); }
     .button-row { display:flex; gap:.65rem; margin-top:.75rem; }
     .btn-primary, .btn-secondary {
       border-radius:999px; font-family:inherit; font-weight:700; cursor:pointer;
@@ -182,6 +208,34 @@
     .result-value { margin:0; color:var(--text); font-size:.95rem; line-height:1.55; overflow-wrap:anywhere; white-space:pre-wrap; }
     .result-value a { color:var(--accent); text-decoration:underline; text-underline-offset:3px; }
     .result-value[hidden] { display:none; }
+    .structured-results { display:grid; gap:.75rem; margin-top:.85rem; }
+    .structured-results[hidden] { display:none; }
+    .structured-result-card { overflow:hidden; border:1px solid rgba(56,189,248,.25); border-radius:.72rem; background:rgba(14,165,233,.055); }
+    .structured-result-header { display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding:.65rem .75rem; border-bottom:1px solid rgba(148,163,184,.15); }
+    .structured-result-header h3 { margin:0; color:var(--text); font-size:.86rem; }
+    .content-type-badge { padding:.22rem .5rem; border-radius:999px; background:rgba(56,189,248,.12); color:#7dd3fc; font-size:.68rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+    .structured-field-list { margin:0; }
+    .structured-field { display:grid; grid-template-columns:minmax(7rem,28%) minmax(0,1fr); border-bottom:1px solid rgba(148,163,184,.12); }
+    .structured-field:last-child { border-bottom:0; }
+    .structured-field dt, .structured-field dd { margin:0; padding:.58rem .72rem; font-size:.79rem; line-height:1.48; }
+    .structured-field dt { color:var(--muted); font-size:.68rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+    .structured-field dd { color:var(--text); overflow-wrap:anywhere; white-space:pre-wrap; }
+    .decoded-details { margin-top:1rem; padding:1rem; border:1px solid rgba(134,239,172,.24); border-radius:.75rem; background:rgba(2,44,34,.24); }
+    .decoded-details[hidden] { display:none; }
+    .decoded-details-header { margin-bottom:.8rem; }
+    .decoded-details-header h3 { margin:0 0 .25rem; color:var(--text); font-size:1rem; }
+    .decoded-details-header p { margin:0; color:var(--muted); font-size:.78rem; line-height:1.45; }
+    .decoded-details-selector { display:flex; flex-wrap:wrap; gap:.4rem; margin:.75rem 0 0; }
+    .decoded-details-selector[hidden] { display:none; }
+    .decoded-details-selector button { padding:.38rem .65rem; border:1px solid var(--border); border-radius:999px; background:rgba(255,255,255,.035); color:var(--muted); font:inherit; font-size:.72rem; font-weight:800; cursor:pointer; }
+    .decoded-details-selector button:hover { border-color:rgba(134,239,172,.5); color:var(--text); }
+    .decoded-details-selector button[aria-pressed="true"] { border-color:rgba(134,239,172,.55); background:rgba(34,197,94,.16); color:#bbf7d0; }
+    .decoded-details-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; margin:0; }
+    .decoded-detail { min-width:0; padding:.7rem .75rem; border:1px solid rgba(148,163,184,.16); border-radius:.6rem; background:rgba(255,255,255,.025); }
+    .decoded-detail dt { margin:0 0 .25rem; color:var(--muted); font-size:.68rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+    .decoded-detail dd { margin:0; color:var(--text); font-size:.82rem; font-weight:700; line-height:1.45; overflow-wrap:anywhere; }
+    .decoded-detail dd.is-valid { color:#86efac; }
+    .decoded-detail dd.is-warning { color:#fde68a; }
     .url-result-table-wrap { margin-top:.7rem; overflow:hidden; border:1px solid rgba(56,189,248,.28); border-radius:.7rem; }
     .url-result-table-wrap[hidden] { display:none; }
     .url-result-table { width:100%; border-collapse:collapse; table-layout:fixed; }
@@ -416,6 +470,25 @@
     .format-sample-item { min-width:0; padding:.5rem; border:1px solid rgba(148,163,184,.18); border-radius:.6rem; background:rgba(255,255,255,.02); }
     .format-sample-item span { display:block; min-height:2.3em; margin-bottom:.35rem; color:var(--muted); font-size:.78rem; font-weight:700; line-height:1.15; }
     .format-sample-item img { display:block; width:100%; height:68px; border-radius:.3rem; background:#fff; object-fit:contain; }
+    .troubleshooting-intro { max-width:760px; }
+    .troubleshooting-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; margin-top:1rem; }
+    .troubleshooting-card { padding:1rem; border:1px solid var(--border); border-radius:.75rem; background:rgba(255,255,255,.025); }
+    .troubleshooting-card h3 { display:flex; align-items:center; gap:.55rem; margin:0 0 .45rem; color:var(--text); font-size:.92rem; }
+    .troubleshooting-number { display:inline-grid; width:1.65rem; height:1.65rem; flex:0 0 auto; place-items:center; border:1px solid rgba(134,239,172,.35); border-radius:50%; background:rgba(34,197,94,.1); color:#bbf7d0; font-size:.7rem; }
+    .troubleshooting-card p { margin:0; color:var(--muted); font-size:.83rem; line-height:1.62; }
+    .troubleshooting-card strong { color:var(--text); }
+    .content-types-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; margin:1rem 0 0; padding:0; list-style:none; }
+    .content-type-item { padding:.8rem .9rem; border:1px solid var(--border); border-radius:.65rem; background:rgba(255,255,255,.02); }
+    .content-type-item strong { display:block; margin-bottom:.2rem; color:var(--text); font-size:.85rem; }
+    .content-type-item span { color:var(--muted); font-size:.77rem; line-height:1.5; }
+    .decoder-pipeline { margin:1rem 0 0; padding:0; list-style:none; counter-reset:decoder-step; }
+    .decoder-pipeline-step { position:relative; margin-left:1.1rem; padding:0 0 1.15rem 1.65rem; border-left:1px solid rgba(134,239,172,.28); counter-increment:decoder-step; }
+    .decoder-pipeline-step:last-child { padding-bottom:0; border-left-color:transparent; }
+    .decoder-pipeline-step::before { position:absolute; top:0; left:0; display:grid; width:1.75rem; height:1.75rem; place-items:center; border:1px solid rgba(134,239,172,.45); border-radius:50%; background:#07150e; color:#bbf7d0; content:counter(decoder-step); font-size:.68rem; font-weight:900; transform:translateX(-50%); }
+    .decoder-pipeline-step h3 { margin:0 0 .3rem; color:var(--text); font-size:.92rem; }
+    .decoder-pipeline-step p { margin:0; color:var(--muted); font-size:.83rem; line-height:1.65; }
+    .technical-reference { margin-top:1rem!important; padding:.75rem .85rem; border-left:3px solid rgba(56,189,248,.45); background:rgba(14,165,233,.055); font-size:.78rem; }
+    .technical-reference a { color:#7dd3fc; text-decoration:underline; text-underline-offset:2px; }
     .faq-section { max-width:740px; margin-top:2rem; }
     .faq-section details { border:1px solid var(--border); border-radius:.75rem; background:rgba(255,255,255,.02); }
     .faq-section summary { position:relative; display:flex; align-items:center; gap:.8rem; padding:1rem 3rem 1rem 1rem; cursor:pointer; list-style:none; }
@@ -445,14 +518,18 @@
       .hero--inner h1 { font-size:1.5rem; }
       .tool-widget { padding:1.25rem; }
       .method-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .example-gallery, .more-examples .example-gallery { grid-template-columns:1fr; }
       .scan-mode-options { align-items:flex-start; flex-direction:column; }
       .format-sample-list { grid-template-columns:1fr; }
+      .troubleshooting-grid { grid-template-columns:1fr; }
+      .content-types-grid { grid-template-columns:1fr; }
       .supported-formats-table th, .supported-formats-table td { padding:.55rem; }
       .format-sample-item img { height:54px; }
       .method-panel { min-height:0; }
       .url-row, .button-row, .result-actions, .link-warning-actions { flex-direction:column; }
       .history-item { grid-template-columns:1fr; }
       .history-code { grid-template-columns:1fr; }
+      .decoded-details-grid { grid-template-columns:1fr; }
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260813-12">
@@ -474,7 +551,7 @@
         <div>
           <p class="premium-eyebrow">Private, deliberate QR inspection</p>
           <h1 id="tool-heading">QR Code &amp; Barcode Decoder</h1>
-          <p class="premium-hero-copy">Decode up to 10 QR codes and common barcodes from a single upload, screenshot, image URL, or camera frame without uploading the image. Auto detection identifies each format, while optional QR-only and barcode-only modes narrow the scan.</p>
+          <p class="premium-hero-copy">Decode up to 10 QR codes and common barcodes from a single upload, screenshot, image URL, camera frame, or built-in example without uploading the image. Auto detection identifies each format, while optional QR-only and barcode-only modes narrow the scan.</p>
           <div class="premium-hero-pills" aria-label="Code decoder features"><span>QR &amp; barcode detection</span><span>Local image processing</span><span>Private link resolution</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>Inspect before you follow</span><strong>Speed <i>meets</i> caution</strong><small>Decode locally. Decide what opens.</small></div>
@@ -515,6 +592,11 @@
                   aria-selected="false" aria-controls="camera-panel" tabindex="-1">
             <span class="method-tab-icon" aria-hidden="true">◉</span>
             <span>Camera</span>
+          </button>
+          <button id="examples-tab" class="method-tab" type="button" role="tab"
+                  aria-selected="false" aria-controls="examples-panel" tabindex="-1">
+            <span class="method-tab-icon" aria-hidden="true">▦</span>
+            <span>Examples</span>
           </button>
         </div>
 
@@ -564,14 +646,35 @@
               </div>
             </div>
             <div class="button-row">
-              <button id="cameraButton" class="btn-primary" type="button">Scan codes</button>
+              <button id="cameraButton" class="btn-primary" type="button" aria-label="Scan QR codes and barcodes using your camera">Scan codes</button>
               <button id="stopCameraButton" class="btn-secondary" type="button" hidden>Stop camera</button>
             </div>
+          </section>
+
+          <section id="examples-panel" class="method-panel" role="tabpanel"
+                   aria-labelledby="examples-tab" tabindex="0" hidden>
+            <h3>Try a QR code example</h3>
+            <p class="input-hint">Choose a sample to load it into the decoder. Examples are generated locally and do not upload data.</p>
+            <div id="exampleGallery" class="example-gallery" aria-label="QR code examples">
+              <button class="example-card" type="button" data-example="url"><img alt="URL QR code example"><strong>URL</strong><span>MonkeyTactics demo page</span></button>
+              <button class="example-card" type="button" data-example="text"><img alt="Plain text QR code example"><strong>Text</strong><span>A short decoded message</span></button>
+              <button class="example-card" type="button" data-example="wifi"><img alt="Wi-Fi credentials QR code example"><strong>Wi‑Fi</strong><span>SSID, security, and password</span></button>
+              <button class="example-card" type="button" data-example="vcard"><img alt="vCard contact QR code example"><strong>vCard</strong><span>Structured contact details</span></button>
+              <button class="example-card" type="button" data-example="calendar"><img alt="Calendar event QR code example"><strong>Calendar</strong><span>Event date and location</span></button>
+              <button class="example-card" type="button" data-example="multi"><img alt="Image containing multiple QR codes"><strong>Multi‑QR</strong><span>Four codes in one image</span></button>
+            </div>
+            <details class="more-examples">
+              <summary>More examples</summary>
+              <div id="moreExampleGallery" class="example-gallery">
+                <button class="example-card" type="button" data-example="damaged"><img alt="Intentionally damaged QR code example"><strong>Damaged QR</strong><span>Tests error correction</span></button>
+                <button class="example-card" type="button" data-example="low-contrast"><img alt="Low-contrast QR code example"><strong>Low contrast</strong><span>Tests difficult foreground contrast</span></button>
+              </div>
+            </details>
           </section>
         </div>
 
         <div id="status" class="status" role="alert" aria-live="assertive"></div>
-        <details id="debugPanel" class="decoder-debug-panel">
+        <details id="debugPanel" class="decoder-debug-panel" hidden>
           <summary>
             <span>Decoder diagnostics</span>
             <label class="decoder-debug-toggle" for="debugToggle">
@@ -588,6 +691,7 @@
             <img id="resultPreview" class="result-preview" alt="Preview of the decoded source image" role="button" tabindex="0" aria-label="Open image actions" hidden>
             <div id="decodedResultLabel" class="result-label">Decoded results</div>
             <p id="resultValue" class="result-value"></p>
+            <section id="structuredResults" class="structured-results" aria-label="Structured decoded content" hidden></section>
             <div id="urlResultTableWrap" class="url-result-table-wrap" hidden>
               <table class="url-result-table">
                 <tbody>
@@ -600,6 +704,27 @@
               <summary>Redirect trace <span id="redirectTraceSummary" class="redirect-trace-summary"></span></summary>
               <ol id="redirectTraceList" class="redirect-trace-list"></ol>
             </details>
+            <section id="decodedDetails" class="decoded-details" aria-labelledby="decoded-details-heading" hidden>
+              <div class="decoded-details-header">
+                <h3 id="decoded-details-heading">Decoded Details</h3>
+                <p>Technical QR structure detected locally from the source image.</p>
+                <div id="decodedDetailsSelector" class="decoded-details-selector" aria-label="Choose a decoded code for technical details" hidden></div>
+              </div>
+              <dl class="decoded-details-grid">
+                <div class="decoded-detail"><dt>QR version</dt><dd id="detailVersion">—</dd></div>
+                <div class="decoded-detail"><dt>Encoding mode</dt><dd id="detailEncodingMode">—</dd></div>
+                <div class="decoded-detail"><dt>Payload bytes</dt><dd id="detailPayloadBytes">—</dd></div>
+                <div class="decoded-detail"><dt>Error correction</dt><dd id="detailErrorCorrection">—</dd></div>
+                <div class="decoded-detail"><dt>Module count</dt><dd id="detailModuleCount">—</dd></div>
+                <div class="decoded-detail"><dt>Symbol contrast</dt><dd id="detailSymbolContrast">—</dd></div>
+                <div class="decoded-detail"><dt>Orientation</dt><dd id="detailOrientation">—</dd></div>
+                <div class="decoded-detail"><dt>Mirrored / inverted</dt><dd id="detailTransformations">—</dd></div>
+                <div class="decoded-detail"><dt>ECI encoding</dt><dd id="detailEci">—</dd></div>
+                <div class="decoded-detail"><dt>Structured append</dt><dd id="detailStructuredAppend">—</dd></div>
+                <div class="decoded-detail"><dt>Finder pattern centers</dt><dd id="detailFinderPatterns">—</dd></div>
+                <div class="decoded-detail"><dt>Quiet zone</dt><dd id="detailQuietZone">—</dd></div>
+              </dl>
+            </section>
             <div class="result-actions">
               <button id="uploadAnotherButton" class="btn-secondary" type="button">Upload another image</button>
               <button id="clearButton" class="btn-secondary" type="button">Clear</button>
@@ -678,8 +803,103 @@
 
     <div class="seo-section">
       <h2>How to decode a QR code or barcode</h2>
-      <p>Choose Auto detect, QR only, or Barcode only, then upload an image, paste a screenshot, enter a public image URL, or scan with your camera. The decoder returns up to 10 distinct codes from one image or camera frame. For the most reliable results, keep every code complete, sharp, and surrounded by a clear border.</p>
+      <p>Choose Auto detect, QR only, or Barcode only, then upload an image, paste a screenshot, enter a public image URL, scan with your camera, or try a built-in example. The decoder returns up to 10 distinct codes from one image or camera frame. For the most reliable results, keep every code complete, sharp, and surrounded by a clear border.</p>
     </div>
+
+    <section class="seo-section" aria-labelledby="camera-scanner-heading">
+      <h2 id="camera-scanner-heading">Scan QR codes using your camera</h2>
+      <p>Use this online QR scanner as a browser-based QR scanner or webcam QR code scanner—no app installation is required. Choose <strong>Camera</strong>, allow camera access, and hold the complete code inside the guide. The scanner can detect up to 10 QR codes or supported barcodes in a camera frame.</p>
+      <p>The camera scanner uses the browser’s MediaDevices API to request a video stream, captures selected frames onto a local canvas, and sends their pixels through the same private decoding pipeline used for uploaded images. Camera frames are not uploaded or stored, and the stream stops when scanning ends, another input method is selected, or you leave the page.</p>
+      <p>It works with compatible desktop webcams and front- or rear-facing mobile cameras. Camera access requires a secure HTTPS page, a supported browser, and your permission.</p>
+    </section>
+
+    <section class="seo-section" aria-labelledby="input-methods-heading">
+      <h2 id="input-methods-heading">Supported input methods</h2>
+      <ul class="content-types-grid">
+        <li class="content-type-item"><strong>Upload an image</strong><span>Select a PNG, JPEG, GIF, WebP, HEIC/HEIF, or another browser-supported image.</span></li>
+        <li class="content-type-item"><strong>Drag and drop</strong><span>Drop an image directly onto the upload area for immediate local decoding.</span></li>
+        <li class="content-type-item"><strong>Paste an image</strong><span>Paste a screenshot or copied image from the clipboard without saving another file.</span></li>
+        <li class="content-type-item"><strong>Image URL</strong><span>Decode a public image address when its host permits cross-origin browser access.</span></li>
+        <li class="content-type-item"><strong>Camera or webcam</strong><span>Scan QR codes online using a mobile camera or computer webcam directly in the browser.</span></li>
+        <li class="content-type-item"><strong>Built-in examples</strong><span>Try URL, text, Wi‑Fi, contact, calendar, multi-code, damaged, and low-contrast samples.</span></li>
+      </ul>
+    </section>
+
+    <section class="seo-section" aria-labelledby="supported-content-heading">
+      <h2 id="supported-content-heading">What QR code content can this decoder read?</h2>
+      <p>The decoder identifies common QR payload formats and presents their values as labeled fields while keeping the original decoded text available.</p>
+      <ul class="content-types-grid">
+        <li class="content-type-item"><strong>URL</strong><span>Website addresses with private redirect and final-destination review.</span></li>
+        <li class="content-type-item"><strong>Text</strong><span>Notes, identifiers, instructions, serial numbers, and other plain text.</span></li>
+        <li class="content-type-item"><strong>Email</strong><span>Mailto and MATMSG recipients, subject lines, CC/BCC values, and message bodies.</span></li>
+        <li class="content-type-item"><strong>Phone</strong><span>Telephone numbers stored with the standard <code>tel:</code> format.</span></li>
+        <li class="content-type-item"><strong>SMS</strong><span>Phone numbers and prewritten messages using SMS or SMSTO payloads.</span></li>
+        <li class="content-type-item"><strong>WiFi</strong><span>Network name, security type, password, hidden-network flag, and enterprise fields.</span></li>
+        <li class="content-type-item"><strong>vCard</strong><span>Names, organizations, phone numbers, email addresses, postal addresses, and notes.</span></li>
+        <li class="content-type-item"><strong>MeCard</strong><span>Compact contact details used by many mobile QR applications.</span></li>
+        <li class="content-type-item"><strong>Calendar events</strong><span>Event title, start and end values, location, organizer, description, and status.</span></li>
+        <li class="content-type-item"><strong>Other formats</strong><span>Geo coordinates and unrecognized payloads, which remain available as decoded text.</span></li>
+      </ul>
+    </section>
+
+    <section class="seo-section" aria-labelledby="qr-troubleshooting-heading">
+      <h2 id="qr-troubleshooting-heading">Why your QR code won’t scan</h2>
+      <p class="troubleshooting-intro">A QR code can look readable to a person while still hiding the visual structure a scanner needs. Check these common problems before replacing or regenerating the code.</p>
+      <div class="troubleshooting-grid">
+        <article class="troubleshooting-card">
+          <h3><span class="troubleshooting-number" aria-hidden="true">01</span>Low contrast</h3>
+          <p>The dark and light modules must be easy to distinguish. Pale foreground colors, transparent backgrounds, gradients, glare, and dark-on-dark designs can erase that separation. <strong>Use a dark code on a plain light background and avoid reflections.</strong></p>
+        </article>
+        <article class="troubleshooting-card">
+          <h3><span class="troubleshooting-number" aria-hidden="true">02</span>Missing quiet zone</h3>
+          <p>The empty border around a standard QR code should be at least four modules wide. Cropping, nearby text, or a decorative frame can make the scanner treat surrounding content as part of the symbol. <strong>Restore a clean, light margin on every side.</strong></p>
+        </article>
+        <article class="troubleshooting-card">
+          <h3><span class="troubleshooting-number" aria-hidden="true">03</span>Blurry or low-resolution image</h3>
+          <p>Motion blur, camera focus, heavy JPEG compression, or aggressive resizing can merge neighboring squares. <strong>Use the original PNG or SVG, move closer, steady the camera, and focus before scanning.</strong></p>
+        </article>
+        <article class="troubleshooting-card">
+          <h3><span class="troubleshooting-number" aria-hidden="true">04</span>Overly large logo</h3>
+          <p>A centered logo covers data modules. Error correction can recover a limited amount, but a large logo—or one placed over a finder pattern—can exceed that capacity. <strong>Shrink the logo, add a clear backing, and test at the final printed size.</strong></p>
+        </article>
+        <article class="troubleshooting-card">
+          <h3><span class="troubleshooting-number" aria-hidden="true">05</span>Damaged finder patterns</h3>
+          <p>The three large squares in the top-left, top-right, and bottom-left corners tell a scanner where the QR code begins and how it is oriented. Tears, folds, stickers, logos, or decorative edits over these squares often prevent detection. <strong>Keep all three patterns complete and unobstructed.</strong></p>
+        </article>
+        <article class="troubleshooting-card">
+          <h3><span class="troubleshooting-number" aria-hidden="true">06</span>Excessive rotation or perspective</h3>
+          <p>Rotation alone is usually recoverable, but a steep camera angle turns the square into a distorted quadrilateral and changes module sizes across the image. <strong>Hold the camera parallel to the code, center it, and include the full border.</strong></p>
+        </article>
+      </div>
+    </section>
+
+    <section class="seo-section" aria-labelledby="how-decoder-works-heading">
+      <h2 id="how-decoder-works-heading">How QR code decoding works</h2>
+      <p>This decoder turns an uploaded image, screenshot, URL image, or camera frame into a verified payload through five local processing stages.</p>
+      <ol class="decoder-pipeline">
+        <li class="decoder-pipeline-step">
+          <h3>Canvas extraction</h3>
+          <p>The browser draws the source onto a hidden HTML canvas and reads its RGBA pixel data with <code>getImageData()</code>. Camera scanning repeats the same operation on selected video frames. Those pixels remain in the browser and are passed to the native Barcode Detector, Rust/WebAssembly QR engine, and ZXing/WebAssembly fallback.</p>
+        </li>
+        <li class="decoder-pipeline-step">
+          <h3>Finder pattern detection</h3>
+          <p>The QR locator searches the light-and-dark image for the three large corner targets and their characteristic 1:1:3:1:1 stripe ratio. Their centers establish the code’s position, orientation, scale, and perspective; larger versions may also use alignment patterns to refine the geometry.</p>
+        </li>
+        <li class="decoder-pipeline-step">
+          <h3>Module grid reconstruction</h3>
+          <p>The detected quadrilateral is mapped back to a square grid of modules. A standard QR code contains 21 × 21 modules at version 1 and adds four modules per side for each version through version 40. Normalization passes resample difficult images at candidate grid sizes to reduce blur, rotation, and perspective distortion.</p>
+        </li>
+        <li class="decoder-pipeline-step">
+          <h3>Error-correction decoding</h3>
+          <p>Format bits identify the mask and error-correction level—L, M, Q, or H. After the mask is removed, Reed–Solomon error correction uses redundant codewords to detect and recover a limited amount of missing or damaged data. Recovery depends on the selected level and where the damage occurs.</p>
+        </li>
+        <li class="decoder-pipeline-step">
+          <h3>Data segment parsing</h3>
+          <p>The corrected bitstream is divided into Numeric, Alphanumeric, Byte, Kanji, ECI, and other QR segments. Their bytes become decoded text, then this page recognizes common payload conventions such as URLs, Wi‑Fi credentials, email, SMS, vCard, MeCard, calendar events, phone numbers, and geo coordinates.</p>
+        </li>
+      </ol>
+      <p class="technical-reference">Technical background: <a href="https://github.com/cozmo/jsQR" target="_blank" rel="noopener noreferrer">jsQR documents its raw RGBA input, finder-pattern locations, extracted bytes, chunks, and version</a>; <a href="https://github.com/mebjas/html5-qrcode" target="_blank" rel="noopener noreferrer">html5-qrcode demonstrates browser camera, image, canvas, and Barcode Detector integration</a>. MonkeyTactics uses its own Rust and ZXing WebAssembly pipeline rather than embedding either library.</p>
+    </section>
 
     <div class="seo-section" aria-labelledby="supported-formats-heading">
       <h2 id="supported-formats-heading">What QR and barcode formats are supported?</h2>
@@ -752,6 +972,14 @@
               <p>Yes. Choose Auto detect, QR only, or Barcode only, allow camera access, and keep one or more complete codes visible in the mode-aware camera guide. The decoder captures up to 10 detected codes from the frame. Camera access requires HTTPS or a localhost address and may be disabled by managed browser policies.</p>
             </li>
             <li class="faq-item">
+              <h3>Does the QR scanner work on mobile devices?</h3>
+              <p>Yes. Open the decoder in a modern mobile browser, choose <strong>Camera</strong>, grant camera permission, and point the device at one or more QR codes. You can also upload or paste an image when those options are supported by your device.</p>
+            </li>
+            <li class="faq-item">
+              <h3>Is browser camera scanning private?</h3>
+              <p>Yes. Camera frames are processed locally in your browser and are not uploaded to MonkeyTactics or stored by the decoder. The camera stream stops when you stop scanning, switch input methods, leave the page, or successfully decode a frame.</p>
+            </li>
+            <li class="faq-item">
               <h3>Which QR code and barcode formats are supported?</h3>
               <p>The supported-formats table above lists every available QR and barcode format. Auto mode checks both columns; QR only and Barcode only restrict detection to their corresponding column. The detected format appears with the result.</p>
             </li>
@@ -814,8 +1042,6 @@
   <!-- qrcode 1.1.0 is MIT licensed; see /third-party-notices. -->
   <!-- QRCode regenerates a clean preview from camera-decoded content locally. -->
   <script src="/assets/js/vendor/qrcode-1.1.0.min.js"></script>
-  <script src="/assets/js/vendor/heic-to-1.5.2.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <!-- zxing-wasm 2.2.2 bundles ZXing-C++ under Apache-2.0; see /third-party-notices. -->
   <script src="/assets/wasm/qr-code-decoder/zxing/reader.js?v=20260813-2"></script>
   <script type="module">
@@ -835,9 +1061,16 @@
       cameraGuideLabel: $('cameraGuideLabel'), scanModeInputs: Array.from(document.querySelectorAll('input[name="scanMode"]')),
       cameraButton: $('cameraButton'), stopCameraButton: $('stopCameraButton'),
       status: $('status'), resultPanel: $('resultPanel'), decodedResultLabel: $('decodedResultLabel'), resultValue: $('resultValue'),
+      structuredResults: $('structuredResults'),
       resultPreview: $('resultPreview'), resultType: $('resultType'), resultFormat: $('resultFormat'),
       urlResultTableWrap: $('urlResultTableWrap'), decodedUrlText: $('decodedUrlText'), finalUrlText: $('finalUrlText'), finalUrlMenuButton: $('finalUrlMenuButton'),
       redirectTrace: $('redirectTrace'), redirectTraceSummary: $('redirectTraceSummary'), redirectTraceList: $('redirectTraceList'),
+      decodedDetails: $('decodedDetails'), decodedDetailsHeading: $('decoded-details-heading'), decodedDetailsSelector: $('decodedDetailsSelector'),
+      detailVersion: $('detailVersion'), detailEncodingMode: $('detailEncodingMode'),
+      detailPayloadBytes: $('detailPayloadBytes'), detailOrientation: $('detailOrientation'),
+      detailTransformations: $('detailTransformations'), detailEci: $('detailEci'), detailStructuredAppend: $('detailStructuredAppend'),
+      detailErrorCorrection: $('detailErrorCorrection'), detailModuleCount: $('detailModuleCount'),
+      detailSymbolContrast: $('detailSymbolContrast'), detailFinderPatterns: $('detailFinderPatterns'), detailQuietZone: $('detailQuietZone'),
       uploadAnotherButton: $('uploadAnotherButton'), copyButton: $('copyButton'), clearButton: $('clearButton'),
       historyList: $('historyList'), historyEmptyMessage: $('historyEmptyMessage'),
       clearHistoryButton: $('clearHistoryButton'), downloadHistoryZipButton: $('downloadHistoryZipButton'),
@@ -861,6 +1094,7 @@
     let actionUrl = '';
     let resultImageUrl = '';
     let resultImageSvg = '';
+    let currentDecodedResults = [];
     let resolveRequestId = 0;
     let cameraDecodeBusy = false;
     let zxingConfigured = false;
@@ -875,9 +1109,21 @@
     let failedCaptureImageUrl = '';
     let failedCaptureReason = '';
     let jsZipLoadPromise = null;
+    let heicToLoadPromise = null;
+    let exampleGalleryLoadPromise = null;
     const QR_FORMATS = ['QRCode', 'MicroQRCode', 'rMQRCode'];
     const BARCODE_FORMATS = ['Aztec', 'Codabar', 'Code39', 'Code93', 'Code128', 'DataBar', 'DataBarExpanded', 'DataMatrix', 'EAN-8', 'EAN-13', 'ITF', 'MaxiCode', 'PDF417', 'UPC-A', 'UPC-E', 'DXFilmEdge', 'DataBarLimited'];
     const NATIVE_BARCODE_FORMATS = ['aztec', 'codabar', 'code_39', 'code_93', 'code_128', 'data_matrix', 'ean_8', 'ean_13', 'itf', 'pdf417', 'upc_a', 'upc_e'];
+    const EXAMPLE_PAYLOADS = {
+      url: 'https://monkeytactics.com/examples/qr/url',
+      text: 'Hello from a MonkeyTactics QR code example.',
+      wifi: 'WIFI:T:WPA;S:ExampleWiFi;P:example123;H:false;;',
+      vcard: 'BEGIN:VCARD\nVERSION:3.0\nFN:Jordan Example\nORG:MonkeyTactics Demo\nTEL:+1-555-0100\nEMAIL:jordan@example.com\nADR:;;123 Example Street;Demo City;IL;60601;USA\nEND:VCARD',
+      calendar: 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:MonkeyTactics QR Demo\nDTSTART:20260915T150000Z\nDTEND:20260915T153000Z\nLOCATION:Online\nDESCRIPTION:Example calendar event decoded from a QR code.\nEND:VEVENT\nEND:VCALENDAR',
+      damaged: 'https://monkeytactics.com/examples/qr/damaged',
+      'low-contrast': 'https://monkeytactics.com/examples/qr/low-contrast'
+    };
+    const exampleImageCache = new Map();
     const wasmReady = initQrDecoder({
       module_or_path: new URL('/assets/wasm/qr-code-decoder/qr_decoder_engine_bg.wasm?v=20260813-2', window.location.href)
     });
@@ -1010,13 +1256,517 @@
         const text = item.text.trim();
         if (!text) continue;
         const format = typeof item.format === 'string' && item.format ? item.format : 'Unknown';
-        const key = `${format}::${text}`;
-        if (seen.has(key)) continue;
+        const key = `${formatLabel(format)}::${text}`;
+        if (seen.has(key)) {
+          const existing = normalized.find((result) => `${formatLabel(result.format)}::${result.text}` === key);
+          if (existing && !existing.details && item.details) existing.details = item.details;
+          continue;
+        }
         seen.add(key);
-        normalized.push({ text, format });
+        normalized.push({ text, format, details: item.details || null });
         if (normalized.length >= max) break;
       }
       return normalized;
+    }
+
+    function generateQrDataUrl(payload, options) {
+      return new Promise((resolve, reject) => {
+        if (!window.QRCode || typeof window.QRCode.toDataURL !== 'function') {
+          reject(new Error('QR example generator is unavailable.'));
+          return;
+        }
+        window.QRCode.toDataURL(payload, {
+          width: 240,
+          margin: 4,
+          errorCorrectionLevel: 'H',
+          color: { dark: '#0f172a', light: '#ffffff' },
+          ...(options || {})
+        }, (error, value) => error ? reject(error) : resolve(value));
+      });
+    }
+
+    function loadImageSource(source) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = reject;
+        image.src = source;
+      });
+    }
+
+    async function buildMultiQrExample() {
+      const payloads = [
+        'https://monkeytactics.com/examples/qr/url',
+        'https://monkeytactics.com/examples/qr/text',
+        'https://monkeytactics.com/examples/qr/vcard',
+        'https://monkeytactics.com/examples/qr/calendar'
+      ];
+      const images = await Promise.all(payloads.map(async (payload) => loadImageSource(await generateQrDataUrl(payload, { width: 180 }))));
+      const canvas = document.createElement('canvas');
+      canvas.width = 420;
+      canvas.height = 420;
+      const canvasContext = canvas.getContext('2d');
+      canvasContext.fillStyle = '#ffffff';
+      canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+      images.forEach((image, index) => {
+        const x = 20 + (index % 2) * 200;
+        const y = 20 + Math.floor(index / 2) * 200;
+        canvasContext.drawImage(image, x, y, 180, 180);
+      });
+      return canvas.toDataURL('image/png');
+    }
+
+    async function buildDamagedExample() {
+      const image = await loadImageSource(await generateQrDataUrl(EXAMPLE_PAYLOADS.damaged));
+      const canvas = document.createElement('canvas');
+      canvas.width = 240;
+      canvas.height = 240;
+      const canvasContext = canvas.getContext('2d');
+      canvasContext.drawImage(image, 0, 0);
+      canvasContext.fillStyle = '#ffffff';
+      canvasContext.fillRect(104, 92, 34, 20);
+      canvasContext.fillRect(76, 152, 28, 18);
+      return canvas.toDataURL('image/png');
+    }
+
+    async function getExampleImage(name) {
+      if (exampleImageCache.has(name)) return exampleImageCache.get(name);
+      const promise = name === 'multi'
+        ? buildMultiQrExample()
+        : name === 'damaged'
+          ? buildDamagedExample()
+          : generateQrDataUrl(EXAMPLE_PAYLOADS[name], name === 'low-contrast'
+            ? { color: { dark: '#75877d', light: '#f0f4f1' } }
+            : null);
+      exampleImageCache.set(name, promise);
+      return promise;
+    }
+
+    async function initializeExampleGallery() {
+      const cards = Array.from(document.querySelectorAll('.example-card[data-example]'));
+      await Promise.all(cards.map(async (card) => {
+        try {
+          card.querySelector('img').src = await getExampleImage(card.dataset.example);
+        } catch (_) {
+          card.disabled = true;
+        }
+      }));
+    }
+
+    function ensureExampleGallery() {
+      if (!exampleGalleryLoadPromise) exampleGalleryLoadPromise = initializeExampleGallery();
+      return exampleGalleryLoadPromise;
+    }
+
+    async function decodeExample(name, button) {
+      const originalLabel = button.querySelector('strong').textContent;
+      button.disabled = true;
+      button.querySelector('strong').textContent = 'Loading…';
+      try {
+        const dataUrl = await getExampleImage(name);
+        const blob = await (await fetch(dataUrl)).blob();
+        await decodeBlob(blob);
+      } catch (_) {
+        showStatus('This example could not be prepared. Try another sample.', 'error');
+      } finally {
+        button.disabled = false;
+        button.querySelector('strong').textContent = originalLabel;
+      }
+    }
+
+    function inferQrEncodingMode(result) {
+      const text = String(result && result.text || '');
+      if (/^[0-9]+$/.test(text)) return 'Numeric';
+      if (/^[0-9A-Z $%*+\-./:]+$/.test(text)) return 'Alphanumeric';
+      if (/[\u3000-\u30ff\u3400-\u9fff\uf900-\ufaff]/u.test(text) && !result.hasECI) return 'Kanji';
+      return result && result.hasECI ? 'Byte (ECI)' : 'Byte';
+    }
+
+    function pointAlong(origin, horizontal, vertical, xRatio, yRatio) {
+      return {
+        x: origin.x + horizontal.x * xRatio + vertical.x * yRatio,
+        y: origin.y + horizontal.y * xRatio + vertical.y * yRatio
+      };
+    }
+
+    function formatPoint(point) {
+      return `(${Math.round(point.x)}, ${Math.round(point.y)})`;
+    }
+
+    function validateQuietZone(position, moduleCount, pixels) {
+      if (!position || !moduleCount || !pixels) return { label: 'Unable to validate', valid: null };
+      const points = [position.topLeft, position.topRight, position.bottomRight, position.bottomLeft];
+      if (points.some((point) => !point || !Number.isFinite(point.x) || !Number.isFinite(point.y))) {
+        return { label: 'Unable to validate', valid: null };
+      }
+      const minX = Math.min(...points.map((point) => point.x));
+      const maxX = Math.max(...points.map((point) => point.x));
+      const minY = Math.min(...points.map((point) => point.y));
+      const maxY = Math.max(...points.map((point) => point.y));
+      const distance = (first, second) => Math.hypot(second.x - first.x, second.y - first.y);
+      const averageEdgeLength = (
+        distance(position.topLeft, position.topRight)
+        + distance(position.bottomLeft, position.bottomRight)
+        + distance(position.topLeft, position.bottomLeft)
+        + distance(position.topRight, position.bottomRight)
+      ) / 4;
+      const moduleSize = averageEdgeLength / moduleCount;
+      if (!Number.isFinite(moduleSize) || moduleSize <= 0) return { label: 'Unable to validate', valid: null };
+      const required = Math.max(2, moduleSize * 4);
+      const edgeMargins = [minX, minY, pixels.width - maxX, pixels.height - maxY];
+      const minimumMarginModules = Math.min(...edgeMargins) / moduleSize;
+      const displayedMargin = Math.max(0, minimumMarginModules).toFixed(1);
+      if (minimumMarginModules < 3) {
+        return { label: `Fail — only ≈${displayedMargin} modules at image edge`, valid: false };
+      }
+
+      const contextData = pixels.data;
+      let light = 0;
+      let sampled = 0;
+      const step = Math.max(1, Math.floor(moduleSize / 2));
+      const bands = [
+        [minX - required, minY - required, maxX + required, minY],
+        [minX - required, maxY, maxX + required, maxY + required],
+        [minX - required, minY, minX, maxY],
+        [maxX, minY, maxX + required, maxY]
+      ];
+      for (const [left, top, right, bottom] of bands) {
+        for (let y = Math.max(0, Math.floor(top)); y < Math.min(pixels.height, Math.ceil(bottom)); y += step) {
+          for (let x = Math.max(0, Math.floor(left)); x < Math.min(pixels.width, Math.ceil(right)); x += step) {
+            const offset = (y * pixels.width + x) * 4;
+            const luminance = contextData[offset] * .2126 + contextData[offset + 1] * .7152 + contextData[offset + 2] * .0722;
+            light += luminance >= 200 ? 1 : 0;
+            sampled += 1;
+          }
+        }
+      }
+      const lightRatio = sampled ? light / sampled : 0;
+      const lightPercent = Math.round(lightRatio * 100);
+      if (minimumMarginModules >= 3.5 && lightRatio >= .85) {
+        return { label: `Pass — ≈${displayedMargin}-module margin (${lightPercent}% light)`, valid: true };
+      }
+      if (minimumMarginModules >= 3 && lightRatio >= .75) {
+        return { label: `Borderline — ≈${displayedMargin} modules (${lightPercent}% light)`, valid: false };
+      }
+      return { label: `Check image — margin is ${lightPercent}% light`, valid: false };
+    }
+
+    function assessSymbolContrast(result, pixels, moduleCount) {
+      const position = result && result.position;
+      const symbol = result && result.symbol;
+      const symbolData = symbol && symbol.data;
+      if (!position || !pixels || !moduleCount || !symbolData || symbolData.length < moduleCount * moduleCount) {
+        return { label: 'Unable to measure', valid: null };
+      }
+      const corners = [position.topLeft, position.topRight, position.bottomRight, position.bottomLeft];
+      if (corners.some((point) => !point || !Number.isFinite(point.x) || !Number.isFinite(point.y))) {
+        return { label: 'Unable to measure', valid: null };
+      }
+      let darkTotal = 0;
+      let darkCount = 0;
+      let lightTotal = 0;
+      let lightCount = 0;
+      for (let row = 0; row < moduleCount; row += 1) {
+        const v = (row + .5) / moduleCount;
+        for (let column = 0; column < moduleCount; column += 1) {
+          const u = (column + .5) / moduleCount;
+          const x = (1 - u) * (1 - v) * position.topLeft.x
+            + u * (1 - v) * position.topRight.x
+            + u * v * position.bottomRight.x
+            + (1 - u) * v * position.bottomLeft.x;
+          const y = (1 - u) * (1 - v) * position.topLeft.y
+            + u * (1 - v) * position.topRight.y
+            + u * v * position.bottomRight.y
+            + (1 - u) * v * position.bottomLeft.y;
+          const pixelX = Math.max(0, Math.min(pixels.width - 1, Math.round(x)));
+          const pixelY = Math.max(0, Math.min(pixels.height - 1, Math.round(y)));
+          const offset = (pixelY * pixels.width + pixelX) * 4;
+          const luminance = pixels.data[offset] * .2126 + pixels.data[offset + 1] * .7152 + pixels.data[offset + 2] * .0722;
+          if (Number(symbolData[row * moduleCount + column]) < 128) {
+            darkTotal += luminance;
+            darkCount += 1;
+          } else {
+            lightTotal += luminance;
+            lightCount += 1;
+          }
+        }
+      }
+      if (!darkCount || !lightCount) return { label: 'Unable to measure', valid: null };
+      const darkAverage = darkTotal / darkCount;
+      const lightAverage = lightTotal / lightCount;
+      // ZXing's logical symbol bitmap can use either binary polarity depending
+      // on the decoded image. Contrast is the distance between the two groups,
+      // so keep this measurement polarity-independent for normal and inverted QR codes.
+      const separation = Math.max(0, Math.min(100, (Math.abs(lightAverage - darkAverage) / 255) * 100));
+      const displayedSeparation = Math.round(separation);
+      if (separation >= 70) return { label: `High — ${displayedSeparation}% luminance separation`, valid: true };
+      if (separation >= 55) return { label: `Good — ${displayedSeparation}% luminance separation`, valid: true };
+      if (separation >= 35) return { label: `Low — ${displayedSeparation}% luminance separation`, valid: false };
+      return { label: `Very low — ${displayedSeparation}% luminance separation`, valid: false };
+    }
+
+    function buildQrDetails(result, pixels) {
+      if (!result || !isQrFormat(result.format)) return null;
+      const rawModuleCount = Number(result.symbol && result.symbol.width);
+      const versionText = String(result.version || '').match(/\d+/)?.[0] || '';
+      const parsedVersion = Number(versionText);
+      const moduleCount = rawModuleCount >= 21 && rawModuleCount <= 177
+        ? rawModuleCount
+        : (parsedVersion >= 1 && parsedVersion <= 40 ? 17 + parsedVersion * 4 : 0);
+      const version = parsedVersion >= 1 && parsedVersion <= 40
+        ? parsedVersion
+        : (moduleCount >= 21 && (moduleCount - 17) % 4 === 0 ? (moduleCount - 17) / 4 : null);
+      const position = result.position;
+      let finderPatterns = 'Unavailable';
+      if (position && moduleCount && position.topLeft && position.topRight && position.bottomLeft) {
+        const horizontal = { x: position.topRight.x - position.topLeft.x, y: position.topRight.y - position.topLeft.y };
+        const vertical = { x: position.bottomLeft.x - position.topLeft.x, y: position.bottomLeft.y - position.topLeft.y };
+        const near = 3.5 / moduleCount;
+        const far = (moduleCount - 3.5) / moduleCount;
+        const topLeft = pointAlong(position.topLeft, horizontal, vertical, near, near);
+        const topRight = pointAlong(position.topLeft, horizontal, vertical, far, near);
+        const bottomLeft = pointAlong(position.topLeft, horizontal, vertical, near, far);
+        finderPatterns = `TL ${formatPoint(topLeft)} · TR ${formatPoint(topRight)} · BL ${formatPoint(bottomLeft)}`;
+      }
+      const payloadByteCount = result.bytes && Number.isFinite(result.bytes.length) ? result.bytes.length : null;
+      const rawOrientation = Number(result.orientation);
+      const orientation = Number.isFinite(rawOrientation) ? ((rawOrientation % 360) + 360) % 360 : null;
+      const sequenceSize = Number(result.sequenceSize);
+      const sequenceIndex = Number(result.sequenceIndex);
+      let structuredAppend = 'Not used';
+      if (Number.isFinite(sequenceSize) && sequenceSize > 0) {
+        structuredAppend = `Part ${Number.isFinite(sequenceIndex) ? sequenceIndex + 1 : 1} of ${sequenceSize}`;
+        if (result.sequenceId) structuredAppend += ` · ID ${result.sequenceId}`;
+      } else if (sequenceSize === 0 && result.sequenceId) {
+        structuredAppend = `Part ${Number.isFinite(sequenceIndex) ? sequenceIndex + 1 : 1} · total unknown · ID ${result.sequenceId}`;
+      }
+      return {
+        version: version ? `${version} (of 1–40)` : 'Unavailable',
+        encodingMode: inferQrEncodingMode(result),
+        payloadBytes: payloadByteCount === null ? 'Unavailable' : `${payloadByteCount} ${payloadByteCount === 1 ? 'byte' : 'bytes'}`,
+        errorCorrection: /^[LMQH]$/.test(result.ecLevel || '') ? result.ecLevel : 'Unavailable',
+        moduleCount: moduleCount ? `${moduleCount} × ${moduleCount} modules` : 'Unavailable',
+        symbolContrast: assessSymbolContrast(result, pixels, moduleCount),
+        orientation: orientation === null ? 'Unavailable' : `${orientation}°`,
+        transformations: `Mirrored: ${result.isMirrored ? 'Yes' : 'No'} · Inverted: ${result.isInverted ? 'Yes' : 'No'}`,
+        eci: result.hasECI ? 'Present' : 'Not present',
+        structuredAppend,
+        finderPatterns,
+        quietZone: validateQuietZone(position, moduleCount, pixels)
+      };
+    }
+
+    function renderDecodedDetails(details, codeNumber) {
+      elements.decodedDetails.hidden = !details;
+      if (!details) {
+        elements.decodedDetailsHeading.textContent = 'Decoded Details';
+        elements.decodedDetailsSelector.replaceChildren();
+        elements.decodedDetailsSelector.hidden = true;
+        return;
+      }
+      elements.decodedDetailsHeading.textContent = codeNumber ? `Decoded Details — Code ${codeNumber}` : 'Decoded Details';
+      elements.detailVersion.textContent = details.version;
+      elements.detailEncodingMode.textContent = details.encodingMode;
+      elements.detailPayloadBytes.textContent = details.payloadBytes;
+      elements.detailErrorCorrection.textContent = details.errorCorrection;
+      elements.detailModuleCount.textContent = details.moduleCount;
+      elements.detailSymbolContrast.textContent = details.symbolContrast.label;
+      elements.detailSymbolContrast.classList.toggle('is-valid', details.symbolContrast.valid === true);
+      elements.detailSymbolContrast.classList.toggle('is-warning', details.symbolContrast.valid === false);
+      elements.detailOrientation.textContent = details.orientation;
+      elements.detailTransformations.textContent = details.transformations;
+      elements.detailEci.textContent = details.eci;
+      elements.detailStructuredAppend.textContent = details.structuredAppend;
+      elements.detailFinderPatterns.textContent = details.finderPatterns;
+      elements.detailQuietZone.textContent = details.quietZone.label;
+      elements.detailQuietZone.classList.toggle('is-valid', details.quietZone.valid === true);
+      elements.detailQuietZone.classList.toggle('is-warning', details.quietZone.valid === false);
+    }
+
+    function renderDecodedDetailsForResults(results, selectedIndex) {
+      const items = Array.isArray(results) ? results : [];
+      const available = items
+        .map((result, index) => ({ result, index }))
+        .filter(({ result }) => isQrFormat(result.format) && result.details);
+      if (!available.length) {
+        renderDecodedDetails(null);
+        return;
+      }
+      const requested = available.find(({ index }) => index === selectedIndex) || available[0];
+      renderDecodedDetails(requested.result.details, items.length > 1 ? requested.index + 1 : null);
+      elements.decodedDetailsSelector.replaceChildren();
+      elements.decodedDetailsSelector.hidden = available.length < 2;
+      for (const { index } of available) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.resultIndex = String(index);
+        button.textContent = `Code ${index + 1}`;
+        button.setAttribute('aria-pressed', String(index === requested.index));
+        button.setAttribute('aria-label', `Show decoded details for code ${index + 1}`);
+        elements.decodedDetailsSelector.appendChild(button);
+      }
+    }
+
+    function decodeQrEscapes(value) {
+      return String(value || '')
+        .replace(/\\n/gi, '\n')
+        .replace(/\\([\\;,:])/g, '$1');
+    }
+
+    function splitEscaped(value, separator) {
+      const parts = [];
+      let current = '';
+      let escaped = false;
+      for (const character of String(value || '')) {
+        if (escaped) {
+          current += `\\${character}`;
+          escaped = false;
+        } else if (character === '\\') {
+          escaped = true;
+        } else if (character === separator) {
+          parts.push(current);
+          current = '';
+        } else {
+          current += character;
+        }
+      }
+      if (escaped) current += '\\';
+      parts.push(current);
+      return parts;
+    }
+
+    function parseDelimitedPayload(text, prefix) {
+      const fields = {};
+      for (const segment of splitEscaped(text.slice(prefix.length), ';')) {
+        const colon = segment.indexOf(':');
+        if (colon < 0) continue;
+        const key = segment.slice(0, colon).toUpperCase();
+        const value = decodeQrEscapes(segment.slice(colon + 1));
+        if (value) fields[key] = fields[key] ? `${fields[key]}, ${value}` : value;
+      }
+      return fields;
+    }
+
+    function parseCardLines(text) {
+      const unfolded = text.replace(/\r?\n[ \t]/g, '');
+      const fields = {};
+      for (const line of unfolded.split(/\r?\n/)) {
+        const colon = line.indexOf(':');
+        if (colon < 0) continue;
+        const key = line.slice(0, colon).split(';')[0].split('.').pop().toUpperCase();
+        const value = decodeQrEscapes(line.slice(colon + 1));
+        if (!value || ['BEGIN', 'END', 'VERSION', 'PRODID'].includes(key)) continue;
+        fields[key] = fields[key] ? `${fields[key]}\n${value}` : value;
+      }
+      return fields;
+    }
+
+    function compactFields(entries) {
+      return entries.filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== '');
+    }
+
+    function parseQrContent(rawValue) {
+      const text = String(rawValue || '').trim();
+      if (isSafeWebUrl(text)) return { type: 'URL', fields: [['Address', text]] };
+
+      if (/^WIFI:/i.test(text)) {
+        const data = parseDelimitedPayload(text, 'WIFI:');
+        return { type: 'WiFi', fields: compactFields([
+          ['Network name (SSID)', data.S], ['Security', data.T || 'Open'], ['Password', data.P || (data.T ? '' : 'None')],
+          ['Hidden network', /^true$/i.test(data.H || '') ? 'Yes' : 'No'], ['Identity', data.I], ['Anonymous identity', data.A], ['EAP method', data.E]
+        ]) };
+      }
+
+      if (/^BEGIN:VCARD/i.test(text)) {
+        const data = parseCardLines(text);
+        return { type: 'vCard', fields: compactFields([
+          ['Name', data.FN || data.N], ['Organization', data.ORG], ['Title', data.TITLE], ['Phone', data.TEL],
+          ['Email', data.EMAIL], ['Address', data.ADR], ['Website', data.URL], ['Birthday', data.BDAY], ['Note', data.NOTE]
+        ]) };
+      }
+
+      if (/^MECARD:/i.test(text)) {
+        const data = parseDelimitedPayload(text, 'MECARD:');
+        return { type: 'MeCard', fields: compactFields([
+          ['Name', data.N], ['Phone', data.TEL], ['Email', data.EMAIL], ['Address', data.ADR],
+          ['Website', data.URL], ['Birthday', data.BDAY], ['Nickname', data.NICKNAME], ['Note', data.NOTE]
+        ]) };
+      }
+
+      if (/BEGIN:VEVENT/i.test(text)) {
+        const data = parseCardLines(text);
+        return { type: 'Calendar event', fields: compactFields([
+          ['Event', data.SUMMARY], ['Starts', data.DTSTART], ['Ends', data.DTEND], ['Location', data.LOCATION],
+          ['Description', data.DESCRIPTION], ['Organizer', data.ORGANIZER], ['Website', data.URL], ['Status', data.STATUS]
+        ]) };
+      }
+
+      if (/^MATMSG:/i.test(text)) {
+        const data = parseDelimitedPayload(text, 'MATMSG:');
+        return { type: 'Email', fields: compactFields([['To', data.TO], ['Subject', data.SUB], ['Message', data.BODY]]) };
+      }
+
+      if (/^mailto:/i.test(text)) {
+        try {
+          const url = new URL(text);
+          return { type: 'Email', fields: compactFields([
+            ['To', decodeURIComponent(url.pathname)], ['CC', url.searchParams.get('cc')], ['BCC', url.searchParams.get('bcc')],
+            ['Subject', url.searchParams.get('subject')], ['Message', url.searchParams.get('body')]
+          ]) };
+        } catch (_) {}
+      }
+
+      if (/^(?:SMSTO|SMS):/i.test(text)) {
+        const body = text.replace(/^(?:SMSTO|SMS):/i, '');
+        const separator = body.indexOf(':');
+        const number = separator < 0 ? body : body.slice(0, separator);
+        const message = separator < 0 ? '' : body.slice(separator + 1);
+        return { type: 'SMS', fields: compactFields([['Phone number', number], ['Message', decodeQrEscapes(message)]]) };
+      }
+
+      if (/^sms:/i.test(text)) {
+        try {
+          const url = new URL(text);
+          return { type: 'SMS', fields: compactFields([['Phone number', url.pathname], ['Message', url.searchParams.get('body')]]) };
+        } catch (_) {}
+      }
+
+      if (/^tel:/i.test(text)) return { type: 'Phone', fields: [['Phone number', decodeURIComponent(text.slice(4))]] };
+      if (/^geo:/i.test(text)) return { type: 'Location', fields: [['Coordinates', text.slice(4).split('?')[0]], ['Geo URI', text]] };
+      return { type: 'Text', fields: [['Content', text]] };
+    }
+
+    function renderStructuredResults(results) {
+      elements.structuredResults.replaceChildren();
+      const items = Array.isArray(results) ? results : [];
+      for (const [index, result] of items.entries()) {
+        const content = parseQrContent(result.text);
+        const card = document.createElement('article');
+        card.className = 'structured-result-card';
+        const header = document.createElement('div');
+        header.className = 'structured-result-header';
+        const heading = document.createElement('h3');
+        heading.textContent = items.length > 1 ? `Code ${index + 1}` : 'Decoded content';
+        const badge = document.createElement('span');
+        badge.className = 'content-type-badge';
+        badge.textContent = content.type;
+        header.append(heading, badge);
+        const list = document.createElement('dl');
+        list.className = 'structured-field-list';
+        for (const [label, value] of content.fields) {
+          const row = document.createElement('div');
+          row.className = 'structured-field';
+          const term = document.createElement('dt');
+          term.textContent = label;
+          const description = document.createElement('dd');
+          description.textContent = value;
+          row.append(term, description);
+          list.appendChild(row);
+        }
+        card.append(header, list);
+        elements.structuredResults.appendChild(card);
+      }
+      elements.structuredResults.hidden = !items.length;
     }
 
     function setFailedScanCaptureState(imageUrl, reason) {
@@ -1103,10 +1853,10 @@
       const hasItems = scanHistory.length > 0;
       elements.historyEmptyMessage.hidden = hasItems;
       elements.historyList.hidden = !hasItems;
+      elements.historyList.replaceChildren();
       if (!hasItems) {
         return;
       }
-      elements.historyList.replaceChildren();
       scanHistory.forEach((record) => {
         const item = document.createElement('li');
         const imageStack = document.createElement('div');
@@ -1234,9 +1984,15 @@
       elements.cameraFrame.dataset.scanMode = mode;
       if (failedCaptureImageUrl) {
         elements.cameraButton.textContent = 'Save screenshot + history entry';
+        elements.cameraButton.setAttribute('aria-label', 'Save the unresolved camera screenshot to scan history');
         elements.cameraButton.disabled = false;
       } else {
         elements.cameraButton.textContent = mode === 'qr' ? 'Scan QR' : mode === 'barcode' ? 'Scan barcode' : 'Scan codes';
+        elements.cameraButton.setAttribute('aria-label', mode === 'qr'
+          ? 'Scan QR codes using your camera'
+          : mode === 'barcode'
+            ? 'Scan barcodes using your camera'
+            : 'Scan QR codes and barcodes using your camera');
         elements.cameraButton.disabled = false;
       }
       elements.cameraGuideLabel.textContent = mode === 'qr'
@@ -1294,6 +2050,7 @@
       methodPanels.forEach((panel) => {
         panel.hidden = panel.id !== tab.getAttribute('aria-controls');
       });
+      if (tab.id === 'examples-tab') ensureExampleGallery();
       if (tab.id !== 'camera-tab') stopCamera();
       if (moveFocus) tab.focus();
     }
@@ -1404,14 +2161,15 @@
 
     async function normalizeImageBlobForDecode(blob) {
       if (!isHeicLikeBlob(blob)) return blob;
-      if (typeof window.HeicTo !== 'function') {
+      const HeicTo = await loadHeicTo();
+      if (typeof HeicTo !== 'function') {
         throw new Error('HEIC/HEIF conversion support is not available right now.');
       }
       const outputTypes = ['image/png', 'image/jpeg', 'image/webp'];
       let lastError;
       for (const toType of outputTypes) {
         try {
-          const normalized = await window.HeicTo({ blob, type: toType, quality: 1 });
+          const normalized = await HeicTo({ blob, type: toType, quality: 1 });
           if (normalized instanceof Blob) return normalized;
         } catch (error) {
           lastError = error;
@@ -1515,6 +2273,20 @@
         document.head.appendChild(script);
       });
       return jsZipLoadPromise;
+    }
+
+    function loadHeicTo() {
+      if (typeof window.HeicTo === 'function') return Promise.resolve(window.HeicTo);
+      if (heicToLoadPromise) return heicToLoadPromise;
+      heicToLoadPromise = new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = '/assets/js/vendor/heic-to-1.5.2.js';
+        script.async = true;
+        script.onload = () => resolve(typeof window.HeicTo === 'function' ? window.HeicTo : null);
+        script.onerror = () => resolve(null);
+        document.head.appendChild(script);
+      });
+      return heicToLoadPromise;
     }
 
     async function urlToBlob(url) {
@@ -1743,9 +2515,9 @@
       return id;
     }
 
-    function showGeneratedQrResult(text, format, sourceImageUrl) {
+    function showGeneratedQrResult(text, format, sourceImageUrl, details) {
       if (!window.QRCode || typeof window.QRCode.toDataURL !== 'function' || typeof window.QRCode.toString !== 'function') {
-        showResult(text, '', format, '', sourceImageUrl);
+        showResult(text, '', format, '', sourceImageUrl, details);
         return;
       }
       const options = {
@@ -1757,10 +2529,10 @@
       Promise.all([
         new Promise((resolve) => window.QRCode.toDataURL(text, options, (error, value) => resolve(error ? '' : value))),
         new Promise((resolve) => window.QRCode.toString(text, { ...options, type: 'svg' }, (error, value) => resolve(error ? '' : value)))
-      ]).then(([dataUrl, svg]) => showResult(text, dataUrl, format, svg, sourceImageUrl));
+      ]).then(([dataUrl, svg]) => showResult(text, dataUrl, format, svg, sourceImageUrl, details));
     }
 
-    function showResult(text, previewUrl, format, svg, sourceImageUrl) {
+    function showResult(text, previewUrl, format, svg, sourceImageUrl, details) {
       clearFailedScanCaptureState();
       decodedText = text;
       resolvedText = '';
@@ -1780,6 +2552,9 @@
       }
       elements.resultFormat.textContent = formatLabel(format);
       elements.resultType.hidden = !format;
+      currentDecodedResults = [{ text, format, details: details || null }];
+      renderDecodedDetailsForResults(currentDecodedResults, 0);
+      renderStructuredResults(currentDecodedResults);
       clearRedirectTrace();
       elements.resultValue.textContent = '';
       const containsUrl = isSafeWebUrl(text);
@@ -1834,7 +2609,7 @@
       const primary = normalized[0];
       if (normalized.length === 1) {
         if (!showFullPreview && isQrFormat(primary.format)) {
-          showGeneratedQrResult(primary.text, primary.format, sourceImageUrl);
+          showGeneratedQrResult(primary.text, primary.format, sourceImageUrl, primary.details);
           return true;
         }
 
@@ -1843,12 +2618,14 @@
           showFullPreview ? elements.canvas.toDataURL('image/png') : '',
           primary.format,
           '',
-          sourceImageUrl
+          sourceImageUrl,
+          primary.details
         );
         return true;
       }
 
       decodedText = normalized.map((result, index) => `${index + 1}. [${formatLabel(result.format)}] ${result.text}`).join('\n');
+      currentDecodedResults = normalized;
       resolvedText = '';
       resultImageUrl = showFullPreview ? elements.canvas.toDataURL('image/png') : '';
       resultImageSvg = '';
@@ -1868,6 +2645,8 @@
       elements.finalUrlText.textContent = '';
       elements.finalUrlMenuButton.disabled = true;
       elements.resultValue.textContent = decodedText;
+      renderStructuredResults(normalized);
+      renderDecodedDetailsForResults(normalized, 0);
       hideStatus();
       elements.resultPanel.style.display = 'block';
       elements.resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1948,7 +2727,7 @@
           if (mode === 'barcode' && item.format && isPlausibleNativeBarcodeValue(text, item.format) === false) {
             continue;
           }
-          decoded.push({ text, format: item.format || 'Unknown' });
+          decoded.push({ text, format: item.format || 'Unknown', details: buildQrDetails(item, pixels) });
           if (decoded.length >= MAX_DECODED_RESULTS) break;
         }
         return { status: decoded.length ? 'decoded' : 'not-found', results: decoded };
@@ -2246,13 +3025,16 @@
       actionUrl = '';
       resultImageUrl = '';
       resultImageSvg = '';
+      currentDecodedResults = [];
       resolveRequestId += 1;
       elements.file.value = '';
       elements.imageUrl.value = '';
       elements.paste.value = '';
       elements.resultValue.textContent = '';
+      renderStructuredResults([]);
       elements.resultFormat.textContent = '';
       elements.resultType.hidden = true;
+      renderDecodedDetails(null);
       elements.resultPreview.removeAttribute('src');
       elements.resultPreview.hidden = true;
       elements.decodedResultLabel.hidden = false;
@@ -2287,6 +3069,10 @@
         event.preventDefault();
         selectMethod(methodTabs[nextIndex], true);
       });
+    });
+
+    document.querySelectorAll('.example-card[data-example]').forEach((button) => {
+      button.addEventListener('click', () => decodeExample(button.dataset.example, button));
     });
 
     function openFilePicker() {
@@ -2504,6 +3290,11 @@
       } catch (_) {
         showStatus('Copying was blocked. Select the result text and copy it manually.', 'error');
       }
+    });
+    elements.decodedDetailsSelector.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-result-index]');
+      if (!button) return;
+      renderDecodedDetailsForResults(currentDecodedResults, Number(button.dataset.resultIndex));
     });
     elements.clearButton.addEventListener('click', clearAll);
     window.addEventListener('pagehide', stopCamera);
