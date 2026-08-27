@@ -15,6 +15,12 @@
 # Long-cache the static assets (they're fingerprintable later if needed)
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Keep machine-readable word lists out of search results while allowing the
+# browser tools to fetch and cache them normally.
+/assets/data/words/*
+  X-Robots-Tag: noindex, nofollow
+
 /assets/css/shared/style.css
   Cache-Control: no-cache
 
