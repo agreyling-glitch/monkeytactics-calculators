@@ -36,11 +36,11 @@ This project is especially useful for students, professionals, developers, small
 
 ## 🧰 Tools
 
-The site currently features 24 tools organized around the hierarchy used by the universal menu and All Tools directory:
+The site currently features 25 tools organized around the hierarchy used by the universal menu and All Tools directory:
 
 - Finance: [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator), [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator), [Percentage Calculator](https://monkeytactics.com/tools/percentage-calculator)
 - Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Daily Energy Needs Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
-- Utilities: [Date Difference & Business Days Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator), [QR Code Decoder](https://monkeytactics.com/tools/qr-code-decoder), [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler), [Crossword Solver & Pattern Finder](https://monkeytactics.com/tools/crossword-solver)
+- Utilities: [Date Difference & Business Days Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator), [QR Code Decoder](https://monkeytactics.com/tools/qr-code-decoder), [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler), [Crossword Solver & Pattern Finder](https://monkeytactics.com/tools/crossword-solver), [Wordle Solver & Helper](https://monkeytactics.com/tools/wordle-helper)
 - Productivity: [Password Generator](https://monkeytactics.com/tools/password-generator), [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter), [OCR Utility](https://monkeytactics.com/tools/ocr-utility)
 - Construction: [Concrete Calculator](https://monkeytactics.com/tools/concrete-calculator), [Drywall Calculator](https://monkeytactics.com/tools/drywall-calculator), [Paint Calculator](https://monkeytactics.com/tools/paint-calculator), [Tile Calculator](https://monkeytactics.com/tools/tile-calculator), [Roofing Shingle Calculator](https://monkeytactics.com/tools/roofing-shingle-calculator), [Lumber Board Foot Calculator](https://monkeytactics.com/tools/lumber-board-foot-calculator), [Batt & Blown Insulation Calculator](https://monkeytactics.com/tools/insulation-calculator)
 
@@ -55,7 +55,7 @@ The site currently features 24 tools organized around the hierarchy used by the 
 | **Calculators** | Health | BMI, Daily Energy Needs, Age |
 | **Calculators** | Time & Date | Date & Business Days, Time Zone Converter |
 | **Calculators** | Construction | Concrete, Drywall, Paint, Tile, Roofing Shingles, Lumber Board Feet, Insulation |
-| **Text & Data** | — | Unit Converter, Tip Calculator, QR Code Decoder, Word Unscrambler, Crossword Solver, Word & Character Counter, OCR Utility |
+| **Text & Data** | — | Unit Converter, Tip Calculator, QR Code Decoder, Word Unscrambler, Crossword Solver, Wordle Solver, Word & Character Counter, OCR Utility |
 | **Batch & Automation** | — | Batch QR Generator, Mortgage Scenario Comparison, Business Day Planner, Image Text Extraction |
 
 The All Tools page mirrors this hierarchy. The same structure is rendered by the Rust/WASM hamburger menu on every page, while global search supports pointer and keyboard selection. The homepage highlights Word Unscrambler, Loan & Mortgage Calculator, and Advanced QR Code Generator as the three featured tools.
@@ -72,7 +72,7 @@ Top advertising blocks have been removed from the redesigned experiences so the 
 
 MonkeyTactics is primarily a static site built from lightweight HTML, CSS, and JavaScript, with a narrowly scoped Cloudflare Pages Function for dynamic Word Unscrambler routes. Six first-party Rust components compile to WebAssembly. Every generated browser package is committed under `assets/wasm/`, so production hosting does not require a Rust toolchain.
 
-The Word Unscrambler and Crossword Solver share ENABLE and SOWPODS word lists with per-word source membership, allowing searches against either dictionary or their deduplicated union. The static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser lazily loads relevant chunks, decompresses them with the native `DecompressionStream` API, and caches indexed words for later searches. The Word Unscrambler enforces rack-letter counts, while the Crossword Solver uses a pattern-first WASM search with literal letters, `?` single-letter blanks, `*` flexible-length wildcards, an optional available-letter pool, word length, starting and ending letters, and required or excluded letters. All matching remains local to the browser.
+The Word Unscrambler, Crossword Solver, and Wordle Solver share ENABLE and SOWPODS word lists with per-word source membership. The static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser decompresses and indexes words locally. The Wordle Solver applies green, yellow, and gray positional rules plus exact repeated-letter limits across every submitted guess. All matching remains local to the browser.
 
 ### Rust/WASM calculators and tools
 
@@ -83,6 +83,7 @@ The Word Unscrambler and Crossword Solver share ENABLE and SOWPODS word lists wi
 | [QR & Barcode Decoder](https://monkeytactics.com/tools/qr-code-decoder) | `wasm/qr-code-decoder-engine` | `assets/wasm/qr-code-decoder` | Local QR and barcode decoding, controlled image preprocessing, and stylized-module normalization |
 | [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Rack-constrained dictionary indexing, searching, filtering, sorting, scoring, hooks, and word analysis |
 | [Crossword Solver](https://monkeytactics.com/tools/crossword-solver) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Pattern-first dictionary search without a rack constraint, plus optional letter-pool and crossword-oriented filters |
+| [Wordle Solver](https://monkeytactics.com/tools/wordle-helper) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Five-letter candidate filtering from multiple color-feedback rows with repeated-letter constraints |
 | [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter) | `wasm/text-analyzer-engine` | `assets/wasm/text-analyzer` | Local text metrics and structural analysis with a JavaScript fallback |
 | Hierarchical site navigation | `wasm/menu-engine` | `assets/wasm/menu` | Domain-verified Leptos header, global search with keyboard navigation, and a hamburger-driven hierarchy drawer rendered on every page |
 
@@ -97,7 +98,7 @@ All six components run locally in the browser. Their Rust source lives under `wa
 - `dev/templates` and `dev/archive` contain non-production reference files.
 - `functions/` contains the Cloudflare Pages Function used by dynamic word routes.
 
-#### Word Unscrambler and Crossword Solver integration
+#### Shared word-tool integration
 
 The checked-in bridge initializes the generated module before enabling the form:
 
@@ -111,6 +112,13 @@ The Crossword Solver uses the same bridge with its dedicated interface:
 ```html
 <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js" defer></script>
 <script src="../assets/js/tools/crossword-solver.js" defer></script>
+```
+
+The Wordle Solver also uses the shared bridge and its duplicate-aware WASM search:
+
+```html
+<script src="../assets/js/tools/word-unscrambler/wasm-bridge.js" defer></script>
+<script src="../assets/js/tools/wordle-helper.js" defer></script>
 ```
 
 Dictionary shards remain lazy-loaded by both interfaces and are passed to `init_engine` as arrays of `word\\tmembership` records. The bridge exposes rack-constrained `unscramble` and pattern-first `crosswordSearch` operations. The WASM module authorizes `monkeytactics.com`, the Cloudflare Pages production and preview hosts under `monkeytactics-calculators.pages.dev`, and the local Wrangler host `127.0.0.1`.

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wordle Solver: Find Possible Words | MonkeyTactics</title>
+  <meta name="description" content="Find possible Wordle answers from your green, yellow, and gray tiles. Add multiple guesses and correctly handle repeated letters—free and private.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://monkeytactics.com/tools/wordle-helper">
+  <meta property="og:title" content="Wordle Solver: Find Possible Words"><meta property="og:description" content="Narrow possible five-letter words using every green, yellow, and gray tile—including repeated letters."><meta property="og:url" content="https://monkeytactics.com/tools/wordle-helper"><meta property="og:type" content="website"><meta property="og:site_name" content="MonkeyTactics">
+  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="Wordle Solver: Find Possible Words"><meta name="twitter:description" content="Use green, yellow, and gray tile feedback to narrow possible five-letter words.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://monkeytactics.com/tools/wordle-helper#breadcrumb",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://monkeytactics.com/" },
+          { "@type": "ListItem", "position": 2, "name": "Tools", "item": "https://monkeytactics.com/tools/" },
+          { "@type": "ListItem", "position": 3, "name": "Wordle Solver", "item": "https://monkeytactics.com/tools/wordle-helper" }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://monkeytactics.com/tools/wordle-helper#app",
+        "name": "Wordle Solver and Helper",
+        "url": "https://monkeytactics.com/tools/wordle-helper",
+        "description": "A free browser-based Wordle helper that filters possible five-letter words from green, yellow, and gray tile feedback, including repeated-letter rules.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript and WebAssembly",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": ["Multiple guess rows", "Green, yellow, and gray tile matching", "Repeated-letter constraints", "ENABLE and SOWPODS dictionaries", "Private in-browser search"]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://monkeytactics.com/tools/wordle-helper#faq",
+        "mainEntity": [
+          { "@type": "Question", "name": "How do I use the Wordle solver?", "acceptedAnswer": { "@type": "Answer", "text": "Enter a completed five-letter guess, tap each tile until its color matches the game, and add the row. Add later guesses the same way. The solver keeps only dictionary words compatible with every row." } },
+          { "@type": "Question", "name": "Does gray always mean a letter is absent?", "acceptedAnswer": { "@type": "Answer", "text": "Not when a guess repeats a letter. A gray copy can mean the answer has fewer copies than your guess. The solver uses the yellow and green copies in that row to determine the exact limit." } },
+          { "@type": "Question", "name": "Which dictionary should I use?", "acceptedAnswer": { "@type": "Answer", "text": "ENABLE is the best general starting point. SOWPODS adds international word-game vocabulary and may include obscure words that are not accepted as Wordle answers." } },
+          { "@type": "Question", "name": "Are my guesses sent anywhere?", "acceptedAnswer": { "@type": "Answer", "text": "No. The dictionary and matching engine run locally in your browser." } }
+        ]
+      }
+    ]
+  }
+  </script>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
+  <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
+  <link rel="stylesheet" href="../assets/css/tools/wordle-helper.css?v=20260827-1">
+  <style>
+    .wordle-page .tool-widget{width:100%;max-width:none;box-sizing:border-box;margin-top:1.25rem;padding:clamp(1rem,3vw,2rem);border-radius:1.5rem}
+    .wordle-page .candidate-list{padding-right:.75rem;scrollbar-gutter:stable}
+    .wordle-page .content-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:1.25rem;margin-top:1.5rem}
+    .wordle-page .content-card{box-sizing:border-box;padding:clamp(1.25rem,3vw,2rem);border:1px solid var(--premium-line);border-radius:1rem;background:#101b16}
+    .wordle-page .content-card h2{margin:.35rem 0 1rem;color:var(--premium-ink);font-family:Georgia,"Times New Roman",serif}
+    .wordle-page .content-card p,.wordle-page .content-card li,.wordle-page .content-card dd{color:var(--premium-muted);line-height:1.65}
+    .wordle-page .wordle-explainer dl{display:grid;gap:.75rem;margin:1.25rem 0 0}
+    .wordle-page .wordle-explainer dt{display:flex;align-items:center;gap:.55rem;color:var(--premium-ink);font-weight:850}
+    .wordle-page .wordle-explainer dt::before{width:.8rem;height:.8rem;flex:0 0 auto;border-radius:.18rem;background:var(--tile-absent);content:""}
+    .wordle-page .wordle-explainer dt:nth-of-type(1)::before{background:var(--tile-correct)}
+    .wordle-page .wordle-explainer dt:nth-of-type(2)::before{background:var(--tile-present)}
+    .wordle-page .wordle-explainer dd{margin:-.45rem 0 0 1.35rem}
+    .wordle-page .faq-section{width:100%;max-width:none;box-sizing:border-box;margin-top:1.5rem}
+    .wordle-page .related-tools{margin-top:1.5rem}
+    @media(max-width:800px){.wordle-page .content-grid{grid-template-columns:1fr}}
+  </style>
+  <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
+</head>
+<body class="premium-tool-page wordle-page">
+  <main>
+    <div id="mt-header"></div>
+    <script type="module" src="/assets/wasm/menu/menu.js?v=20260812-menu-assets-v2"></script>
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><a href="/tools/#text-data">Text &amp; Data</a><span class="sep">/</span><span aria-current="page">Wordle Helper</span></nav>
+      <div class="premium-hero-grid">
+        <div><p class="premium-eyebrow">Private, feedback-first word search</p><h1 id="tool-heading">Wordle Solver &amp; Helper</h1><p class="premium-hero-copy">Turn your green, yellow, and gray tiles into a focused list of possible five-letter words.</p><div class="premium-hero-pills"><span>Duplicate-letter aware</span><span>Searches stay local</span></div></div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>Your next guess, narrowed</span><div class="hero-tiles"><b>C</b><b class="present">R</b><b class="correct">A</b><b>N</b><b class="correct">E</b></div><small>Match every clue from every row.</small></div>
+      </div>
+    </section>
+    <section class="tool-widget" aria-labelledby="solver-heading">
+      <div class="solver-heading"><div><div class="premium-section-kicker">01 / Enter your result</div><h2 id="solver-heading">What did your guess reveal?</h2><p>Type a five-letter guess, then tap each tile to mark it gray, yellow, or green.</p></div><fieldset class="dictionary-selector"><legend>Dictionary</legend><div class="segmented-control"><label><input type="radio" name="dictionary" value="1" checked><span>ENABLE</span></label><label><input type="radio" name="dictionary" value="2"><span>SOWPODS</span></label><label><input type="radio" name="dictionary" value="3"><span>Both</span></label></div></fieldset></div>
+      <div class="wordle-layout">
+        <section class="guess-panel">
+          <label for="guess-input">Your guess</label>
+          <input id="guess-input" class="guess-input" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="CRANE" aria-describedby="guess-message">
+          <div class="feedback-tiles" id="feedback-tiles" aria-label="Set feedback for each letter"><button type="button" data-index="0" aria-label="Letter 1: absent">–</button><button type="button" data-index="1" aria-label="Letter 2: absent">–</button><button type="button" data-index="2" aria-label="Letter 3: absent">–</button><button type="button" data-index="3" aria-label="Letter 4: absent">–</button><button type="button" data-index="4" aria-label="Letter 5: absent">–</button></div>
+          <p class="tile-hint"><span class="hint-absent">Gray</span> absent <span class="hint-present">Yellow</span> wrong spot <span class="hint-correct">Green</span> correct spot</p>
+          <button class="primary-action" id="add-guess" type="button" disabled>Loading dictionary…</button><p id="guess-message" role="alert" hidden></p>
+          <div class="guess-history-wrap" id="guess-history-wrap" hidden><div class="history-heading"><strong>Your clues</strong><button id="clear-guesses" type="button">Clear all</button></div><ul id="guess-history" class="guess-history"></ul></div>
+        </section>
+        <section class="candidate-panel" id="candidate-panel" aria-live="polite" aria-busy="false"><span class="result-kicker">Possible answers</span><h2 id="candidate-heading">Ready for your first guess</h2><p id="candidate-summary">Add feedback to see only words that satisfy every tile.</p><ol class="candidate-list" id="candidate-list"></ol><div class="candidate-placeholder" id="candidate-placeholder">Your candidates will appear here</div></section>
+      </div>
+    </section>
+    <section class="content-grid"><article class="content-card"><p class="premium-section-kicker">02 / Read the colors</p><h2>How to Use the Wordle Solver</h2><ol><li>Enter the five letters from one completed guess.</li><li>Tap each tile until it matches the result: gray for absent, yellow for present in another position, or green for correct.</li><li>Select <strong>Add guess &amp; find words</strong>. Add later guesses the same way to narrow the answer list.</li><li>Compare the remaining candidates and choose the word that best tests the letters you still need to place.</li></ol></article><aside class="content-card"><p class="premium-section-kicker">Built for the tricky cases</p><h2>How Repeated Letters Work</h2><p>Wordle scores duplicate letters according to how many copies exist in the answer. If one copy is yellow or green while another is gray, the answer contains exactly the confirmed number of copies. This solver applies that maximum instead of incorrectly removing the letter altogether.</p><p>For example, if one E is green and a second E is gray, matching words must contain exactly one E—and it must remain in the green position.</p><p class="disclaimer">Wordle is a trademark of The New York Times Company. MonkeyTactics is not affiliated with or endorsed by The New York Times.</p></aside></section>
+    <section class="content-grid wordle-explainer"><article class="content-card"><p class="premium-section-kicker">03 / Tile meanings</p><h2>Green, Yellow, and Gray Explained</h2><dl><dt>Green letter</dt><dd>The answer contains the letter in that exact position.</dd><dt>Yellow letter</dt><dd>The answer contains the letter, but not in that position.</dd><dt>Gray letter</dt><dd>The answer does not contain another copy of that letter beyond any green or yellow copies shown in the same row.</dd></dl></article><aside class="content-card"><p class="premium-section-kicker">Choosing a candidate</p><h2>What to Try Next</h2><p>When many possible answers remain, favor a candidate that covers several untested letters. When only a few remain, use the positional clues to choose between them. The result list is a dictionary-based candidate set, not a prediction of the official daily answer list.</p></aside></section>
+    <section class="content-card faq-section"><p class="premium-section-kicker">04 / Common questions</p><h2>Wordle Solver FAQ</h2><details><summary>How do I use the Wordle solver?</summary><p>Enter a completed five-letter guess, tap each tile until its color matches the game, and add the row. Add later guesses the same way. The solver keeps only dictionary words compatible with every row.</p></details><details><summary>Does gray always mean a letter is absent?</summary><p>Not when a guess repeats a letter. A gray copy can mean the answer has fewer copies than your guess. The solver uses the yellow and green copies in that row to determine the exact limit.</p></details><details><summary>Which dictionary should I use?</summary><p>ENABLE is the best general starting point. SOWPODS adds international word-game vocabulary and may include obscure words that are not accepted as Wordle answers.</p></details><details><summary>Are my guesses sent anywhere?</summary><p>No. The dictionary and matching engine run locally in your browser.</p></details></section>
+    <section class="related-tools"><h2>Related Word Tools</h2><div class="related-grid"><a href="/tools/crossword-solver" class="related-card"><strong>Crossword Solver</strong><span>Find words from known letters and blanks.</span></a><a href="/tools/word-unscrambler" class="related-card"><strong>Word Unscrambler</strong><span>Turn rack letters into playable words.</span></a></div></section>
+  </main>
+  <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot"><div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div><a class="trustpilot-review-link" href="https://www.trustpilot.com/evaluate/monkeytactics.com" target="_blank" rel="noopener noreferrer"><img src="/assets/images/trustpilot-review.svg" width="360" height="52" alt="Review MonkeyTactics on Trustpilot"></a></section>
+  <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/about">About</a></nav></footer>
+  <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-wordle-1" defer></script>
+  <script src="../assets/js/tools/wordle-helper.js?v=20260827-1" defer></script>
+</body>
+</html>

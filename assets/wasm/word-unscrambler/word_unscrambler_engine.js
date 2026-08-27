@@ -130,6 +130,16 @@ export function verify_domain(host) {
     const ret = wasm.verify_domain(ptr0, len0);
     return ret !== 0;
 }
+
+/**
+ * @param {any} guesses
+ * @param {number} dictionary_bit
+ * @returns {any}
+ */
+export function wordle_search(guesses, dictionary_bit) {
+    const ret = wasm.wordle_search(addHeapObject(guesses), dictionary_bit);
+    return takeObject(ret);
+}
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
