@@ -11,6 +11,7 @@ export const is_valid_word: (a: number, b: number) => number;
 export const score_word: (a: number, b: number) => number;
 export const unscramble: (a: number, b: number, c: number, d: number, e: number) => number;
 export const verify_domain: (a: number, b: number) => number;
+export const wordle_search: (a: number, b: number) => number;
 export const __wbindgen_export: (a: number, b: number) => number;
 export const __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
 export const __wbindgen_export3: (a: number) => void;

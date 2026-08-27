@@ -25,6 +25,8 @@ export function unscramble(rack: string, pattern: string, options: any): any;
 
 export function verify_domain(host: string): boolean;
 
+export function wordle_search(guesses: any, dictionary_bit: number): any;
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
@@ -39,6 +41,7 @@ export interface InitOutput {
     readonly score_word: (a: number, b: number) => number;
     readonly unscramble: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly verify_domain: (a: number, b: number) => number;
+    readonly wordle_search: (a: number, b: number) => number;
     readonly __wbindgen_export: (a: number, b: number) => number;
     readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
     readonly __wbindgen_export3: (a: number) => void;

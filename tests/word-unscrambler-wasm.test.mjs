@@ -10,7 +10,8 @@ import init, {
   init_engine,
   score_word,
   unscramble,
-  verify_domain
+  verify_domain,
+  wordle_search
 } from "../assets/wasm/word-unscrambler/word_unscrambler_engine.js";
 
 const wasmBytes = fs.readFileSync(new URL(
@@ -19,7 +20,7 @@ const wasmBytes = fs.readFileSync(new URL(
 ));
 
 await init({ module_or_path: wasmBytes });
-init_engine(["ate", "eat", "tea", "eats"]);
+init_engine(["ate", "eat", "tea", "eats", "ample", "angle", "apple", "allee"]);
 
 test("the browser bridge resolves engine files from the canonical WASM directory", () => {
   const bridge = fs.readFileSync(new URL(
@@ -65,6 +66,10 @@ test("searches crossword patterns without requiring rack letters", () => {
   assert.deepEqual(crossword_search("???", "", options), ["ate", "eat", "tea"]);
   assert.deepEqual(crossword_search("???", "ate", options), ["ate", "eat", "tea"]);
   assert.deepEqual(crossword_search("???", "at", options), []);
+});
+
+test("filters Wordle candidates with duplicate-aware feedback", () => {
+  assert.deepEqual(wordle_search([{ word: "allee", feedback: "cpaac" }], 1), ["ample", "angle", "apple"]);
 });
 
 test("returns analysis data in the bridge's expected shape", () => {

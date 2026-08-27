@@ -192,6 +192,12 @@ const TEXT_DATA: &[ToolItem] = &[
         children: &[],
     },
     ToolItem {
+        id: "wordle-helper",
+        label: "Wordle Solver",
+        url: "/tools/wordle-helper",
+        children: &[],
+    },
+    ToolItem {
         id: "word-character-counter",
         label: "Word & Character Counter",
         url: "/tools/word-character-counter",

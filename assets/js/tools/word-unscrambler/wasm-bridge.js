@@ -1,7 +1,7 @@
 "use strict";
 
 (function initializeWordUnscramblerWasm(global) {
-  const ASSET_VERSION = "20260827-1";
+  const ASSET_VERSION = "20260827-2";
   const bridgeUrl = document.currentScript.src;
   const moduleUrl = new URL(
     `/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=${ASSET_VERSION}`,
@@ -47,6 +47,9 @@
 
     crosswordSearch(pattern, availableLetters, options) {
       return requireEngine().crossword_search(pattern, availableLetters, options);
+    },
+    wordleSearch(guesses, dictionaryBit) {
+      return requireEngine().wordle_search(guesses, dictionaryBit);
     },
     scoreWord(word) {
       return requireEngine().score_word(word);

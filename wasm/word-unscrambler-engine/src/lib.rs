@@ -57,6 +57,12 @@ struct SearchOptions {
     sort_by: String,
 }
 
+#[derive(Debug, Deserialize)]
+struct WordleGuess {
+    word: String,
+    feedback: String,
+}
+
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct WordAnalysis {
@@ -121,6 +127,16 @@ pub fn crossword_search(pattern: String, available_letters: String, options: JsV
             .borrow_mut()
             .find_crossword_matches(&pattern, &available_letters, &options)
     });
+    serde_wasm_bindgen::to_value(&matches).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen]
+pub fn wordle_search(guesses: JsValue, dictionary_bit: u8) -> JsValue {
+    let guesses: Vec<WordleGuess> = match serde_wasm_bindgen::from_value(guesses) {
+        Ok(guesses) => guesses,
+        Err(error) => return JsValue::from_str(&format!("Invalid Wordle guesses: {error}")),
+    };
+    let matches = ENGINE.with(|engine| engine.borrow().find_wordle_matches(&guesses, dictionary_bit));
     serde_wasm_bindgen::to_value(&matches).unwrap_or(JsValue::NULL)
 }
 
@@ -294,6 +310,22 @@ impl Engine {
             }
         }
         self.sort_matches(&mut matches, pattern, options);
+        matches
+    }
+
+    fn find_wordle_matches(&self, guesses: &[WordleGuess], dictionary_bit: u8) -> Vec<String> {
+        let dictionary_bit = normalized_dictionary_bit(dictionary_bit);
+        let mut matches = self
+            .metadata
+            .iter()
+            .filter(|(word, info)| {
+                word.len() == 5
+                    && info.membership & dictionary_bit != 0
+                    && guesses.iter().all(|guess| wordle_guess_matches(word, guess))
+            })
+            .map(|(word, _)| word.clone())
+            .collect::<Vec<_>>();
+        matches.sort();
         matches
     }
 
@@ -541,6 +573,44 @@ fn contains_required(counts: &[u8; 26], required: &str) -> bool {
     true
 }
 
+fn wordle_guess_matches(candidate: &str, guess: &WordleGuess) -> bool {
+    if guess.word.len() != 5
+        || guess.feedback.len() != 5
+        || !guess.word.bytes().all(|byte| byte.is_ascii_lowercase())
+        || !guess.feedback.bytes().all(|byte| matches!(byte, b'a' | b'p' | b'c'))
+    {
+        return false;
+    }
+
+    let candidate_bytes = candidate.as_bytes();
+    let guess_bytes = guess.word.as_bytes();
+    let feedback_bytes = guess.feedback.as_bytes();
+    let mut candidate_counts = [0u8; 26];
+    let mut required_counts = [0u8; 26];
+    let mut has_absent = [false; 26];
+
+    for byte in candidate_bytes {
+        candidate_counts[(byte - b'a') as usize] += 1;
+    }
+    for index in 0..5 {
+        let letter = guess_bytes[index];
+        let letter_index = (letter - b'a') as usize;
+        match feedback_bytes[index] {
+            b'c' if candidate_bytes[index] != letter => return false,
+            b'p' if candidate_bytes[index] == letter => return false,
+            b'a' if candidate_bytes[index] == letter => return false,
+            b'c' | b'p' => required_counts[letter_index] += 1,
+            b'a' => has_absent[letter_index] = true,
+            _ => return false,
+        }
+    }
+
+    (0..26).all(|index| {
+        candidate_counts[index] >= required_counts[index]
+            && (!has_absent[index] || candidate_counts[index] == required_counts[index])
+    })
+}
+
 fn glob_matches(word: &[u8], pattern: &[u8]) -> bool {
     let mut word_index = 0;
     let mut pattern_index = 0;
@@ -712,6 +782,19 @@ mod tests {
             engine
                 .find_crossword_matches("???", "at", &options)
                 .is_empty()
+        );
+    }
+
+    #[test]
+    fn wordle_search_handles_positions_and_duplicate_letters() {
+        let mut engine = Engine::default();
+        engine.index_records(vec![
+            "apple\t1".into(), "ample\t1".into(), "allee\t1".into(), "angle\t1".into(),
+        ]);
+        let guesses = vec![WordleGuess { word: "allee".into(), feedback: "cpaac".into() }];
+        assert_eq!(
+            engine.find_wordle_matches(&guesses, ENABLE),
+            vec!["ample", "angle", "apple"]
         );
     }
 
