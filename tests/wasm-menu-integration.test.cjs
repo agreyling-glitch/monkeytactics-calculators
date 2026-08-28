@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const siteRoot = path.resolve(__dirname, "..");
-const menuAssetVersion = "20260812-menu-assets-v2";
+const menuAssetVersion = "20260827-menu-wwf-v1";
 const integrationMarkup = [
   '<div id="mt-header"></div>',
 ];

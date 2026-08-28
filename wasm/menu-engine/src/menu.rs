@@ -94,6 +94,13 @@ fn text_match_score(value: &str, query: &str) -> Option<u8> {
     }
 }
 
+fn tool_aliases(tool_id: &str) -> &'static [&'static str] {
+    match tool_id {
+        "words-with-friends-solver" => &["wwf", "words with friends word finder"],
+        _ => &[],
+    }
+}
+
 fn matching_results(query: &str, blog_items: &[BlogItem]) -> Vec<SearchResult> {
     let normalized = query.trim().to_lowercase();
     if normalized.is_empty() {
@@ -104,9 +111,18 @@ fn matching_results(query: &str, blog_items: &[BlogItem]) -> Vec<SearchResult> {
     let mut matches = Vec::new();
 
     for (position, tool) in searchable_tools().enumerate() {
-        let score = text_match_score(tool.label, &normalized).or_else(|| {
-            text_match_score(&tool.id.replace('-', " "), &normalized).map(|score| score + 1)
-        });
+        let label_score = text_match_score(tool.label, &normalized);
+        let id_score =
+            text_match_score(&tool.id.replace('-', " "), &normalized).map(|score| score + 1);
+        let alias_score = tool_aliases(tool.id)
+            .iter()
+            .filter_map(|alias| text_match_score(alias, &normalized))
+            .min();
+        let score = label_score
+            .into_iter()
+            .chain(id_score)
+            .chain(alias_score)
+            .min();
         let Some(score) = score else {
             continue;
         };
@@ -450,6 +466,14 @@ mod tests {
         let matches = matching_results("tip", &[]);
         assert_eq!(matches.len(), 1);
         assert_eq!(matches[0].id, "tip-calculator");
+    }
+
+    #[test]
+    fn tool_aliases_return_the_words_with_friends_solver() {
+        let matches = matching_results("wwf", &[]);
+        assert_eq!(matches.len(), 1);
+        assert_eq!(matches[0].id, "words-with-friends-solver");
+        assert_eq!(matches[0].url, "/tools/words-with-friends-solver");
     }
 
     #[test]
