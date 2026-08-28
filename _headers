@@ -35,3 +35,7 @@
 /assets/wasm/menu/menu.css
   Content-Type: text/css
   Cache-Control: no-cache
+
+/assets/wasm/menu/tools-manifest.json
+  Content-Type: application/json
+  Cache-Control: no-cache

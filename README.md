@@ -36,7 +36,7 @@ This project is especially useful for students, professionals, developers, small
 
 ## 🧰 Tools
 
-The site currently features 25 tools organized around the hierarchy used by the universal menu and All Tools directory:
+The site currently features 26 tools organized around the hierarchy used by the universal menu and All Tools directory:
 
 - Finance: [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator), [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator), [Percentage Calculator](https://monkeytactics.com/tools/percentage-calculator)
 - Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Daily Energy Needs Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
@@ -55,10 +55,10 @@ The site currently features 25 tools organized around the hierarchy used by the 
 | **Calculators** | Health | BMI, Daily Energy Needs, Age |
 | **Calculators** | Time & Date | Date & Business Days, Time Zone Converter |
 | **Calculators** | Construction | Concrete, Drywall, Paint, Tile, Roofing Shingles, Lumber Board Feet, Insulation |
-| **Text & Data** | — | Unit Converter, Tip Calculator, QR Code Decoder, Word Unscrambler, Crossword Solver, Wordle Solver, Word & Character Counter, OCR Utility |
-| **Batch & Automation** | — | Batch QR Generator, Mortgage Scenario Comparison, Business Day Planner, Image Text Extraction |
+| **Text & Data** | — | Unit Converter, Tip Calculator, QR Code Decoder, Word Unscrambler, Words With Friends Solver, Crossword Solver, Wordle Solver, Word & Character Counter, OCR Utility |
+| **Batch & Automation** | — | Batch QR Generator, Batch Password Generator, Mortgage Scenario Comparison, Business Day Planner, Image Text Extraction |
 
-The All Tools page mirrors this hierarchy. The same structure is rendered by the Rust/WASM hamburger menu on every page, while global search supports pointer and keyboard selection. The homepage highlights Word Unscrambler, Loan & Mortgage Calculator, and Advanced QR Code Generator as the three featured tools.
+The All Tools page mirrors this hierarchy. The same structure is rendered by the Rust/WASM hamburger menu on every page, while global search supports pointer and keyboard selection. The homepage features Word Unscrambler, Loan & Mortgage Calculator, Advanced QR Code Generator, Words With Friends Solver, Wordle Solver, and Crossword Solver.
 
 ## 🎨 Interface
 

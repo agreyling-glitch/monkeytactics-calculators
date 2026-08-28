@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const siteRoot = path.resolve(__dirname, "..");
-const menuAssetVersion = "20260827-menu-wwf-v1";
+const menuAssetVersion = "20260828-menu-manifest-v1";
 const integrationMarkup = [
   '<div id="mt-header"></div>',
 ];
@@ -68,10 +68,48 @@ test("the old HTML site navigation is absent", () => {
   }
 });
 
-test("compiled WASM menu artifacts exist at their deployment paths", () => {
-  for (const file of ["menu.css", "menu.js", "menu_bg.wasm"]) {
+test("compiled WASM menu artifacts and runtime manifest exist at their deployment paths", () => {
+  for (const file of ["menu.css", "menu.js", "menu_bg.wasm", "tools-manifest.json"]) {
     const artifact = path.join(siteRoot, "assets", "wasm", "menu", file);
     assert.ok(fs.statSync(artifact).size > 0, `${artifact} must be non-empty`);
+  }
+});
+
+test("the runtime menu manifest owns the complete menu hierarchy", () => {
+  const manifestPath = path.join(siteRoot, "assets", "wasm", "menu", "tools-manifest.json");
+  const groups = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  const leaves = [];
+  const collectLeaves = (items) => items.forEach((item) => {
+    assert.equal(typeof item.id, "string");
+    assert.equal(typeof item.label, "string");
+    assert.match(item.url, /^\/tools(?:\/|$)/);
+    if (item.children?.length) collectLeaves(item.children);
+    else {
+      assert.equal(typeof item.description, "string");
+      assert.ok(item.description.length > 20, `${item.id} needs a useful search description`);
+      assert.ok(Array.isArray(item.keywords) && item.keywords.length > 0, `${item.id} needs search keywords`);
+      assert.equal(item.capabilities?.length, 3, `${item.id} needs exactly three capabilities`);
+      leaves.push(item);
+    }
+  });
+  collectLeaves(groups);
+
+  assert.deepEqual(groups.map(({ id }) => id), ["generators", "calculators", "text-data", "batch-automation"]);
+  assert.equal(leaves.length, 31);
+  assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
+});
+
+test("the All Tools page renders manifest-owned capability disclosures", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
+  const manifest = JSON.parse(fs.readFileSync(path.join(siteRoot, "assets", "wasm", "menu", "tools-manifest.json"), "utf8"));
+  const leaves = [];
+  const collectLeaves = (items) => items.forEach((item) => item.children?.length ? collectLeaves(item.children) : leaves.push(item));
+  collectLeaves(manifest);
+
+  assert.equal((html.match(/class="directory-tool__capabilities"/g) || []).length, leaves.length);
+  for (const tool of leaves) {
+    assert.match(html, new RegExp(`data-tool-id="${tool.id}"[\\s\\S]*?aria-label="Capabilities"`));
+    for (const capability of tool.capabilities) assert.ok(html.includes(capability.replaceAll("&", "&amp;")));
   }
 });
 
@@ -84,6 +122,29 @@ test("the menu loader versions its CSS and WASM dependencies", () => {
   assert.match(loader, /Failed to initialize the MonkeyTactics navigation/);
 });
 
+test("the menu provides versioned browser-local favorites", () => {
+  const source = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "src", "menu.rs"), "utf8");
+  const css = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "menu.css"), "utf8");
+  assert.match(source, /monkeytactics\.menu-favorites/);
+  assert.match(source, /const FAVORITES_VERSION: u8 = 1/);
+  assert.match(source, /const MAX_FAVORITES: usize = 12/);
+  assert.match(source, /aria-pressed/);
+  assert.match(source, /Add \{favorite_label\} to favorites/);
+  assert.match(css, /\.mt-favorites/);
+  assert.match(css, /\.mt-favorite-toggle\[aria-pressed="true"\]/);
+});
+
+test("the menu glass treatment respects reduced-motion and blur fallbacks", () => {
+  const source = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "src", "menu.rs"), "utf8");
+  const css = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "menu.css"), "utf8");
+  assert.match(source, /class:open=move \|\| mobile_open\.get\(\)/);
+  assert.match(css, /backdrop-filter: blur\(24px\) saturate\(155%\)/);
+  assert.match(css, /@keyframes mt-star-pop/);
+  assert.match(css, /@keyframes mt-section-in/);
+  assert.match(css, /@supports not \(\(backdrop-filter:/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.mt-mobile-drawer \*/);
+});
+
 test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
@@ -91,7 +152,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
     ["text-data", "Text &amp; Data", 9],
-    ["batch-automation", "Batch &amp; Automation", 4],
+    ["batch-automation", "Batch &amp; Automation", 5],
   ]) {
     assert.match(html, new RegExp(`id="${id}"[\\s\\S]*?<h2>${label} <span>${count}</span></h2>`));
   }
@@ -100,7 +161,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 30);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 31);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -114,7 +175,7 @@ test("site-wide references describe the Batt and Blown Insulation Calculator", (
     "tools/drywall-calculator.html",
     "tools/paint-calculator.html",
     "tools/roofing-shingle-calculator.html",
-    "wasm/menu-engine/src/tools.rs",
+    "assets/wasm/menu/tools-manifest.json",
   ]) {
     const content = fs.readFileSync(path.join(siteRoot, relativePath), "utf8");
     assert.match(content, expectedName, `${relativePath} must use the current calculator name`);
@@ -123,7 +184,7 @@ test("site-wide references describe the Batt and Blown Insulation Calculator", (
   assert.match(construction, /batt packages or blown-in bags, R-value, depth, load, and cost/i);
 });
 
-test("the homepage features only the three designated popular tools", () => {
+test("the homepage features the six designated popular tools", () => {
   const html = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
   const titles = [...html.matchAll(/<article class="featured-tool[^>]*>[\s\S]*?<h3>([^<]+)<\/h3>/g)]
     .map((match) => match[1]);
@@ -132,9 +193,12 @@ test("the homepage features only the three designated popular tools", () => {
     "Word Unscrambler",
     "Loan &amp; Mortgage Calculator",
     "Advanced QR Code Generator",
+    "Words With Friends Solver",
+    "Wordle Solver",
+    "Crossword Solver",
   ]);
-  assert.equal((html.match(/class="capability-list"/g) || []).length, 3);
-  assert.equal((html.match(/<li>/g) || []).length, 12);
+  assert.equal((html.match(/class="capability-list"/g) || []).length, 6);
+  assert.equal((html.match(/<li>/g) || []).length, 24);
 });
 
 test("the flagship word and QR tools use the mortgage-inspired presentation", () => {

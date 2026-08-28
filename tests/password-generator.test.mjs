@@ -77,7 +77,7 @@ test("password generator publishes capability-aligned SEO metadata and content",
   assert.match(html, /name="twitter:card"\s+content="summary"/);
   assert.match(html, /"@type": "WebApplication"/);
   assert.match(html, /"Batch generation of up to 100 passwords"/);
-  assert.match(html, /"dateModified": "2026-08-11"/);
+  assert.match(html, /"dateModified": "2026-08-28"/);
   assert.match(html, /aria-label="Password generator guide"/);
   assert.match(html, /aria-label="Password generator capabilities"/);
   assert.match(html, /Password Generator, Analyzer &amp; Breach Checker/);
@@ -345,4 +345,13 @@ test("password table truncates only its screen value after 16 characters", () =>
   assert.match(html, /className = 'password-print-value'/);
   assert.match(html, /body\.print-passwords \.password-screen-value \{ display: none; \}/);
   assert.match(html, /body\.print-passwords \.password-print-value \{ display: inline; \}/);
+});
+
+test("batch password deep link opens and reveals the quantity workflow", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "tools", "password-generator.html"), "utf8");
+
+  assert.match(html, /id="batch-passwords"/);
+  assert.match(html, /window\.location\.hash !== '#batch-passwords'/);
+  assert.match(html, /byId\('passwordAdvanced'\)\.open = true/);
+  assert.match(html, /window\.addEventListener\('hashchange', restorePasswordHashState\)/);
 });

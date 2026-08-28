@@ -1,11 +1,63 @@
-use crate::tools::{searchable_tools, TOOLS_TREE};
+use crate::tools::{searchable_tools, ToolItem};
 use gloo_net::http::Request;
 use leptos::*;
-use serde::Deserialize;
-use std::collections::HashSet;
+use serde::{Deserialize, Serialize};
+use std::collections::{HashMap, HashSet};
 
 const BLOG_SEARCH_INDEX_URL: &str = "https://blog.monkeytactics.com/menu-search.json";
 const LOCAL_BLOG_SEARCH_INDEX_URL: &str = "http://localhost:1313/menu-search.json";
+const TOOLS_MANIFEST_URL: &str = "/assets/wasm/menu/tools-manifest.json";
+const FAVORITES_STORAGE_KEY: &str = "monkeytactics.menu-favorites";
+const FAVORITES_VERSION: u8 = 1;
+const MAX_FAVORITES: usize = 12;
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+struct FavoriteState {
+    version: u8,
+    tool_ids: Vec<String>,
+}
+
+fn normalized_favorites(tool_ids: Vec<String>) -> Vec<String> {
+    let mut seen = HashSet::new();
+    tool_ids
+        .into_iter()
+        .filter(|id| !id.is_empty() && seen.insert(id.clone()))
+        .take(MAX_FAVORITES)
+        .collect()
+}
+
+fn load_favorites() -> Vec<String> {
+    web_sys::window()
+        .and_then(|window| window.local_storage().ok().flatten())
+        .and_then(|storage| storage.get_item(FAVORITES_STORAGE_KEY).ok().flatten())
+        .and_then(|json| serde_json::from_str::<FavoriteState>(&json).ok())
+        .filter(|state| state.version == FAVORITES_VERSION)
+        .map(|state| normalized_favorites(state.tool_ids))
+        .unwrap_or_default()
+}
+
+fn save_favorites(tool_ids: &[String]) {
+    let state = FavoriteState {
+        version: FAVORITES_VERSION,
+        tool_ids: tool_ids.to_vec(),
+    };
+    let Ok(json) = serde_json::to_string(&state) else {
+        return;
+    };
+    if let Some(storage) =
+        web_sys::window().and_then(|window| window.local_storage().ok().flatten())
+    {
+        let _ = storage.set_item(FAVORITES_STORAGE_KEY, &json);
+    }
+}
+
+fn toggle_favorite(tool_id: &str, favorites: &mut Vec<String>) {
+    if let Some(index) = favorites.iter().position(|id| id == tool_id) {
+        favorites.remove(index);
+    } else if favorites.len() < MAX_FAVORITES {
+        favorites.push(tool_id.to_string());
+    }
+}
 
 fn blog_search_index_url(hostname: &str) -> &'static str {
     if hostname == "127.0.0.1" || hostname == "localhost" {
@@ -101,45 +153,189 @@ fn tool_aliases(tool_id: &str) -> &'static [&'static str] {
     }
 }
 
-fn matching_results(query: &str, blog_items: &[BlogItem]) -> Vec<SearchResult> {
+fn search_tokens(value: &str) -> Vec<String> {
+    const STOP_WORDS: &[&str] = &["a", "an", "and", "for", "from", "of", "the", "to", "with"];
+    value
+        .to_lowercase()
+        .split(|character: char| !character.is_alphanumeric())
+        .filter(|token| token.len() > 1 && !STOP_WORDS.contains(token))
+        .map(|token| token.to_string())
+        .collect()
+}
+
+fn tool_search_text(tool: &ToolItem) -> String {
+    format!(
+        "{} {} {} {} {}",
+        tool.label,
+        tool.id.replace('-', " "),
+        tool.description,
+        tool.keywords.join(" "),
+        tool_aliases(&tool.id).join(" ")
+    )
+}
+
+fn levenshtein_distance(left: &str, right: &str) -> usize {
+    let mut previous = (0..=right.chars().count()).collect::<Vec<_>>();
+    for (left_index, left_character) in left.chars().enumerate() {
+        let mut current = vec![left_index + 1];
+        for (right_index, right_character) in right.chars().enumerate() {
+            current.push(
+                (current[right_index] + 1)
+                    .min(previous[right_index + 1] + 1)
+                    .min(previous[right_index] + usize::from(left_character != right_character)),
+            );
+        }
+        previous = current;
+    }
+    previous[right.chars().count()]
+}
+
+fn tf_idf_scores(query_tokens: &[String], documents: &[Vec<String>]) -> Vec<f64> {
+    let mut document_frequency = HashMap::<&str, usize>::new();
+    for document in documents {
+        let unique = document.iter().map(String::as_str).collect::<HashSet<_>>();
+        for token in unique {
+            *document_frequency.entry(token).or_default() += 1;
+        }
+    }
+
+    let document_count = documents.len() as f64;
+    documents
+        .iter()
+        .map(|document| {
+            let vocabulary = query_tokens
+                .iter()
+                .chain(document.iter())
+                .map(String::as_str)
+                .collect::<HashSet<_>>();
+            let mut dot = 0.0;
+            let mut query_norm = 0.0;
+            let mut document_norm = 0.0;
+            for token in vocabulary {
+                let idf = ((document_count + 1.0)
+                    / (*document_frequency.get(token).unwrap_or(&0) as f64 + 1.0))
+                    .ln()
+                    + 1.0;
+                let query_weight = query_tokens
+                    .iter()
+                    .filter(|item| item.as_str() == token)
+                    .count() as f64
+                    * idf;
+                let document_weight = document
+                    .iter()
+                    .filter(|item| item.as_str() == token)
+                    .count() as f64
+                    * idf;
+                dot += query_weight * document_weight;
+                query_norm += query_weight * query_weight;
+                document_norm += document_weight * document_weight;
+            }
+            if query_norm == 0.0 || document_norm == 0.0 {
+                0.0
+            } else {
+                dot / (query_norm.sqrt() * document_norm.sqrt())
+            }
+        })
+        .collect()
+}
+
+fn tool_relevance(
+    tool: &ToolItem,
+    normalized_query: &str,
+    query_tokens: &[String],
+    document_tokens: &[String],
+    cosine_similarity: f64,
+) -> Option<i32> {
+    let label = tool.label.to_lowercase();
+    let id = tool.id.replace('-', " ").to_lowercase();
+    let keywords = tool
+        .keywords
+        .iter()
+        .map(|keyword| keyword.to_lowercase())
+        .collect::<Vec<_>>();
+    let mut score = (cosine_similarity * 2_000.0).round() as i32;
+
+    if label == normalized_query || keywords.iter().any(|keyword| keyword == normalized_query) {
+        score += 10_000;
+    } else if label.starts_with(normalized_query) || id.starts_with(normalized_query) {
+        score += 8_000;
+    } else if label.contains(normalized_query)
+        || id.contains(normalized_query)
+        || keywords
+            .iter()
+            .any(|keyword| keyword.contains(normalized_query))
+    {
+        score += 6_000;
+    }
+
+    let all_tokens_match = !query_tokens.is_empty()
+        && query_tokens
+            .iter()
+            .all(|query_token| document_tokens.contains(query_token));
+    if all_tokens_match {
+        score += 4_000;
+    }
+
+    let fuzzy_matches = query_tokens
+        .iter()
+        .filter(|query_token| {
+            query_token.len() >= 4
+                && document_tokens.iter().any(|document_token| {
+                    document_token.len().abs_diff(query_token.len()) <= 1
+                        && levenshtein_distance(query_token, document_token) <= 1
+                })
+        })
+        .count();
+    score += fuzzy_matches as i32 * 150;
+
+    (score > 0).then_some(score)
+}
+
+fn matching_results_with_favorites(
+    query: &str,
+    tools_tree: &[ToolItem],
+    blog_items: &[BlogItem],
+    favorite_ids: &[String],
+) -> Vec<SearchResult> {
     let normalized = query.trim().to_lowercase();
     if normalized.is_empty() {
         return Vec::new();
     }
 
-    let mut seen_urls = HashSet::new();
     let mut matches = Vec::new();
+    let tools = searchable_tools(tools_tree);
+    let query_tokens = search_tokens(&normalized);
+    let document_tokens = tools
+        .iter()
+        .map(|tool| search_tokens(&tool_search_text(tool)))
+        .collect::<Vec<_>>();
+    let cosine_scores = tf_idf_scores(&query_tokens, &document_tokens);
 
-    for (position, tool) in searchable_tools().enumerate() {
-        let label_score = text_match_score(tool.label, &normalized);
-        let id_score =
-            text_match_score(&tool.id.replace('-', " "), &normalized).map(|score| score + 1);
-        let alias_score = tool_aliases(tool.id)
-            .iter()
-            .filter_map(|alias| text_match_score(alias, &normalized))
-            .min();
-        let score = label_score
-            .into_iter()
-            .chain(id_score)
-            .chain(alias_score)
-            .min();
-        let Some(score) = score else {
+    for (position, tool) in tools.into_iter().enumerate() {
+        let score = tool_relevance(
+            tool,
+            &normalized,
+            &query_tokens,
+            &document_tokens[position],
+            cosine_scores[position],
+        );
+        let Some(mut score) = score else {
             continue;
         };
-        let destination = tool.url.split('#').next().unwrap_or(tool.url);
-        if seen_urls.insert(destination.to_string()) {
-            matches.push((
-                0,
-                score,
-                position,
-                SearchResult {
-                    id: tool.id.to_string(),
-                    label: tool.label.to_string(),
-                    url: tool.url.to_string(),
-                    kind: SearchResultKind::Tool,
-                },
-            ));
+        if favorite_ids.contains(&tool.id) {
+            score += 250;
         }
+        matches.push((
+            score,
+            0,
+            position,
+            SearchResult {
+                id: tool.id.clone(),
+                label: tool.label.clone(),
+                url: tool.url.clone(),
+                kind: SearchResultKind::Tool,
+            },
+        ));
     }
 
     for (position, article) in blog_items.iter().enumerate() {
@@ -152,29 +348,79 @@ fn matching_results(query: &str, blog_items: &[BlogItem]) -> Vec<SearchResult> {
         let Some(score) = title_score.into_iter().chain(tag_score).min() else {
             continue;
         };
-        if seen_urls.insert(article.url.clone()) {
-            matches.push((
-                1,
-                score,
-                position,
-                SearchResult {
-                    id: format!("blog-{position}"),
-                    label: article.title.clone(),
-                    url: article.url.clone(),
-                    kind: SearchResultKind::Article,
-                },
-            ));
-        }
+        matches.push((
+            5_000 - score as i32,
+            1,
+            position,
+            SearchResult {
+                id: format!("blog-{position}"),
+                label: article.title.clone(),
+                url: article.url.clone(),
+                kind: SearchResultKind::Article,
+            },
+        ));
     }
 
-    matches.sort_by_key(|(kind, score, position, _)| {
-        (*kind, if *kind == 0 { 0 } else { *score }, *position)
-    });
+    matches.sort_by_key(|(score, kind, position, _)| (std::cmp::Reverse(*score), *kind, *position));
+    let mut seen_destinations = HashSet::new();
     matches
         .into_iter()
-        .map(|(_, _, _, result)| result)
+        .filter_map(|(_, _, _, result)| {
+            let destination = result
+                .url
+                .split('#')
+                .next()
+                .unwrap_or(&result.url)
+                .to_string();
+            seen_destinations.insert(destination).then_some(result)
+        })
         .take(8)
         .collect()
+}
+
+#[cfg(test)]
+fn matching_results(
+    query: &str,
+    tools_tree: &[ToolItem],
+    blog_items: &[BlogItem],
+) -> Vec<SearchResult> {
+    matching_results_with_favorites(query, tools_tree, blog_items, &[])
+}
+
+#[component]
+fn ToolRow(
+    tool: ToolItem,
+    favorite_ids: ReadSignal<Vec<String>>,
+    set_favorite_ids: WriteSignal<Vec<String>>,
+) -> impl IntoView {
+    let tool_id = tool.id.clone();
+    let tool_id_for_state = tool.id.clone();
+    let tool_label = tool.label.clone();
+    let favorite_label = tool.label.clone();
+    let is_favorite = create_memo(move |_| favorite_ids.get().contains(&tool_id_for_state));
+
+    view! {
+        <div class="mt-tool-row">
+            <a href=tool.url>{tool_label}</a>
+            <button
+                class="mt-favorite-toggle"
+                type="button"
+                aria-label=move || if is_favorite.get() {
+                    format!("Remove {favorite_label} from favorites")
+                } else {
+                    format!("Add {favorite_label} to favorites")
+                }
+                aria-pressed=move || is_favorite.get().to_string()
+                title=move || if is_favorite.get() { "Remove from favorites" } else { "Add to favorites" }
+                on:click=move |_| {
+                    set_favorite_ids.update(|favorites| {
+                        toggle_favorite(&tool_id, favorites);
+                        save_favorites(favorites);
+                    });
+                }
+            >{move || if is_favorite.get() { "★" } else { "☆" }}</button>
+        </div>
+    }
 }
 
 #[component]
@@ -183,9 +429,39 @@ pub fn Header() -> impl IntoView {
     let (active_result, set_active_result) = create_signal(None::<usize>);
     let (mobile_open, set_mobile_open) = create_signal(false);
     let (blog_items, set_blog_items) = create_signal(Vec::<BlogItem>::new());
+    let (tools_tree, set_tools_tree) = create_signal(Vec::<ToolItem>::new());
+    let (favorite_ids, set_favorite_ids) = create_signal(load_favorites());
     let search_input = create_node_ref::<html::Input>();
 
-    let results = create_memo(move |_| matching_results(&query.get(), &blog_items.get()));
+    let results = create_memo(move |_| {
+        matching_results_with_favorites(
+            &query.get(),
+            &tools_tree.get(),
+            &blog_items.get(),
+            &favorite_ids.get(),
+        )
+    });
+    let favorite_tools = create_memo(move |_| {
+        let tree = tools_tree.get();
+        let favorites = favorite_ids.get();
+        searchable_tools(&tree)
+            .into_iter()
+            .filter(|tool| favorites.contains(&tool.id))
+            .cloned()
+            .collect::<Vec<_>>()
+    });
+
+    spawn_local(async move {
+        let Ok(response) = Request::get(TOOLS_MANIFEST_URL).send().await else {
+            return;
+        };
+        if !response.ok() {
+            return;
+        }
+        if let Ok(items) = response.json::<Vec<ToolItem>>().await {
+            set_tools_tree.set(items);
+        }
+    });
 
     let blog_index_url = web_sys::window()
         .and_then(|window| window.location().hostname().ok())
@@ -348,8 +624,9 @@ pub fn Header() -> impl IntoView {
 
             <button
                 class="mt-hamburger"
+                class:open=move || mobile_open.get()
                 type="button"
-                aria-label="Open tools menu"
+                aria-label=move || if mobile_open.get() { "Close tools menu" } else { "Open tools menu" }
                 aria-controls="mt-mobile-drawer"
                 aria-expanded=move || mobile_open.get().to_string()
                 on:click=move |_| set_mobile_open.update(|open| *open = !*open)
@@ -382,19 +659,34 @@ pub fn Header() -> impl IntoView {
                 >"×"</button>
             </div>
             <a class="mt-drawer-all" href="/tools">"View all tools"</a>
-            {TOOLS_TREE.iter().map(|group| view! {
+            <Show when=move || !favorite_tools.get().is_empty()>
+                <section class="mt-favorites" aria-label="Favorite tools">
+                    <div class="mt-favorites-heading">
+                        <strong>"Favorites"</strong>
+                        <span>{move || favorite_tools.get().len()}</span>
+                    </div>
+                    <div class="mt-favorites-list">
+                        {move || favorite_tools.get().into_iter().map(|tool| view! {
+                            <ToolRow tool=tool favorite_ids=favorite_ids set_favorite_ids=set_favorite_ids/>
+                        }).collect_view()}
+                    </div>
+                </section>
+            </Show>
+            {move || tools_tree.get().into_iter().map(|group| view! {
                 <details>
-                    <summary>{group.label}<span>{group.leaf_count()}</span></summary>
+                    <summary>{group.label.clone()}<span>{group.leaf_count()}</span></summary>
                     <div>
-                        {group.children.iter().map(|item| {
+                        {group.children.into_iter().map(|item| {
                             if item.children.is_empty() {
-                                view! { <a href=item.url>{item.label}</a> }.into_view()
+                                view! {
+                                    <ToolRow tool=item favorite_ids=favorite_ids set_favorite_ids=set_favorite_ids/>
+                                }.into_view()
                             } else {
                                 view! {
                                     <section class="mt-drawer-subgroup">
                                         <strong>{item.label}</strong>
-                                        {item.children.iter().map(|tool| view! {
-                                            <a href=tool.url>{tool.label}</a>
+                                        {item.children.into_iter().map(|tool| view! {
+                                            <ToolRow tool=tool favorite_ids=favorite_ids set_favorite_ids=set_favorite_ids/>
                                         }).collect_view()}
                                     </section>
                                 }.into_view()
@@ -410,9 +702,18 @@ pub fn Header() -> impl IntoView {
 #[cfg(test)]
 mod tests {
     use super::{
-        blog_search_index_url, keyboard_direction, matching_results, move_selection, BlogItem,
-        SearchResultKind, BLOG_SEARCH_INDEX_URL, LOCAL_BLOG_SEARCH_INDEX_URL,
+        blog_search_index_url, keyboard_direction, matching_results, move_selection,
+        normalized_favorites, toggle_favorite, BlogItem, SearchResultKind, BLOG_SEARCH_INDEX_URL,
+        LOCAL_BLOG_SEARCH_INDEX_URL, MAX_FAVORITES,
     };
+    use crate::tools::ToolItem;
+
+    fn tools_tree() -> Vec<ToolItem> {
+        serde_json::from_str(include_str!(
+            "../../../assets/wasm/menu/tools-manifest.json"
+        ))
+        .expect("valid tools manifest")
+    }
 
     #[test]
     fn local_sites_use_the_local_hugo_search_index() {
@@ -463,22 +764,71 @@ mod tests {
 
     #[test]
     fn a_single_tool_search_returns_the_expected_result() {
-        let matches = matching_results("tip", &[]);
-        assert_eq!(matches.len(), 1);
-        assert_eq!(matches[0].id, "tip-calculator");
+        let matches = matching_results("tip", &tools_tree(), &[]);
+        assert_eq!(
+            matches.first().map(|result| result.id.as_str()),
+            Some("tip-calculator")
+        );
     }
 
     #[test]
     fn tool_aliases_return_the_words_with_friends_solver() {
-        let matches = matching_results("wwf", &[]);
+        let matches = matching_results("wwf", &tools_tree(), &[]);
         assert_eq!(matches.len(), 1);
         assert_eq!(matches[0].id, "words-with-friends-solver");
         assert_eq!(matches[0].url, "/tools/words-with-friends-solver");
     }
 
     #[test]
+    fn intent_phrases_rank_the_expected_tools_first() {
+        for (query, expected_id) in [
+            ("mortgage compare", "mortgage-comparison"),
+            ("qr colors", "qr-code-generator"),
+            ("days between dates", "date-difference-calculator"),
+            ("read text from photo", "ocr-utility"),
+            ("100 passwords", "batch-password-generator"),
+        ] {
+            let matches = matching_results(query, &tools_tree(), &[]);
+            assert_eq!(
+                matches.first().map(|result| result.id.as_str()),
+                Some(expected_id),
+                "query: {query}"
+            );
+        }
+    }
+
+    #[test]
+    fn minor_search_typos_still_find_the_expected_tool() {
+        let matches = matching_results("mortage compare", &tools_tree(), &[]);
+        assert_eq!(
+            matches.first().map(|result| result.id.as_str()),
+            Some("mortgage-comparison")
+        );
+    }
+
+    #[test]
+    fn favorites_are_unique_versionable_ids_capped_at_the_limit() {
+        let ids = (0..MAX_FAVORITES + 3)
+            .map(|index| format!("tool-{index}"))
+            .chain(["tool-0".to_string(), String::new()])
+            .collect();
+        let favorites = normalized_favorites(ids);
+        assert_eq!(favorites.len(), MAX_FAVORITES);
+        assert_eq!(favorites[0], "tool-0");
+    }
+
+    #[test]
+    fn favorite_toggle_adds_and_removes_stable_tool_ids() {
+        let mut favorites = vec!["paint-calculator".to_string()];
+        toggle_favorite("qr-code-generator", &mut favorites);
+        assert_eq!(favorites, ["paint-calculator", "qr-code-generator"]);
+        toggle_favorite("paint-calculator", &mut favorites);
+        assert_eq!(favorites, ["qr-code-generator"]);
+    }
+
+    #[test]
     fn search_results_are_unique_by_destination_page() {
-        let matches = matching_results("qr", &[]);
+        let matches = matching_results("qr", &tools_tree(), &[]);
         let ids = matches
             .iter()
             .map(|result| result.id.as_str())
@@ -495,9 +845,8 @@ mod tests {
             tags: vec!["qr code reliability".into(), "printing".into()],
         }];
 
-        let matches = matching_results("printing", &articles);
+        let matches = matching_results("printing", &tools_tree(), &articles);
 
-        assert_eq!(matches.len(), 1);
         assert_eq!(matches[0].kind, SearchResultKind::Article);
         assert_eq!(matches[0].url, articles[0].url);
     }

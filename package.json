@@ -11,9 +11,10 @@
     "build:word-wasm": "wasm-pack build wasm/word-unscrambler-engine --target web --release --out-dir ../../assets/wasm/word-unscrambler --out-name word_unscrambler_engine && node -e \"require('fs').rmSync('assets/wasm/word-unscrambler/.gitignore',{force:true})\"",
     "build:text-wasm": "wasm-pack build wasm/text-analyzer-engine --target web --release --out-dir ../../assets/wasm/text-analyzer --out-name text_analyzer && node -e \"require('fs').rmSync('assets/wasm/text-analyzer/.gitignore',{force:true})\"",
     "build:menu-wasm": "node wasm/menu-engine/build.mjs",
+    "build:tools-directory": "node scripts/generate-tools-directory-capabilities.mjs",
     "build:wasm": "npm run build:qr-wasm && npm run build:qr-decoder-wasm && npm run build:mortgage-wasm && npm run build:insulation-wasm && npm run build:word-wasm && npm run build:text-wasm && npm run build:menu-wasm",
     "build:sitemaps": "node scripts/generate-sitemaps.mjs",
-    "build": "npm run build:wasm && npm run build:qr && npm run build:sitemaps",
+    "build": "npm run build:tools-directory && npm run build:wasm && npm run build:qr && npm run build:sitemaps",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.cjs tests/*.test.mjs"
   },

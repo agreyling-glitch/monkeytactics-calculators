@@ -7,7 +7,8 @@ menu, and a hamburger-triggered slide-in drawer at every screen size. Pressing
 navigation and Enter activation. `Escape` closes search results, dropdowns, and
 the drawer.
 
-The hierarchy in `src/tools.rs` is derived from the site's 23 real tools:
+The hierarchy is loaded at runtime from
+`/assets/wasm/menu/tools-manifest.json`:
 
 - Generators
 - Calculators
@@ -16,7 +17,26 @@ The hierarchy in `src/tools.rs` is derived from the site's 23 real tools:
 
 Calculators contains a third hierarchy level with Finance, Health, Time & Date,
 and Construction subsections. Counts are computed recursively from leaf tools,
-and global search traverses the same nested tree.
+and global search traverses the same nested tree. Changing labels, URLs, groups,
+or hierarchy only requires deploying the manifest; WASM does not need rebuilding.
+Leaf entries also provide descriptions and intent-oriented keywords. Search combines
+exact and prefix matching, TF-IDF cosine similarity, and typo tolerance to rank
+queries by purpose instead of requiring the visible tool name.
+
+Visitors can favorite up to 12 tools from the drawer. Favorite IDs are stored
+locally in a versioned `localStorage` record, shown in manifest order above the
+main hierarchy, and receive a small search-ranking bonus. No account or network
+write is involved.
+
+The header, search panel, and drawer use progressive glass styling with subtle
+disclosure, search-result, favorite, and control animations. Opaque fallbacks
+preserve contrast without backdrop-filter support, and reduced-motion settings
+disable nonessential movement.
+
+Each manifest leaf also owns exactly three concise `capabilities`. Run
+`npm run build:tools-directory` after editing the catalog to regenerate the
+accessible capability lists on `/tools/`; desktop hover and keyboard focus
+reveal them, while touch-oriented layouts keep them visible.
 
 The component also loads the public Hugo blog index from
 `https://blog.monkeytactics.com/menu-search.json`. Article titles and tags are
@@ -47,6 +67,9 @@ component stylesheet, and copies the deployment files to:
 - `assets/wasm/menu/menu.js`
 - `assets/wasm/menu/menu_bg.wasm`
 - `assets/wasm/menu/menu.css`
+
+The runtime manifest remains a separately deployed content asset, so rebuilding
+the component cannot overwrite a newer navigation catalog.
 
 `Trunk.toml` and `index.html` are included for local component development. The
 caller validates `location.hostname`, so the approved `127.0.0.1` entry works

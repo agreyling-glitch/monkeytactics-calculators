@@ -216,10 +216,16 @@
 }
 
 .directory-tool:hover,
+.directory-tool:focus-visible,
 .directory-tool.is-keyboard-active {
   border-color: rgba(34, 197, 94, 0.55);
   background: rgba(34, 197, 94, 0.08);
   transform: translateY(-1px);
+}
+
+.directory-tool:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
 }
 
 .directory-tool.is-keyboard-active { box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.16); }
@@ -239,8 +245,49 @@
 
 .directory-tool strong { display: block; color: var(--text); font-size: 0.9rem; line-height: 1.3; }
 .directory-tool small { display: block; margin-top: 0.2rem; color: var(--muted); font-size: 0.76rem; line-height: 1.35; }
+.directory-tool__capabilities {
+  display: grid;
+  gap: 0.28rem;
+  overflow: hidden;
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+  color: #b8c5d6;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  list-style: none;
+  opacity: 0;
+  transform: translateY(-0.3rem);
+  transition: max-height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), margin 0.2s ease, opacity 0.18s ease, transform 0.22s ease;
+}
+
+.directory-tool__capabilities li {
+  position: relative;
+  padding-left: 0.85rem;
+}
+
+.directory-tool__capabilities li::before {
+  position: absolute;
+  top: 0.42em;
+  left: 0;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4ade80, #22d3ee);
+  box-shadow: 0 0 0.45rem rgba(34, 211, 238, 0.26);
+  content: "";
+}
+
+.directory-tool:hover .directory-tool__capabilities,
+.directory-tool:focus-visible .directory-tool__capabilities,
+.directory-tool.is-keyboard-active .directory-tool__capabilities {
+  max-height: 8rem;
+  margin-top: 0.65rem;
+  opacity: 1;
+  transform: translateY(0);
+}
 .directory-tool__arrow { color: #64748b; transition: color 0.15s, transform 0.15s; }
-.directory-tool:hover .directory-tool__arrow, .directory-tool.is-keyboard-active .directory-tool__arrow { color: var(--accent); transform: translateX(2px); }
+.directory-tool:hover .directory-tool__arrow, .directory-tool:focus-visible .directory-tool__arrow, .directory-tool.is-keyboard-active .directory-tool__arrow { color: var(--accent); transform: translateX(2px); }
 
 .calculator-groups {
   display: grid;
@@ -273,6 +320,15 @@
   .calculator-groups { grid-template-columns: 1fr; }
 }
 
+@media (hover: none), (pointer: coarse) {
+  .directory-tool__capabilities {
+    max-height: 8rem;
+    margin-top: 0.6rem;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (max-width: 480px) {
   .tools-hero { padding: 1.4rem; border-radius: 1rem; }
   .tools-hero h1 { font-size: 2.35rem; }
@@ -284,5 +340,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .directory-tool,
-  .directory-tool__arrow { transition: none; }
+  .directory-tool__arrow,
+  .directory-tool__capabilities { transition: none; }
 }
