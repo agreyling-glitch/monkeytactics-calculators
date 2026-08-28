@@ -90,7 +90,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   for (const [id, label, count] of [
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
-    ["text-data", "Text &amp; Data", 7],
+    ["text-data", "Text &amp; Data", 9],
     ["batch-automation", "Batch &amp; Automation", 4],
   ]) {
     assert.match(html, new RegExp(`id="${id}"[\\s\\S]*?<h2>${label} <span>${count}</span></h2>`));
@@ -100,7 +100,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 29);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 30);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -138,7 +138,7 @@ test("the homepage features only the three designated popular tools", () => {
 });
 
 test("the flagship word and QR tools use the mortgage-inspired presentation", () => {
-  for (const name of ["word-unscrambler.html", "qr-code-generator.html"]) {
+  for (const name of ["word-unscrambler.html", "words-with-friends-solver.html", "qr-code-generator.html"]) {
     const html = fs.readFileSync(path.join(siteRoot, "tools", name), "utf8");
     assert.match(html, /class="premium-tool-page [^"]+"/);
     assert.match(html, /class="premium-tool-hero"/);
@@ -513,7 +513,7 @@ test("featured pages keep only the lower ad and top tools invite Trustpilot revi
     .map((name) => `tools/${name}`)
     .filter((name) => fs.readFileSync(path.join(siteRoot, name), "utf8").includes('class="review-collector"'));
 
-  assert.equal(reviewPages.length, 25, "all review prompts should be covered");
+  assert.equal(reviewPages.length, 26, "all review prompts should be covered");
 
   for (const name of reviewPages) {
     const html = fs.readFileSync(path.join(siteRoot, name), "utf8");

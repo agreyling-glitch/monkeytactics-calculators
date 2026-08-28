@@ -12,6 +12,17 @@ export function analyze_word(word) {
 }
 
 /**
+ * @param {string} word
+ * @returns {any}
+ */
+export function analyze_wwf_word(word) {
+    const ptr0 = passStringToWasm0(word, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.analyze_wwf_word(ptr0, len0);
+    return takeObject(ret);
+}
+
+/**
  * @param {string} rack
  * @param {string} pattern
  * @param {any} options
@@ -102,6 +113,17 @@ export function score_word(word) {
     const ptr0 = passStringToWasm0(word, wasm.__wbindgen_export, wasm.__wbindgen_export2);
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.score_word(ptr0, len0);
+    return ret;
+}
+
+/**
+ * @param {string} word
+ * @returns {number}
+ */
+export function score_wwf_word(word) {
+    const ptr0 = passStringToWasm0(word, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.score_wwf_word(ptr0, len0);
     return ret;
 }
 

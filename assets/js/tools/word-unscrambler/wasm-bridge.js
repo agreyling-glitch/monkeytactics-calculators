@@ -1,7 +1,7 @@
 "use strict";
 
 (function initializeWordUnscramblerWasm(global) {
-  const ASSET_VERSION = "20260827-2";
+  const ASSET_VERSION = "20260827-wwf-1";
   const bridgeUrl = document.currentScript.src;
   const moduleUrl = new URL(
     `/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=${ASSET_VERSION}`,
@@ -54,11 +54,17 @@
     scoreWord(word) {
       return requireEngine().score_word(word);
     },
+    scoreWwfWord(word) {
+      return requireEngine().score_wwf_word(word);
+    },
     findHooks(word, dictionaryBit) {
       return requireEngine().find_hooks_for_dictionary(word, dictionaryBit);
     },
     analyzeWord(word) {
       return requireEngine().analyze_word(word);
+    },
+    analyzeWwfWord(word) {
+      return requireEngine().analyze_wwf_word(word);
     },
     boardFitAnalysis(rack, pattern, options) {
       return requireEngine().board_fit_analysis(rack, pattern, options);

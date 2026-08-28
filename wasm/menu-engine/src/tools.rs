@@ -186,6 +186,12 @@ const TEXT_DATA: &[ToolItem] = &[
         children: &[],
     },
     ToolItem {
+        id: "words-with-friends-solver",
+        label: "Words With Friends Solver",
+        url: "/tools/words-with-friends-solver",
+        children: &[],
+    },
+    ToolItem {
         id: "crossword-solver",
         label: "Crossword Solver",
         url: "/tools/crossword-solver",

@@ -9,7 +9,10 @@
 }(typeof globalThis !== "undefined" ? globalThis : this, function createHistoryApi() {
   "use strict";
 
-  const STORAGE_KEY = "monkeytactics.word-unscrambler.history.v1";
+  const IS_WWF = typeof document !== "undefined" && document.body?.dataset.wordGame === "wwf";
+  const STORAGE_KEY = IS_WWF
+    ? "monkeytactics.words-with-friends-solver.history.v1"
+    : "monkeytactics.word-unscrambler.history.v1";
   const MAX_UNPINNED_ENTRIES = 50;
 
   function createId(now = Date.now()) {
