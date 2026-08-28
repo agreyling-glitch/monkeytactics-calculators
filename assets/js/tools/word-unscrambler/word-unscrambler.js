@@ -70,6 +70,9 @@ const HistoryStore = window.MonkeyTacticsHistory;
 const PickListStore = window.MonkeyTacticsPickList;
 const InputRules = window.MonkeyTacticsWordInputRules;
 const Engine = window.MonkeyTacticsWasm;
+const IS_WWF = document.body.dataset.wordGame === "wwf";
+const GAME_NAME = IS_WWF ? "Words With Friends Solver" : "Word Unscrambler";
+const analyzeWord = (word) => IS_WWF ? Engine.analyzeWwfWord(word) : Engine.analyzeWord(word);
 
 const MANIFEST_URL =
   "../assets/data/words/manifest.enable-sowpods-v2.json?v=enable-sowpods-v2";
@@ -79,6 +82,10 @@ const HIGH_VALUE_LETTERS = "jqxz";
 const SCRABBLE_TILE_VALUES = Object.freeze({
   a: 1, b: 3, c: 3, d: 2, e: 1, f: 4, g: 2, h: 4, i: 1, j: 8, k: 5, l: 1, m: 3,
   n: 1, o: 1, p: 3, q: 10, r: 1, s: 1, t: 1, u: 1, v: 4, w: 4, x: 8, y: 4, z: 10
+});
+const WWF_TILE_VALUES = Object.freeze({
+  a: 1, b: 4, c: 4, d: 2, e: 1, f: 4, g: 3, h: 3, i: 1, j: 10, k: 5, l: 2, m: 4,
+  n: 2, o: 1, p: 4, q: 10, r: 1, s: 1, t: 1, u: 2, v: 5, w: 4, x: 8, y: 3, z: 10
 });
 const LENGTH_GROUP_SORTS = new Set(["length-desc", "length-asc", "uses-most"]);
 const DICTIONARY_LINKS = Object.freeze([
@@ -116,7 +123,7 @@ const DICTIONARY_LINKS = Object.freeze([
   }
 ]);
 const SORT_LABELS = Object.freeze({
-  "score-desc": "Words sorted by Scrabble score",
+  "score-desc": `Words sorted by ${IS_WWF ? "Words With Friends" : "Scrabble"} score`,
   alpha: "Words sorted alphabetically",
   "high-value": "Words with high-value letters first",
   bingo: "Bingo candidates first",
@@ -156,7 +163,7 @@ input.style.webkitTextFillColor = "transparent";
 input.style.textShadow = "0 0 0 transparent";
 input.style.caretColor = "#22c55e";
 
-const getScrabbleScore = (word) => Engine.scoreWord(word);
+const getScrabbleScore = (word) => IS_WWF ? Engine.scoreWwfWord(word) : Engine.scoreWord(word);
 
 function focusFilterInput(filterInput) {
   const filterPanel = filterInput.closest("details");
@@ -369,7 +376,7 @@ function getHistoryEntropy(letters) {
   if (letters.length < 2) {
     return 0;
   }
-  const analysis = Engine.analyzeWord(letters);
+  const analysis = analyzeWord(letters);
   const wildcardBonus = analysis.wildcards > 0 ? 0.08 : 0;
   return Number(clamp(analysis.normalizedEntropy + wildcardBonus, 0, 1).toFixed(2));
 }
@@ -946,7 +953,8 @@ function renderResultsPickButtons() {
 }
 
 function getScrabbleTileValue(letter) {
-  return SCRABBLE_TILE_VALUES[letter.toLowerCase()] ?? 0;
+  const values = IS_WWF ? WWF_TILE_VALUES : SCRABBLE_TILE_VALUES;
+  return values[letter.toLowerCase()] ?? 0;
 }
 
 function getPickListSortKey(entry, mode) {
@@ -1404,7 +1412,7 @@ function createWordItem(word, letters, options) {
   if (word.length === 7) {
     const bingoBadge = document.createElement("span");
     bingoBadge.className = "result-badge result-badge--bingo";
-    bingoBadge.textContent = "Bingo +50";
+    bingoBadge.textContent = IS_WWF ? "Bingo +35" : "Bingo +50";
     linkMeta.append(bingoBadge);
   }
 
@@ -1702,7 +1710,7 @@ function createVowelBalanceChart(letters) {
     "Vowel/Consonant Ratio",
     "Shows the balance of playable letters in the entered rack."
   );
-  const analysis = Engine.analyzeWord(letters);
+  const analysis = analyzeWord(letters);
   const vowels = analysis.vowels;
   const wildcards = analysis.wildcards;
   const consonants = analysis.consonants;
@@ -1745,10 +1753,10 @@ function createVowelBalanceChart(letters) {
 function createTileValueChart(letters) {
   const card = createBreakdownCard(
     "Tile Value Distribution",
-    "Counts rack tiles by standard English Scrabble point value; unknown positions appear at 0."
+    `Counts rack tiles by standard English ${IS_WWF ? "Words With Friends" : "Scrabble"} point value; unknown positions appear at 0.`
   );
   const pointValues = [0, 1, 2, 3, 4, 5, 8, 10];
-  const analysis = Engine.analyzeWord(letters);
+  const analysis = analyzeWord(letters);
   const counts = new Map(
     pointValues.map((points) => [points, analysis.tileDistribution.get(points) ?? 0])
   );
@@ -2038,7 +2046,7 @@ function createScoreDistributionChart(matches) {
 
   return createDistributionChart(
     "Score Distribution",
-    "Groups current matches by standard English Scrabble tile score.",
+    `Groups current matches by standard English ${IS_WWF ? "Words With Friends" : "Scrabble"} tile score.`,
     entries,
     "linear-gradient(180deg, #fbbf24, #d97706)"
   );
@@ -2050,7 +2058,7 @@ function createPremiumPotentialChart(letters, matches) {
     "Theoretical multiplier potential only; exact premium hits require board-square positions."
   );
   const highValueCandidates = matches.filter((word) => getHighValueLetters(word)).length;
-  const highestTileValue = Math.max(...Engine.analyzeWord(letters).tileDistribution.keys());
+  const highestTileValue = Math.max(...analyzeWord(letters).tileDistribution.keys());
   const averageWordScore = Math.round(
     matches.reduce((sum, word) => sum + getScrabbleScore(word), 0) / matches.length
   );
@@ -2129,7 +2137,7 @@ function createEntropyChart(letters) {
     "Rack Entropy",
     "A normalized Shannon-entropy score for letter variety; repeated letters reduce flexibility."
   );
-  const entropyScore = Engine.analyzeWord(letters).entropyScore;
+  const entropyScore = analyzeWord(letters).entropyScore;
   const rating = entropyScore >= 75
     ? "High flexibility"
     : entropyScore >= 45
@@ -2271,7 +2279,7 @@ async function loadAllChunks() {
 }
 
 function getHighValueLetters(word) {
-  return Engine.analyzeWord(word).highValueLetters;
+  return analyzeWord(word).highValueLetters;
 }
 
 function getHookInfo(word, dictionaryBit) {
@@ -2418,7 +2426,7 @@ async function handleSubmit(event) {
     (maximumScore !== null && (!Number.isInteger(maximumScore) || maximumScore < 0))
   ) {
     resultsHeading.textContent = "Ready when you are";
-    setEmptyState("Check score filters", "Enter whole-number Scrabble scores of zero or more.");
+    setEmptyState("Check score filters", `Enter whole-number ${IS_WWF ? "Words With Friends" : "Scrabble"} scores of zero or more.`);
     showMessage("Score filters must be whole numbers of zero or more.");
     focusFilterInput(minimumScoreInput);
     return;
@@ -2455,6 +2463,7 @@ async function handleSubmit(event) {
     maximumScore,
     hookFilter,
     sortBy,
+    scoring: IS_WWF ? "wwf" : "scrabble",
     showHooks: Boolean(hookFilter || sortBy.startsWith("hooks-"))
   };
   const historyFilters = getCurrentFilters();
@@ -2518,7 +2527,7 @@ async function loadManifest() {
     if (error.message === "Unauthorized domain") {
       alert("Unauthorized domain");
       buttonLabel.textContent = "Unauthorized domain";
-      showMessage("The Word Unscrambler is not authorized on this host.");
+      showMessage(`The ${GAME_NAME} is not authorized on this host.`);
     } else {
       buttonLabel.textContent = "Dictionary unavailable";
       showMessage("The dictionary index could not be loaded. Please refresh the page.");
@@ -2609,7 +2618,7 @@ historySort.addEventListener("change", () => {
   renderHistoryPanel();
 });
 historyClear.addEventListener("click", () => {
-  if (historyEntries.length === 0 || !window.confirm("Clear all Word Unscrambler history?")) {
+  if (historyEntries.length === 0 || !window.confirm(`Clear all ${GAME_NAME} history?`)) {
     return;
   }
 

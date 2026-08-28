@@ -3,6 +3,8 @@
 
 export function analyze_word(word: string): any;
 
+export function analyze_wwf_word(word: string): any;
+
 export function board_fit_analysis(rack: string, pattern: string, options: any): any;
 
 export function crossword_search(pattern: string, available_letters: string, options: any): any;
@@ -21,6 +23,8 @@ export function is_valid_word(word: string): boolean;
 
 export function score_word(word: string): number;
 
+export function score_wwf_word(word: string): number;
+
 export function unscramble(rack: string, pattern: string, options: any): any;
 
 export function verify_domain(host: string): boolean;
@@ -32,6 +36,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly analyze_word: (a: number, b: number) => number;
+    readonly analyze_wwf_word: (a: number, b: number) => number;
     readonly board_fit_analysis: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly crossword_search: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly find_hooks: (a: number, b: number) => number;
@@ -39,6 +44,7 @@ export interface InitOutput {
     readonly init_engine: (a: number, b: number) => void;
     readonly is_valid_word: (a: number, b: number) => number;
     readonly score_word: (a: number, b: number) => number;
+    readonly score_wwf_word: (a: number, b: number) => number;
     readonly unscramble: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly verify_domain: (a: number, b: number) => number;
     readonly wordle_search: (a: number, b: number) => number;

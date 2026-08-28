@@ -4,11 +4,13 @@ import test from "node:test";
 
 import init, {
   analyze_word,
+  analyze_wwf_word,
   board_fit_analysis,
   crossword_search,
   find_hooks_for_dictionary,
   init_engine,
   score_word,
+  score_wwf_word,
   unscramble,
   verify_domain,
   wordle_search
@@ -48,6 +50,7 @@ test("searches, scores, and finds dictionary hooks through WASM", () => {
 
   assert.deepEqual(unscramble("a?e", "?a*", options), ["eat"]);
   assert.equal(score_word("quiz"), 22);
+  assert.equal(score_wwf_word("quiz"), 23);
   assert.deepEqual(find_hooks_for_dictionary("eat", 1), {
     front: [],
     back: ["s"],
@@ -74,8 +77,11 @@ test("filters Wordle candidates with duplicate-aware feedback", () => {
 
 test("returns analysis data in the bridge's expected shape", () => {
   const analysis = analyze_word("quiz?");
+  const wwfAnalysis = analyze_wwf_word("quiz?");
 
   assert.equal(analysis.entropyScore, 100);
   assert.equal(analysis.highValueLetters, "qz");
   assert.equal(analysis.tileDistribution.get(1), 2);
+  assert.equal(wwfAnalysis.score, 23);
+  assert.equal(wwfAnalysis.tileDistribution.get(2), 1);
 });

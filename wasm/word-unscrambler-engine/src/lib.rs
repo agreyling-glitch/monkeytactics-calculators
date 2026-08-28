@@ -25,7 +25,6 @@ struct Engine {
 #[derive(Clone)]
 struct WordInfo {
     membership: u8,
-    score: i32,
     vowels: usize,
     letter_counts: [u8; 26],
 }
@@ -55,6 +54,7 @@ struct SearchOptions {
     maximum_score: Option<i32>,
     hook_filter: String,
     sort_by: String,
+    scoring: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -136,13 +136,22 @@ pub fn wordle_search(guesses: JsValue, dictionary_bit: u8) -> JsValue {
         Ok(guesses) => guesses,
         Err(error) => return JsValue::from_str(&format!("Invalid Wordle guesses: {error}")),
     };
-    let matches = ENGINE.with(|engine| engine.borrow().find_wordle_matches(&guesses, dictionary_bit));
+    let matches = ENGINE.with(|engine| {
+        engine
+            .borrow()
+            .find_wordle_matches(&guesses, dictionary_bit)
+    });
     serde_wasm_bindgen::to_value(&matches).unwrap_or(JsValue::NULL)
 }
 
 #[wasm_bindgen]
 pub fn score_word(word: String) -> i32 {
     score(&word)
+}
+
+#[wasm_bindgen]
+pub fn score_wwf_word(word: String) -> i32 {
+    wwf_score(&word)
 }
 
 #[wasm_bindgen]
@@ -164,6 +173,11 @@ pub fn find_hooks_for_dictionary(word: String, dictionary_bit: u8) -> JsValue {
 #[wasm_bindgen]
 pub fn analyze_word(word: String) -> JsValue {
     serde_wasm_bindgen::to_value(&analyze(&word)).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen]
+pub fn analyze_wwf_word(word: String) -> JsValue {
+    serde_wasm_bindgen::to_value(&analyze_with(&word, wwf_tile_value)).unwrap_or(JsValue::NULL)
 }
 
 #[wasm_bindgen]
@@ -321,7 +335,9 @@ impl Engine {
             .filter(|(word, info)| {
                 word.len() == 5
                     && info.membership & dictionary_bit != 0
-                    && guesses.iter().all(|guess| wordle_guess_matches(word, guess))
+                    && guesses
+                        .iter()
+                        .all(|guess| wordle_guess_matches(word, guess))
             })
             .map(|(word, _)| word.clone())
             .collect::<Vec<_>>();
@@ -350,10 +366,10 @@ impl Engine {
             || word.len() - info.vowels < options.minimum_consonants
             || options
                 .minimum_score
-                .is_some_and(|minimum| info.score < minimum)
+                .is_some_and(|minimum| score_for(word, &options.scoring) < minimum)
             || options
                 .maximum_score
-                .is_some_and(|maximum| info.score > maximum)
+                .is_some_and(|maximum| score_for(word, &options.scoring) > maximum)
             || !contains_required(&info.letter_counts, &options.must_include)
         {
             return false;
@@ -376,6 +392,7 @@ impl Engine {
 
     fn sort_matches(&mut self, matches: &mut [String], pattern: &str, options: &SearchOptions) {
         let dictionary_bit = normalized_dictionary_bit(options.dictionary_bit);
+        let score = |word: &str| score_for(word, &options.scoring);
         let mut hook_sort_values = HashMap::new();
         if options.sort_by.starts_with("hooks-") {
             for word in matches.iter() {
@@ -388,8 +405,8 @@ impl Engine {
                 "score-desc" => score(b).cmp(&score(a)).then_with(longest),
                 "alpha" => a.cmp(b),
                 "length-asc" => a.len().cmp(&b.len()).then_with(|| a.cmp(b)),
-                "high-value" => high_value_score(b)
-                    .cmp(&high_value_score(a))
+                "high-value" => high_value_score_for(b, &options.scoring)
+                    .cmp(&high_value_score_for(a, &options.scoring))
                     .then_with(|| score(b).cmp(&score(a)))
                     .then_with(longest),
                 "bingo" => (b.len() == 7)
@@ -523,7 +540,6 @@ fn make_word_info(word: &str, membership: u8) -> WordInfo {
     }
     WordInfo {
         membership,
-        score: score(word),
         vowels: word.bytes().filter(|byte| is_vowel(*byte)).count(),
         letter_counts,
     }
@@ -577,7 +593,10 @@ fn wordle_guess_matches(candidate: &str, guess: &WordleGuess) -> bool {
     if guess.word.len() != 5
         || guess.feedback.len() != 5
         || !guess.word.bytes().all(|byte| byte.is_ascii_lowercase())
-        || !guess.feedback.bytes().all(|byte| matches!(byte, b'a' | b'p' | b'c'))
+        || !guess
+            .feedback
+            .bytes()
+            .all(|byte| matches!(byte, b'a' | b'p' | b'c'))
     {
         return false;
     }
@@ -645,6 +664,18 @@ fn score(word: &str) -> i32 {
     word.bytes().map(tile_value).sum()
 }
 
+fn wwf_score(word: &str) -> i32 {
+    word.bytes().map(wwf_tile_value).sum()
+}
+
+fn score_for(word: &str, scoring: &str) -> i32 {
+    if scoring == "wwf" {
+        wwf_score(word)
+    } else {
+        score(word)
+    }
+}
+
 fn tile_value(byte: u8) -> i32 {
     match byte.to_ascii_lowercase() {
         b'a' | b'e' | b'i' | b'l' | b'n' | b'o' | b'r' | b's' | b't' | b'u' => 1,
@@ -654,6 +685,19 @@ fn tile_value(byte: u8) -> i32 {
         b'k' => 5,
         b'j' | b'x' => 8,
         b'q' | b'z' => 10,
+        _ => 0,
+    }
+}
+
+fn wwf_tile_value(byte: u8) -> i32 {
+    match byte.to_ascii_lowercase() {
+        b'a' | b'e' | b'i' | b'o' | b'r' | b's' | b't' => 1,
+        b'd' | b'l' | b'n' | b'u' => 2,
+        b'g' | b'h' | b'y' => 3,
+        b'b' | b'c' | b'f' | b'm' | b'p' | b'w' => 4,
+        b'k' | b'v' => 5,
+        b'x' => 8,
+        b'j' | b'q' | b'z' => 10,
         _ => 0,
     }
 }
@@ -673,6 +717,16 @@ fn high_value_score(word: &str) -> i32 {
         .sum()
 }
 
+fn high_value_score_for(word: &str, scoring: &str) -> i32 {
+    if scoring != "wwf" {
+        return high_value_score(word);
+    }
+    word.bytes()
+        .filter(|byte| is_high_value(*byte))
+        .map(wwf_tile_value)
+        .sum()
+}
+
 fn pattern_strength(word: &str, pattern: &str) -> f64 {
     if pattern.is_empty() || word.is_empty() {
         return 0.0;
@@ -685,6 +739,10 @@ fn pattern_strength(word: &str, pattern: &str) -> f64 {
 }
 
 fn analyze(word: &str) -> WordAnalysis {
+    analyze_with(word, tile_value)
+}
+
+fn analyze_with(word: &str, value_for: fn(u8) -> i32) -> WordAnalysis {
     let mut letter_distribution = HashMap::new();
     let mut tile_distribution = HashMap::new();
     let mut wildcards = 0;
@@ -698,7 +756,7 @@ fn analyze(word: &str) -> WordAnalysis {
         *letter_distribution
             .entry((byte as char).to_string())
             .or_insert(0) += 1;
-        *tile_distribution.entry(tile_value(byte)).or_insert(0) += 1;
+        *tile_distribution.entry(value_for(byte)).or_insert(0) += 1;
     }
     let length = word.len();
     let entropy = if length == 0 {
@@ -726,7 +784,7 @@ fn analyze(word: &str) -> WordAnalysis {
         entropy,
         normalized_entropy,
         entropy_score,
-        score: score(word),
+        score: word.bytes().map(value_for).sum(),
         high_value_letters: (b'a'..=b'z')
             .filter(|byte| is_high_value(*byte) && word.as_bytes().contains(byte))
             .map(char::from)
@@ -789,9 +847,15 @@ mod tests {
     fn wordle_search_handles_positions_and_duplicate_letters() {
         let mut engine = Engine::default();
         engine.index_records(vec![
-            "apple\t1".into(), "ample\t1".into(), "allee\t1".into(), "angle\t1".into(),
+            "apple\t1".into(),
+            "ample\t1".into(),
+            "allee\t1".into(),
+            "angle\t1".into(),
         ]);
-        let guesses = vec![WordleGuess { word: "allee".into(), feedback: "cpaac".into() }];
+        let guesses = vec![WordleGuess {
+            word: "allee".into(),
+            feedback: "cpaac".into(),
+        }];
         assert_eq!(
             engine.find_wordle_matches(&guesses, ENABLE),
             vec!["ample", "angle", "apple"]
@@ -830,6 +894,25 @@ mod tests {
             (2, 2, 1)
         );
         assert!(analysis.entropy_score > 90);
+    }
+
+    #[test]
+    fn scores_and_sorts_with_words_with_friends_values() {
+        assert_eq!(wwf_score("quiz"), 23);
+        assert_eq!(wwf_score("badge"), 11);
+
+        let mut engine = engine();
+        engine.index_records(vec!["badge\t3".into(), "faced\t3".into()]);
+        let options = SearchOptions {
+            dictionary_bit: 3,
+            sort_by: "score-desc".into(),
+            scoring: "wwf".into(),
+            ..Default::default()
+        };
+        assert_eq!(
+            engine.find_matches("abcdefg", "", &options),
+            vec!["faced", "badge"]
+        );
     }
 
     #[test]

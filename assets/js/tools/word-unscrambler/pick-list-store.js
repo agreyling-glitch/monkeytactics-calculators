@@ -9,7 +9,10 @@
 }(typeof globalThis !== "undefined" ? globalThis : this, function createPickListApi() {
   "use strict";
 
-  const STORAGE_KEY = "monkeytactics.word-unscrambler.pick-list.v1";
+  const IS_WWF = typeof document !== "undefined" && document.body?.dataset.wordGame === "wwf";
+  const STORAGE_KEY = IS_WWF
+    ? "monkeytactics.words-with-friends-solver.pick-list.v1"
+    : "monkeytactics.word-unscrambler.pick-list.v1";
   const NOTE_MAX_LENGTH = 120;
 
   function createId(now = Date.now()) {
