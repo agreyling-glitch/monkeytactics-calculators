@@ -13,7 +13,7 @@ test("Wordle helper ships an accessible feedback workflow",()=>{
   assert.match(html,/id="feedback-tiles"/);
   assert.match(html,/Duplicate-letter aware/);
   assert.match(script,/Engine\.wordleSearch/);
-  assert.match(script,/states=\["absent","present","correct"\]/);
+  assert.match(script,/states=\["neutral","absent","present","correct"\]/);
 });
 
 test("Wordle page publishes consistent SEO metadata and structured data",()=>{
@@ -31,7 +31,7 @@ test("Wordle page publishes consistent SEO metadata and structured data",()=>{
 });
 
 test("Wordle workspace aligns with the full-width page panels",()=>{
-  assert.match(html,/\.wordle-page \.tool-widget\{width:100%;max-width:none;box-sizing:border-box/);
+  assert.match(html,/\.wordle-page \.tool-widget:not\(\.is-focus-mode\)\{width:100%;max-width:none;box-sizing:border-box/);
 });
 
 test("candidate tiles have space beside the vertical scrollbar",()=>{

@@ -23,6 +23,11 @@
   const resultsRegion = byId("results");
   const clearButton = byId("clear-search");
   const activeFilterCount = byId("active-filter-count");
+  const dictionaryModal = byId("dictionary-modal");
+  const dictionaryModalTitle = byId("dictionary-modal-title");
+  const dictionaryModalBody = byId("dictionary-modal-body");
+  const dictionaryModalClose = byId("dictionary-modal-close");
+  const dictionaryFullLink = byId("dictionary-full-link");
   const sampleButtons = document.querySelectorAll("[data-pattern]");
   const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
   const DICTIONARY_BITS = { enable: 1, sowpods: 2, both: 3 };
@@ -31,6 +36,9 @@
   let manifest;
   const loadedChunks = new Set();
   const chunkPromises = new Map();
+  let dictionaryRequest = 0;
+  let dictionaryReturnFocus = null;
+  let dictionaryAbortController = null;
 
   function normalizePattern(value) {
     return value.toLowerCase().replace(/[._-]/g, "?").replace(/\s+/g, "").replace(/[^a-z?*]/g, "");
@@ -112,6 +120,76 @@
     return fragment;
   }
 
+  function renderDictionaryEntries(entries, requestedWord) {
+    const fragment = document.createDocumentFragment();
+    const entry = entries.find(({ word }) => word.toLowerCase() === requestedWord.toLowerCase()) || entries[0];
+    const partNames = { n: "noun", v: "verb", adj: "adjective", adv: "adverb", u: "definition" };
+    const groupedDefinitions = new Map();
+    (entry?.defs || []).forEach((rawDefinition) => {
+      const separator = rawDefinition.indexOf("\t");
+      const part = separator >= 0 ? rawDefinition.slice(0, separator) : "u";
+      const definition = separator >= 0 ? rawDefinition.slice(separator + 1) : rawDefinition;
+      if (!groupedDefinitions.has(part)) groupedDefinitions.set(part, []);
+      groupedDefinitions.get(part).push(definition.trim());
+    });
+    groupedDefinitions.forEach((definitions, part) => {
+      const section = document.createElement("section");
+      section.className = "dictionary-entry";
+      const heading = document.createElement("div");
+      heading.className = "dictionary-entry-heading";
+      const partOfSpeech = document.createElement("strong");
+      partOfSpeech.textContent = partNames[part] || part;
+      heading.append(partOfSpeech);
+      const list = document.createElement("ol");
+      list.className = "dictionary-definitions";
+      definitions.slice(0, 5).forEach((definition) => {
+        const item = document.createElement("li");
+        item.textContent = definition;
+        list.append(item);
+      });
+      section.append(heading, list);
+      fragment.append(section);
+    });
+    return fragment;
+  }
+
+  async function openDictionary(word, trigger) {
+    const request = ++dictionaryRequest;
+    dictionaryAbortController?.abort();
+    dictionaryAbortController = new AbortController();
+    const requestTimeout = window.setTimeout(() => dictionaryAbortController?.abort(), 8000);
+    dictionaryReturnFocus = trigger;
+    dictionaryModalTitle.textContent = word;
+    dictionaryFullLink.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
+    const loading = document.createElement("p");
+    loading.className = "dictionary-modal-status";
+    loading.textContent = `Looking up ${word}…`;
+    dictionaryModalBody.replaceChildren(loading);
+    if (!dictionaryModal.open) dictionaryModal.showModal();
+    dictionaryModalClose.focus();
+    try {
+      const parameters = new URLSearchParams({ sp: word, md: "d", max: "1" });
+      const response = await fetch(`https://api.datamuse.com/words?${parameters}`, {
+        signal: dictionaryAbortController.signal
+      });
+      if (!response.ok) throw new Error("Definition unavailable");
+      const entries = await response.json();
+      if (request !== dictionaryRequest || !dictionaryModal.open) return;
+      const definitions = renderDictionaryEntries(entries, word);
+      if (!definitions.childNodes.length) throw new Error("Definition unavailable");
+      dictionaryModalBody.replaceChildren(definitions);
+    } catch (error) {
+      if (request !== dictionaryRequest || !dictionaryModal.open) return;
+      const unavailable = document.createElement("p");
+      unavailable.className = "dictionary-modal-status";
+      unavailable.textContent = `A definition for ${word} is not available here. Use the Merriam-Webster link below to continue.`;
+      dictionaryModalBody.replaceChildren(unavailable);
+    } finally {
+      window.clearTimeout(requestTimeout);
+      if (request === dictionaryRequest) dictionaryAbortController = null;
+    }
+  }
+
   function renderResults(matches, pattern, dictionaryName) {
     resultList.replaceChildren();
     const shown = matches.slice(0, 500);
@@ -119,13 +197,12 @@
     const fragment = document.createDocumentFragment();
     shown.forEach((word) => {
       const item = document.createElement("li");
-      const link = document.createElement("a");
-      link.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
+      const link = document.createElement("button");
+      link.type = "button";
       link.className = "result-word";
-      link.setAttribute("aria-label", `Look up ${word} in Merriam-Webster`);
+      link.setAttribute("aria-label", `Look up the definition of ${word}`);
       link.append(highlightWord(word.toUpperCase(), pattern.toUpperCase()));
+      link.addEventListener("click", () => openDictionary(word, link));
       item.setAttribute("aria-label", `${word}, ${word.length} letters`);
       item.append(link);
       if (hasMixedLengths) {
@@ -218,6 +295,17 @@
     byId("pattern-length-preview").textContent = length ? `${length}-letter pattern` : normalized ? "Flexible-length pattern" : "Use ? for one blank";
   });
   clearButton.addEventListener("click", clearSearch);
+  dictionaryModalClose.addEventListener("click", () => dictionaryModal.close());
+  dictionaryModal.addEventListener("click", (event) => {
+    if (event.target === dictionaryModal) dictionaryModal.close();
+  });
+  dictionaryModal.addEventListener("close", () => {
+    dictionaryRequest += 1;
+    dictionaryAbortController?.abort();
+    dictionaryAbortController = null;
+    if (dictionaryReturnFocus?.isConnected) dictionaryReturnFocus.focus();
+    dictionaryReturnFocus = null;
+  });
   form.addEventListener("submit", handleSubmit);
   updateActiveFilterCount();
 

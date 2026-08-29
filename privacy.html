@@ -10,12 +10,12 @@
   <title>Privacy Policy — MonkeyTactics</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="MonkeyTactics Privacy Policy — local browser processing, limited password breach and QR link requests, device-local caching, and third-party services." />
+        content="MonkeyTactics Privacy Policy — local browser processing, limited password breach, QR link, and crossword definition requests, device-local caching, and third-party services." />
   <meta name="robots" content="noindex, follow" />
 
   <!-- Open Graph -->
   <meta property="og:title"       content="Privacy Policy — MonkeyTactics" />
-  <meta property="og:description" content="Learn how MonkeyTactics processes most inputs locally and handles limited password breach checks, QR link resolution, and device-local caching." />
+  <meta property="og:description" content="Learn how MonkeyTactics processes most inputs locally and handles limited password breach checks, QR link resolution, crossword definition lookups, and device-local caching." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/privacy" />
 
@@ -198,7 +198,7 @@
     }
   </style>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-08-11" />
+  <meta name="date" content="2026-08-29" />
 </head>
 
 <body>
@@ -218,7 +218,7 @@
     <!-- POLICY BODY -->
     <div class="policy-body">
 
-      <span class="last-updated">Last updated: August 11, 2026</span>
+      <span class="last-updated">Last updated: August 29, 2026</span>
 
       <!-- QUICK SUMMARY TABLE -->
       <section class="policy-section" aria-labelledby="summary-heading">
@@ -237,7 +237,7 @@
             <tr>
               <td>Calculator and tool inputs</td>
               <td><span class="badge-limited">Limited</span></td>
-              <td>Normally processed locally; the password breach check and QR web-link resolver have the limited disclosures described below</td>
+              <td>Normally processed locally; password breach checks, QR web-link resolution, and optional crossword definition lookups have the limited disclosures described below</td>
             </tr>
             <tr>
               <td>Device-local breach cache</td>
@@ -305,6 +305,16 @@
            The proxy follows the link's redirect chain using header-only requests and returns the final URL; it
            does not automatically open or navigate your browser to the decoded destination. Other decoded QR
            content is not sent to the proxy.</p>
+        <h3>Crossword Solver definition lookups</h3>
+        <p>Crossword patterns, filters, and matching run locally in your browser. If you click a
+           matching word to view its definition, your browser sends only that selected word to the
+           <a href="https://www.datamuse.com/api/" target="_blank" rel="noopener noreferrer"
+              style="color: var(--accent);">Datamuse API</a>. The pattern, filters, and complete
+           result list are not included in that request.</p>
+        <p>Datamuse states that its servers keep a temporary log of API queries and discard that log
+           at the end of the day after the request. Datamuse retains only long-term aggregate request
+           counts grouped by broad request category. Definition lookups are optional and occur only
+           after you select a result.</p>
       </section>
 
       <!-- 3. CLOUDFLARE CDN & SECURITY -->

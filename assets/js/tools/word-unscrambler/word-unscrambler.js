@@ -2747,6 +2747,16 @@ wordBreakdown.addEventListener("toggle", () => {
     breakdownCharts.replaceChildren();
   }
 });
+function focusRackInput() {
+  window.scrollTo({ top: 0, behavior: "auto" });
+  const focusModePanel = input.closest("[data-focus-mode].is-focus-mode");
+  if (focusModePanel) {
+    focusModePanel.scrollTo({ top: 0, behavior: "auto" });
+  }
+  input.focus({ preventScroll: true });
+  const cursorPosition = input.value.length;
+  input.setSelectionRange(cursorPosition, cursorPosition);
+}
 form.addEventListener("keydown", (event) => {
   if (event.key !== "Enter" || (!event.ctrlKey && !event.metaKey) || button.disabled) {
     return;
@@ -2754,6 +2764,7 @@ form.addEventListener("keydown", (event) => {
 
   event.preventDefault();
   form.requestSubmit(button);
+  requestAnimationFrame(focusRackInput);
 });
 document.addEventListener("keydown", (event) => {
   if (event.repeat || !event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || event.key.toLowerCase() !== "l") {
@@ -2787,8 +2798,7 @@ document.addEventListener("keydown", (event) => {
   }
 
   event.preventDefault();
-  input.focus();
-  input.setSelectionRange(input.value.length, input.value.length);
+  focusRackInput();
 });
 document.addEventListener("keydown", (event) => {
   const keyMatches = event.key.toLowerCase() === "h";

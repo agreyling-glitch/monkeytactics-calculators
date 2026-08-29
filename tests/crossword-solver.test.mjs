@@ -21,7 +21,7 @@ test("crossword solver exposes pattern-first controls and an optional letter poo
   assert.match(html, /id="crossword-pattern"/);
   assert.match(html, /id="available-letters"/);
   assert.match(html, /id="word-length"/);
-  assert.match(html, /name="dictionary" value="enable" checked/);
+  assert.match(html, /name="dictionary" value="enable"[^>]* checked/);
   assert.match(html, /name="dictionary" value="sowpods"/);
   assert.match(html, /name="dictionary" value="both"/);
 });

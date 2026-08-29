@@ -12,7 +12,7 @@
   <meta name="description" content="Unscramble letters into words with wildcards, patterns, Words With Friends scores, hooks, filters, private history, a Pick List, and in-browser rack analysis.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-08-27">
+  <meta name="date" content="2026-08-29">
   <meta name="theme-color" content="#0f172a">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/words-with-friends-solver">
@@ -86,7 +86,7 @@
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-08-27"
+        "dateModified": "2026-08-29"
       },
       {
         "@type": "WebPage",
@@ -99,7 +99,7 @@
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/words-with-friends-solver#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/words-with-friends-solver#app" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-08-27"
+        "dateModified": "2026-08-29"
       }
     ]
   }
@@ -208,6 +208,7 @@
   <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260803-17">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
+  <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
   <script src="../assets/js/shared/ads.js" defer></script>
   <!-- TrustBox script -->
   <!-- End TrustBox script -->
@@ -238,7 +239,7 @@
     </section>
 
     <section aria-labelledby="unscrambler-heading">
-      <div class="tool-widget">
+      <div class="tool-widget" data-focus-mode data-focus-mode-label="Words With Friends Solver">
         <form id="unscramble-form" novalidate>
           <div class="tool-heading-row">
             <div class="premium-app-title"><div class="premium-section-kicker">01 / Solve</div><h2 id="unscrambler-heading">Unscramble Letters Into Words</h2><p>Choose a dictionary, enter your rack, then refine the result for the board in front of you.</p></div>
@@ -1225,6 +1226,7 @@
   <script src="../assets/js/tools/word-unscrambler/history-store.js?v=20260827-wwf-1" defer></script>
   <script src="../assets/js/tools/word-unscrambler/pick-list-store.js?v=20260827-wwf-1" defer></script>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-wwf-1" defer></script>
-  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260827-wwf-1" defer></script>
+  <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
+  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260829-focus-rack-2" defer></script>
 </body>
 </html>

@@ -6,6 +6,7 @@
   <title>Free Crossword Solver &amp; Pattern Finder | MonkeyTactics</title>
   <meta name="description" content="Solve crossword clues by pattern. Enter known letters and blanks to find matching words using ENABLE and SOWPODS dictionaries.">
   <meta name="robots" content="index, follow">
+  <meta name="date" content="2026-08-29">
   <link rel="canonical" href="https://monkeytactics.com/tools/crossword-solver">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Free Crossword Solver &amp; Pattern Finder">
@@ -39,6 +40,7 @@
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
         "description": "A private browser-based crossword answer finder that searches ENABLE and SOWPODS dictionaries by letter pattern, blanks, word length, and optional letter filters.",
+        "dateModified": "2026-08-29",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "featureList": ["Single-letter blank wildcard", "Flexible-length wildcard", "Word length filter", "ENABLE and SOWPODS dictionaries", "Optional available-letter pool", "Private in-browser matching"]
       },
@@ -49,7 +51,7 @@
           { "@type": "Question", "name": "How do I search by pattern only?", "acceptedAnswer": { "@type": "Answer", "text": "Enter a pattern and leave Available Letters empty. The solver searches the selected dictionary without limiting words to a letter rack." } },
           { "@type": "Question", "name": "Can I limit results to a specific length?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. A pattern without an asterisk already fixes the answer length. You can also set Word Length, especially when using an asterisk for a flexible-length pattern." } },
           { "@type": "Question", "name": "What do question marks and asterisks mean?", "acceptedAnswer": { "@type": "Answer", "text": "A question mark stands for exactly one unknown letter. An asterisk stands for zero or more letters." } },
-          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Dictionary matching runs locally in your browser and your pattern is not uploaded." } }
+          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Dictionary matching runs locally in your browser, and your pattern and filters are not uploaded. If you select a result for an optional definition lookup, only that word is sent to Datamuse." } }
         ]
       }
     ]
@@ -57,7 +59,9 @@
   </script>
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
-  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260827-9">
+  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260829-14">
+  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260829-2">
+  <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/shared/ads.js" defer></script>
 </head>
@@ -83,17 +87,20 @@
       </div>
     </section>
 
-    <section class="tool-widget" aria-labelledby="solver-heading">
+    <section class="tool-widget" aria-labelledby="solver-heading" data-focus-mode data-focus-mode-label="Crossword Solver">
       <form id="crossword-form" novalidate>
         <div class="solver-heading">
           <div><div class="premium-section-kicker">01 / Find the fit</div><h2 id="solver-heading">Search Crossword Answers by Pattern</h2><p>Start with the squares you know, then narrow the answer list only as much as needed.</p></div>
           <fieldset class="dictionary-selector">
             <legend class="visually-hidden">Dictionary</legend>
             <div class="segmented-control">
-              <label><input type="radio" name="dictionary" value="enable" checked><span>ENABLE</span></label>
-              <label><input type="radio" name="dictionary" value="sowpods"><span>SOWPODS</span></label>
-              <label><input type="radio" name="dictionary" value="both"><span>Both</span></label>
+              <label data-tooltip="Choose ENABLE for this search: a broad, public-domain English word list used for North American word-game searches."><input type="radio" name="dictionary" value="enable" aria-describedby="dictionary-enable-description" checked><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span><span>ENABLE</span></span></label>
+              <label data-tooltip="Choose SOWPODS for this search: an international English word list containing British and North American word-game vocabulary."><input type="radio" name="dictionary" value="sowpods" aria-describedby="dictionary-sowpods-description"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--sowpods" aria-hidden="true"></span><span>SOWPODS</span></span></label>
+              <label data-tooltip="Choose Both for this search to combine the ENABLE and SOWPODS lists with duplicate words removed."><input type="radio" name="dictionary" value="both" aria-describedby="dictionary-both-description"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--both" aria-hidden="true"></span><span>Both</span></span></label>
             </div>
+            <span class="visually-hidden" id="dictionary-enable-description">A broad, public-domain English word list used for North American word-game searches.</span>
+            <span class="visually-hidden" id="dictionary-sowpods-description">An international English word list containing British and North American word-game vocabulary.</span>
+            <span class="visually-hidden" id="dictionary-both-description">Search the combined ENABLE and SOWPODS lists with duplicate words removed.</span>
           </fieldset>
         </div>
 
@@ -167,7 +174,7 @@
       <details><summary>Can I limit results to a specific length?</summary><p>Yes. Patterns without <code>*</code> already have a fixed length. You can also set Word Length, which is especially useful with flexible patterns such as <code>B*</code>.</p></details>
       <details><summary>What is the difference between ? and *?</summary><p>A question mark matches exactly one letter—the equivalent of one empty grid square. An asterisk matches zero or more letters, so it is useful when you know an edge or fragment but not the total length.</p></details>
       <details><summary>Which dictionary should I choose?</summary><p>ENABLE is a broad public-domain English word list suited to general searches. SOWPODS includes international word-game vocabulary. Both searches their deduplicated union, which is larger and may include obscure entries.</p></details>
-      <details><summary>Are my searches private?</summary><p>Yes. The dictionaries and matching engine run entirely in your browser. Your pattern and filters are not sent to a search service.</p></details>
+      <details><summary>Are my searches private?</summary><p>Yes. The dictionaries and matching engine run entirely in your browser, and your pattern and filters are not sent to a search service. If you choose a result to view its definition, only that selected word is sent to Datamuse for the optional lookup.</p></details>
     </section>
 
     <section class="related-tools" aria-labelledby="related-heading">
@@ -180,9 +187,21 @@
     </section>
   </main>
 
+  <dialog class="dictionary-modal" id="dictionary-modal" aria-labelledby="dictionary-modal-title">
+    <div class="dictionary-modal-card">
+      <header class="dictionary-modal-header">
+        <div><span class="premium-section-kicker">Dictionary lookup</span><h2 id="dictionary-modal-title">Definition</h2></div>
+        <button class="dictionary-modal-close" id="dictionary-modal-close" type="button" aria-label="Close dictionary">&times;</button>
+      </header>
+      <div class="dictionary-modal-body" id="dictionary-modal-body" aria-live="polite"></div>
+      <footer class="dictionary-modal-footer"><span>Definitions via <a href="https://www.datamuse.com/api/" target="_blank" rel="noopener noreferrer">Datamuse</a></span><a id="dictionary-full-link" href="https://www.merriam-webster.com/" target="_blank" rel="noopener noreferrer">View on Merriam-Webster <span aria-hidden="true">↗</span></a></footer>
+    </div>
+  </dialog>
+
   <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot"><div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div><a class="trustpilot-review-link" href="https://www.trustpilot.com/evaluate/monkeytactics.com" target="_blank" rel="noopener noreferrer"><img src="/assets/images/trustpilot-review.svg" width="360" height="52" alt="Review MonkeyTactics on Trustpilot"></a></section>
   <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-crossword-1" defer></script>
-  <script src="../assets/js/tools/crossword-solver.js?v=20260827-3" defer></script>
+  <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
+  <script src="../assets/js/tools/crossword-solver.js?v=20260829-dictionary-modal-3" defer></script>
 </body>
 </html>
