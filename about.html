@@ -72,7 +72,7 @@
   </script>
 
   <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260807-wasm-menu" />
-  <link rel="stylesheet" href="/assets/css/pages/about.css?v=20260807-2" />
+  <link rel="stylesheet" href="/assets/css/pages/about.css?v=20260829-5" />
 </head>
 
 <body class="about-page sticky-footer-page">
@@ -191,26 +191,38 @@
     </section>
 
     <section class="build-story" aria-label="Why MonkeyTactics builds calculators and browser tools">
-      <div>
-        <p class="about-kicker">Why calculators?</p>
-        <h2>Because small tools solve real problems.</h2>
-        <p>
-          A calculator is software in its most honest form: you bring a question, the tool applies clear logic, and it returns an answer. It does not need to know who you are. It does not need to remember you. It simply needs to work.
-        </p>
-        <p>
-          MonkeyTactics began with that straightforward promise and continues to expand into practical finance, construction, health, productivity, and utility workflows.
-        </p>
+      <div class="build-story__intro">
+        <div>
+          <p class="about-kicker">Why calculators?</p>
+          <h2>Because small tools solve real problems.</h2>
+        </div>
+        <div class="build-story__copy">
+          <p>
+            A calculator is software in its most honest form: you bring a question, the tool applies clear logic, and it returns an answer. It does not need to know who you are. It does not need to remember you. It simply needs to work.
+          </p>
+          <p>
+            MonkeyTactics began with that straightforward promise and continues to expand into practical finance, construction, health, productivity, and utility workflows.
+          </p>
+        </div>
       </div>
       <div class="technical-note">
-        <p class="about-kicker">Why Rust + WebAssembly?</p>
-        <h2>Serious engineering, inside your browser.</h2>
-        <p>
-          Six MonkeyTactics systems use <code>Rust</code> compiled to <code>WebAssembly</code>, keeping complex work fast, predictable, and local to your browser:
-        </p>
+        <div class="technical-note__intro">
+          <div>
+            <p class="about-kicker">Why Rust + WebAssembly?</p>
+            <h2>Serious engineering, inside your browser.</h2>
+          </div>
+          <p>
+            MonkeyTactics has seven distinct first-party <code>Rust</code> crates compiled to <code>WebAssembly</code>. Several tools share an engine, so those seven compiled components power the 13 browser experiences listed below.
+          </p>
+        </div>
         <ul class="wasm-systems">
           <li>
             <a href="/tools/qr-code-generator">Advanced QR Code Generator</a>
             <span>Encodes, styles, and exports QR codes, including batch workflows.</span>
+          </li>
+          <li>
+            <a href="/tools/password-generator">Password Generator</a>
+            <span>Uses the shared QR engine for local, exportable password QR previews.</span>
           </li>
           <li>
             <a href="/tools/qr-code-decoder">QR Code Decoder</a>
@@ -225,8 +237,32 @@
             <span>Projects compound growth, regular contributions, tax drag, inflation, and up to five scenarios.</span>
           </li>
           <li>
+            <a href="/tools/insulation-calculator">Batt &amp; Blown Insulation Calculator</a>
+            <span>Loads manufacturer coverage charts and calculates blown-insulation material requirements locally.</span>
+          </li>
+          <li>
             <a href="/tools/word-unscrambler">Word Unscrambler</a>
             <span>Indexes dictionaries and handles searching, filtering, scoring, and word analysis.</span>
+          </li>
+          <li>
+            <a href="/tools/words-with-friends-solver">Words With Friends Solver</a>
+            <span>Uses the shared word engine with Words With Friends scoring, wildcards, patterns, and bingo rules.</span>
+          </li>
+          <li>
+            <a href="/tools/crossword-solver">Crossword Solver</a>
+            <span>Searches known-letter patterns and optional letter pools through the shared dictionary engine.</span>
+          </li>
+          <li>
+            <a href="/tools/wordle-helper">Wordle Solver</a>
+            <span>Filters five-letter candidates from duplicate-aware green, yellow, and gray feedback.</span>
+          </li>
+          <li>
+            <a href="/tools/quordle-solver">Quordle Solver</a>
+            <span>Uses the shared word engine to filter four color-feedback boards, with browser-side entropy and cross-board guess ranking.</span>
+          </li>
+          <li>
+            <a href="/tools/word-character-counter">Word &amp; Character Counter</a>
+            <span>Calculates local text metrics and structural analysis with a JavaScript fallback.</span>
           </li>
           <li>
             <strong>Site navigation and search</strong>

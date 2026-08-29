@@ -354,6 +354,10 @@
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-10" />
+  <link rel="stylesheet" href="/assets/css/shared/focus-mode.css?v=20260829-2" />
+  <style>
+    .age-tool-page [data-focus-mode] .age-app-title { padding-right: 2.75rem; }
+  </style>
   <script src="/assets/js/shared/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -422,7 +426,7 @@
 
     <!-- CALCULATOR WIDGET -->
     <section class="age-calculator-section" aria-labelledby="calc-heading">
-      <div class="tool-widget">
+      <div class="tool-widget" data-focus-mode data-focus-mode-label="Age Calculator">
         <div class="premium-app-title age-app-title"><div class="premium-section-kicker">01 / Calculate</div><h2 id="calc-heading">Set the dates that matter</h2><p>Enter a birth date and retirement goal to reveal an exact age and the milestones ahead.</p></div>
 
         <div class="input-row">
@@ -921,6 +925,7 @@
 
   })();
   </script>
+  <script src="/assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
 
 </body>
 </html>

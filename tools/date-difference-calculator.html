@@ -835,6 +835,10 @@
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-6" />
+  <link rel="stylesheet" href="/assets/css/shared/focus-mode.css?v=20260829-2" />
+  <style>
+    .date-tool-page [data-focus-mode] .date-app-title { padding-right: 2.75rem; }
+  </style>
   <script src="/assets/js/shared/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-08-26" />
@@ -914,7 +918,7 @@
 
     <!-- CALCULATOR WIDGET -->
     <section class="date-calculator-section" aria-labelledby="calc-heading">
-      <div class="tool-widget">
+      <div class="tool-widget" data-focus-mode data-focus-mode-label="Date Difference Calculator">
         <div class="premium-app-title date-app-title"><div class="premium-section-kicker">01 / Plan</div><h2 id="calc-heading">Choose how to work with your dates</h2><p>Compare a date range, map a project deadline, or generate a recurring schedule.</p></div>
 
         <!-- MODE TABS -->
@@ -2764,6 +2768,7 @@
 
   })();
   </script>
+  <script src="/assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
 
 </body>
 </html>

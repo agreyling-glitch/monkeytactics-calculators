@@ -424,6 +424,10 @@
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-8" />
+  <link rel="stylesheet" href="/assets/css/shared/focus-mode.css?v=20260829-2" />
+  <style>
+    .bmi-tool-page [data-focus-mode] .bmi-app-title { padding-right: 2.75rem; }
+  </style>
   <script src="/assets/js/shared/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
@@ -492,7 +496,7 @@
 
     <!-- CALCULATOR WIDGET -->
     <section class="bmi-calculator-section" aria-labelledby="calc-heading">
-      <div class="tool-widget">
+      <div class="tool-widget" data-focus-mode data-focus-mode-label="BMI Calculator">
         <div class="premium-app-title bmi-app-title"><div class="premium-section-kicker">01 / Measure</div><h2 id="calc-heading">Enter your measurements</h2><p>Adjust height, weight, and age group to see the result and guidance update instantly.</p></div>
 
         <div class="unit-toggle" role="group" aria-label="Unit system">
@@ -1071,6 +1075,7 @@
 
   })();
   </script>
+  <script src="/assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
 
 </body>
 </html>

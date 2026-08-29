@@ -95,7 +95,7 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   collectLeaves(groups);
 
   assert.deepEqual(groups.map(({ id }) => id), ["generators", "calculators", "text-data", "batch-automation"]);
-  assert.equal(leaves.length, 31);
+  assert.equal(leaves.length, 32);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
 });
 
@@ -151,7 +151,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   for (const [id, label, count] of [
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
-    ["text-data", "Text &amp; Data", 9],
+    ["text-data", "Text &amp; Data", 10],
     ["batch-automation", "Batch &amp; Automation", 5],
   ]) {
     assert.match(html, new RegExp(`id="${id}"[\\s\\S]*?<h2>${label} <span>${count}</span></h2>`));
@@ -161,7 +161,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 31);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 32);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -191,7 +191,7 @@ test("the homepage features the six designated popular tools", () => {
 
   assert.deepEqual(titles, [
     "Word Unscrambler",
-    "Loan &amp; Mortgage Calculator",
+    "Quordle Solver",
     "Advanced QR Code Generator",
     "Words With Friends Solver",
     "Wordle Solver",
@@ -247,6 +247,9 @@ test("the Date Difference Calculator uses the premium planning presentation", ()
   assert.match(html, /Download phases CSV/);
   assert.match(html, /Download calendar ICS/);
   assert.match(html, /params\.set\('phases'/);
+  assert.match(html, /class="tool-widget" data-focus-mode data-focus-mode-label="Date Difference Calculator"/);
+  assert.match(html, /assets\/css\/shared\/focus-mode\.css\?v=/);
+  assert.match(html, /assets\/js\/shared\/focus-mode\.js\?v=/);
   assert.doesNotMatch(html, /Top Display Ad/);
   assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
 });
@@ -270,6 +273,9 @@ test("the BMI Calculator uses the premium health presentation", () => {
   assert.match(html, /01 \/ Measure/);
   assert.match(html, /02 \/ Understand/);
   assert.match(html, /Instant live results/);
+  assert.match(html, /class="tool-widget" data-focus-mode data-focus-mode-label="BMI Calculator"/);
+  assert.match(html, /assets\/css\/shared\/focus-mode\.css\?v=/);
+  assert.match(html, /assets\/js\/shared\/focus-mode\.js\?v=/);
   assert.doesNotMatch(html, /Top Display Ad/);
   assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
 });
@@ -292,6 +298,9 @@ test("the Age Calculator uses the premium milestone presentation", () => {
   assert.match(html, /class="age-calculator-section"/);
   assert.match(html, /01 \/ Calculate/);
   assert.match(html, /Exact years, months &amp; days/);
+  assert.match(html, /class="tool-widget" data-focus-mode data-focus-mode-label="Age Calculator"/);
+  assert.match(html, /assets\/css\/shared\/focus-mode\.css\?v=/);
+  assert.match(html, /assets\/js\/shared\/focus-mode\.js\?v=/);
   assert.doesNotMatch(html, /Top Display Ad/);
   assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
 });
@@ -559,10 +568,21 @@ test("the Compound Interest Calculator uses the premium growth presentation", ()
 
 test("the About page lists the Rust WebAssembly apps", () => {
   const html = fs.readFileSync(path.join(siteRoot, "about.html"), "utf8");
-  assert.match(html, /Six MonkeyTactics systems use <code>Rust<\/code> compiled to <code>WebAssembly<\/code>/);
+  const css = fs.readFileSync(path.join(siteRoot, "assets", "css", "pages", "about.css"), "utf8");
+  assert.match(html, /seven distinct first-party <code>Rust<\/code> crates compiled to <code>WebAssembly<\/code>/);
+  assert.match(html, /seven compiled components power the 13 browser experiences listed below/);
   assert.match(html, /href="\/tools\/qr-code-decoder">QR Code Decoder<\/a>/);
   assert.match(html, /href="\/tools\/compound-interest-calculator">Compound Interest Calculator<\/a>/);
+  assert.match(html, /href="\/tools\/password-generator">Password Generator<\/a>/);
+  assert.match(html, /href="\/tools\/insulation-calculator">Batt &amp; Blown Insulation Calculator<\/a>/);
+  assert.match(html, /href="\/tools\/words-with-friends-solver">Words With Friends Solver<\/a>/);
+  assert.match(html, /href="\/tools\/crossword-solver">Crossword Solver<\/a>/);
+  assert.match(html, /href="\/tools\/wordle-helper">Wordle Solver<\/a>/);
+  assert.match(html, /href="\/tools\/quordle-solver">Quordle Solver<\/a>/);
+  assert.match(html, /href="\/tools\/word-character-counter">Word &amp; Character Counter<\/a>/);
+  assert.match(html, /shared word engine to filter four color-feedback boards/);
   assert.match(html, /Projects compound growth, regular contributions, tax drag, inflation, and up to five scenarios/);
+  assert.match(css, /--about-ink: #f2f8f4/);
 });
 
 test("featured pages keep only the lower ad and top tools invite Trustpilot reviews", () => {
