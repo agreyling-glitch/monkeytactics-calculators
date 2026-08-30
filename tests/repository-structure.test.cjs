@@ -80,6 +80,55 @@ test("every local HTML asset reference resolves", () => {
   }
 });
 
+test("every public page declares the complete favicon set", () => {
+  const pages = [
+    ...fs.readdirSync(siteRoot).filter((name) => name.endsWith(".html")).map((name) => path.join(siteRoot, name)),
+    ...fs.readdirSync(path.join(siteRoot, "tools")).filter((name) => name.endsWith(".html")).map((name) => path.join(siteRoot, "tools", name)),
+  ];
+  const requiredDeclarations = [
+    '<link rel="icon" type="image/svg+xml" href="/favicon.svg">',
+    '<link rel="icon" href="/favicon.ico" sizes="any">',
+    '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">',
+    '<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">',
+    '<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">',
+    '<link rel="manifest" href="/site.webmanifest">',
+  ];
+
+  for (const page of pages) {
+    const html = fs.readFileSync(page, "utf8");
+    for (const declaration of requiredDeclarations) {
+      assert.ok(html.includes(declaration), `${path.relative(siteRoot, page)} is missing ${declaration}`);
+    }
+  }
+});
+
+test("every public page includes the canonical footer navigation", () => {
+  const pages = [
+    ...fs.readdirSync(siteRoot).filter((name) => name.endsWith(".html")).map((name) => path.join(siteRoot, name)),
+    ...fs.readdirSync(path.join(siteRoot, "tools")).filter((name) => name.endsWith(".html")).map((name) => path.join(siteRoot, "tools", name)),
+  ];
+  const requiredLinks = [
+    'href="https://blog.monkeytactics.com/"',
+    'href="/privacy"',
+    'href="/terms-of-service"',
+    'href="/third-party-notices"',
+    'href="/about"',
+    'href="/contact"',
+    'href="/sitemap"',
+  ];
+
+  for (const page of pages) {
+    const html = fs.readFileSync(page, "utf8");
+    const relative = path.relative(siteRoot, page);
+    assert.match(html, /<footer\b/, `${relative} is missing a footer`);
+    assert.match(html, /(?:©|&copy;) 2026 MonkeyTactics/, `${relative} is missing the footer copyright`);
+    assert.match(html, /<nav\b[^>]*aria-label="Footer navigation"/, `${relative} is missing labeled footer navigation`);
+    for (const link of requiredLinks) {
+      assert.ok(html.includes(link), `${relative} is missing footer link ${link}`);
+    }
+  }
+});
+
 test("every absolute asset reference in authored code resolves", () => {
   const sourceFiles = [];
   const collect = (directory) => {

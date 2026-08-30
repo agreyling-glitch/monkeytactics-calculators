@@ -54,6 +54,14 @@ test("Quordle solver avoids exhaustive work before clues and bounds probe rankin
   assert.doesNotMatch(script,/allWords\.filter\(word=>new Set\(word\)\.size>=4\)/);
 });
 
+test("candidate boards disclose when only the first 120 matches are shown",()=>{
+  assert.match(script,/candidateDisplayLimit=120/);
+  assert.match(script,/words\.slice\(0,candidateDisplayLimit\)/);
+  assert.match(script,/Showing \$\{candidateDisplayLimit\.toLocaleString\(\)\} of \$\{words\.length\.toLocaleString\(\)\} matching words/);
+  assert.match(script,/limit\.hidden=words\.length<=candidateDisplayLimit/);
+  assert.match(css,/\.candidate-limit\{/);
+});
+
 test("Quordle results override the shared hidden calculator panel rule",()=>{
   assert.match(css,/\.quordle-page \.results-panel\{display:block/);
   assert.doesNotMatch(css,/\.quordle-page \.tool-widget\{position:relative\}/);
@@ -100,12 +108,16 @@ test("the selected board receives Wordle-style keyboard color cycling",()=>{
   assert.match(script,/if\(cycleLetter\(event\.key\)\)event\.preventDefault\(\)/);
 });
 
-test("boards can be completed and reopened without five green tiles",()=>{
-  assert.match(script,/completedBoards=Array\(4\)\.fill\(false\)/);
-  assert.match(script,/completedBoards\[board\]\|\|guesses\.some/);
-  assert.match(script,/completedBoards\[board\]=!completedBoards\[board\]/);
-  assert.match(script,/completeButtons\[i\]\.textContent=completedBoards\[i\]\?"Reopen board":"Mark complete"/);
-  assert.match(script,/const displayedState=completedBoards\[board\]\?"correct":feedback\[board\]\[i\]/);
+test("completed boards retain and display their solved word",()=>{
+  assert.match(script,/manualCompletedWords=Array\(4\)\.fill\(""\)/);
+  assert.match(script,/reopenedBoards=Array\(4\)\.fill\(false\)/);
+  assert.match(script,/function automaticCompletedWord\(board\)/);
+  assert.match(script,/function completedWord\(board\)/);
+  assert.match(script,/const answer=completedWord\(board\),displayedState=answer\?"correct":feedback\[board\]\[i\]/);
+  assert.match(script,/Solved · \$\{completedWord\(i\)\.toUpperCase\(\)\}/);
+  assert.match(script,/Enter or select the completed five-letter word before marking this board complete\./);
+  assert.match(script,/function syncCompletedHistory\(\)/);
+  assert.match(script,/answer\?scoreGuess\(answer,guesses\[index\]\.word\)\[i\]/);
   assert.match(css,/\.board-complete\[aria-pressed="true"\]/);
 });
 
@@ -130,7 +142,7 @@ test("completing all four boards offers a full reset",()=>{
   assert.match(html,/<h2 id="completion-title">Congrats!<\/h2>/);
   assert.match(html,/id="keep-results"/);
   assert.match(html,/id="reset-all-boards"/);
-  assert.match(script,/completedBoards\.every\(Boolean\).*completionDialog\.showModal\(\)/);
+  assert.match(script,/Array\.from\(\{length:4\},\(_,board\)=>solved\(board\)\)\.every\(Boolean\).*completionDialog\.showModal\(\)/);
   assert.match(script,/function resetAll\(\)/);
   assert.match(script,/resetAllBoards\.addEventListener\("click"/);
   assert.match(css,/\.completion-dialog::backdrop/);
