@@ -14,13 +14,14 @@
   <meta property="og:url" content="https://monkeytactics.com/tools/" />
   <link rel="canonical" href="https://monkeytactics.com/tools/" />
 
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <link rel="manifest" href="/site.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260807-wasm-menu" />
-  <link rel="stylesheet" href="/assets/css/pages/tools-index.css?v=20260828-capabilities" />
+  <link rel="stylesheet" href="/assets/css/pages/tools-index.css?v=20260830-word-games" />
   <script src="/assets/js/shared/ads.js" defer></script>
 </head>
 
@@ -47,13 +48,14 @@
     </section>
 
     <nav class="directory-jump" aria-label="Jump to a tool group">
-      <a href="#generators"><span>01</span>Generators <strong>2</strong></a>
-      <a href="#calculators"><span>02</span>Calculators <strong>15</strong></a>
-      <a href="#text-data"><span>03</span>Text &amp; Data <strong>10</strong></a>
-      <a href="#batch-automation"><span>04</span>Batch &amp; Automation <strong>5</strong></a>
+      <a href="#word-games"><span>01</span>Word Games <strong>6</strong></a>
+      <a href="#generators"><span>02</span>Generators <strong>2</strong></a>
+      <a href="#calculators"><span>03</span>Calculators <strong>15</strong></a>
+      <a href="#text-data"><span>04</span>Text &amp; Data <strong>5</strong></a>
+      <a href="#batch-automation"><span>05</span>Batch &amp; Automation <strong>5</strong></a>
     </nav>
 
-    <p class="tools-stats" id="toolsStats" aria-live="polite">Showing <strong id="visibleCount">32</strong> menu entries</p>
+    <p class="tools-stats" id="toolsStats" aria-live="polite">Showing <strong id="visibleCount">33</strong> menu entries</p>
 
     <div class="no-results" id="noResults" role="status" aria-live="polite" hidden>
       <span aria-hidden="true">?</span>
@@ -61,9 +63,24 @@
     </div>
 
     <div class="tools-directory" id="toolsDirectory">
-      <section class="directory-group" id="generators" data-tool-group>
+      <section class="directory-group" id="word-games" data-tool-group>
         <header class="directory-group__header">
           <span class="directory-group__number">01</span>
+          <div><h2>Word Games <span>6</span></h2><p>Solve word puzzles, find playable words, and narrow letter patterns.</p></div>
+        </header>
+        <div class="directory-grid">
+          <a class="directory-tool" data-tool-id="word-unscrambler" href="/tools/word-unscrambler" data-search="word games word unscrambler anagram scrabble letters"><span class="directory-tool__icon">AZ</span><span><strong>Word Unscrambler</strong><small>Find words, scores, bingos, and hooks.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Rack letters and wildcard searches</li><li>Scores, bingos, hooks, and patterns</li><li>Advanced filters, sorting, and saved picks</li></ul></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" data-tool-id="words-with-friends-solver" href="/tools/words-with-friends-solver" data-search="word games words with friends wwf solver cheat anagram letters"><span class="directory-tool__icon">WF</span><span><strong>Words With Friends Solver</strong><small>Find playable words with WWF scores, bingos, and hooks.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Words With Friends tile scoring</li><li>Wildcards, bingos, and hooks</li><li>Strategic filters and sorting</li></ul></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" data-tool-id="crossword-solver" href="/tools/crossword-solver" data-search="word games crossword solver clue pattern blanks word finder"><span class="directory-tool__icon">?A</span><span><strong>Crossword Solver</strong><small>Find answers by pattern, blanks, and length.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Known-letter pattern matching</li><li>Optional available-letter pool</li><li>Length and advanced result filters</li></ul></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" data-tool-id="wordle-helper" href="/tools/wordle-helper" data-search="word games wordle solver helper green yellow gray five letter words"><span class="directory-tool__icon">GY</span><span><strong>Wordle Solver</strong><small>Narrow five-letter words from colored tile feedback.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Green, yellow, and gray feedback</li><li>Duplicate-letter-aware filtering</li><li>Candidate ranking and analysis</li></ul></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" data-tool-id="quordle-solver" href="/tools/quordle-solver" data-search="word games quordle solver help four boards classic green yellow gray entropy five letter words"><span class="directory-tool__icon">Q4</span><span><strong>Quordle Solver</strong><small>Solve four boards with entropy-ranked shared guesses.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Four independent feedback boards</li><li>Per-board entropy and expandable candidates</li><li>Explained cross-board next-guess ranking</li></ul></span><span class="directory-tool__arrow">→</span></a>
+          <a class="directory-tool" data-tool-id="octordle-solver" href="/tools/octordle-solver" data-search="word games octordle solver help eight boards daily green yellow gray entropy five letter words"><span class="directory-tool__icon">O8</span><span><strong>Octordle Solver</strong><small>Solve eight boards with entropy-ranked shared guesses.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Eight independent feedback boards</li><li>Per-board entropy and expandable candidates</li><li>Explained eight-board next-guess ranking</li></ul></span><span class="directory-tool__arrow">→</span></a>
+        </div>
+      </section>
+
+      <section class="directory-group" id="generators" data-tool-group>
+        <header class="directory-group__header">
+          <span class="directory-group__number">02</span>
           <div><h2>Generators <span>2</span></h2><p>Create secure, ready-to-use digital assets.</p></div>
         </header>
         <div class="directory-grid">
@@ -78,7 +95,7 @@
 
       <section class="directory-group directory-group--calculators" id="calculators" data-tool-group>
         <header class="directory-group__header">
-          <span class="directory-group__number">02</span>
+          <span class="directory-group__number">03</span>
           <div><h2>Calculators <span>15</span></h2><p>Calculate finances, health, dates, and construction materials.</p></div>
         </header>
 
@@ -124,20 +141,16 @@
         </div>
       </section>
 
+
       <section class="directory-group" id="text-data" data-tool-group>
         <header class="directory-group__header">
-          <span class="directory-group__number">03</span>
-          <div><h2>Text &amp; Data <span>10</span></h2><p>Convert, decode, count, and extract everyday information.</p></div>
+          <span class="directory-group__number">04</span>
+          <div><h2>Text &amp; Data <span>5</span></h2><p>Convert, decode, count, and extract everyday information.</p></div>
         </header>
         <div class="directory-grid">
           <a class="directory-tool" data-tool-id="unit-converter" href="/tools/unit-converter" data-search="text data unit converter metric imperial length weight temperature"><span class="directory-tool__icon">UN</span><span><strong>Unit Converter</strong><small>Convert common metric and imperial units.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Metric and imperial units</li><li>Length, area, volume, weight, and temperature</li><li>Instant bidirectional conversions</li></ul></span><span class="directory-tool__arrow">→</span></a>
           <a class="directory-tool" data-tool-id="tip-calculator" href="/tools/tip-calculator" data-search="text data tip calculator bill split gratuity tax"><span class="directory-tool__icon">%</span><span><strong>Tip Calculator</strong><small>Calculate and split a tip-aware bill.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Tip before or after tax</li><li>Split totals across multiple people</li><li>Per-person bill and gratuity amounts</li></ul></span><span class="directory-tool__arrow">→</span></a>
           <a class="directory-tool" data-tool-id="qr-code-decoder" href="/tools/qr-code-decoder" data-search="text data qr barcode code decoder reader scanner image link redirect destination privacy proxy upc ean code128 data matrix"><span class="directory-tool__icon">QD</span><span><strong>QR &amp; Barcode Decoder</strong><small>Auto-detect codes locally and inspect web destinations.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Camera, upload, paste, and sample inputs</li><li>QR and common barcode formats</li><li>Local decoding and safe URL inspection</li></ul></span><span class="directory-tool__arrow">→</span></a>
-          <a class="directory-tool" data-tool-id="word-unscrambler" href="/tools/word-unscrambler" data-search="text data word unscrambler anagram scrabble letters"><span class="directory-tool__icon">AZ</span><span><strong>Word Unscrambler</strong><small>Find words, scores, bingos, and hooks.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Rack letters and wildcard searches</li><li>Scores, bingos, hooks, and patterns</li><li>Advanced filters, sorting, and saved picks</li></ul></span><span class="directory-tool__arrow">→</span></a>
-          <a class="directory-tool" data-tool-id="words-with-friends-solver" href="/tools/words-with-friends-solver" data-search="text data words with friends wwf solver cheat anagram letters"><span class="directory-tool__icon">WF</span><span><strong>Words With Friends Solver</strong><small>Find playable words with WWF scores, bingos, and hooks.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Words With Friends tile scoring</li><li>Wildcards, bingos, and hooks</li><li>Strategic filters and sorting</li></ul></span><span class="directory-tool__arrow">→</span></a>
-          <a class="directory-tool" data-tool-id="crossword-solver" href="/tools/crossword-solver" data-search="text data crossword solver clue pattern blanks word finder"><span class="directory-tool__icon">?A</span><span><strong>Crossword Solver</strong><small>Find answers by pattern, blanks, and length.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Known-letter pattern matching</li><li>Optional available-letter pool</li><li>Length and advanced result filters</li></ul></span><span class="directory-tool__arrow">→</span></a>
-          <a class="directory-tool" data-tool-id="wordle-helper" href="/tools/wordle-helper" data-search="text data wordle solver helper green yellow gray five letter words"><span class="directory-tool__icon">GY</span><span><strong>Wordle Solver</strong><small>Narrow five-letter words from colored tile feedback.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Green, yellow, and gray feedback</li><li>Duplicate-letter-aware filtering</li><li>Candidate ranking and analysis</li></ul></span><span class="directory-tool__arrow">→</span></a>
-          <a class="directory-tool" data-tool-id="quordle-solver" href="/tools/quordle-solver" data-search="text data quordle solver help four boards classic green yellow gray entropy five letter words"><span class="directory-tool__icon">Q4</span><span><strong>Quordle Solver</strong><small>Solve four boards with entropy-ranked shared guesses.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Four independent feedback boards</li><li>Per-board entropy and expandable candidates</li><li>Explained cross-board next-guess ranking</li></ul></span><span class="directory-tool__arrow">→</span></a>
           <a class="directory-tool" data-tool-id="word-character-counter" href="/tools/word-character-counter" data-search="text data word character counter sentences paragraphs writing"><span class="directory-tool__icon">#</span><span><strong>Word &amp; Character Counter</strong><small>Count text as you type or paste.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Words, characters, sentences, and paragraphs</li><li>Reading, speaking, and page estimates</li><li>Keywords and writing analysis</li></ul></span><span class="directory-tool__arrow">→</span></a>
           <a class="directory-tool" data-tool-id="ocr-utility" href="/tools/ocr-utility" data-search="text data ocr image pdf heic scan camera crop multi-region extraction optical character recognition"><span class="directory-tool__icon">TX</span><span><strong>Image &amp; PDF OCR Utility</strong><small>Extract editable text from images, HEIC files, scanned PDFs, or your camera.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Images, HEIC files, PDFs, paste, and camera</li><li>Crop, deskew, threshold, and region controls</li><li>Private browser-based text extraction</li></ul></span><span class="directory-tool__arrow">→</span></a>
         </div>
@@ -145,7 +158,7 @@
 
       <section class="directory-group" id="batch-automation" data-tool-group>
         <header class="directory-group__header">
-          <span class="directory-group__number">04</span>
+          <span class="directory-group__number">05</span>
           <div><h2>Batch &amp; Automation <span>5</span></h2><p>Jump directly into multi-item and advanced workflows.</p></div>
         </header>
         <div class="directory-grid">

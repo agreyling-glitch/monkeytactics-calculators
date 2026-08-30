@@ -94,8 +94,12 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   });
   collectLeaves(groups);
 
-  assert.deepEqual(groups.map(({ id }) => id), ["generators", "calculators", "text-data", "batch-automation"]);
-  assert.equal(leaves.length, 32);
+  assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "text-data", "batch-automation"]);
+  assert.deepEqual(
+    groups.find(({ id }) => id === "word-games").children.map(({ id }) => id),
+    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordle-helper", "quordle-solver", "octordle-solver"],
+  );
+  assert.equal(leaves.length, 33);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
 });
 
@@ -149,9 +153,10 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
   for (const [id, label, count] of [
+    ["word-games", "Word Games", 6],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
-    ["text-data", "Text &amp; Data", 10],
+    ["text-data", "Text &amp; Data", 5],
     ["batch-automation", "Batch &amp; Automation", 5],
   ]) {
     assert.match(html, new RegExp(`id="${id}"[\\s\\S]*?<h2>${label} <span>${count}</span></h2>`));
@@ -161,7 +166,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 32);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 33);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -192,13 +197,16 @@ test("the homepage features the six designated popular tools", () => {
   assert.deepEqual(titles, [
     "Word Unscrambler",
     "Quordle Solver",
-    "Advanced QR Code Generator",
+    "Octordle Solver",
     "Words With Friends Solver",
     "Wordle Solver",
     "Crossword Solver",
   ]);
   assert.equal((html.match(/class="capability-list"/g) || []).length, 6);
   assert.equal((html.match(/<li>/g) || []).length, 24);
+  assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 2);
+  assert.match(html, /featured-tool--quordle[\s\S]*?featured-tool__new">New/);
+  assert.match(html, /featured-tool--octordle[\s\S]*?featured-tool__new">New/);
 });
 
 test("the flagship word and QR tools use the mortgage-inspired presentation", () => {
@@ -581,6 +589,7 @@ test("the About page lists the Rust WebAssembly apps", () => {
   assert.match(html, /href="\/tools\/quordle-solver">Quordle Solver<\/a>/);
   assert.match(html, /href="\/tools\/word-character-counter">Word &amp; Character Counter<\/a>/);
   assert.match(html, /shared word engine to filter four color-feedback boards/);
+  assert.match(html, /shared word engine to filter eight color-feedback boards/);
   assert.match(html, /Projects compound growth, regular contributions, tax drag, inflation, and up to five scenarios/);
   assert.match(css, /--about-ink: #f2f8f4/);
 });

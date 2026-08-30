@@ -53,9 +53,9 @@ mod tests {
     }
 
     #[test]
-    fn manifest_has_four_populated_groups() {
+    fn manifest_has_five_populated_groups() {
         let tree = manifest();
-        assert_eq!(tree.len(), 4);
+        assert_eq!(tree.len(), 5);
         assert!(tree.iter().all(|group| !group.children.is_empty()));
     }
 
