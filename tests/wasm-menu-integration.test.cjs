@@ -238,7 +238,7 @@ test("the Tip Calculator uses the premium calculator presentation", () => {
   assert.match(html, /01 \/ Calculate/);
   assert.match(html, /Tax-aware tipping/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("the Date Difference Calculator uses the premium planning presentation", () => {
@@ -262,7 +262,7 @@ test("the Date Difference Calculator uses the premium planning presentation", ()
   assert.match(html, /assets\/css\/shared\/focus-mode\.css\?v=/);
   assert.match(html, /assets\/js\/shared\/focus-mode\.js\?v=/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("the Time Zone Converter uses the premium meeting presentation", () => {
@@ -273,7 +273,7 @@ test("the Time Zone Converter uses the premium meeting presentation", () => {
   assert.match(html, /01 \/ Coordinate/);
   assert.match(html, /DST-aware conversion/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("the BMI Calculator uses the premium health presentation", () => {
@@ -288,7 +288,7 @@ test("the BMI Calculator uses the premium health presentation", () => {
   assert.match(html, /assets\/css\/shared\/focus-mode\.css\?v=/);
   assert.match(html, /assets\/js\/shared\/focus-mode\.js\?v=/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("the Daily Energy Needs Calculator uses the premium health presentation", () => {
@@ -299,7 +299,7 @@ test("the Daily Energy Needs Calculator uses the premium health presentation", (
   assert.match(html, /01 \/ Estimate/);
   assert.match(html, /BMR &amp; TDEE estimates/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container/g) || []).length, 0);
 });
 
 test("the Age Calculator uses the premium milestone presentation", () => {
@@ -313,7 +313,7 @@ test("the Age Calculator uses the premium milestone presentation", () => {
   assert.match(html, /assets\/css\/shared\/focus-mode\.css\?v=/);
   assert.match(html, /assets\/js\/shared\/focus-mode\.js\?v=/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("the QR Code Decoder uses the premium private scanning presentation", () => {
@@ -324,7 +324,7 @@ test("the QR Code Decoder uses the premium private scanning presentation", () =>
   assert.match(html, /01 \/ Decode/);
   assert.match(html, /QR &amp; barcode detection/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("the OCR Utility uses the premium private recognition presentation", () => {
@@ -453,7 +453,7 @@ test("the OCR Utility uses the premium private recognition presentation", () => 
   assert.match(wordCounter, /Extract editable text from images, HEIC files, PDFs/);
   assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/ocr-utility<\/loc>\s*<lastmod>2026-08-26<\/lastmod>/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("all construction calculators use the premium estimating presentation", () => {
@@ -474,7 +474,7 @@ test("all construction calculators use the premium estimating presentation", () 
     assert.match(html, /construction-calculator-section/);
     assert.match(html, /01 \/ Estimate/);
     assert.doesNotMatch(html, /Top Display Ad/);
-    assert.equal((html.match(/class="ad-container"/g) || []).length, 1, `${name} should keep only its lower ad slot`);
+    assert.equal((html.match(/class="ad-container"/g) || []).length, 0, `${name} should not contain an ad slot`);
   }
 });
 
@@ -486,7 +486,7 @@ test("the Word and Character Counter uses the premium text analysis presentation
   assert.match(html, /01 \/ Analyze/);
   assert.match(html, /Instant live counts/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("the Word and Character Counter keeps analysis controls inside mobile viewports", () => {
@@ -506,7 +506,7 @@ test("the Unit Converter uses the premium measurement presentation", () => {
   assert.match(html, /01 \/ Convert/);
   assert.match(html, /Metric &amp; imperial/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
 });
 
 test("the Percentage Calculator uses the premium percentage presentation", () => {
@@ -517,21 +517,71 @@ test("the Percentage Calculator uses the premium percentage presentation", () =>
   assert.match(html, /01 \/ Calculate/);
   assert.match(html, /Three calculation modes/);
   assert.doesNotMatch(html, /Top Display Ad/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
+});
+
+test("site pages do not contain bottom advertisement slots", () => {
+  for (const file of pageFiles) {
+    const html = fs.readFileSync(file, "utf8");
+    assert.doesNotMatch(html, /AdSense: Bottom Display Ad|ad-container--bottom/, `${file} should not contain a bottom ad slot`);
+  }
+
+  for (const name of ["index.html", path.join("tools", "index.html")]) {
+    const html = fs.readFileSync(path.join(siteRoot, name), "utf8");
+    assert.equal((html.match(/class="ad-container"/g) || []).length, 0, `${name} should not contain an ad slot`);
+  }
+});
+
+test("the All Tools directory reinforces the compound calculator search intent", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
+  const manifest = fs.readFileSync(path.join(siteRoot, "assets", "wasm", "menu", "tools-manifest.json"), "utf8");
+  const toolSitemap = fs.readFileSync(path.join(siteRoot, "sitemap-tools.xml"), "utf8");
+  assert.match(html, /data-search="finance compound interest monthly contributions future value investment growth calculator savings growth interest projection"/);
+  assert.match(html, /<small>Calculate future savings and investment growth with monthly contributions\.<\/small>/);
+  assert.match(manifest, /"description":"Calculate future savings and investment growth with monthly contributions\."/);
+  assert.match(manifest, /"compound interest with monthly contributions","investment growth calculator"/);
+  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>2026-08-31<\/lastmod>/);
+});
+
+test("the Mortgage Calculator identifies its author and review scope", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "tools", "loan-mortgage-calculator.html"), "utf8");
+  const css = fs.readFileSync(path.join(siteRoot, "assets", "css", "tools", "mortgage-calculator.css"), "utf8");
+  assert.match(html, /<meta name="author" content="Adriaan Greyling">/);
+  assert.match(html, /id="mortgage-methodology-heading">Methodology &amp; limitations<\/h2>/);
+  assert.match(html, /<strong>Author and reviewer:<\/strong> <a href="\/about" rel="author">Adriaan Greyling<\/a>/);
+  assert.match(html, /He does not hold financial planning, mortgage, lending, tax, or accounting credentials/);
+  assert.match(html, /His review covers the mortgage formula implementation, amortization behavior, and software calculations/);
+  assert.match(html, /"reviewedBy":\{"@type":"Person","name":"Adriaan Greyling"/);
+  assert.match(html, /"dateModified":"2026-08-31"/);
+  assert.match(css, /\.methodology\{margin-top:2\.5rem;padding:\.25rem 1rem 1rem;/);
+  assert.match(html, /mortgage-calculator\.css\?v=20260831-methodology-spacing-1/);
 });
 
 test("the Compound Interest Calculator uses the premium growth presentation", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "compound-interest-calculator.html"), "utf8");
   const script = fs.readFileSync(path.join(siteRoot, "assets", "js", "tools", "compound-interest-calculator", "compound-interest-calculator.js"), "utf8");
   const chartScript = fs.readFileSync(path.join(siteRoot, "assets", "js", "tools", "compound-interest-calculator", "compound-interest-chart.js"), "utf8");
+  const toolSitemap = fs.readFileSync(path.join(siteRoot, "sitemap-tools.xml"), "utf8");
   assert.match(html, /class="premium-tool-page compound-tool-page"/);
-  assert.match(html, /<title>Compound Interest Calculator with Contributions<\/title>/);
-  assert.match(html, /Calculate compound interest with monthly contributions, five compounding frequencies/);
+  assert.match(html, /<title>Compound Interest Calculator with Monthly Contributions<\/title>/);
+  assert.match(html, /<h1 id="tool-heading">Compound Interest Calculator with Monthly Contributions<\/h1>/);
+  assert.match(html, /Calculate future savings and investment growth with monthly contributions/);
   assert.match(html, /"url": "https:\/\/monkeytactics\.com\/tools\/compound-interest-calculator"/);
   assert.doesNotMatch(html, /compound-interest-calculator\.html#app/);
   assert.match(html, /How are monthly contributions calculated\?/);
   assert.match(html, /Why might another compound interest calculator show a different result\?/);
   assert.match(html, /Methodology and limitations/);
+  assert.match(html, /<strong>Author and reviewer:<\/strong> <a href="\/about" rel="author">Adriaan Greyling<\/a>/);
+  assert.match(html, /He does not hold financial planning, investment, tax, or accounting credentials/);
+  assert.match(html, /His review covers the calculator's formula implementation, calculation behavior, and alignment with the cited methodology/);
+  assert.match(html, /id="compound-examples-heading">Compound interest examples<\/h2>/);
+  assert.match(html, /\$10,000 invested at 7% for 20 years/);
+  assert.match(html, /\$200 monthly contribution for 30 years/);
+  assert.match(html, /Daily versus monthly compounding/);
+  assert.match(html, /7% return after 3% inflation/);
+  assert.match(html, /How long does it take \$10,000 to double\?/);
+  assert.match(html, /\$243,994\.20/);
+  assert.match(html, /\$22,361\.52/);
   assert.match(html, /class="premium-tool-hero"/);
   assert.match(html, /class="compound-workspace-section"/);
   assert.match(html, /01 \/ Project/);
@@ -574,7 +624,11 @@ test("the Compound Interest Calculator uses the premium growth presentation", ()
   assert.match(chartScript, /const nominalDelta = rows\[1\]\.row\.nominal - rows\[0\]\.row\.nominal/);
   assert.match(chartScript, /const hidden = !layerVisible \|\| !scenarioVisible/);
   assert.doesNotMatch(html, /AdSense: Top/);
-  assert.equal((html.match(/class="ad-container"/g) || []).length, 1);
+  assert.equal((html.match(/class="ad-container"/g) || []).length, 0);
+  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/compound-interest-calculator<\/loc>\s*<lastmod>2026-08-31<\/lastmod>/);
+  assert.doesNotMatch(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/compound-interest-calculator\?/);
+  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/loan-mortgage-calculator<\/loc>\s*<lastmod>2026-08-31<\/lastmod>/);
+  assert.doesNotMatch(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/loan-mortgage-calculator\?/);
 });
 
 test("the About page lists the Rust WebAssembly apps", () => {
@@ -599,10 +653,10 @@ test("the About page lists the Rust WebAssembly apps", () => {
   assert.match(css, /--about-ink: #f2f8f4/);
 });
 
-test("featured pages keep only the lower ad and top tools invite Trustpilot reviews", () => {
+test("featured pages are ad-free and top tools invite Trustpilot reviews", () => {
   for (const name of ["index.html", "tools/word-unscrambler.html", "tools/qr-code-generator.html"]) {
     const html = fs.readFileSync(path.join(siteRoot, name), "utf8");
-    assert.equal((html.match(/class="ad-container"/g) || []).length, 1, `${name} should contain only its lower ad slot`);
+    assert.equal((html.match(/class="ad-container"/g) || []).length, 0, `${name} should not contain an ad slot`);
     assert.doesNotMatch(html, /Top Display Ad/);
   }
 

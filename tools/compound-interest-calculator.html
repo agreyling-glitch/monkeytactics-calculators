@@ -8,18 +8,18 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>Compound Interest Calculator with Contributions</title>
+  <title>Compound Interest Calculator with Monthly Contributions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Calculate compound interest with monthly contributions, five compounding frequencies, estimated taxes, inflation-adjusted results, charts, and yearly tables." />
+        content="Calculate future savings and investment growth with monthly contributions, flexible compounding, estimated taxes, inflation, charts, and yearly results." />
 
-  <meta property="og:title"       content="Compound Interest Calculator with Contributions | MonkeyTactics" />
-  <meta property="og:description" content="Project compound growth with regular contributions, tax estimates, inflation adjustment, interactive charts, and up to five scenarios." />
+  <meta property="og:title"       content="Compound Interest Calculator with Monthly Contributions | MonkeyTactics" />
+  <meta property="og:description" content="Project savings and investment growth with monthly contributions, tax estimates, inflation adjustment, interactive charts, and up to five scenarios." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/compound-interest-calculator" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Compound Interest Calculator with Contributions" />
-  <meta name="twitter:description" content="Compare compound growth scenarios with contributions, taxes, inflation, charts, and yearly results." />
+  <meta name="twitter:title" content="Compound Interest Calculator with Monthly Contributions" />
+  <meta name="twitter:description" content="Compare savings and investment growth with monthly contributions, taxes, inflation, charts, and yearly results." />
   <link rel="canonical"           href="https://monkeytactics.com/tools/compound-interest-calculator" />
 
   <script type="application/ld+json">
@@ -226,6 +226,19 @@
     .seo-section p:last-child { margin-bottom: 0; }
     .formula-block { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.85rem 1.1rem; font-family: monospace; font-size: 0.9rem; color: var(--accent); margin: 0.75rem 0; line-height: 1.7; overflow-x: auto; }
 
+    /* Crawlable worked examples */
+    .compound-examples-section { margin-top: 2rem; }
+    .compound-examples-section > p { max-width: 740px; color: var(--muted); line-height: 1.75; }
+    .compound-example-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .compound-example-card { display: flex; min-height: 230px; flex-direction: column; padding: 1.15rem; border: 1px solid var(--border); border-radius: var(--radius); background: rgba(255,255,255,0.025); }
+    .compound-example-card h3 { margin: 0; color: var(--text); font-size: 1rem; line-height: 1.4; }
+    .compound-example-result { margin: 0.8rem 0 0; color: var(--muted); font-size: 0.84rem; line-height: 1.65; }
+    .compound-example-result strong { color: var(--accent); font-size: 1.15rem; }
+    .compound-example-note { margin: 0.55rem 0 1rem; color: var(--muted); font-size: 0.78rem; line-height: 1.6; }
+    .compound-example-links { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: auto; }
+    .compound-example-links a { color: var(--accent); font-size: 0.78rem; font-weight: 700; }
+    .compound-example-links a:hover { text-decoration: underline; }
+
     /* FAQ */
     .faq-section { max-width: 740px; margin-top: 2rem; }
     .faq-section details { border: 1px solid var(--border); border-radius: 0.75rem; background: rgba(255,255,255,0.02); }
@@ -315,12 +328,13 @@
       .results-secondary { grid-template-columns: 1fr; }
       .input-row-2 { grid-template-columns: 1fr; }
       .result-card.primary .result-value { font-size: 1.75rem; }
+      .compound-example-grid { grid-template-columns: 1fr; }
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260809-interactive-5" />
   <script src="/assets/js/shared/ads.js" defer></script>
-  <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-08-09" />
+  <meta name="author" content="Adriaan Greyling" />
+  <meta name="date" content="2026-08-31" />
 
   <script type="application/ld+json">
 {
@@ -329,9 +343,9 @@
     {
       "@type": "WebApplication",
       "@id": "https://monkeytactics.com/tools/compound-interest-calculator#app",
-      "name": "Compound Interest Calculator with Contributions",
+      "name": "Compound Interest Calculator with Monthly Contributions",
       "url": "https://monkeytactics.com/tools/compound-interest-calculator",
-      "description": "Calculate compound growth with regular contributions, multiple compounding frequencies, estimated taxes, inflation adjustment, scenario comparisons, charts, and year-by-year tables.",
+      "description": "Calculate future savings and investment growth with monthly contributions, multiple compounding frequencies, estimated taxes, inflation adjustment, scenario comparisons, charts, and year-by-year tables.",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Any",
       "isAccessibleForFree": true,
@@ -344,12 +358,18 @@
         "@id": "https://monkeytactics.com/#organization"
       },
       "author": {
-        "@id": "https://monkeytactics.com/#organization"
+        "@type": "Person",
+        "name": "Adriaan Greyling",
+        "url": "https://monkeytactics.com/about",
+        "jobTitle": "Financial technology software engineer"
       },
       "reviewedBy": {
-        "@id": "https://monkeytactics.com/#organization"
+        "@type": "Person",
+        "name": "Adriaan Greyling",
+        "url": "https://monkeytactics.com/about",
+        "jobTitle": "Financial technology software engineer"
       },
-      "dateModified": "2026-08-09"
+      "dateModified": "2026-08-31"
     }
   ]
 }
@@ -374,7 +394,7 @@
       <div class="premium-hero-grid">
         <div>
           <div class="premium-eyebrow">Project savings and investment growth</div>
-          <h1 id="tool-heading">Compound Interest Calculator</h1>
+          <h1 id="tool-heading">Compound Interest Calculator with Monthly Contributions</h1>
           <p>Calculate compound interest with monthly contributions and daily, monthly, quarterly, semiannual, or annual compounding. Compare nominal growth, inflation-adjusted purchasing power, and optional estimated tax drag.</p>
           <div class="premium-hero-pills" aria-label="Tool highlights">
             <span>Tax &amp; inflation aware</span>
@@ -646,6 +666,51 @@
       </div>
     </section>
 
+    <section class="compound-examples-section" aria-labelledby="compound-examples-heading">
+      <div class="premium-section-kicker">Worked examples</div>
+      <h2 id="compound-examples-heading">Compound interest examples</h2>
+      <p>These illustrative results use the same calculation method as the tool above. Contributions are added at the end of each compounding period, amounts are rounded to the nearest cent, and tax is set to 0% unless stated otherwise.</p>
+      <div class="compound-example-grid">
+        <article class="compound-example-card">
+          <h3>$10,000 invested at 7% for 20 years</h3>
+          <p class="compound-example-result">With monthly compounding and no additional deposits, $10,000 grows to <strong>$40,387.39</strong>.</p>
+          <p class="compound-example-note">That is $30,387.39 of compound growth on the original $10,000. The 7% rate is an illustration, not a guaranteed investment return.</p>
+          <div class="compound-example-links"><a href="/tools/compound-interest-calculator?principal=10000&amp;rate=7&amp;years=20&amp;compound=12&amp;contrib=0&amp;tax=0&amp;inflation=0">Open the 20-year example →</a></div>
+        </article>
+
+        <article class="compound-example-card">
+          <h3>$200 monthly contribution for 30 years</h3>
+          <p class="compound-example-result">Starting from $0 and earning an illustrative 7% compounded monthly, $200 per month grows to <strong>$243,994.20</strong>.</p>
+          <p class="compound-example-note">The deposits total $72,000; the remaining $171,994.20 is modeled compound growth.</p>
+          <div class="compound-example-links"><a href="/tools/compound-interest-calculator?principal=0&amp;rate=7&amp;years=30&amp;compound=12&amp;contrib=200&amp;tax=0&amp;inflation=0">Open the monthly contribution example →</a></div>
+        </article>
+
+        <article class="compound-example-card">
+          <h3>Daily versus monthly compounding</h3>
+          <p class="compound-example-result">On $10,000 at 7% for 20 years, daily compounding produces <strong>$40,546.56</strong>, compared with $40,387.39 for monthly compounding.</p>
+          <p class="compound-example-note">Under these assumptions, compounding daily adds $159.17 over 20 years. The difference depends on the balance, rate, and time period.</p>
+          <div class="compound-example-links">
+            <a href="/tools/compound-interest-calculator?principal=10000&amp;rate=7&amp;years=20&amp;compound=365&amp;contrib=0&amp;tax=0&amp;inflation=0">Open daily →</a>
+            <a href="/tools/compound-interest-calculator?principal=10000&amp;rate=7&amp;years=20&amp;compound=12&amp;contrib=0&amp;tax=0&amp;inflation=0">Open monthly →</a>
+          </div>
+        </article>
+
+        <article class="compound-example-card">
+          <h3>7% return after 3% inflation</h3>
+          <p class="compound-example-result">After 20 years, $10,000 at an illustrative 7% compounded monthly reaches $40,387.39 nominally but has estimated purchasing power of <strong>$22,361.52</strong> in today's dollars.</p>
+          <p class="compound-example-note">The real balance divides the nominal result by 20 years of cumulative 3% inflation. Taxes and fees are not included.</p>
+          <div class="compound-example-links"><a href="/tools/compound-interest-calculator?principal=10000&amp;rate=7&amp;years=20&amp;compound=12&amp;contrib=0&amp;tax=0&amp;inflation=3">Open the inflation-adjusted example →</a></div>
+        </article>
+
+        <article class="compound-example-card">
+          <h3>How long does it take $10,000 to double?</h3>
+          <p class="compound-example-result">At an illustrative 7% compounded monthly, $10,000 doubles in about <strong>9.93 years</strong> and reaches $20,096.61 after 10 full years.</p>
+          <p class="compound-example-note">The Rule of 72 gives a quick estimate of 10.3 years. The exact result varies with compounding frequency and any taxes or fees.</p>
+          <div class="compound-example-links"><a href="/tools/compound-interest-calculator?principal=10000&amp;rate=7&amp;years=10&amp;compound=12&amp;contrib=0&amp;tax=0&amp;inflation=0">Open the doubling example →</a></div>
+        </article>
+      </div>
+    </section>
+
     <!-- HOW TO USE -->
     <div class="seo-section">
       <h2>How to use this calculator</h2>
@@ -767,7 +832,8 @@ Real balance          = nominal balance ÷ (1 + inflation rate)^year
       <p class="disclaimer">This model follows the Investor.gov convention: it divides the annualized monthly contribution evenly among the selected compounding periods and applies each portion at the end of its period. Tax is an illustrative percentage of each year's calculated interest; inflation converts the resulting nominal balance into an estimated value in today's purchasing power.</p>
       <p class="disclaimer"><strong>Limitations:</strong> Results are estimates for planning, not investment, tax, or financial advice. Actual returns, timing of deposits, taxes, fees, inflation, and account rules can differ.</p>
       <p class="disclaimer"><strong>Source:</strong> <a href="https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator">U.S. Securities and Exchange Commission: Compound Interest Calculator</a>.</p>
-      <p class="disclaimer">Prepared and reviewed by MonkeyTactics. Last reviewed <time datetime="2026-08-09">August 9, 2026</time>.</p>
+      <p class="disclaimer"><strong>Author and reviewer:</strong> <a href="/about" rel="author">Adriaan Greyling</a> is a financial technology software engineer who has worked on transaction and credit-decisioning systems at large financial institutions since 1996. He does not hold financial planning, investment, tax, or accounting credentials. His review covers the calculator's formula implementation, calculation behavior, and alignment with the cited methodology—not personalized financial advice.</p>
+      <p class="disclaimer">Prepared and reviewed by Adriaan Greyling for MonkeyTactics. Last reviewed <time datetime="2026-08-31">August 31, 2026</time>.</p>
     </section>
 
     <!-- RELATED -->
@@ -788,8 +854,6 @@ Real balance          = nominal balance ÷ (1 + inflation rate)^year
         </a>
       </div>
     </section>
-
-    <div class="ad-container" aria-label="Advertisement" style="margin-top:2rem;"><!-- AdSense: Bottom --></div>
 
   </main>
 

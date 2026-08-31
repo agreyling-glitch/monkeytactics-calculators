@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Mortgage Calculator – Payments, Interest, and Amortization</title>
   <meta name="description" content="Compare mortgage payments, interest, extra payments, bi-weekly schedules, and payoff dates with a private Rust and WebAssembly mortgage calculator.">
-  <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-08-06">
+  <meta name="author" content="Adriaan Greyling">
+  <meta name="date" content="2026-08-31">
   <link rel="canonical" href="https://monkeytactics.com/tools/loan-mortgage-calculator">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260807-wasm-menu">
-  <link rel="stylesheet" href="/assets/css/tools/mortgage-calculator.css?v=20260809-3">
+  <link rel="stylesheet" href="/assets/css/tools/mortgage-calculator.css?v=20260831-methodology-spacing-1">
   <link rel="stylesheet" href="/assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <meta property="og:title" content="Mortgage Calculator – Payments, Interest, and Amortization">
   <meta property="og:description" content="Compare up to five mortgage scenarios privately in your browser.">
@@ -25,7 +25,7 @@
   {
     "@context":"https://schema.org",
     "@graph":[
-      {"@type":"WebApplication","@id":"https://monkeytactics.com/tools/loan-mortgage-calculator#app","name":"MonkeyTactics Mortgage Calculator","url":"https://monkeytactics.com/tools/loan-mortgage-calculator","description":"A private mortgage payment, interest, amortization, and multi-scenario comparison calculator powered by Rust and WebAssembly.","applicationCategory":"FinanceApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript and WebAssembly","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},
+      {"@type":"WebApplication","@id":"https://monkeytactics.com/tools/loan-mortgage-calculator#app","name":"MonkeyTactics Mortgage Calculator","url":"https://monkeytactics.com/tools/loan-mortgage-calculator","description":"A private mortgage payment, interest, amortization, and multi-scenario comparison calculator powered by Rust and WebAssembly.","applicationCategory":"FinanceApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript and WebAssembly","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"publisher":{"@id":"https://monkeytactics.com/#organization"},"author":{"@type":"Person","name":"Adriaan Greyling","url":"https://monkeytactics.com/about","jobTitle":"Financial technology software engineer"},"reviewedBy":{"@type":"Person","name":"Adriaan Greyling","url":"https://monkeytactics.com/about","jobTitle":"Financial technology software engineer"},"dateModified":"2026-08-31"},
       {"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Finance","item":"https://monkeytactics.com/tools/finance"},{"@type":"ListItem","position":3,"name":"Mortgage Calculator","item":"https://monkeytactics.com/tools/loan-mortgage-calculator"}]},
       {"@type":"FAQPage","mainEntity":[
         {"@type":"Question","name":"How is my mortgage payment calculated?","acceptedAnswer":{"@type":"Answer","text":"A fixed-rate mortgage payment uses the loan principal, periodic interest rate, and total number of payments. The result shown here covers principal and interest only."}},
@@ -205,7 +205,12 @@
       <details><summary>Is this financial advice?</summary><p>No. Results are educational estimates. Rates, rounding, payment timing, escrow, fees, and lender rules can change real loan costs.</p></details>
     </section>
 
-    <section class="methodology"><strong>Methodology &amp; limitations</strong><p>Fixed-rate, fully amortizing model. Results are rounded to cents for display; internal calculations use floating-point precision. Confirm all figures with a lender. Prepared and reviewed by MonkeyTactics. Last reviewed <time datetime="2026-08-06">August 6, 2026</time>.</p></section>
+    <section class="methodology" aria-labelledby="mortgage-methodology-heading">
+      <h2 id="mortgage-methodology-heading">Methodology &amp; limitations</h2>
+      <p>This calculator uses a fixed-rate, fully amortizing principal-and-interest model. It does not include property taxes, homeowners insurance, mortgage insurance, HOA dues, closing costs, or lender fees. Results are rounded to cents for display; internal calculations use floating-point precision. Confirm payment schedules, prepayment rules, and all figures with your lender.</p>
+      <p><strong>Author and reviewer:</strong> <a href="/about" rel="author">Adriaan Greyling</a> is a financial technology software engineer who has worked on transaction and credit-decisioning systems at large financial institutions since 1996. He does not hold financial planning, mortgage, lending, tax, or accounting credentials. His review covers the mortgage formula implementation, amortization behavior, and software calculations—not mortgage advice, underwriting, or lender verification.</p>
+      <p>Prepared and reviewed by Adriaan Greyling for MonkeyTactics. Last reviewed <time datetime="2026-08-31">August 31, 2026</time>.</p>
+    </section>
 
     <section aria-labelledby="related-heading" class="related-section"><h2 id="related-heading">Related Tools</h2><div class="related-grid"><a href="/tools/compound-interest-calculator"><strong>Compound Interest Calculator</strong><span>Model savings and investment growth.</span></a><a href="/tools/percentage-calculator"><strong>Percentage Calculator</strong><span>Calculate changes, discounts, and ratios.</span></a><a href="/tools/date-difference-calculator"><strong>Date Difference &amp; Business Days Calculator</strong><span>Add working days and plan phased financial deadlines.</span></a></div></section>
 
