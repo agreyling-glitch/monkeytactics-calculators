@@ -3,15 +3,16 @@ import fs from "node:fs";
 import test from "node:test";
 
 const html=fs.readFileSync(new URL("../tools/quordle-solver.html",import.meta.url),"utf8");
-const script=fs.readFileSync(new URL("../assets/js/tools/quordle-solver.js",import.meta.url),"utf8");
+const configScript=fs.readFileSync(new URL("../assets/js/tools/quordle-solver.js",import.meta.url),"utf8");
+const script=configScript+fs.readFileSync(new URL("../assets/js/tools/multi-board-word-solver.js",import.meta.url),"utf8");
 const css=fs.readFileSync(new URL("../assets/css/tools/quordle-solver.css",import.meta.url),"utf8");
 
 test("Quordle solver models four boards and nine shared guesses",()=>{
   assert.equal((html.match(/class="board-tab"/g)||[]).length,4);
   assert.equal((html.match(/class="feedback-board"/g)||[]).length,4);
   assert.equal((html.match(/class="board-result"/g)||[]).length,4);
-  assert.match(script,/Array\.from\(\{length:4\}/);
-  assert.match(script,/guesses\.length>=9/);
+  assert.match(configScript,/"boardCount":4/);
+  assert.match(configScript,/"guessLimit":9/);
 });
 
 test("Quordle solver filters every board independently",()=>{
@@ -40,6 +41,11 @@ test("a result board can expand while the other three are hidden",()=>{
   assert.match(css,/\.boards-results\.is-board-expanded \.candidate-list\{max-height:min\(62vh,680px\)\}/);
 });
 
+test("the shared layout control preserves full-width expanded boards",()=>{
+  const sharedCss=fs.readFileSync("assets/css/tools/multi-board-word-solver-enhancements.css","utf8");
+  assert.match(sharedCss,/\.multi-board-layout-root \.boards-results\.is-board-expanded\{grid-template-columns:minmax\(0,1fr\)\}/);
+});
+
 test("the expanded board is highlighted in every shared guess",()=>{
   assert.match(script,/group\.dataset\.boardIndex=String\(board\)/);
   assert.match(script,/function syncHistoryBoardHighlight\(\)/);
@@ -50,7 +56,7 @@ test("the expanded board is highlighted in every shared guess",()=>{
 
 test("Quordle solver avoids exhaustive work before clues and bounds probe ranking",()=>{
   assert.match(script,/if\(!guesses\.length\)/);
-  assert.match(script,/slice\(0,240\)/);
+  assert.match(script,/slice\(0,probePoolLimit\)/);
   assert.doesNotMatch(script,/allWords\.filter\(word=>new Set\(word\)\.size>=4\)/);
 });
 
@@ -82,7 +88,7 @@ test("Quordle workspace stacks panels and uses branded scrollbars",()=>{
 
 test("keyboard mirrors four-board feedback with colored quadrants",()=>{
   assert.match(script,/function keyboardState\(board,letter\)/);
-  assert.match(script,/statesForBoards=\[0,1,2,3\]/);
+  assert.match(script,/statesForBoards=boardIndices\.map/);
   assert.match(script,/button\.dataset\.letter=key\.toLowerCase\(\)/);
   assert.match(css,/linear-gradient\(var\(--board-1/);
   assert.match(css,/linear-gradient\(var\(--board-4/);
@@ -109,8 +115,8 @@ test("the selected board receives Wordle-style keyboard color cycling",()=>{
 });
 
 test("completed boards retain and display their solved word",()=>{
-  assert.match(script,/manualCompletedWords=Array\(4\)\.fill\(""\)/);
-  assert.match(script,/reopenedBoards=Array\(4\)\.fill\(false\)/);
+  assert.match(script,/manualCompletedWords=Array\(boardCount\)\.fill\(""\)/);
+  assert.match(script,/reopenedBoards=Array\(boardCount\)\.fill\(false\)/);
   assert.match(script,/function automaticCompletedWord\(board\)/);
   assert.match(script,/function completedWord\(board\)/);
   assert.match(script,/const answer=completedWord\(board\),displayedState=answer\?"correct":feedback\[board\]\[i\]/);
@@ -142,7 +148,7 @@ test("completing all four boards offers a full reset",()=>{
   assert.match(html,/<h2 id="completion-title">Congrats!<\/h2>/);
   assert.match(html,/id="keep-results"/);
   assert.match(html,/id="reset-all-boards"/);
-  assert.match(script,/Array\.from\(\{length:4\},\(_,board\)=>solved\(board\)\)\.every\(Boolean\).*completionDialog\.showModal\(\)/);
+  assert.match(script,/boardIndices\.map\(solved\)\.every\(Boolean\).*completionDialog\.showModal\(\)/);
   assert.match(script,/function resetAll\(\)/);
   assert.match(script,/resetAllBoards\.addEventListener\("click"/);
   assert.match(css,/\.completion-dialog::backdrop/);
@@ -164,4 +170,13 @@ test("Quordle page publishes metadata and matching FAQ content",()=>{
   assert.match(html,/<h2>How Entropy Improves a Quordle Guess<\/h2>/);
   assert.match(html,/<h2>Focus on One Quordle Board<\/h2>/);
   assert.match(html,/<h2>Choose the Right Dictionary<\/h2>/);
+});
+
+test("Quordle explains the shared workspace enhancements",()=>{
+  assert.match(html,/Explore Candidates Your Way/);
+  assert.match(html,/Alphabetical/);
+  assert.match(html,/Information/);
+  assert.match(html,/Letter pattern/);
+  assert.match(html,/Game history/);
+  assert.match(html,/Continue marking letters/);
 });

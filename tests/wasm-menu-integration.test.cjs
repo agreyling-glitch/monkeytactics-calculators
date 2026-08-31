@@ -97,9 +97,9 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "text-data", "batch-automation"]);
   assert.deepEqual(
     groups.find(({ id }) => id === "word-games").children.map(({ id }) => id),
-    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordle-helper", "quordle-solver", "octordle-solver"],
+    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordle-helper", "quordle-solver", "octordle-solver", "sedecordle-solver"],
   );
-  assert.equal(leaves.length, 33);
+  assert.equal(leaves.length, 34);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
 });
 
@@ -153,7 +153,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
   for (const [id, label, count] of [
-    ["word-games", "Word Games", 6],
+    ["word-games", "Word Games", 7],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
     ["text-data", "Text &amp; Data", 5],
@@ -166,7 +166,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 33);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 34);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -196,17 +196,20 @@ test("the homepage features the six designated popular tools", () => {
 
   assert.deepEqual(titles, [
     "Word Unscrambler",
-    "Quordle Solver",
-    "Octordle Solver",
     "Words With Friends Solver",
     "Wordle Solver",
-    "Crossword Solver",
+    "Quordle Solver",
+    "Octordle Solver",
+    "Sedecordle Solver",
   ]);
+
+  assert.match(html, /featured-tool--sedecordle[\s\S]*?featured-tool__new">New<[\s\S]*?<h3>Sedecordle Solver<\/h3>/);
   assert.equal((html.match(/class="capability-list"/g) || []).length, 6);
   assert.equal((html.match(/<li>/g) || []).length, 24);
-  assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 2);
+  assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 3);
   assert.match(html, /featured-tool--quordle[\s\S]*?featured-tool__new">New/);
   assert.match(html, /featured-tool--octordle[\s\S]*?featured-tool__new">New/);
+  assert.match(html, /href="\/tools\/sedecordle-solver"/);
 });
 
 test("the flagship word and QR tools use the mortgage-inspired presentation", () => {
@@ -578,7 +581,7 @@ test("the About page lists the Rust WebAssembly apps", () => {
   const html = fs.readFileSync(path.join(siteRoot, "about.html"), "utf8");
   const css = fs.readFileSync(path.join(siteRoot, "assets", "css", "pages", "about.css"), "utf8");
   assert.match(html, /seven distinct first-party <code>Rust<\/code> crates compiled to <code>WebAssembly<\/code>/);
-  assert.match(html, /seven compiled components power the 13 browser experiences listed below/);
+  assert.match(html, /seven compiled components power the 14 browser experiences listed below/);
   assert.match(html, /href="\/tools\/qr-code-decoder">QR Code Decoder<\/a>/);
   assert.match(html, /href="\/tools\/compound-interest-calculator">Compound Interest Calculator<\/a>/);
   assert.match(html, /href="\/tools\/password-generator">Password Generator<\/a>/);
@@ -587,9 +590,11 @@ test("the About page lists the Rust WebAssembly apps", () => {
   assert.match(html, /href="\/tools\/crossword-solver">Crossword Solver<\/a>/);
   assert.match(html, /href="\/tools\/wordle-helper">Wordle Solver<\/a>/);
   assert.match(html, /href="\/tools\/quordle-solver">Quordle Solver<\/a>/);
+  assert.match(html, /href="\/tools\/sedecordle-solver">Sedecordle Solver<\/a>/);
   assert.match(html, /href="\/tools\/word-character-counter">Word &amp; Character Counter<\/a>/);
   assert.match(html, /shared word engine to filter four color-feedback boards/);
   assert.match(html, /shared word engine to filter eight color-feedback boards/);
+  assert.match(html, /shared multi-board engine to filter sixteen boards/);
   assert.match(html, /Projects compound growth, regular contributions, tax drag, inflation, and up to five scenarios/);
   assert.match(css, /--about-ink: #f2f8f4/);
 });

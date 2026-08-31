@@ -36,11 +36,11 @@ This project is especially useful for students, professionals, developers, small
 
 ## 🧰 Tools
 
-The site currently features 33 tools organized around the hierarchy used by the universal menu and All Tools directory:
+The site currently features 34 tools organized around the hierarchy used by the universal menu and All Tools directory:
 
 - Finance: [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator), [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator), [Percentage Calculator](https://monkeytactics.com/tools/percentage-calculator)
 - Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Daily Energy Needs Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
-- Word Games: [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler), [Words With Friends Solver](https://monkeytactics.com/tools/words-with-friends-solver), [Crossword Solver & Pattern Finder](https://monkeytactics.com/tools/crossword-solver), [Wordle Solver & Helper](https://monkeytactics.com/tools/wordle-helper), [Quordle Solver](https://monkeytactics.com/tools/quordle-solver), [Octordle Solver](https://monkeytactics.com/tools/octordle-solver)
+- Word Games: [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler), [Words With Friends Solver](https://monkeytactics.com/tools/words-with-friends-solver), [Crossword Solver & Pattern Finder](https://monkeytactics.com/tools/crossword-solver), [Wordle Solver & Helper](https://monkeytactics.com/tools/wordle-helper), [Quordle Solver](https://monkeytactics.com/tools/quordle-solver), [Octordle Solver](https://monkeytactics.com/tools/octordle-solver), [Sedecordle Solver](https://monkeytactics.com/tools/sedecordle-solver)
 - Utilities: [Date Difference & Business Days Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator), [QR Code Decoder](https://monkeytactics.com/tools/qr-code-decoder)
 - Productivity: [Password Generator](https://monkeytactics.com/tools/password-generator), [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter), [OCR Utility](https://monkeytactics.com/tools/ocr-utility)
 - Construction: [Concrete Calculator](https://monkeytactics.com/tools/concrete-calculator), [Drywall Calculator](https://monkeytactics.com/tools/drywall-calculator), [Paint Calculator](https://monkeytactics.com/tools/paint-calculator), [Tile Calculator](https://monkeytactics.com/tools/tile-calculator), [Roofing Shingle Calculator](https://monkeytactics.com/tools/roofing-shingle-calculator), [Lumber Board Foot Calculator](https://monkeytactics.com/tools/lumber-board-foot-calculator), [Batt & Blown Insulation Calculator](https://monkeytactics.com/tools/insulation-calculator)
@@ -51,7 +51,7 @@ The site currently features 33 tools organized around the hierarchy used by the 
 
 | Menu group | Subgroup | Tools |
 |---|---|---|
-| **Word Games** | — | Word Unscrambler, Words With Friends Solver, Crossword Solver, Wordle Solver, Quordle Solver, Octordle Solver |
+| **Word Games** | — | Word Unscrambler, Words With Friends Solver, Crossword Solver, Wordle Solver, Quordle Solver, Octordle Solver, Sedecordle Solver |
 | **Generators** | — | Advanced QR Code Generator, Password Generator |
 | **Calculators** | Finance | Loan & Mortgage, Compound Interest, Percentage |
 | **Calculators** | Health | BMI, Daily Energy Needs, Age |
@@ -60,11 +60,11 @@ The site currently features 33 tools organized around the hierarchy used by the 
 | **Text & Data** | — | Unit Converter, Tip Calculator, QR Code Decoder, Word & Character Counter, OCR Utility |
 | **Batch & Automation** | — | Batch QR Generator, Batch Password Generator, Mortgage Scenario Comparison, Business Day Planner, Image Text Extraction |
 
-The All Tools page mirrors this hierarchy. The same structure is rendered by the Rust/WASM hamburger menu on every page, while global search supports pointer and keyboard selection. The homepage features Word Unscrambler, Quordle Solver, Octordle Solver, Words With Friends Solver, Wordle Solver, and Crossword Solver.
+The All Tools page mirrors this hierarchy. The same structure is rendered by the Rust/WASM hamburger menu on every page, while global search supports pointer and keyboard selection. The homepage features Word Unscrambler, Words With Friends Solver, Wordle Solver, Quordle Solver, Octordle Solver, and Sedecordle Solver.
 
 ## 🎨 Interface
 
-The homepage, All Tools directory, and flagship tool pages share a responsive premium visual system with editorial hero panels, clearer workspace separation, consistent green-accented controls, and focused result surfaces. Updated tools include Word Unscrambler, Crossword Solver, Wordle Solver, Quordle Solver, Octordle Solver, Advanced QR Code Generator, Password Generator, Tip Calculator, Date & Business Days Calculator, Time Zone Converter, BMI Calculator, Daily Energy Needs Calculator, Age Calculator, QR Code Decoder, and OCR Utility.
+The homepage, All Tools directory, and flagship tool pages share a responsive premium visual system with editorial hero panels, clearer workspace separation, consistent green-accented controls, and focused result surfaces. Updated tools include Word Unscrambler, Crossword Solver, Wordle Solver, Quordle Solver, Octordle Solver, Sedecordle Solver, Advanced QR Code Generator, Password Generator, Tip Calculator, Date & Business Days Calculator, Time Zone Converter, BMI Calculator, Daily Energy Needs Calculator, Age Calculator, QR Code Decoder, and OCR Utility.
 
 Top advertising blocks have been removed from the redesigned experiences so the primary workspace follows the page introduction directly. Lower-page advertising placements remain available. Featured tools also include a Trustpilot review invitation near the page footer.
 
@@ -74,7 +74,7 @@ Top advertising blocks have been removed from the redesigned experiences so the 
 
 MonkeyTactics is primarily a static site built from lightweight HTML, CSS, and JavaScript, with a narrowly scoped Cloudflare Pages Function for dynamic Word Unscrambler routes. Seven first-party Rust components compile to WebAssembly. Every generated browser package is committed under `assets/wasm/`, so production hosting does not require a Rust toolchain.
 
-The Word Unscrambler, Words With Friends Solver, Crossword Solver, Wordle Solver, Quordle Solver, and Octordle Solver share ENABLE and SOWPODS word lists with per-word source membership. The static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser decompresses and indexes words locally. The Wordle, Quordle, and Octordle solvers apply green, yellow, and gray positional rules plus exact repeated-letter limits across every submitted guess. All matching remains local to the browser.
+The Word Unscrambler, Words With Friends Solver, Crossword Solver, Wordle Solver, Quordle Solver, Octordle Solver, and Sedecordle Solver share ENABLE and SOWPODS word lists with per-word source membership. The static dictionary is split into 26 versioned gzip chunks with a small manifest. The browser decompresses and indexes words locally. The Wordle, Quordle, Octordle, and Sedecordle solvers apply green, yellow, and gray positional rules plus exact repeated-letter limits across every submitted guess. All matching remains local to the browser.
 
 ### Rust/WASM calculators and tools
 
@@ -91,6 +91,7 @@ The Word Unscrambler, Words With Friends Solver, Crossword Solver, Wordle Solver
 | [Wordle Solver](https://monkeytactics.com/tools/wordle-helper) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Five-letter candidate filtering from multiple color-feedback rows with repeated-letter constraints |
 | [Quordle Solver](https://monkeytactics.com/tools/quordle-solver) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Four independent candidate searches from shared color-feedback guesses, with browser-side entropy and cross-board next-guess ranking |
 | [Octordle Solver](https://monkeytactics.com/tools/octordle-solver) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Eight independent candidate searches from shared color-feedback guesses, with solved-board retention and cross-board next-guess ranking |
+| [Sedecordle Solver](https://monkeytactics.com/tools/sedecordle-solver) | `wasm/word-unscrambler-engine` | `assets/wasm/word-unscrambler` | Sixteen independent candidate searches using the configurable multi-board solver engine and entropy-ranked shared guesses |
 | [Word & Character Counter](https://monkeytactics.com/tools/word-character-counter) | `wasm/text-analyzer-engine` | `assets/wasm/text-analyzer` | Local text metrics and structural analysis with a JavaScript fallback |
 | [Batt & Blown Insulation Calculator](https://monkeytactics.com/tools/insulation-calculator) | `wasm/blown-insulation-engine` | `assets/wasm/blown-insulation` | Manufacturer coverage-chart loading and local blown-insulation material calculations |
 | Hierarchical site navigation | `wasm/menu-engine` | `assets/wasm/menu` | Domain-verified Leptos header, global search with keyboard navigation, and a hamburger-driven hierarchy drawer rendered on every page |
