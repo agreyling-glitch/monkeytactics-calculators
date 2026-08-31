@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Antiwordle Helper: Find Safe Next Guesses | MonkeyTactics</title>
+  <meta name="description" content="Find legal Antiwordle guesses that avoid the hidden answer. Enter gray, yellow, and red feedback to rank safer five-letter words privately.">
+  <meta name="robots" content="index, follow">
+  <meta name="date" content="2026-08-31">
+  <link rel="canonical" href="https://monkeytactics.com/tools/antiwordle-helper">
+  <meta property="og:title" content="Antiwordle Helper: Find Safe Next Guesses"><meta property="og:description" content="Use Antiwordle feedback to find legal guesses ranked to avoid the hidden word."><meta property="og:url" content="https://monkeytactics.com/tools/antiwordle-helper"><meta property="og:type" content="website"><meta property="og:site_name" content="MonkeyTactics">
+  <meta name="twitter:card" content="summary"><meta name="twitter:title" content="Antiwordle Helper: Find Safe Next Guesses"><meta name="twitter:description" content="Find legal Antiwordle guesses ranked to avoid solving the hidden word.">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://monkeytactics.com/tools/"},{"@type":"ListItem","position":3,"name":"Antiwordle Helper","item":"https://monkeytactics.com/tools/antiwordle-helper"}]},{"@type":"SoftwareApplication","name":"Antiwordle Helper","url":"https://monkeytactics.com/tools/antiwordle-helper","description":"A private browser-based helper that ranks legal Antiwordle guesses to reduce the chance of finding the hidden answer.","dateModified":"2026-08-31","applicationCategory":"GameApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript and WebAssembly","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Gray, yellow, and red feedback","Mandatory Antiwordle legality checks","Avoidance-focused guess ranking","Repeated-letter handling","ENABLE and SOWPODS dictionaries","Private in-browser search"]}]}
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
+  <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
+  <link rel="stylesheet" href="../assets/css/tools/wordle-helper.css?v=20260829-10">
+  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260829-2">
+  <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
+  <style>
+    .antiwordle-page{--tile-correct:#b84a4a}
+    .antiwordle-page .tool-widget:not(.is-focus-mode){width:100%;max-width:none;box-sizing:border-box;margin-top:1.25rem;padding:clamp(1rem,3vw,2rem);border-radius:1.5rem}
+    .antiwordle-page .candidate-list{padding-right:.75rem;scrollbar-gutter:stable}
+    .antiwordle-page .content-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:1.25rem;margin-top:1.5rem}
+    .antiwordle-page .content-card{box-sizing:border-box;padding:clamp(1.25rem,3vw,2rem);border:1px solid var(--premium-line);border-radius:1rem;background:#101b16}
+    .antiwordle-page .content-card h2{margin:.35rem 0 1rem;color:var(--premium-ink);font-family:Georgia,"Times New Roman",serif}
+    .antiwordle-page .content-card p,.antiwordle-page .content-card li,.antiwordle-page .content-card dd{color:var(--premium-muted);line-height:1.65}
+    .antiwordle-page .antiwordle-explainer dl{display:grid;gap:.75rem;margin:1.25rem 0 0}
+    .antiwordle-page .antiwordle-explainer dt{display:flex;align-items:center;gap:.55rem;color:var(--premium-ink);font-weight:850}
+    .antiwordle-page .antiwordle-explainer dt::before{width:.8rem;height:.8rem;flex:0 0 auto;border-radius:.18rem;background:var(--tile-absent);content:""}
+    .antiwordle-page .antiwordle-explainer dt:nth-of-type(1)::before{background:var(--tile-correct)}
+    .antiwordle-page .antiwordle-explainer dt:nth-of-type(2)::before{background:var(--tile-present)}
+    .antiwordle-page .antiwordle-explainer dd{margin:-.45rem 0 0 1.35rem}
+    .antiwordle-page .faq-section{width:100%;max-width:none;box-sizing:border-box;margin-top:1.5rem}
+    .antiwordle-page .related-tools{margin-top:1.5rem}
+    @media(max-width:800px){.antiwordle-page .content-grid{grid-template-columns:1fr}}
+  </style>
+  <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
+</head>
+<body class="premium-tool-page wordle-page antiwordle-page">
+  <main>
+    <div id="mt-header"></div>
+    <script type="module" src="/assets/wasm/menu/menu.js?v=20260828-menu-manifest-v1"></script>
+    <section class="premium-tool-hero" aria-labelledby="tool-heading">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><a href="/tools/#word-games">Word Games</a><span class="sep">/</span><span aria-current="page">Antiwordle Helper</span></nav>
+      <div class="premium-hero-grid">
+        <div><p class="premium-eyebrow">Lose slowly, guess legally</p><h1 id="tool-heading">Antiwordle Helper</h1><p class="premium-hero-copy">Enter your feedback and find legal five-letter guesses ranked to avoid the hidden answer.</p><div class="premium-hero-pills"><span>Mandatory clue rules</span><span>Avoidance ranking</span><span>Searches stay local</span></div></div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>Safer guesses, longer games</span><div class="hero-tiles"><b>C</b><b class="present">R</b><b class="correct">A</b><b>N</b><b class="correct">E</b></div><small>Gray is banned, yellow must move, red stays locked.</small></div>
+      </div>
+    </section>
+    <section class="tool-widget" aria-labelledby="solver-heading" data-focus-mode data-focus-mode-label="Antiwordle Helper">
+      <div class="solver-heading"><div><div class="premium-section-kicker">01 / Enter your result</div><h2 id="solver-heading">What did your Antiwordle guess reveal?</h2><p>Enter a five-letter guess, then mark each tile gray, yellow, or red.</p></div><fieldset class="dictionary-selector"><legend class="visually-hidden">Dictionary</legend><div class="segmented-control"><label data-tooltip="Choose ENABLE for this search: a broad, public-domain English word list used for North American word-game searches."><input type="radio" name="dictionary" value="1" aria-describedby="dictionary-enable-description" checked><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span><span>ENABLE</span></span></label><label data-tooltip="Choose SOWPODS for this search: an international English word list containing British and North American word-game vocabulary."><input type="radio" name="dictionary" value="2" aria-describedby="dictionary-sowpods-description"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--sowpods" aria-hidden="true"></span><span>SOWPODS</span></span></label><label data-tooltip="Choose Both for this search to combine the ENABLE and SOWPODS lists with duplicate words removed."><input type="radio" name="dictionary" value="3" aria-describedby="dictionary-both-description"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--both" aria-hidden="true"></span><span>Both</span></span></label></div><span class="visually-hidden" id="dictionary-enable-description">A broad, public-domain English word list used for North American word-game searches.</span><span class="visually-hidden" id="dictionary-sowpods-description">An international English word list containing British and North American word-game vocabulary.</span><span class="visually-hidden" id="dictionary-both-description">Search the combined ENABLE and SOWPODS lists with duplicate words removed.</span></fieldset></div>
+      <div class="wordle-layout">
+        <section class="guess-panel">
+          <label for="guess-input">Your guess</label>
+          <input id="guess-input" class="guess-input" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="CRANE" aria-describedby="guess-message">
+          <div class="feedback-tiles" id="feedback-tiles" aria-label="Set gray, yellow, or red feedback for each letter"><button type="button" data-index="0" aria-label="Letter 1: absent">–</button><button type="button" data-index="1" aria-label="Letter 2: absent">–</button><button type="button" data-index="2" aria-label="Letter 3: absent">–</button><button type="button" data-index="3" aria-label="Letter 4: absent">–</button><button type="button" data-index="4" aria-label="Letter 5: absent">–</button></div>
+          <p class="tile-hint"><span class="hint-absent">Gray</span> absent <span class="hint-present">Yellow</span> wrong spot <span class="hint-correct">Red</span> correct and locked. Unmarked letters count as gray.</p>
+          <div class="wordle-keyboard" id="antiwordle-keyboard" aria-label="Antiwordle keyboard"></div>
+          <button class="primary-action" id="add-guess" type="button" disabled>Loading dictionary…</button><p id="guess-message" role="alert" hidden></p>
+          <div class="guess-history-wrap" id="guess-history-wrap" hidden><div class="history-heading"><strong>Your clues</strong><button id="clear-guesses" type="button">Clear all</button></div><ul id="guess-history" class="guess-history"></ul></div>
+        </section>
+        <section class="candidate-panel" id="candidate-panel" aria-live="polite" aria-busy="false">
+          <div class="candidate-heading-row"><div><span class="result-kicker">Legal guesses</span><h2 id="candidate-heading">Ready for your first guess</h2></div><label class="hard-mode-toggle"><input id="antiwordle-rules" disabled checked type="checkbox"><span class="toggle-track" aria-hidden="true"></span><span><strong>Antiwordle rules</strong><small>Always required</small></span></label></div>
+          <p id="candidate-summary">Add feedback to see only words that satisfy every tile.</p>
+          <button class="next-guess-card" id="next-guess-card" type="button" hidden><span class="next-guess-kicker">Safest next guess</span><strong id="next-guess-word"></strong><small id="next-guess-metrics"></small></button>
+          <ol class="candidate-list" id="candidate-list"></ol><div class="candidate-placeholder" id="candidate-placeholder">Your safe guesses will appear here</div>
+        </section>
+      </div>
+    </section>
+    <section class="content-grid"><article class="content-card"><p class="premium-section-kicker">02 / Enter the result</p><h2>How to Use the Antiwordle Helper</h2><ol><li>Enter the five-letter word you played.</li><li>Click each tile to mark it gray, yellow, or red. Unmarked tiles count as gray.</li><li>Select <strong>Add feedback &amp; find safe guesses</strong>.</li><li>Choose a legal suggestion, play it in Antiwordle, and add the new feedback.</li><li>Edit or remove the newest row if a color was entered incorrectly.</li></ol></article><aside class="content-card"><p class="premium-section-kicker">Mandatory rules</p><h2>What Makes a Guess Legal?</h2><p>Gray letters cannot be reused. Yellow letters must appear again but cannot stay in the same position. Red letters are locked and must remain in that square.</p><p>The helper also accounts for repeated letters. If one copy is yellow or red and another is gray, later guesses use the confirmed number of copies without adding an eliminated extra copy.</p></aside></section>
+    <section class="content-grid antiwordle-explainer"><article class="content-card"><p class="premium-section-kicker">03 / Tile meanings</p><h2>Red, Yellow, and Gray Explained</h2><dl><dt>Red letter</dt><dd>The hidden answer contains this letter in this exact position. Every later guess must keep it there.</dd><dt>Yellow letter</dt><dd>The letter is required, but every later guess must move it away from this position.</dd><dt>Gray letter</dt><dd>The letter is eliminated, except when another copy in the same row establishes a required count.</dd></dl></article><aside class="content-card"><p class="premium-section-kicker">Avoiding the answer</p><h2>How Safe Guesses Are Ranked</h2><p>Every legal Antiwordle guess remains a possible hidden answer when guesses and answers use the same dictionary. The helper ranks lower-information choices first because they are expected to preserve more uncertainty.</p><p>A recommendation reduces information gain but cannot guarantee safety. The displayed uniform risk is one divided by the number of remaining answers.</p></aside></section>
+    <section class="content-card faq-section"><p class="premium-section-kicker">04 / Common questions</p><h2>Antiwordle Helper FAQ</h2><details><summary>Does the helper enforce Antiwordle rules?</summary><p>Yes. Suggestions exclude eliminated gray letters, include required yellow letters in new positions, and preserve red letters in their locked positions.</p></details><details><summary>Can any suggestion still be the answer?</summary><p>Yes. Every legal guess remains consistent with the feedback when the same dictionary supplies guesses and answers. The helper reduces information gain; it cannot guarantee a safe word.</p></details><details><summary>What does the avoidance score mean?</summary><p>A lower score indicates a guess expected to reveal less information and preserve more uncertainty about the hidden answer.</p></details><details><summary>Are repeated letters supported?</summary><p>Yes. Mixed feedback for duplicate letters establishes minimum and maximum copy counts for later guesses.</p></details><details><summary>Are my guesses private?</summary><p>Yes. Dictionary filtering and ranking run locally in your browser.</p></details></section>    <section class="related-tools"><h2>Related Word Tools</h2><div class="related-grid"><a href="/tools/word-unscrambler" class="related-card"><strong>Word Unscrambler</strong><span>Turn rack letters into playable words with wildcards and filters.</span></a><a href="/tools/words-with-friends-solver" class="related-card"><strong>Words With Friends Solver</strong><span>Find playable words with WWF tile scores, bingos, and hooks.</span></a><a href="/tools/crossword-solver" class="related-card"><strong>Crossword Solver</strong><span>Search clues and match known letters or blanks.</span></a></div></section>
+  </main>
+  <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot"><div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div><a class="trustpilot-review-link" href="https://www.trustpilot.com/evaluate/monkeytactics.com" target="_blank" rel="noopener noreferrer"><img src="/assets/images/trustpilot-review.svg" width="360" height="52" alt="Review MonkeyTactics on Trustpilot"></a></section>
+  <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
+  <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-wordle-1" defer></script>
+  <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
+  <script src="../assets/js/tools/antiwordle-helper.js?v=20260831-1" defer></script>
+</body>
+</html>

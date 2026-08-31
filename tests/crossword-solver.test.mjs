@@ -7,10 +7,12 @@ const script = fs.readFileSync(new URL("../assets/js/tools/crossword-solver.js",
 const css = fs.readFileSync(new URL("../assets/css/tools/crossword-solver.css", import.meta.url), "utf8");
 
 test("crossword solver publishes distinct metadata and structured application data", () => {
-  assert.match(html, /<title>Free Crossword Solver &amp; Pattern Finder \| MonkeyTactics<\/title>/);
+  assert.match(html, /<title>Crossword Solver: Search Clues &amp; Letter Patterns \| MonkeyTactics<\/title>/);
   assert.match(html, /<link rel="canonical" href="https:\/\/monkeytactics\.com\/tools\/crossword-solver">/);
   assert.match(html, /"@type": "SoftwareApplication"/);
   assert.match(html, /"@type": "FAQPage"/);
+  assert.match(html, /"Crossword clue search"/);
+  assert.match(html, /94,000\+ clue records/);
 });
 
 test("crossword solver currently omits advertising slots", () => {
@@ -18,12 +20,30 @@ test("crossword solver currently omits advertising slots", () => {
 });
 
 test("crossword solver exposes pattern-first controls and an optional letter pool", () => {
+  assert.match(html, /id="crossword-clue"/);
   assert.match(html, /id="crossword-pattern"/);
   assert.match(html, /id="available-letters"/);
   assert.match(html, /id="word-length"/);
   assert.match(html, /name="dictionary" value="enable"[^>]* checked/);
   assert.match(html, /name="dictionary" value="sowpods"/);
   assert.match(html, /name="dictionary" value="both"/);
+});
+
+test("crossword clue search lazily loads reviewed static data and supports combined filtering", () => {
+  assert.match(script, /CLUE_MANIFEST_URL/);
+  assert.match(script, /async function loadClueIndex\(\)/);
+  assert.match(script, /async function loadClueShard\(length\)/);
+  assert.match(script, /async function searchClues\(clue, pattern, filters\)/);
+  assert.match(script, /globMatches\(answer, pattern\)/);
+  assert.match(script, /if \(clue\) \{/);
+  assert.doesNotMatch(script, /Promise\.all\(\[Engine\.ready, loadClue/);
+});
+
+test("only the latest crossword search can update the results", () => {
+  assert.match(script, /const request = \+\+searchRequest;/);
+  assert.match(script, /if \(request !== searchRequest\) return;\s+renderClueResults/);
+  assert.match(script, /if \(request !== searchRequest\) return;\s+renderResults/);
+  assert.match(script, /function clearSearch\(\) \{\s+searchRequest \+= 1;/);
 });
 
 test("crossword solver calls the shared WASM pattern search without inventing a rack", () => {

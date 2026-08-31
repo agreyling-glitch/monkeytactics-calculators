@@ -99,7 +99,7 @@ test("site directories and privacy disclosures describe password checks and QR l
   const directory = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
   const decoder = fs.readFileSync(path.join(siteRoot, "tools", "qr-code-decoder.html"), "utf8");
 
-  assert.match(privacy, /Last updated: August 11, 2026/);
+  assert.match(privacy, /Last updated: August 29, 2026/);
   assert.match(privacy, /Only the first five characters[\s\S]*Pwned Passwords range API/);
   assert.match(privacy, /IndexedDB cache for up to 24 hours/);
   assert.match(privacy, /MonkeyTactics privacy proxy[\s\S]*resolve its final destination for your review/);

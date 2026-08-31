@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Free Crossword Solver &amp; Pattern Finder | MonkeyTactics</title>
-  <meta name="description" content="Solve crossword clues by pattern. Enter known letters and blanks to find matching words using ENABLE and SOWPODS dictionaries.">
+  <title>Crossword Solver: Search Clues &amp; Letter Patterns | MonkeyTactics</title>
+  <meta name="description" content="Find crossword answers by clue, known letters, wildcard pattern, and answer length. Search 94,000+ WordNet clue records privately in your browser.">
   <meta name="robots" content="index, follow">
-  <meta name="date" content="2026-08-29">
+  <meta name="date" content="2026-08-31">
   <link rel="canonical" href="https://monkeytactics.com/tools/crossword-solver">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Free Crossword Solver &amp; Pattern Finder">
-  <meta property="og:description" content="Enter known letters and blanks to find matching crossword answers by pattern and length.">
+  <meta property="og:title" content="Crossword Solver: Search Clues &amp; Letter Patterns">
+  <meta property="og:description" content="Find ranked crossword answers using clue meanings, crossing letters, wildcard patterns, and answer length.">
   <meta property="og:url" content="https://monkeytactics.com/tools/crossword-solver">
   <meta property="og:site_name" content="MonkeyTactics">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Free Crossword Solver &amp; Pattern Finder">
-  <meta name="twitter:description" content="Search crossword answers by known letters, blanks, length, and dictionary.">
+  <meta name="twitter:title" content="Crossword Solver: Search Clues &amp; Letter Patterns">
+  <meta name="twitter:description" content="Find ranked crossword answers by clue, crossing letters, wildcard pattern, and length.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -38,23 +38,24 @@
       {
         "@type": "SoftwareApplication",
         "@id": "https://monkeytactics.com/tools/crossword-solver#app",
-        "name": "Crossword Solver and Word Pattern Finder",
+        "name": "Crossword Solver: Clue and Letter Pattern Search",
         "url": "https://monkeytactics.com/tools/crossword-solver",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
-        "description": "A private browser-based crossword answer finder that searches ENABLE and SOWPODS dictionaries by letter pattern, blanks, word length, and optional letter filters.",
-        "dateModified": "2026-08-29",
+        "description": "A private browser-based crossword answer finder that searches an automatically filtered WordNet clue dataset and ENABLE/SOWPODS dictionaries by clue, letter pattern, word length, and optional filters.",
+        "dateModified": "2026-08-31",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "featureList": ["Single-letter blank wildcard", "Flexible-length wildcard", "Word length filter", "ENABLE and SOWPODS dictionaries", "Optional available-letter pool", "Private in-browser matching"]
+        "featureList": ["Crossword clue search", "Clue plus answer-pattern search", "Single-letter blank wildcard", "Flexible-length wildcard", "Word length filter", "ENABLE and SOWPODS dictionaries", "Private in-browser matching"]
       },
       {
         "@type": "FAQPage",
         "mainEntity": [
-          { "@type": "Question", "name": "How do I solve a crossword clue with this tool?", "acceptedAnswer": { "@type": "Answer", "text": "Enter the answer pattern using letters you know and question marks for blank squares. For example, C?A?E searches five-letter words with C, A, and E in those positions." } },
-          { "@type": "Question", "name": "How do I search by pattern only?", "acceptedAnswer": { "@type": "Answer", "text": "Enter a pattern and leave Available Letters empty. The solver searches the selected dictionary without limiting words to a letter rack." } },
-          { "@type": "Question", "name": "Can I limit results to a specific length?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. A pattern without an asterisk already fixes the answer length. You can also set Word Length, especially when using an asterisk for a flexible-length pattern." } },
-          { "@type": "Question", "name": "What do question marks and asterisks mean?", "acceptedAnswer": { "@type": "Answer", "text": "A question mark stands for exactly one unknown letter. An asterisk stands for zero or more letters." } },
-          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Dictionary matching runs locally in your browser, and your pattern and filters are not uploaded. If you select a result for an optional definition lookup, only that word is sent to Datamuse." } }
+          { "@type": "Question", "name": "Can I search using only a crossword clue?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enter the clue without an answer pattern to search and rank matching WordNet definitions. Add the answer length when you know the number of squares." } },
+          { "@type": "Question", "name": "How do I combine a clue with crossing letters?", "acceptedAnswer": { "@type": "Answer", "text": "Enter the clue, then type the known letters in their grid positions and use a question mark for each unknown square. The solver ranks clue matches that also fit the pattern." } },
+          { "@type": "Question", "name": "Can I search by letter pattern only?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Leave the clue blank and enter a pattern. The solver searches the selected ENABLE or SOWPODS dictionary without loading clue data." } },
+          { "@type": "Question", "name": "What do question marks and asterisks mean?", "acceptedAnswer": { "@type": "Answer", "text": "A question mark matches exactly one unknown letter. An asterisk matches zero or more letters when the answer length is uncertain." } },
+          { "@type": "Question", "name": "Where do the crossword clues come from?", "acceptedAnswer": { "@type": "Answer", "text": "Clue search uses an automatically filtered and transformed dataset derived from Princeton WordNet 3.0. Pattern-only answers come from ENABLE and SOWPODS word lists." } },
+          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Clues, patterns, filters, and ranking stay in your browser. If you open an optional definition lookup, only the selected answer word is sent to Datamuse." } }
         ]
       }
     ]
@@ -62,7 +63,7 @@
   </script>
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
-  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260829-14">
+  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260831-clue-search-1">
   <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260829-2">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
@@ -81,19 +82,19 @@
       </nav>
       <div class="premium-hero-grid">
         <div>
-          <p class="premium-eyebrow">Private, pattern-first word search</p>
-          <h1 id="tool-heading">Crossword Solver &amp; Word Pattern Finder</h1>
-          <p class="premium-hero-copy">Solve crossword clues by pattern—enter known letters and blanks to find matching words.</p>
-          <div class="premium-hero-pills" aria-label="Crossword solver features"><span>ENABLE &amp; SOWPODS</span><span>Searches stay local</span></div>
+          <p class="premium-eyebrow">Private clue and pattern search</p>
+          <h1 id="tool-heading">Crossword Solver: Clue &amp; Letter Pattern Search</h1>
+          <p class="premium-hero-copy">Find crossword answers from a clue, crossing letters, answer length, or any combination of them.</p>
+          <div class="premium-hero-pills" aria-label="Crossword solver features"><span>94,000+ clue records</span><span>ENABLE &amp; SOWPODS</span><span>Searches stay local</span></div>
         </div>
-        <div class="premium-hero-stat" aria-hidden="true"><span>Known letters meet blanks</span><strong>C?A?E</strong><small>Turn the shape in your grid into a focused answer list.</small></div>
+        <div class="premium-hero-stat" aria-hidden="true"><span>Clue meaning meets crossing letters</span><strong>?P*</strong><small>Rank answers by relevance, pattern fit, length, and source quality.</small></div>
       </div>
     </section>
 
     <section class="tool-widget" aria-labelledby="solver-heading" data-focus-mode data-focus-mode-label="Crossword Solver">
       <form id="crossword-form" novalidate>
         <div class="solver-heading">
-          <div><div class="premium-section-kicker">01 / Find the fit</div><h2 id="solver-heading">Search Crossword Answers by Pattern</h2><p>Start with the squares you know, then narrow the answer list only as much as needed.</p></div>
+          <div><div class="premium-section-kicker">01 / Find the answer</div><h2 id="solver-heading">Search Crossword Clues and Answer Patterns</h2><p>Enter a clue, known crossing letters, or both. Add the answer length and filters when you need a tighter result list.</p></div>
           <fieldset class="dictionary-selector">
             <legend class="visually-hidden">Dictionary</legend>
             <div class="segmented-control">
@@ -109,8 +110,12 @@
 
         <div class="crossword-layout">
           <div class="solver-panel">
+            <div class="field clue-field">
+              <label for="crossword-clue">Crossword clue</label>
+              <input id="crossword-clue" name="clue" type="search" autocomplete="off" maxlength="140" placeholder="e.g. Come into possession of" aria-describedby="form-message">
+            </div>
             <div class="pattern-label-row"><label for="crossword-pattern">Answer pattern</label><span id="pattern-length-preview">Use ? for one blank</span></div>
-            <input class="pattern-input" id="crossword-pattern" name="pattern" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" placeholder="C?A?E" aria-describedby="pattern-hint form-message" required>
+            <input class="pattern-input" id="crossword-pattern" name="pattern" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" placeholder="C?A?E" aria-describedby="pattern-hint form-message">
             <p class="pattern-hint" id="pattern-hint"><code>?</code> is one unknown letter. <code>*</code> is any number of letters. Dots, underscores, and hyphens also become <code>?</code>.</p>
             <div class="sample-row" aria-label="Example searches">
               <button type="button" data-pattern="C?A?E" data-length="5">Try C?A?E</button>
@@ -143,41 +148,57 @@
 
     <section class="content-grid" aria-label="Crossword solver guide">
       <article class="content-card">
-        <p class="premium-section-kicker">02 / Read the grid</p>
+        <p class="premium-section-kicker">02 / Narrow the possibilities</p>
         <h2>How to Use the Crossword Solver</h2>
         <ol>
-          <li>Count the answer squares. Enter each known letter in its position and use <code>?</code> for every blank.</li>
-          <li>Select ENABLE for a broad general-English list, SOWPODS for international word-game vocabulary, or Both.</li>
-          <li>Set Word Length when your pattern uses <code>*</code>, or when you want an extra check against the grid.</li>
-          <li>Add Starts With, Ends With, Must Include, or Exclude Letters only when the clue or crossing answers support them.</li>
-          <li>Open a result to check its definition against the clue.</li>
+          <li>Enter the crossword clue as written. Straight definition clues work best; cryptic wordplay is not interpreted.</li>
+          <li>Add the answer pattern from your grid. Keep known letters in position and use <code>?</code> for each unknown square.</li>
+          <li>If you only know part of the answer, use <code>*</code> for a flexible number of letters or set an exact Word Length.</li>
+          <li>Use Starts With, Ends With, Must Include, or Exclude Letters only when crossing answers support those restrictions.</li>
+          <li>Compare the highest-ranked definitions with the clue's meaning, tense, plurality, and abbreviation signals.</li>
         </ol>
         <p class="crossword-link-callout">Have a rack of letters instead of a grid pattern? Use the <a href="/tools/word-unscrambler">Word Unscrambler &amp; Scrabble Word Finder →</a></p>
       </article>
       <aside class="content-card">
-        <p class="premium-section-kicker">Pattern language</p>
-        <h2>Pattern Examples</h2>
+        <p class="premium-section-kicker">Clue and pattern language</p>
+        <h2>Crossword Search Examples</h2>
         <table class="pattern-table">
-          <thead><tr><th>Enter</th><th>Find</th></tr></thead>
+          <thead><tr><th>Search</th><th>Meaning</th></tr></thead>
           <tbody>
+            <tr><td>Clue only</td><td>Rank answers with definitions related to the clue</td></tr>
+            <tr><td><code>?????</code></td><td>Any five-letter dictionary word</td></tr>
             <tr><td><code>C?A?E</code></td><td>Five letters with C, A, and E fixed</td></tr>
-            <tr><td><code>??ING</code></td><td>Any five-letter word ending in ING</td></tr>
-            <tr><td><code>B*</code></td><td>Any length beginning with B</td></tr>
-            <tr><td><code>*TION</code></td><td>Any length ending in TION</td></tr>
+            <tr><td><code>?P*</code></td><td>Second letter P, followed by any number of letters</td></tr>
+            <tr><td>Clue + pattern</td><td>Keep only clue matches that fit the crossing letters</td></tr>
           </tbody>
         </table>
       </aside>
     </section>
 
+    <section class="content-grid" aria-label="How crossword clue search works">
+      <article class="content-card">
+        <p class="premium-section-kicker">03 / Ranking</p>
+        <h2>How Clue Search Ranks Answers</h2>
+        <p>The browser compares meaningful clue words with an indexed set of WordNet definitions. Exact phrases and multiple matching clue terms rank higher. Known pattern letters, exact answer length, dictionary membership, and dataset quality then refine the order.</p>
+        <p>Results are ranked possibilities, not probabilities. “Best match” means the strongest result in the current filtered set; always confirm it against the puzzle's crossings and clue style.</p>
+      </article>
+      <article class="content-card">
+        <p class="premium-section-kicker">Data and privacy</p>
+        <h2>Private, Browser-Based Crossword Search</h2>
+        <p>The clue index contains more than 94,000 automatically filtered records derived from Princeton WordNet 3.0. Answer validation uses the ENABLE and SOWPODS word lists. Data loads in compressed pieces only when needed.</p>
+        <p>Your clue, pattern, and filters remain on your device. Selecting an answer for the optional dictionary popup sends only that answer word to Datamuse. See <a href="/third-party-notices#wordnet-heading">data sources and licensing</a>.</p>
+      </article>
+    </section>
+
     <section class="content-card faq-section" aria-labelledby="faq-heading">
-      <p class="premium-section-kicker">03 / Common questions</p>
+      <p class="premium-section-kicker">04 / Common questions</p>
       <h2 id="faq-heading">Crossword Solver FAQ</h2>
-      <details><summary>How do I solve a crossword clue with this?</summary><p>Combine the clue with the letter positions supplied by crossing answers. Enter known letters exactly where they appear and use <code>?</code> for each empty square. Then compare the matching words with the clue's meaning, tense, and wordplay.</p></details>
-      <details><summary>How do I search by pattern only?</summary><p>Enter the pattern and leave Available Letters empty. Unlike an unscrambler, this solver does not enforce rack-letter counts unless you deliberately provide a letter pool.</p></details>
-      <details><summary>Can I limit results to a specific length?</summary><p>Yes. Patterns without <code>*</code> already have a fixed length. You can also set Word Length, which is especially useful with flexible patterns such as <code>B*</code>.</p></details>
-      <details><summary>What is the difference between ? and *?</summary><p>A question mark matches exactly one letter—the equivalent of one empty grid square. An asterisk matches zero or more letters, so it is useful when you know an edge or fragment but not the total length.</p></details>
-      <details><summary>Which dictionary should I choose?</summary><p>ENABLE is a broad public-domain English word list suited to general searches. SOWPODS includes international word-game vocabulary. Both searches their deduplicated union, which is larger and may include obscure entries.</p></details>
-      <details><summary>Are my searches private?</summary><p>Yes. The dictionaries and matching engine run entirely in your browser, and your pattern and filters are not sent to a search service. If you choose a result to view its definition, only that selected word is sent to Datamuse for the optional lookup.</p></details>
+      <details><summary>Can I search using only a crossword clue?</summary><p>Yes. Enter the clue without an answer pattern to search and rank matching WordNet definitions. Add the answer length when you know the number of squares.</p></details>
+      <details><summary>How do I combine a clue with crossing letters?</summary><p>Enter the clue, then type the known letters in their grid positions and use a question mark for each unknown square. The solver ranks clue matches that also fit the pattern.</p></details>
+      <details><summary>Can I search by letter pattern only?</summary><p>Yes. Leave the clue blank and enter a pattern. The solver searches the selected ENABLE or SOWPODS dictionary without loading clue data.</p></details>
+      <details><summary>What do question marks and asterisks mean?</summary><p>A question mark matches exactly one unknown letter. An asterisk matches zero or more letters when the answer length is uncertain.</p></details>
+      <details><summary>Where do the crossword clues come from?</summary><p>Clue search uses an automatically filtered and transformed dataset derived from Princeton WordNet 3.0. Pattern-only answers come from ENABLE and SOWPODS word lists.</p></details>
+      <details><summary>Are crossword searches private?</summary><p>Yes. Clues, patterns, filters, and ranking stay in your browser. If you open an optional definition lookup, only the selected answer word is sent to Datamuse.</p></details>
     </section>
 
     <section class="related-tools" aria-labelledby="related-heading">
@@ -205,6 +226,6 @@
   <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-crossword-1" defer></script>
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
-  <script src="../assets/js/tools/crossword-solver.js?v=20260829-dictionary-modal-3" defer></script>
+  <script src="../assets/js/tools/crossword-solver.js?v=20260831-clue-search-3" defer></script>
 </body>
 </html>

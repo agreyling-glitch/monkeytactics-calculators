@@ -43,6 +43,19 @@ DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
 ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
+## Princeton WordNet 3.0
+
+- Source: <https://wordnetcode.princeton.edu/3.0/WNdb-3.0.tar.gz>
+- Version: `3.0`
+- Purpose: Source glosses and lexical metadata for Crossword Clue Search feasibility work
+- License: Princeton WordNet 3.0 License
+- Full license: [WordNet 3.0 license](licenses/wordnet-3.0.txt)
+- Provenance and checksum: [WordNet source record](docs/crossword-clue-search/wordnet-3.0-source.json)
+
+WordNet permits use, copying, modification, and distribution without fee or royalty
+when its copyright notice, statements, and disclaimer are retained on all copies.
+The generated feasibility records retain per-record WordNet source identifiers.
+
 ## JavaScript libraries
 
 ### rqrr
