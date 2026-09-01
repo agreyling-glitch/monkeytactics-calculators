@@ -30,3 +30,9 @@ test("Antiwordle helper is registered in the shared tools manifest",()=>{
   assert.equal(tool.url,"/tools/antiwordle-helper");
   assert.equal(tool.capabilities.length,3);
 });
+
+test("Antiwordle FAQ keeps every answer visible without collapsible controls",()=>{
+  assert.match(html,/class="antiwordle-faq-grid"/);
+  assert.match(html,/<h3>Does the helper enforce Antiwordle rules\?<\/h3>/);
+  assert.doesNotMatch(html,/<details>|<summary>/);
+});

@@ -102,5 +102,10 @@
 .dictionary-example { display: block; margin-top: .25rem; color: var(--premium-muted); font-style: italic; }
 .dictionary-modal-footer { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; padding: .9rem 1.35rem; border-top: 1px solid var(--premium-line); background: #08110c; color: var(--premium-muted); font-size: .82rem; }
 .dictionary-modal-footer a { color: var(--premium-green); font-weight: 750; text-decoration: none; }
+.dictionary-modal-actions { display: flex; gap: .65rem; align-items: center; flex-wrap: wrap; }
+#dictionary-copy-word { min-height: 2.25rem; padding: .45rem .7rem; border: 1px solid var(--premium-line); border-radius: .55rem; background: #101f17; color: var(--premium-ink); font: inherit; font-weight: 800; cursor: pointer; }
+#dictionary-copy-word:hover,#dictionary-copy-word:focus-visible { border-color: var(--crossword-gold); color: var(--crossword-gold); }
+#dictionary-copy-word:focus-visible { outline: 2px solid var(--crossword-gold); outline-offset: 2px; }
+#dictionary-copy-word.is-copied { border-color: var(--premium-green); color: var(--premium-green); }
 @media (max-width: 800px) { .content-grid, .crossword-page .faq-section { grid-template-columns: 1fr; } .crossword-page .faq-section > .premium-section-kicker, .crossword-page .faq-section > h2 { grid-column: auto; } .solver-heading { align-items: start; flex-direction: column; } .results-panel { min-height: 18rem; } }
 @media (max-width: 520px) { .field-grid, .word-results { grid-template-columns: 1fr; } .solver-actions { flex-direction: column; } .dictionary-modal { width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); } .dictionary-modal-card { max-height: calc(100dvh - 1rem); } }
