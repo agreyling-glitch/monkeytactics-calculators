@@ -7,7 +7,7 @@ const script = fs.readFileSync(new URL("../assets/js/tools/crossword-solver.js",
 const css = fs.readFileSync(new URL("../assets/css/tools/crossword-solver.css", import.meta.url), "utf8");
 
 test("crossword solver cache-busts the WordNet graph release", () => {
-  assert.match(html, /crossword-solver\.js\?v=20260901-grid-positions-1/);
+  assert.match(html, /crossword-solver\.js\?v=20260901-plural-normalization-21/);
   assert.match(html, /crossword-solver\.css\?v=20260901-grid-positions-1/);
   assert.match(html, /crossword-pick-list-store\.js\?v=20260901-grid-positions-1/);
 });
@@ -82,6 +82,80 @@ test("multi-word answers keep phrase boundaries while matching grid letters", ()
   assert.match(css, /\.clue-result-topline \{[^}]*grid-template-columns: minmax\(0, 1fr\) max-content;/);
   assert.match(css, /\.clue-result-topline \.result-word \{ overflow: hidden; \}/);
   assert.match(css, /\.clue-result-match \{[^}]*text-align: right;[^}]*overflow-wrap: anywhere;/);
+});
+
+test("plural clues can project singular WordNet lemmas into fixed-length answers", () => {
+  assert.match(script, /function hasPluralClueTerm\(value\)/);
+  assert.match(script, /function pluralizeAnswer\(record\)/);
+  assert.match(script, /pluralProjectionEnabled/);
+  assert.match(script, /projection\.length !== inferredLength/);
+  assert.match(script, /match\.inflected \? "Plural answer"/);
+});
+
+test("fixed-length clues can project plural WordNet lemmas into singular answers", () => {
+  assert.match(script, /function singularizeAnswer\(record\)/);
+  assert.match(script, /singularProjectionEnabled/);
+  assert.match(script, /candidateRecord\.singularInflected \? 20/);
+  assert.match(script, /match\.singularInflected \? "Singular answer"/);
+});
+
+test("past-tense clues can project matching WordNet verb lemmas", () => {
+  assert.match(script, /\["showed irritation", \["offended"\]\]/);
+  assert.match(script, /\["expunged", \["remove"\]\]/);
+  assert.match(script, /function pastTenseAnswer\(record\)/);
+  assert.match(script, /pastProjectionEnabled/);
+  assert.match(script, /match\.pastInflected \? "Past-tense answer"/);
+});
+
+test("again clues can project matching base verbs into re- forms", () => {
+  assert.match(script, /\["claim again", \["state"\]\]/);
+  assert.match(script, /function repeatedActionAnswer\(record\)/);
+  assert.match(script, /const repeatedActionEnabled = tokens\.includes\("again"\)/);
+  assert.match(script, /derivationFit: candidateRecord\.repeatedAction \|\| candidateRecord\.superlative \? 35 : 0/);
+  assert.match(script, /match\.repeatedAction \? "Re- form"/);
+});
+
+test("most clues can project matching adjectives into superlatives", () => {
+  assert.match(script, /\["most unruly", \["wild"\]\]/);
+  assert.match(script, /answer: "wildest", definition: "most unruly or uncontrolled"/);
+  assert.match(script, /candidates\.some\(\(result\) => result\.localSupplement\)/);
+  assert.match(script, /rawTokens\.filter\(\(token\) => token !== "most"\)/);
+  assert.match(script, /function superlativeAnswer\(record\)/);
+  assert.match(script, /const superlativeEnabled = rawTokens\.includes\("most"\)/);
+  assert.match(script, /match\.superlative \? "Superlative answer"/);
+});
+
+test("compound crossword clues can bridge locally to WordNet definition concepts", () => {
+  assert.match(script, /\["garden area", \["plot"\]\]/);
+  assert.match(script, /\["thrift store", \["selling"\]\]/);
+  assert.match(script, /function phraseConceptTerms\(value\)/);
+  assert.match(script, /for \(const term of phraseConceptTerms\(clue\)\)/);
+  assert.match(script, /const expansionIds = index\.postings\[term\] \|\| \[\]/);
+  assert.match(script, /phraseConcept: \(candidateScore\.phrase \|\| 0\) \* 10/);
+  assert.match(script, /match\.phraseMatch \? "Clue phrase match"/);
+});
+
+test("derivational clue terms expand to equivalent WordNet vocabulary", () => {
+  assert.match(script, /\["pigmented", \["colored"\]\]/);
+  assert.match(script, /CLUE_TERM_EXPANSIONS\.get\(token\)/);
+  assert.match(script, /tokens\.some\(\(token\) => token\.endsWith\("ed"\)\) && answer\.endsWith\("ed"\) \? 30 : 0/);
+});
+
+test("local crossword phrases cover valid answers outside WordNet parts of speech", () => {
+  assert.match(script, /\["heading for", \[\{ answer: "toward", definition: "in the direction of", dictionaryBits: 3 \}\]\]/);
+  assert.match(script, /\["before in poems", \[\{ answer: "ere", definition: "before; archaic or poetic", dictionaryBits: 3 \}\]\]/);
+  assert.match(script, /\{ answer: "nodes", definition: "lymph nodes", dictionaryBits: 3 \}/);
+  assert.match(script, /\["press", \[\{ answer: "iron", definition: "press and smooth clothes", dictionaryBits: 3 \}\]\]/);
+  assert.match(script, /function supplementalClueAnswers\(value\)/);
+  assert.match(script, /Strong match · Local crossword phrase \+ pattern/);
+  assert.match(script, /local crossword phrases \+ WordNet 3\.0/);
+});
+
+test("an empty semantic search can offer clearly labeled near-spelling pattern matches", () => {
+  assert.match(script, /function isOneEditAway\(left, right\)/);
+  assert.match(script, /\.filter\(\(word\) => isOneEditAway\(tokens\[0\], word\)\)/);
+  assert.match(script, /match\.spellingMatch \? "Near spelling"/);
+  assert.match(script, /dictionary spelling fallback/);
 });
 
 test("only the latest crossword search can update the results", () => {
