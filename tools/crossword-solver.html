@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Crossword Clue &amp; Pattern Solver | MonkeyTactics</title>
-  <meta name="description" content="Find crossword answers by clue, length, and known letters. Rank WordNet meanings and synonyms, save candidates, restore searches, and share picks by URL or QR.">
+  <title>Crossword Solver: Clues, Patterns &amp; WordNet | MonkeyTactics</title>
+  <meta name="description" content="Solve crossword clues by meaning, WordNet similarity, pattern, and length. Find multi-word answers, explain rankings, and export grouped candidate lists.">
   <meta name="robots" content="index, follow">
   <meta name="date" content="2026-09-01">
   <link rel="canonical" href="https://monkeytactics.com/tools/crossword-solver">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Crossword Clue Solver &amp; Letter Pattern Finder">
-  <meta property="og:description" content="Solve crossword clues with WordNet meanings, synonym expansion, crossing-letter patterns, saved picks, and shareable QR links.">
+  <meta property="og:title" content="Crossword Solver: Clues, Patterns &amp; WordNet">
+  <meta property="og:description" content="Find single- and multi-word crossword answers with WordNet graph similarity, crossing-letter patterns, explainable scores, and grouped Pick Lists.">
   <meta property="og:url" content="https://monkeytactics.com/tools/crossword-solver">
   <meta property="og:site_name" content="MonkeyTactics">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Crossword Clue Solver &amp; Letter Pattern Finder">
-  <meta name="twitter:description" content="Find ranked crossword answers by clue meaning, synonyms, known letters, pattern, and length—then save or share promising picks.">
+  <meta name="twitter:title" content="Crossword Solver: Clues, Patterns &amp; WordNet">
+  <meta name="twitter:description" content="Rank crossword answers by clue meaning, WordNet relationships, known letters, and length—then group, export, or share promising picks.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -38,23 +38,26 @@
       {
         "@type": "SoftwareApplication",
         "@id": "https://monkeytactics.com/tools/crossword-solver#app",
-        "name": "Crossword Clue Solver and Letter Pattern Finder",
+        "name": "Crossword Clue Solver with WordNet and Letter Patterns",
         "url": "https://monkeytactics.com/tools/crossword-solver",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
-        "description": "A private browser-based crossword clue solver that ranks WordNet meanings and synonyms, filters answers by known letters and length, saves candidates, restores searches, and shares picks by compact URL or QR code.",
+        "description": "A private browser-based crossword solver that ranks single- and multi-word answers with WordNet meanings, synonyms, graph relationships, letter patterns, and length, then groups candidates by grid position for export or sharing.",
         "dateModified": "2026-09-01",
         "isAccessibleForFree": true,
         "browserRequirements": "Requires JavaScript and a modern web browser.",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "featureList": ["Crossword clue and answer search", "WordNet definition ranking", "WordNet synonym and query expansion", "Known-letter answer patterns", "Exact and flexible answer lengths", "ENABLE and SOWPODS dictionaries", "Private crossword Pick List", "Restore and rerun saved searches", "Compact share URLs", "Crossword pick QR codes", "Copyable formatted pick summaries", "Independent filter reset", "Stationary-hover definitions", "Private in-browser matching"]
+        "featureList": ["Crossword clue and answer search", "129,000+ WordNet clue records", "Single- and multi-word answers", "WordNet definition and graph similarity ranking", "WordNet synonym and query expansion", "Explainable semantic score breakdowns", "Known-letter answer patterns", "Exact and flexible answer lengths", "ENABLE and SOWPODS dictionaries", "Candidates grouped by grid position", "Reusable Grid Position suggestions", "Collapsible Pick List groups", "Versioned JSON Pick List export and import", "Merge or replace imported Pick Lists", "Session-cached dictionary definitions", "Restore and rerun saved searches", "Compact share URLs", "Crossword pick QR codes", "Private in-browser matching"]
       },
       {
         "@type": "FAQPage",
         "mainEntity": [
           { "@type": "Question", "name": "Can I search using only a crossword clue?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enter the clue without an answer pattern to search and rank matching WordNet definitions. Add the answer length when you know the number of squares." } },
           { "@type": "Question", "name": "Can the solver understand synonyms?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. When a clue does not directly match words in a WordNet definition, the solver can retrieve answers through closely related WordNet synonyms. Literal clue words and exact phrases receive more weight, so related meanings broaden the results without replacing stronger direct matches." } },
-          { "@type": "Question", "name": "What does the crossword Pick List save?", "acceptedAnswer": { "@type": "Answer", "text": "Each pick stores the answer, clue, pattern, matched WordNet definition, numeric match strength, clue-word count, dictionary membership, grid position, notes, and timestamp. Pick List data remains only in this browser." } },
+          { "@type": "Question", "name": "Does the crossword solver support multi-word answers?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The WordNet clue dataset includes more than 34,000 multi-word answers. Results preserve spaces for readability while answer length and letter patterns count only crossword grid letters." } },
+          { "@type": "Question", "name": "How does WordNet graph similarity rank crossword answers?", "acceptedAnswer": { "@type": "Answer", "text": "The solver compares clue words with WordNet definitions, synonyms, and semantic relationships such as broader, narrower, and similar concepts. The result window explains the score contributions so you can distinguish direct clue matches from related meanings." } },
+          { "@type": "Question", "name": "What does the crossword Pick List save?", "acceptedAnswer": { "@type": "Answer", "text": "Each pick stores the answer, clue, pattern, matched WordNet definition, numeric match strength, clue-word count, dictionary membership, grid position, notes, and timestamp. Pick List data remains in this browser unless you export it." } },
+          { "@type": "Question", "name": "Can I export or import a crossword Pick List?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Open the Pick List actions menu to export every candidate and its solving context as versioned JSON. Import can merge candidates with the current list or replace it after confirmation." } },
           { "@type": "Question", "name": "How do I reopen a saved crossword search?", "acceptedAnswer": { "@type": "Answer", "text": "Select Insert beside a Pick List candidate. The solver restores its clue, answer pattern, inferred length, and dictionary, clears unrelated secondary filters, and runs the search again." } },
           { "@type": "Question", "name": "Can I reset only the crossword filters?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Reset button inside Filters clears length, sorting, letter-pool, starts-with, ends-with, must-include, and excluded-letter settings without clearing the clue, pattern, dictionary, Pick List, or current results." } },
           { "@type": "Question", "name": "Can I share a crossword pick?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select Share beside a saved pick to create a compact deep link, formatted copyable summary, and URL QR code. The link includes only the answer, clue, pattern, and dictionary. Opening it restores the search controls, runs the search, and adds the candidate to the recipient's browser-local Pick List." } },
@@ -62,7 +65,8 @@
           { "@type": "Question", "name": "Can I search by letter pattern only?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Leave the clue blank and enter a pattern. The solver searches the selected ENABLE or SOWPODS dictionary without loading clue data." } },
           { "@type": "Question", "name": "What do question marks and asterisks mean?", "acceptedAnswer": { "@type": "Answer", "text": "A question mark matches exactly one unknown letter. An asterisk matches zero or more letters when the answer length is uncertain." } },
           { "@type": "Question", "name": "Where do the crossword clues come from?", "acceptedAnswer": { "@type": "Answer", "text": "Clue search uses an automatically filtered and transformed dataset derived from Princeton WordNet 3.0. Pattern-only answers come from ENABLE and SOWPODS word lists." } },
-          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Clues, patterns, filters, and ranking stay in your browser. If you open an optional definition lookup, only the selected answer word is sent to Datamuse." } }
+          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Clues, patterns, filters, and ranking stay in your browser. If you open an optional definition lookup, only the selected answer word is sent to Datamuse." } },
+          { "@type": "Question", "name": "What does Cached this session mean?", "acceptedAnswer": { "@type": "Answer", "text": "It means that answer's Datamuse definition was already requested during the current page session and the saved response was reused. The temporary definition cache clears when the page is reloaded." } }
         ]
       }
     ]
@@ -70,7 +74,7 @@
   </script>
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
-  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260901-pick-share-7">
+  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260901-grid-positions-1">
   <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260831-stable-mobile-7">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
@@ -90,9 +94,9 @@
       <div class="premium-hero-grid">
         <div>
           <p class="premium-eyebrow">Private clue and pattern search</p>
-          <h1 id="tool-heading">Crossword Clue Solver &amp; Letter Pattern Finder</h1>
-          <p class="premium-hero-copy">Find and rank crossword answers from clue meanings, synonyms, crossing letters, answer length, or any combination of them.</p>
-          <div class="premium-hero-pills" aria-label="Crossword solver features"><span>94,000+ clue records</span><span>Synonym expansion</span><span>Save &amp; share picks</span></div>
+          <h1 id="tool-heading">Crossword Clue Solver with WordNet &amp; Letter Patterns</h1>
+          <p class="premium-hero-copy">Find single- and multi-word crossword answers from clue meanings, WordNet relationships, crossing letters, answer length, or any combination of them.</p>
+          <div class="premium-hero-pills" aria-label="Crossword solver features"><span>129,000+ clue records</span><span>Multi-word answers</span><span>WordNet graph matching</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>Clue meaning meets crossing letters</span><strong>?P*</strong><small>Rank answers by relevance, pattern fit, length, and source quality.</small></div>
       </div>
@@ -125,9 +129,9 @@
             <input class="pattern-input" id="crossword-pattern" name="pattern" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" placeholder="C?A?E" aria-describedby="pattern-hint form-message">
             <p class="pattern-hint" id="pattern-hint"><code>?</code> is one unknown letter. <code>*</code> is any number of letters. Dots, underscores, and hyphens also become <code>?</code>.</p>
             <div class="sample-row" aria-label="Example searches">
-              <button type="button" data-pattern="C?A?E" data-length="5">Try C?A?E</button>
-              <button type="button" data-pattern="??ING" data-length="5">Try ??ING</button>
-              <button type="button" data-pattern="B*" data-length="0">Try B*</button>
+              <button type="button" tabindex="-1" data-pattern="C?A?E" data-length="5">Try C?A?E</button>
+              <button type="button" tabindex="-1" data-pattern="??ING" data-length="5">Try ??ING</button>
+              <button type="button" tabindex="-1" data-pattern="B*" data-length="0">Try B*</button>
             </div>
             <details class="filter-disclosure" id="filter-disclosure">
               <summary><span><strong>Filters <em id="active-filter-count">(0 active)</em></strong><small>Length, sorting, letter pool, and extra filters</small></span><i aria-hidden="true"></i></summary>
@@ -153,11 +157,14 @@
         </div>
       </form>
       <details class="crossword-pick-list" id="crossword-pick-list">
-        <summary><span><strong>Pick List</strong><small>Saved crossword candidates and notes</small></span><em id="crossword-pick-count">0 picks</em></summary>
+        <summary><span><strong>Pick List</strong><small>Saved crossword candidates and notes</small></span><span class="crossword-pick-summary-actions"><em id="crossword-pick-count">0 picks</em><button id="crossword-pick-menu-toggle" type="button" title="Pick List actions" aria-label="Pick List actions" aria-expanded="false" aria-controls="crossword-pick-menu">☰</button><button id="crossword-pick-clear" type="button" title="Clear Pick List" aria-label="Clear Pick List">Clear</button></span></summary>
+        <div class="crossword-pick-menu" id="crossword-pick-menu" aria-label="Pick List actions" hidden><button id="crossword-pick-export" type="button">Export Pick List</button><label for="crossword-pick-import-mode">Import as <select id="crossword-pick-import-mode"><option value="merge">Merge</option><option value="replace">Replace</option></select></label><button id="crossword-pick-import" type="button">Import Pick List</button><input id="crossword-pick-import-file" type="file" accept="application/json,.json" hidden></div>
         <div class="crossword-pick-list-content">
-          <div class="crossword-pick-toolbar"><p>Keep promising answers with their clue, pattern, matched definition, and crossing notes. Picks stay only in this browser.</p><label for="crossword-pick-sort">Sort <select id="crossword-pick-sort"><option value="newest">Newest</option><option value="strength">Match strength</option><option value="answer">Answer</option></select></label><button id="crossword-pick-clear" type="button">Clear pick list</button></div>
+          <div class="crossword-pick-toolbar"><p>Keep promising answers grouped by Grid Position. Picks stay in this browser unless you export them.</p><label for="crossword-pick-sort">Sort <select id="crossword-pick-sort"><option value="newest">Newest</option><option value="strength">Match strength</option><option value="answer">Answer</option></select></label></div>
+          <p class="crossword-pick-import-status" id="crossword-pick-import-status" role="status" hidden></p>
           <p class="crossword-pick-empty" id="crossword-pick-empty">Add an answer from its definition window to start your crossword shortlist.</p>
           <div class="crossword-pick-entries" id="crossword-pick-entries" aria-live="polite"></div>
+          <datalist id="crossword-grid-positions"></datalist>
         </div>
       </details>
     </section>
@@ -175,6 +182,7 @@
           <li>Select <strong>Reset</strong> inside Filters to clear only the secondary filters without losing the clue, pattern, dictionary, Pick List, or current results.</li>
           <li>Pause the pointer over an answer to preview its definition, or select it with a click or keyboard. Compare the highest-ranked definitions with the clue's meaning, tense, plurality, and abbreviation signals.</li>
           <li>Select <strong>Add to Pick List</strong> in the definition window to save the answer with its clue, pattern, match details, grid position, and private crossing notes.</li>
+          <li>Assign the same Grid Position to group alternative answers together. After a position is defined, select it from the suggestions on another candidate instead of retyping it. Use the Pick List actions menu to export the complete shortlist or import it with Merge or Replace.</li>
           <li>Use <strong>Insert</strong> to restore and rerun a saved candidate search, or <strong>Share</strong> to create a compact link, formatted clipboard summary, and QR code.</li>
         </ol>
         <p class="crossword-link-callout">Have a rack of letters instead of a grid pattern? Use the <a href="/tools/word-unscrambler">Word Unscrambler &amp; Scrabble Word Finder →</a></p>
@@ -198,14 +206,14 @@
     <section class="content-grid" aria-label="How crossword clue search works">
       <article class="content-card">
         <p class="premium-section-kicker">03 / Ranking</p>
-        <h2>How Clue Search Ranks Answers</h2>
-        <p>The browser compares meaningful clue words with an indexed set of WordNet definitions and expands common clue terms through closely related WordNet synonyms. Literal terms and exact phrases rank higher than related meanings. Known pattern letters, exact answer length, dictionary membership, and dataset quality then refine the order.</p>
+        <h2>How WordNet Crossword Clue Ranking Works</h2>
+        <p>The browser compares meaningful clue words with indexed WordNet definitions, synonyms, and graph relationships such as broader, narrower, and similar concepts. Literal terms and exact phrases rank higher than related meanings. Known pattern letters, exact answer length, dictionary membership, and dataset quality then refine the order.</p>
         <p>Results are ranked possibilities, not probabilities. “Best match” means the strongest result in the current filtered set; always confirm it against the puzzle's crossings and clue style.</p>
       </article>
       <article class="content-card">
         <p class="premium-section-kicker">Save and continue</p>
         <h2>Build a Crossword Candidate Pick List</h2>
-        <p>Save promising crossword answers with their clue, answer pattern, matched definition, match strength, dictionary membership, grid position, notes, and timestamp. Sort the shortlist by newest pick, match strength, or answer.</p>
+        <p>Save promising crossword answers with their clue, answer pattern, matched definition, explainable match strength, dictionary membership, grid position, notes, and timestamp. Candidates sharing a Grid Position are organized into a collapsible group, while answers without a position remain under Unassigned. Grid Position fields suggest positions already used in the Pick List, while still allowing new positions.</p>
         <p>Select <strong>Insert</strong> on any pick to restore its clue, pattern, inferred length, and dictionary and immediately rerun the answer search. This makes it easier to revisit alternatives as crossing letters change.</p>
       </article>
       <article class="content-card">
@@ -217,8 +225,14 @@
       <article class="content-card">
         <p class="premium-section-kicker">Data and privacy</p>
         <h2>Private, Browser-Based Crossword Search</h2>
-        <p>The clue index contains more than 94,000 automatically filtered records derived from Princeton WordNet 3.0. Answer validation uses the ENABLE and SOWPODS word lists. Data loads in compressed pieces only when needed.</p>
-        <p>Your clue, pattern, filters, Pick List, grid positions, and notes remain on your device. A share link contains only the answer, clue, pattern, and dictionary selection. Selecting an answer for the optional definition popup sends only that answer word to Datamuse. See <a href="/third-party-notices#wordnet-heading">data sources and licensing</a>.</p>
+        <p>The clue index contains more than 129,000 automatically filtered records derived from Princeton WordNet 3.0, including over 34,000 multi-word answers. Phrase spacing is shown in results while patterns and answer length count letters as crossword grid cells. Semantic graph relationships—including broader, narrower, and similar concepts—help find answers beyond exact clue words. Answer validation uses the ENABLE and SOWPODS word lists. Data loads in compressed pieces only when needed.</p>
+        <p>Your clue, pattern, filters, Pick List, grid positions, notes, and exported JSON files remain under your control. A share link contains only the answer, clue, pattern, and dictionary selection. Selecting a single-word answer for the optional definition popup sends only that answer to Datamuse; repeated lookups reuse a temporary page-session cache. See <a href="/third-party-notices#wordnet-heading">data sources and licensing</a>.</p>
+      </article>
+      <article class="content-card">
+        <p class="premium-section-kicker">Move or back up a shortlist</p>
+        <h2>Export and Import a Crossword Pick List</h2>
+        <p>Open the Pick List actions menu to export every saved candidate, clue, pattern, definition, semantic score, Grid Position, and note as a versioned JSON file. Import it later or move it to another browser without re-entering the puzzle.</p>
+        <p>Choose <strong>Merge</strong> to add new candidates while skipping duplicates, or <strong>Replace</strong> to overwrite the current Pick List after confirmation. Imported files are validated before any candidate is saved.</p>
       </article>
     </section>
 
@@ -227,7 +241,10 @@
       <h2 id="faq-heading">Crossword Solver FAQ</h2>
       <details><summary>Can I search using only a crossword clue?</summary><p>Yes. Enter the clue without an answer pattern to search and rank matching WordNet definitions. Add the answer length when you know the number of squares.</p></details>
       <details><summary>Can the solver understand synonyms?</summary><p>Yes. When a clue does not directly match words in a WordNet definition, the solver can retrieve answers through closely related WordNet synonyms. Literal clue words and exact phrases receive more weight, so related meanings broaden the results without replacing stronger direct matches.</p></details>
-      <details><summary>What does the crossword Pick List save?</summary><p>Each pick stores the answer, clue, pattern, matched WordNet definition, numeric match strength, clue-word count, dictionary membership, grid position, notes, and timestamp. Pick List data remains only in this browser.</p></details>
+      <details><summary>Does the crossword solver support multi-word answers?</summary><p>Yes. The WordNet clue dataset includes more than 34,000 multi-word answers. Results preserve spaces for readability while answer length and letter patterns count only crossword grid letters.</p></details>
+      <details><summary>How does WordNet graph similarity rank crossword answers?</summary><p>The solver compares clue words with WordNet definitions, synonyms, and semantic relationships such as broader, narrower, and similar concepts. The result window explains the score contributions so you can distinguish direct clue matches from related meanings.</p></details>
+      <details><summary>What does the crossword Pick List save?</summary><p>Each pick stores the answer, clue, pattern, matched WordNet definition, numeric match strength, clue-word count, dictionary membership, grid position, notes, and timestamp. Pick List data remains in this browser unless you export it.</p></details>
+      <details><summary>Can I export or import a crossword Pick List?</summary><p>Yes. Open the Pick List actions menu to export every candidate and its solving context as versioned JSON. Import can merge candidates with the current list or replace it after confirmation.</p></details>
       <details><summary>How do I reopen a saved crossword search?</summary><p>Select <strong>Insert</strong> beside a Pick List candidate. The solver restores its clue, answer pattern, inferred length, and dictionary, clears unrelated secondary filters, and runs the search again.</p></details>
       <details><summary>Can I reset only the crossword filters?</summary><p>Yes. The <strong>Reset</strong> button inside Filters clears length, sorting, letter-pool, starts-with, ends-with, must-include, and excluded-letter settings without clearing the clue, pattern, dictionary, Pick List, or current results.</p></details>
       <details><summary>Can I share a crossword pick?</summary><p>Yes. Select <strong>Share</strong> beside a saved pick to create a compact deep link, formatted copyable summary, and URL QR code. The link includes only the answer, clue, pattern, and dictionary. Opening it restores the search controls, runs the search, and adds the candidate to the recipient's browser-local Pick List.</p></details>
@@ -236,6 +253,7 @@
       <details><summary>What do question marks and asterisks mean?</summary><p>A question mark matches exactly one unknown letter. An asterisk matches zero or more letters when the answer length is uncertain.</p></details>
       <details><summary>Where do the crossword clues come from?</summary><p>Clue search uses an automatically filtered and transformed dataset derived from Princeton WordNet 3.0. Pattern-only answers come from ENABLE and SOWPODS word lists.</p></details>
       <details><summary>Are crossword searches private?</summary><p>Yes. Clues, patterns, filters, and ranking stay in your browser. If you open an optional definition lookup, only the selected answer word is sent to Datamuse.</p></details>
+      <details><summary>What does Cached this session mean?</summary><p>It means that answer's Datamuse definition was already requested during the current page session and the saved response was reused. The temporary definition cache clears when the page is reloaded.</p></details>
     </section>
 
     <section class="related-tools" aria-labelledby="related-heading">
@@ -279,8 +297,8 @@
   <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-crossword-1" defer></script>
   <script src="../assets/js/vendor/qrcode-1.1.0.min.js" defer></script>
-  <script src="../assets/js/tools/crossword-pick-list-store.js?v=20260901-1" defer></script>
+  <script src="../assets/js/tools/crossword-pick-list-store.js?v=20260901-grid-positions-1" defer></script>
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
-  <script src="../assets/js/tools/crossword-solver.js?v=20260901-pick-share-9" defer></script>
+  <script src="../assets/js/tools/crossword-solver.js?v=20260901-grid-positions-1" defer></script>
 </body>
 </html>

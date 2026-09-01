@@ -7,6 +7,7 @@ const EXPECTED_SHA256 = "658b1ba191f5f98c2e9bae3e25c186013158f30ef779f191d2a44e5
 const DEFAULT_LIMIT = 1000;
 const POS_NAMES = { n: "noun", v: "verb", a: "adjective", s: "adjective", r: "adverb" };
 const DATA_FILES = { n: "noun", v: "verb", a: "adj", r: "adv" };
+const GRAPH_RELATIONS = new Set(["@", "~", "&", "+", "*", "%m", "%s", "%p"]);
 const sourceArgument = process.argv.find((argument) => argument.startsWith("--source="));
 const outputArgument = process.argv.find((argument) => argument.startsWith("--output="));
 const limitArgument = process.argv.find((argument) => argument.startsWith("--limit="));
@@ -44,7 +45,17 @@ function parseSynsets(text, pos) {
     const wordCount = Number.parseInt(fields[3], 16);
     const words = [];
     for (let index = 0; index < wordCount; index += 1) words.push(fields[4 + index * 2]);
-    synsets.push({ synsetOffset: fields[0], pos, words, rawGloss: line.slice(divider + 3).trim() });
+    const pointerCountIndex = 4 + wordCount * 2;
+    const pointerCount = Number.parseInt(fields[pointerCountIndex], 10);
+    const pointers = [];
+    for (let index = 0; index < pointerCount; index += 1) {
+      const offset = pointerCountIndex + 1 + index * 4;
+      const [symbol, targetOffset, rawTargetPos] = fields.slice(offset, offset + 3);
+      if (!GRAPH_RELATIONS.has(symbol)) continue;
+      const targetPos = rawTargetPos === "s" ? "a" : rawTargetPos;
+      pointers.push({ relation: symbol, targetSourceId: `wn30:${targetOffset}-${targetPos}` });
+    }
+    synsets.push({ synsetOffset: fields[0], pos, words, pointers, rawGloss: line.slice(divider + 3).trim() });
   }
   return synsets;
 }
@@ -81,8 +92,20 @@ function normalizeClue(rawGloss) {
   return rawGloss.split(/;\s*"/)[0].replace(/\s+/g, " ").replace(/[.;:]$/, "").trim();
 }
 
-function containsAnswer(clue, answer) {
-  return (clue.toLowerCase().match(/[a-z]+/g) || []).includes(answer);
+function normalizeAnswer(sourceLemma) {
+  const source = sourceLemma.toLowerCase().replace(/\([a-z]\)$/i, "");
+  if (!/^[a-z]+(?:[_'-][a-z]+)*$/.test(source)) return null;
+  const displayAnswer = source.replaceAll("_", " ");
+  const answer = displayAnswer.replace(/[^a-z]/g, "");
+  const words = displayAnswer.split(/[ '-]+/).filter(Boolean);
+  return { answer, displayAnswer, words, wordCount: words.length };
+}
+
+function containsAnswer(clue, displayAnswer) {
+  const clueWords = clue.toLowerCase().match(/[a-z]+/g) || [];
+  const answerWords = displayAnswer.match(/[a-z]+/g) || [];
+  if (answerWords.length === 1) return clueWords.includes(answerWords[0]);
+  return clueWords.join(" ").includes(answerWords.join(" "));
 }
 
 function qualityScore({ clue, answer, tagCount, senseRank }) {
@@ -116,26 +139,30 @@ const exclude = (reason) => exclusions.set(reason, (exclusions.get(reason) || 0)
 for (const pos of ["n", "v", "a", "r"]) {
   for (const synset of parseSynsets(entries.get(`dict/data.${DATA_FILES[pos]}`) || "", pos)) {
     for (const sourceLemma of synset.words) {
-      const answer = sourceLemma.toLowerCase().replace(/\([a-z]\)$/i, "");
-      if (!/^[a-z]+$/.test(answer)) { exclude("unsupported-answer-shape"); continue; }
-      const dictionaryBits = membership.get(answer) || 0;
+      const normalized = normalizeAnswer(sourceLemma);
+      if (!normalized) { exclude("unsupported-answer-shape"); continue; }
+      const { answer, displayAnswer, words, wordCount } = normalized;
+      const dictionaryBits = wordCount === 1
+        ? membership.get(answer) || 0
+        : words.reduce((bits, word) => bits & (membership.get(word) || 0), 3);
       if (!dictionaryBits) { exclude("not-in-enable-or-sowpods"); continue; }
       const clue = normalizeClue(synset.rawGloss);
       if (clue.length < 8 || clue.length > 140) { exclude("clue-length"); continue; }
-      if (containsAnswer(clue, answer)) { exclude("answer-leakage"); continue; }
+      if (containsAnswer(clue, displayAnswer)) { exclude("answer-leakage"); continue; }
       const rank = senseRanks.get(`${synset.synsetOffset}:${pos}:${sourceLemma}`) || { senseRank: 99, tagCount: 0 };
       const quality = qualityScore({ clue, answer, ...rank });
       if (quality < 70) { exclude("quality-below-70"); continue; }
-      candidates.push({ source_id: `wn30:${synset.synsetOffset}-${pos}`, answer, display_answer: answer.toUpperCase(), clue,
+      candidates.push({ source_id: `wn30:${synset.synsetOffset}-${pos}`, answer, display_answer: displayAnswer, word_count: wordCount, clue,
         raw_gloss: synset.rawGloss, length: answer.length, part_of_speech: POS_NAMES[pos], sense_rank: rank.senseRank,
-        source: "wordnet-3.0", review_state: "automated", quality, dictionary_bits: dictionaryBits, flags: [] });
+        source: "wordnet-3.0", review_state: "automated", quality, dictionary_bits: dictionaryBits,
+        graph_edges: synset.pointers, flags: [] });
     }
   }
 }
 
 const unique = new Map();
 for (const candidate of candidates) {
-  const key = `${candidate.answer}\0${candidate.clue.toLowerCase()}`;
+  const key = `${candidate.display_answer}\0${candidate.clue.toLowerCase()}`;
   const prior = unique.get(key);
   if (!prior || candidate.quality > prior.quality) unique.set(key, candidate);
 }

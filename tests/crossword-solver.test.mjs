@@ -6,16 +6,27 @@ const html = fs.readFileSync(new URL("../tools/crossword-solver.html", import.me
 const script = fs.readFileSync(new URL("../assets/js/tools/crossword-solver.js", import.meta.url), "utf8");
 const css = fs.readFileSync(new URL("../assets/css/tools/crossword-solver.css", import.meta.url), "utf8");
 
+test("crossword solver cache-busts the WordNet graph release", () => {
+  assert.match(html, /crossword-solver\.js\?v=20260901-grid-positions-1/);
+  assert.match(html, /crossword-solver\.css\?v=20260901-grid-positions-1/);
+  assert.match(html, /crossword-pick-list-store\.js\?v=20260901-grid-positions-1/);
+});
+
 test("crossword solver publishes distinct metadata and structured application data", () => {
-  assert.match(html, /<title>Crossword Clue &amp; Pattern Solver \| MonkeyTactics<\/title>/);
+  assert.match(html, /<title>Crossword Solver: Clues, Patterns &amp; WordNet \| MonkeyTactics<\/title>/);
   assert.match(html, /<link rel="canonical" href="https:\/\/monkeytactics\.com\/tools\/crossword-solver">/);
   assert.match(html, /"@type": "SoftwareApplication"/);
   assert.match(html, /"@type": "FAQPage"/);
   assert.match(html, /"Crossword clue and answer search"/);
-  assert.match(html, /<h1 id="tool-heading">Crossword Clue Solver &amp; Letter Pattern Finder<\/h1>/);
-  assert.match(html, /save candidates, restore searches, and share picks by URL or QR/);
+  assert.match(html, /<h1 id="tool-heading">Crossword Clue Solver with WordNet &amp; Letter Patterns<\/h1>/);
+  assert.match(html, /Find single- and multi-word crossword answers/);
   assert.match(html, /"isAccessibleForFree": true/);
-  assert.match(html, /94,000\+ clue records/);
+  assert.match(html, /129,000\+ clue records/);
+  const jsonLd = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(jsonLd);
+  assert.doesNotThrow(() => JSON.parse(jsonLd));
+  assert.match(html, /WordNet definition and graph similarity ranking/);
+  assert.match(html, /Versioned JSON Pick List export and import/);
 });
 
 test("new crossword workflows are described in visible and structured content", () => {
@@ -24,6 +35,11 @@ test("new crossword workflows are described in visible and structured content", 
   assert.equal((html.match(/How do I reopen a saved crossword search\?/g) || []).length, 2);
   assert.equal((html.match(/Can I reset only the crossword filters\?/g) || []).length, 2);
   assert.equal((html.match(/Can I share a crossword pick\?/g) || []).length, 2);
+  assert.equal((html.match(/Does the crossword solver support multi-word answers\?/g) || []).length, 2);
+  assert.equal((html.match(/How does WordNet graph similarity rank crossword answers\?/g) || []).length, 2);
+  assert.equal((html.match(/Can I export or import a crossword Pick List\?/g) || []).length, 2);
+  assert.equal((html.match(/What does Cached this session mean\?/g) || []).length, 2);
+  assert.match(html, /Export and Import a Crossword Pick List/);
 });
 
 test("crossword solver currently omits advertising slots", () => {
@@ -42,7 +58,7 @@ test("crossword solver exposes pattern-first controls and an optional letter poo
 
 test("crossword clue search lazily loads reviewed static data and supports combined filtering", () => {
   assert.match(script, /CLUE_MANIFEST_URL/);
-  assert.match(script, /data\?\.formatVersion !== 2/);
+  assert.match(script, /data\?\.formatVersion !== 4/);
   assert.match(script, /async function loadClueIndex\(\)/);
   assert.match(script, /async function loadClueShard\(length\)/);
   assert.match(script, /async function searchClues\(clue, pattern, filters\)/);
@@ -50,8 +66,22 @@ test("crossword clue search lazily loads reviewed static data and supports combi
   assert.match(script, /if \(clue\) \{/);
   assert.match(script, /index\.synonymPostings/);
   assert.match(script, /\* 0\.35/);
+  assert.match(script, /index\.graphPostings/);
+  assert.match(script, /\* 0\.20/);
+  assert.match(script, /WordNet graph match/);
   assert.match(script, /Related meaning/);
   assert.doesNotMatch(script, /Promise\.all\(\[Engine\.ready, loadClue/);
+});
+
+test("multi-word answers keep phrase boundaries while matching grid letters", () => {
+  assert.match(script, /displayAnswer, wordCount, answerLength/);
+  assert.match(script, /word\.replace\(\/\[\^A-Z\]\/g, ""\)/);
+  assert.match(script, /span\.className = "phrase-separator"/);
+  assert.match(script, /entry\.word\.replace\(\/\[\^A-Z\]\/gi, ""\)\.length/);
+  assert.match(css, /\.result-word \.phrase-separator/);
+  assert.match(css, /\.clue-result-topline \{[^}]*grid-template-columns: minmax\(0, 1fr\) max-content;/);
+  assert.match(css, /\.clue-result-topline \.result-word \{ overflow: hidden; \}/);
+  assert.match(css, /\.clue-result-match \{[^}]*text-align: right;[^}]*overflow-wrap: anywhere;/);
 });
 
 test("only the latest crossword search can update the results", () => {
@@ -144,6 +174,42 @@ test("dictionary lookup links follow the selected word list", () => {
   assert.match(script, /dictionaryCollinsLink\.hidden = selectedDictionary === "enable"/);
 });
 
+test("pattern examples do not interrupt keyboard navigation to Filters", () => {
+  assert.equal((html.match(/<button type="button" tabindex="-1" data-pattern=/g) || []).length, 3);
+  assert.match(html, /id="crossword-pattern"[\s\S]*?<details class="filter-disclosure"/);
+});
+
+test("clue and pattern fields share a restrained input treatment", () => {
+  assert.match(css, /\.clue-field input,\.pattern-input \{[^}]*border: 1px solid var\(--premium-line\);[^}]*background: #111e17;/);
+  assert.match(css, /\.pattern-input \{[^}]*font-size: 1rem|\.clue-field input,\.pattern-input \{[^}]*font-size: 1rem/);
+  assert.doesNotMatch(css, /\.pattern-input \{[^}]*border: 2px solid/);
+  assert.match(css, /\.pattern-label-row label \{[^}]*color: var\(--premium-muted\)/);
+});
+
+test("Datamuse definitions are cached for the current page session", () => {
+  assert.match(script, /const dictionaryDefinitionCache = new Map\(\)/);
+  assert.match(script, /const cacheKey = word\.toLowerCase\(\)\.normalize\("NFKD"\)/);
+  assert.match(script, /let entries = dictionaryDefinitionCache\.get\(cacheKey\)/);
+  assert.match(script, /const fromCache = dictionaryDefinitionCache\.has\(cacheKey\)/);
+  assert.match(script, /if \(!entries\) \{/);
+  assert.match(script, /dictionaryDefinitionCache\.set\(cacheKey, entries\)/);
+  assert.match(script, /cacheStatus\.textContent = "Cached this session"/);
+  assert.match(css, /\.dictionary-cache-status \{/);
+  assert.match(css, /\.dictionary-cache-block \+ \.dictionary-entry \{[^}]*border-top:/);
+  assert.doesNotMatch(script, /dictionaryDefinitionCache\.set\([^\n]+catch/);
+});
+
+test("phrase lookups keep the matched WordNet definition and reject partial remote headwords", () => {
+  assert.match(script, /const normalizeHeadword = \(value\) => value\.toLowerCase\(\)\.replace\(\/\[\^a-z0-9\]\/g, ""\)/);
+  assert.match(script, /entries\.find\(\(\{ word \}\) => normalizeHeadword\(word\) === requestedHeadword\)/);
+  assert.doesNotMatch(script, /\|\| entries\[0\]/);
+  assert.match(script, /function renderMatchedDefinition\(definition\)/);
+  assert.match(script, /source\.textContent = "Matched WordNet definition"/);
+  assert.match(script, /if \(matchedDefinition && \/\[\\s'-\]\/\.test\(word\)\) \{/);
+  assert.match(script, /dictionaryModalBody\.replaceChildren\(\.\.\.localContent\);\s+window\.clearTimeout\(requestTimeout\);\s+dictionaryAbortController = null;\s+return;/);
+  assert.match(script, /if \(!definitions\.childNodes\.length\) \{\s+if \(!matchedDefinition\) throw new Error/);
+});
+
 test("synonym expansion is documented in visible and structured page content", () => {
   assert.match(html, /"featureList": \[[^\]]*"WordNet synonym and query expansion"/);
   assert.equal((html.match(/Can the solver understand synonyms\?/g) || []).length, 2);
@@ -155,7 +221,7 @@ test("dictionary definitions open after a stationary fine-pointer hover", () => 
   assert.match(script, /matchMedia\("\(hover: hover\) and \(pointer: fine\)"\)/);
   assert.match(script, /trigger\.addEventListener\("pointermove", schedulePreview\)/);
   assert.match(script, /trigger\.addEventListener\("pointerleave", cancelDictionaryHover\)/);
-  assert.match(script, /bindDictionaryTrigger\(button, match\.answer,/);
+  assert.match(script, /bindDictionaryTrigger\(button, displayAnswer,/);
   assert.match(script, /bindDictionaryTrigger\(link, word,/);
 });
 
@@ -166,12 +232,58 @@ test("crossword candidates can be saved with complete solving context", () => {
   assert.match(script, /definition: match\.clue/);
   assert.match(script, /relevance: match\.relevance/);
   assert.match(script, /matchedTokens: match\.matchedTokens/);
+  assert.match(script, /scoreBreakdown: match\.scoreBreakdown/);
+  assert.match(script, /matchExplanation: match\.matchExplanation/);
   assert.match(script, /dictionaryMembership: dictionaryMembership\(match\.dictionaryBits\)/);
   assert.match(script, /gridPosition: gridPosition\.value, note: note\.value/);
   assert.match(script, /insert\.textContent = "Insert"/);
   assert.match(script, /insert\.addEventListener\("click", \(\) => insertPickSearch\(entry\)\)/);
   assert.match(script, /function populateSearchFromPick\(entry\)/);
   assert.equal((html.match(/What does the crossword Pick List save\?/g) || []).length, 2);
+});
+
+test("semantic score explanations render in the lookup modal and Pick List", () => {
+  assert.match(script, /function renderScoreBreakdown\(scoreBreakdown, matchExplanation\)/);
+  assert.match(script, /title\.textContent = "Why this result\?"/);
+  assert.match(script, /directClue: candidateScore\.direct \* 10/);
+  assert.match(script, /graph: candidateScore\.graph \* 10/);
+  assert.match(script, /exactPhrase: exactPhrase \? 100 : 0/);
+  assert.match(script, /scoreDetails\.className = "crossword-pick-score-details"/);
+  assert.match(script, /scoreSummary\.textContent = "Score details"/);
+  assert.match(css, /\.crossword-score-row \{/);
+  assert.match(css, /\.crossword-score-breakdown \+ \.dictionary-entry \{[^}]*border-top: 1px solid var\(--premium-line\);/);
+  assert.match(css, /\.crossword-pick-score-details \{/);
+});
+
+test("Pick List groups Grid Positions and supports JSON export and import", () => {
+  assert.match(html, /id="crossword-pick-menu-toggle"[^>]*aria-label="Pick List actions"[^>]*aria-expanded="false"/);
+  assert.match(html, /id="crossword-pick-clear" type="button" title="Clear Pick List" aria-label="Clear Pick List">Clear/);
+  assert.equal((html.match(/id="crossword-pick-clear"/g) || []).length, 1);
+  assert.match(script, /pickListClear\.addEventListener\("click", \(event\) => \{\s+event\.stopPropagation\(\)/);
+  assert.match(script, /pickListMenuToggle\.addEventListener\("click", \(event\) =>/);
+  assert.match(script, /event\.key !== "Escape" \|\| pickListMenu\.hidden/);
+  assert.match(html, /id="crossword-pick-export"/);
+  assert.match(html, /id="crossword-pick-import"/);
+  assert.match(html, /id="crossword-pick-import-mode"/);
+  assert.match(html, /id="crossword-pick-import-file"[^>]*accept="application\/json,\.json"/);
+  assert.match(script, /group\.className = "crossword-pick-group"/);
+  assert.match(script, /group\.open = storedState !== "closed"/);
+  assert.match(script, /PickListStore\.exportData\(pickListEntries\)/);
+  assert.match(script, /PickListStore\.importData\(payload, mode\)/);
+  assert.match(script, /window\.confirm\("Replace the current Pick List with the imported file\?"\)/);
+  assert.match(css, /\.crossword-pick-group > summary \{/);
+  assert.match(css, /\.crossword-pick-summary-actions \{/);
+  assert.match(css, /\.crossword-pick-menu \{/);
+});
+
+test("Grid Position fields suggest unique positions already in the Pick List", () => {
+  assert.match(html, /<datalist id="crossword-grid-positions"><\/datalist>/);
+  assert.match(script, /function renderGridPositionOptions\(entries\)/);
+  assert.match(script, /positions\.has\(position\.toLowerCase\(\)\)/);
+  assert.match(script, /gridPosition\.setAttribute\("list", "crossword-grid-positions"\)/);
+  assert.match(script, /renderGridPositionOptions\(entries\)/);
+  assert.match(html, /"Reusable Grid Position suggestions"/);
+  assert.match(html, /select it from the suggestions on another candidate instead of retyping it/);
 });
 
 test("pick list shares deep links and QR codes and imports shared URL parameters", () => {
@@ -192,7 +304,7 @@ test("pick list shares deep links and QR codes and imports shared URL parameters
   assert.match(script, /`🔗 Try this pick: \$\{buildPickShareUrl\(entry\)\}`/u);
   assert.match(script, /function importSharedPickFromUrl\(\)/);
   assert.match(script, /populateSearchFromPick\(sharedEntry\)/);
-  assert.match(script, /lengthInput\.value = String\(fixedPatternLength\(restoredPattern\) \|\| entry\.word\.length\)/);
+  assert.match(script, /lengthInput\.value = String\(fixedPatternLength\(restoredPattern\) \|\| entry\.word\.replace/);
   assert.match(script, /if \(sharedSearchPending\) form\.requestSubmit\(\)/);
   assert.match(script, /parameters\.has\("pick"\)/);
   assert.match(script, /pickListEntries = PickListStore\.add/);

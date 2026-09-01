@@ -169,7 +169,7 @@
 .featured-tool__symbol--qr span:last-child { border-width: 0; background: var(--accent); }
 
 .featured-tool h3 { margin: 0; font-size: 1.3rem; letter-spacing: -0.025em; }
-.featured-tool > p { min-height: 6.3rem; margin: 0.6rem 0 1rem; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
+.featured-tool > p { min-height: 5.25rem; margin: 0.6rem 0 0.75rem; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
 
 .capability-list { display: grid; gap: 0.58rem; margin: 0 0 1.3rem; padding: 0; list-style: none; }
 .capability-list li { position: relative; margin: 0; padding-left: 1.1rem; color: #cbd5e1; font-size: 0.77rem; line-height: 1.4; }

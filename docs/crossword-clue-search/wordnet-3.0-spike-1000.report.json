@@ -8,18 +8,18 @@
   },
   "requestedRecords": 1000,
   "emittedRecords": 1000,
-  "eligibleRecordsBeforeDeduplication": 94878,
-  "eligibleUniqueRecords": 94856,
+  "eligibleRecordsBeforeDeduplication": 129521,
+  "eligibleUniqueRecords": 129492,
   "automatedUsabilityRate": 1,
   "manualReviewCompleted": true,
   "reviewEvidence": "Signed Phase 0 checklist; row-level worksheet decisions were not recorded",
   "rowLevelDecisionsRecorded": false,
-  "recordsSha256": "9c43d3be1452460f97aa3e51c933a43af74f85c5eb48c9369ccc6e9dd8f9eb76",
+  "recordsSha256": "b5237f3e8d34d89a860fb33ad697bddc41fd730dab8776309bca64fda934a60c",
   "exclusionCounts": {
-    "answer-leakage": 5135,
-    "clue-length": 2687,
-    "not-in-enable-or-sowpods": 19590,
-    "quality-below-70": 10206,
-    "unsupported-answer-shape": 74482
+    "answer-leakage": 5731,
+    "clue-length": 5888,
+    "not-in-enable-or-sowpods": 43345,
+    "quality-below-70": 21262,
+    "unsupported-answer-shape": 1231
   }
 }

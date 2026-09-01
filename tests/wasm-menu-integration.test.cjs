@@ -191,6 +191,7 @@ test("site-wide references describe the Batt and Blown Insulation Calculator", (
 
 test("the homepage features nine designated popular tools", () => {
   const html = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
+  const homeCss = fs.readFileSync(path.join(siteRoot, "assets", "css", "pages", "home.css"), "utf8");
   const titles = [...html.matchAll(/<article class="featured-tool[^>]*>[\s\S]*?<h3>([^<]+)<\/h3>/g)]
     .map((match) => match[1]);
 
@@ -208,6 +209,12 @@ test("the homepage features nine designated popular tools", () => {
 
   assert.match(html, /featured-tool--sedecordle[\s\S]*?featured-tool__new">New<[\s\S]*?<h3>Sedecordle Solver<\/h3>/);
   assert.match(html, /featured-tool--crossword[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Crossword Solver<\/h3>/);
+  assert.match(html, /Find single- and multi-word crossword answers using WordNet clue similarity/);
+  assert.match(html, /Rank definitions, synonyms, and WordNet graph relationships/);
+  assert.match(html, /Group candidate answers by reusable Grid Positions/);
+  assert.match(html, /Import, export, restore, and share complete Pick Lists/);
+  assert.match(html, /home\.css\?v=20260901-featured-spacing-1/);
+  assert.match(homeCss, /\.featured-tool > p \{ min-height: 5\.25rem; margin: 0\.6rem 0 0\.75rem;/);
   assert.equal((html.match(/class="capability-list"/g) || []).length, 9);
   assert.equal((html.match(/<li>/g) || []).length, 36);
   assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 3);
