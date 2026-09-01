@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Crossword Solver: Search Clues &amp; Letter Patterns | MonkeyTactics</title>
-  <meta name="description" content="Find crossword answers by clue, known letters, wildcard pattern, and answer length. Search 94,000+ WordNet clue records privately in your browser.">
+  <title>Crossword Clue Solver &amp; Letter Pattern Finder | MonkeyTactics</title>
+  <meta name="description" content="Find crossword answers by clue, length, and known letters. Rank WordNet meanings and synonyms, save candidates, restore searches, and share picks by URL or QR.">
   <meta name="robots" content="index, follow">
-  <meta name="date" content="2026-08-31">
+  <meta name="date" content="2026-09-01">
   <link rel="canonical" href="https://monkeytactics.com/tools/crossword-solver">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Crossword Solver: Search Clues &amp; Letter Patterns">
-  <meta property="og:description" content="Find ranked crossword answers using clue meanings, crossing letters, wildcard patterns, and answer length.">
+  <meta property="og:title" content="Crossword Clue Solver &amp; Letter Pattern Finder">
+  <meta property="og:description" content="Solve crossword clues with WordNet meanings, synonym expansion, crossing-letter patterns, saved picks, and shareable QR links.">
   <meta property="og:url" content="https://monkeytactics.com/tools/crossword-solver">
   <meta property="og:site_name" content="MonkeyTactics">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Crossword Solver: Search Clues &amp; Letter Patterns">
-  <meta name="twitter:description" content="Find ranked crossword answers by clue, crossing letters, wildcard pattern, and length.">
+  <meta name="twitter:title" content="Crossword Clue Solver &amp; Letter Pattern Finder">
+  <meta name="twitter:description" content="Find ranked crossword answers by clue meaning, synonyms, known letters, pattern, and length—then save or share promising picks.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -38,19 +38,26 @@
       {
         "@type": "SoftwareApplication",
         "@id": "https://monkeytactics.com/tools/crossword-solver#app",
-        "name": "Crossword Solver: Clue and Letter Pattern Search",
+        "name": "Crossword Clue Solver and Letter Pattern Finder",
         "url": "https://monkeytactics.com/tools/crossword-solver",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "Any",
-        "description": "A private browser-based crossword answer finder that searches an automatically filtered WordNet clue dataset and ENABLE/SOWPODS dictionaries by clue, letter pattern, word length, and optional filters.",
-        "dateModified": "2026-08-31",
+        "description": "A private browser-based crossword clue solver that ranks WordNet meanings and synonyms, filters answers by known letters and length, saves candidates, restores searches, and shares picks by compact URL or QR code.",
+        "dateModified": "2026-09-01",
+        "isAccessibleForFree": true,
+        "browserRequirements": "Requires JavaScript and a modern web browser.",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "featureList": ["Crossword clue search", "Clue plus answer-pattern search", "Single-letter blank wildcard", "Flexible-length wildcard", "Word length filter", "ENABLE and SOWPODS dictionaries", "Private in-browser matching"]
+        "featureList": ["Crossword clue and answer search", "WordNet definition ranking", "WordNet synonym and query expansion", "Known-letter answer patterns", "Exact and flexible answer lengths", "ENABLE and SOWPODS dictionaries", "Private crossword Pick List", "Restore and rerun saved searches", "Compact share URLs", "Crossword pick QR codes", "Copyable formatted pick summaries", "Independent filter reset", "Stationary-hover definitions", "Private in-browser matching"]
       },
       {
         "@type": "FAQPage",
         "mainEntity": [
           { "@type": "Question", "name": "Can I search using only a crossword clue?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enter the clue without an answer pattern to search and rank matching WordNet definitions. Add the answer length when you know the number of squares." } },
+          { "@type": "Question", "name": "Can the solver understand synonyms?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. When a clue does not directly match words in a WordNet definition, the solver can retrieve answers through closely related WordNet synonyms. Literal clue words and exact phrases receive more weight, so related meanings broaden the results without replacing stronger direct matches." } },
+          { "@type": "Question", "name": "What does the crossword Pick List save?", "acceptedAnswer": { "@type": "Answer", "text": "Each pick stores the answer, clue, pattern, matched WordNet definition, numeric match strength, clue-word count, dictionary membership, grid position, notes, and timestamp. Pick List data remains only in this browser." } },
+          { "@type": "Question", "name": "How do I reopen a saved crossword search?", "acceptedAnswer": { "@type": "Answer", "text": "Select Insert beside a Pick List candidate. The solver restores its clue, answer pattern, inferred length, and dictionary, clears unrelated secondary filters, and runs the search again." } },
+          { "@type": "Question", "name": "Can I reset only the crossword filters?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Reset button inside Filters clears length, sorting, letter-pool, starts-with, ends-with, must-include, and excluded-letter settings without clearing the clue, pattern, dictionary, Pick List, or current results." } },
+          { "@type": "Question", "name": "Can I share a crossword pick?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select Share beside a saved pick to create a compact deep link, formatted copyable summary, and URL QR code. The link includes only the answer, clue, pattern, and dictionary. Opening it restores the search controls, runs the search, and adds the candidate to the recipient's browser-local Pick List." } },
           { "@type": "Question", "name": "How do I combine a clue with crossing letters?", "acceptedAnswer": { "@type": "Answer", "text": "Enter the clue, then type the known letters in their grid positions and use a question mark for each unknown square. The solver ranks clue matches that also fit the pattern." } },
           { "@type": "Question", "name": "Can I search by letter pattern only?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Leave the clue blank and enter a pattern. The solver searches the selected ENABLE or SOWPODS dictionary without loading clue data." } },
           { "@type": "Question", "name": "What do question marks and asterisks mean?", "acceptedAnswer": { "@type": "Answer", "text": "A question mark matches exactly one unknown letter. An asterisk matches zero or more letters when the answer length is uncertain." } },
@@ -63,7 +70,7 @@
   </script>
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
-  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260831-modal-copy-2">
+  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260901-pick-share-7">
   <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260831-stable-mobile-7">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
@@ -83,9 +90,9 @@
       <div class="premium-hero-grid">
         <div>
           <p class="premium-eyebrow">Private clue and pattern search</p>
-          <h1 id="tool-heading">Crossword Solver: Clue &amp; Letter Pattern Search</h1>
-          <p class="premium-hero-copy">Find crossword answers from a clue, crossing letters, answer length, or any combination of them.</p>
-          <div class="premium-hero-pills" aria-label="Crossword solver features"><span>94,000+ clue records</span><span>ENABLE &amp; SOWPODS</span><span>Searches stay local</span></div>
+          <h1 id="tool-heading">Crossword Clue Solver &amp; Letter Pattern Finder</h1>
+          <p class="premium-hero-copy">Find and rank crossword answers from clue meanings, synonyms, crossing letters, answer length, or any combination of them.</p>
+          <div class="premium-hero-pills" aria-label="Crossword solver features"><span>94,000+ clue records</span><span>Synonym expansion</span><span>Save &amp; share picks</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>Clue meaning meets crossing letters</span><strong>?P*</strong><small>Rank answers by relevance, pattern fit, length, and source quality.</small></div>
       </div>
@@ -133,6 +140,7 @@
                 <div class="field"><label for="must-include">Must include</label><input id="must-include" type="text" maxlength="30" autocomplete="off" spellcheck="false" placeholder="e.g. QU"></div>
                 <div class="field"><label for="exclude-letters">Exclude letters</label><input id="exclude-letters" type="text" maxlength="30" autocomplete="off" spellcheck="false" placeholder="e.g. XZ"></div>
               </div>
+              <button class="filter-section-reset" id="reset-crossword-filters" type="button" title="Reset filters" hidden>Reset</button>
             </details>
             <div class="solver-actions"><button id="solve-button" type="submit" disabled><span id="solve-button-label">Loading dictionary…</span></button><button id="clear-search" type="button">Clear</button></div>
             <p id="form-message" role="alert" hidden></p>
@@ -144,6 +152,14 @@
           </section>
         </div>
       </form>
+      <details class="crossword-pick-list" id="crossword-pick-list">
+        <summary><span><strong>Pick List</strong><small>Saved crossword candidates and notes</small></span><em id="crossword-pick-count">0 picks</em></summary>
+        <div class="crossword-pick-list-content">
+          <div class="crossword-pick-toolbar"><p>Keep promising answers with their clue, pattern, matched definition, and crossing notes. Picks stay only in this browser.</p><label for="crossword-pick-sort">Sort <select id="crossword-pick-sort"><option value="newest">Newest</option><option value="strength">Match strength</option><option value="answer">Answer</option></select></label><button id="crossword-pick-clear" type="button">Clear pick list</button></div>
+          <p class="crossword-pick-empty" id="crossword-pick-empty">Add an answer from its definition window to start your crossword shortlist.</p>
+          <div class="crossword-pick-entries" id="crossword-pick-entries" aria-live="polite"></div>
+        </div>
+      </details>
     </section>
 
     <section class="content-grid" aria-label="Crossword solver guide">
@@ -156,7 +172,10 @@
           <li>Add the answer pattern from your grid. Keep known letters in position and use <code>?</code> for each unknown square.</li>
           <li>If you only know part of the answer, use <code>*</code> for a flexible number of letters or set an exact Word Length.</li>
           <li>Use Starts With, Ends With, Must Include, or Exclude Letters only when crossing answers support those restrictions.</li>
-          <li>Compare the highest-ranked definitions with the clue's meaning, tense, plurality, and abbreviation signals.</li>
+          <li>Select <strong>Reset</strong> inside Filters to clear only the secondary filters without losing the clue, pattern, dictionary, Pick List, or current results.</li>
+          <li>Pause the pointer over an answer to preview its definition, or select it with a click or keyboard. Compare the highest-ranked definitions with the clue's meaning, tense, plurality, and abbreviation signals.</li>
+          <li>Select <strong>Add to Pick List</strong> in the definition window to save the answer with its clue, pattern, match details, grid position, and private crossing notes.</li>
+          <li>Use <strong>Insert</strong> to restore and rerun a saved candidate search, or <strong>Share</strong> to create a compact link, formatted clipboard summary, and QR code.</li>
         </ol>
         <p class="crossword-link-callout">Have a rack of letters instead of a grid pattern? Use the <a href="/tools/word-unscrambler">Word Unscrambler &amp; Scrabble Word Finder →</a></p>
       </article>
@@ -180,14 +199,26 @@
       <article class="content-card">
         <p class="premium-section-kicker">03 / Ranking</p>
         <h2>How Clue Search Ranks Answers</h2>
-        <p>The browser compares meaningful clue words with an indexed set of WordNet definitions. Exact phrases and multiple matching clue terms rank higher. Known pattern letters, exact answer length, dictionary membership, and dataset quality then refine the order.</p>
+        <p>The browser compares meaningful clue words with an indexed set of WordNet definitions and expands common clue terms through closely related WordNet synonyms. Literal terms and exact phrases rank higher than related meanings. Known pattern letters, exact answer length, dictionary membership, and dataset quality then refine the order.</p>
         <p>Results are ranked possibilities, not probabilities. “Best match” means the strongest result in the current filtered set; always confirm it against the puzzle's crossings and clue style.</p>
+      </article>
+      <article class="content-card">
+        <p class="premium-section-kicker">Save and continue</p>
+        <h2>Build a Crossword Candidate Pick List</h2>
+        <p>Save promising crossword answers with their clue, answer pattern, matched definition, match strength, dictionary membership, grid position, notes, and timestamp. Sort the shortlist by newest pick, match strength, or answer.</p>
+        <p>Select <strong>Insert</strong> on any pick to restore its clue, pattern, inferred length, and dictionary and immediately rerun the answer search. This makes it easier to revisit alternatives as crossing letters change.</p>
+      </article>
+      <article class="content-card">
+        <p class="premium-section-kicker">Share a candidate</p>
+        <h2>Share Crossword Answers by Link or QR Code</h2>
+        <p>Each saved pick can generate a compact Crossword Solver URL and a scannable QR code. The formatted clipboard summary includes the answer, clue, pattern, matched definition, ranking details, dictionary, timestamp, and direct solver link.</p>
+        <p>Opening a shared link fills the clue and pattern controls, infers the answer length, selects the dictionary, runs the search, and adds the candidate to the recipient's browser-local Pick List.</p>
       </article>
       <article class="content-card">
         <p class="premium-section-kicker">Data and privacy</p>
         <h2>Private, Browser-Based Crossword Search</h2>
         <p>The clue index contains more than 94,000 automatically filtered records derived from Princeton WordNet 3.0. Answer validation uses the ENABLE and SOWPODS word lists. Data loads in compressed pieces only when needed.</p>
-        <p>Your clue, pattern, and filters remain on your device. Selecting an answer for the optional dictionary popup sends only that answer word to Datamuse. See <a href="/third-party-notices#wordnet-heading">data sources and licensing</a>.</p>
+        <p>Your clue, pattern, filters, Pick List, grid positions, and notes remain on your device. A share link contains only the answer, clue, pattern, and dictionary selection. Selecting an answer for the optional definition popup sends only that answer word to Datamuse. See <a href="/third-party-notices#wordnet-heading">data sources and licensing</a>.</p>
       </article>
     </section>
 
@@ -195,6 +226,11 @@
       <p class="premium-section-kicker">04 / Common questions</p>
       <h2 id="faq-heading">Crossword Solver FAQ</h2>
       <details><summary>Can I search using only a crossword clue?</summary><p>Yes. Enter the clue without an answer pattern to search and rank matching WordNet definitions. Add the answer length when you know the number of squares.</p></details>
+      <details><summary>Can the solver understand synonyms?</summary><p>Yes. When a clue does not directly match words in a WordNet definition, the solver can retrieve answers through closely related WordNet synonyms. Literal clue words and exact phrases receive more weight, so related meanings broaden the results without replacing stronger direct matches.</p></details>
+      <details><summary>What does the crossword Pick List save?</summary><p>Each pick stores the answer, clue, pattern, matched WordNet definition, numeric match strength, clue-word count, dictionary membership, grid position, notes, and timestamp. Pick List data remains only in this browser.</p></details>
+      <details><summary>How do I reopen a saved crossword search?</summary><p>Select <strong>Insert</strong> beside a Pick List candidate. The solver restores its clue, answer pattern, inferred length, and dictionary, clears unrelated secondary filters, and runs the search again.</p></details>
+      <details><summary>Can I reset only the crossword filters?</summary><p>Yes. The <strong>Reset</strong> button inside Filters clears length, sorting, letter-pool, starts-with, ends-with, must-include, and excluded-letter settings without clearing the clue, pattern, dictionary, Pick List, or current results.</p></details>
+      <details><summary>Can I share a crossword pick?</summary><p>Yes. Select <strong>Share</strong> beside a saved pick to create a compact deep link, formatted copyable summary, and URL QR code. The link includes only the answer, clue, pattern, and dictionary. Opening it restores the search controls, runs the search, and adds the candidate to the recipient's browser-local Pick List.</p></details>
       <details><summary>How do I combine a clue with crossing letters?</summary><p>Enter the clue, then type the known letters in their grid positions and use a question mark for each unknown square. The solver ranks clue matches that also fit the pattern.</p></details>
       <details><summary>Can I search by letter pattern only?</summary><p>Yes. Leave the clue blank and enter a pattern. The solver searches the selected ENABLE or SOWPODS dictionary without loading clue data.</p></details>
       <details><summary>What do question marks and asterisks mean?</summary><p>A question mark matches exactly one unknown letter. An asterisk matches zero or more letters when the answer length is uncertain.</p></details>
@@ -219,14 +255,32 @@
         <button class="dictionary-modal-close" id="dictionary-modal-close" type="button" aria-label="Close dictionary">&times;</button>
       </header>
       <div class="dictionary-modal-body" id="dictionary-modal-body" aria-live="polite"></div>
-      <footer class="dictionary-modal-footer"><span>Definitions via <a href="https://www.datamuse.com/api/" target="_blank" rel="noopener noreferrer">Datamuse</a></span><div class="dictionary-modal-actions"><button id="dictionary-copy-word" type="button"><span aria-hidden="true">⧉</span> <span id="dictionary-copy-label">Copy word</span></button><a id="dictionary-full-link" href="https://www.merriam-webster.com/" target="_blank" rel="noopener noreferrer">View on Merriam-Webster <span aria-hidden="true">↗</span></a></div></footer>
+      <footer class="dictionary-modal-footer"><div class="dictionary-modal-actions"><button id="dictionary-pick-word" type="button" aria-pressed="false"><span aria-hidden="true">＋</span> <span id="dictionary-pick-label">Add to Pick List</span></button><button id="dictionary-copy-word" type="button"><span aria-hidden="true">⧉</span> <span id="dictionary-copy-label">Copy word</span></button><a id="dictionary-merriam-link" href="https://www.merriam-webster.com/" target="_blank" rel="noopener noreferrer">View on Merriam-Webster <span aria-hidden="true">↗</span></a><a id="dictionary-collins-link" href="https://scrabble.collinsdictionary.com/check/" target="_blank" rel="noopener noreferrer" hidden>Check in Collins Scrabble <span aria-hidden="true">↗</span></a></div></footer>
+    </div>
+  </dialog>
+
+  <dialog class="crossword-share-modal" id="crossword-share-modal" aria-labelledby="crossword-share-title">
+    <div class="crossword-share-card">
+      <header class="dictionary-modal-header"><div><span class="premium-section-kicker">Share crossword pick</span><h2 id="crossword-share-title">Share candidate</h2></div><button class="dictionary-modal-close" id="crossword-share-close" type="button" aria-label="Close share window">&times;</button></header>
+      <section class="crossword-share-summary" aria-label="Pick details">
+        <div><h3 id="crossword-share-word">Candidate</h3><p id="crossword-share-meta"></p></div>
+        <div class="crossword-share-context"><p><strong>Clue:</strong> <span id="crossword-share-clue"></span></p><p><strong>Pattern:</strong> <span id="crossword-share-pattern"></span></p><p><strong>Matched definition:</strong> <span id="crossword-share-definition"></span></p></div>
+        <button id="crossword-share-copy-summary" type="button">Copy to clipboard</button>
+        <p class="crossword-share-url"><strong>Share URL:</strong> <a id="crossword-share-url" href="https://monkeytactics.com/tools/crossword-solver"></a></p>
+      </section>
+      <div class="crossword-share-body">
+        <section class="crossword-share-qr"><span>URL QR code</span><div class="crossword-share-qr-frame"><canvas id="crossword-share-qr" width="280" height="280" aria-label="QR code containing the shared crossword pick URL"></canvas></div></section>
+      </div>
+      <footer class="dictionary-modal-footer"><div class="dictionary-modal-actions"><button id="crossword-share-copy-qr" type="button">Copy QR code</button></div></footer>
     </div>
   </dialog>
 
   <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot"><div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div><a class="trustpilot-review-link" href="https://www.trustpilot.com/evaluate/monkeytactics.com" target="_blank" rel="noopener noreferrer"><img src="/assets/images/trustpilot-review.svg" width="360" height="52" alt="Review MonkeyTactics on Trustpilot"></a></section>
   <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-crossword-1" defer></script>
+  <script src="../assets/js/vendor/qrcode-1.1.0.min.js" defer></script>
+  <script src="../assets/js/tools/crossword-pick-list-store.js?v=20260901-1" defer></script>
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
-  <script src="../assets/js/tools/crossword-solver.js?v=20260831-modal-copy-4" defer></script>
+  <script src="../assets/js/tools/crossword-solver.js?v=20260901-pick-share-9" defer></script>
 </body>
 </html>

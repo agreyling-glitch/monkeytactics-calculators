@@ -8,7 +8,7 @@ const inputArgument = process.argv.find((argument) => argument.startsWith("--inp
 if (!inputArgument) throw new Error("Pass the approved filtered JSONL as --input=/path/to/wordnet-records.jsonl");
 const INPUT = pathToFileURL(resolve(inputArgument.slice("--input=".length)));
 const OUTPUT = new URL("../assets/data/crossword-clues/", import.meta.url);
-const VERSION = "wordnet-3.0-filtered-v1";
+const VERSION = "wordnet-3.0-filtered-v2";
 const STOP_WORDS = new Set(["a", "an", "and", "as", "at", "be", "by", "for", "from", "in", "into", "is", "it", "of", "on", "or", "that", "the", "to", "with"]);
 
 export function tokenizeClue(value) {
@@ -39,6 +39,7 @@ const records = sortedSourceRecords.map((record, index) => ({
 }));
 const byLength = Map.groupBy(records, ({ length }) => length > 15 ? "16-plus" : String(length));
 const postings = {};
+const synonymPostings = {};
 const lengthRanges = {};
 
 for (const record of records) {
@@ -47,21 +48,37 @@ for (const record of records) {
   }
 }
 
+// Records with the same WordNet source ID are lemmas in the same synset. Map
+// each single-word lemma to the eligible answer records in those synsets so a
+// clue can retrieve answers through a synonym even when no gloss word overlaps.
+const recordsBySource = Map.groupBy(records, ({ sourceId }) => sourceId);
+for (const synsetRecords of recordsBySource.values()) {
+  if (synsetRecords.length < 2) continue;
+  for (const { answer } of synsetRecords) {
+    const relatedIds = synsetRecords.filter((record) => record.answer !== answer).map(({ id }) => id);
+    if (!relatedIds.length) continue;
+    const posting = (synonymPostings[answer] ||= []);
+    posting.push(...relatedIds);
+  }
+}
+for (const [answer, ids] of Object.entries(synonymPostings)) synonymPostings[answer] = [...new Set(ids)].sort((a, b) => a - b);
+
 for (const [length, lengthRecords] of byLength) {
   lengthRanges[length] = [lengthRecords[0].id, lengthRecords.at(-1).id];
 }
 
 const index = {
-  formatVersion: 1,
+  formatVersion: 2,
   datasetVersion: VERSION,
   stopWords: [...STOP_WORDS].sort(),
   lengthRanges,
-  postings: Object.fromEntries(Object.entries(postings).sort(([a], [b]) => a.localeCompare(b)))
+  postings: Object.fromEntries(Object.entries(postings).sort(([a], [b]) => a.localeCompare(b))),
+  synonymPostings: Object.fromEntries(Object.entries(synonymPostings).sort(([a], [b]) => a.localeCompare(b)))
 };
 
 await rm(OUTPUT, { recursive: true, force: true });
 await mkdir(OUTPUT, { recursive: true });
-const indexFile = "keyword-index-v1.json.gz";
+const indexFile = "keyword-index-v2.json.gz";
 const indexBytes = gzipJson(index);
 await writeFile(new URL(indexFile, OUTPUT), indexBytes);
 const shards = {};
@@ -70,6 +87,7 @@ for (const [length, shardRecords] of [...byLength].sort(([a], [b]) => Number.par
   const parts = [];
   for (let offset = 0; offset < shardRecords.length; offset += 7000) {
     const partNumber = parts.length + 1;
+    // The compact record schema is unchanged in v2, so retain stable shard URLs.
     const file = `clues-${length}-${partNumber}-v1.json.gz`;
     const compact = shardRecords.slice(offset, offset + 7000).map(({ id, clue, answer, length: answerLength, quality, sourceBits, dictionaryBits }) =>
       [id, clue, answer, answerLength, quality, sourceBits, dictionaryBits]);
@@ -81,7 +99,7 @@ for (const [length, shardRecords] of [...byLength].sort(([a], [b]) => Number.par
 }
 
 const manifest = {
-  formatVersion: 1,
+  formatVersion: 2,
   schema: ["id", "clue", "answer", "length", "quality", "sourceBits", "dictionaryBits"],
   datasetVersion: VERSION,
   encoding: "gzip-json",
@@ -89,8 +107,8 @@ const manifest = {
   reviewBasis: "Automated filtering approved for the full eligible WordNet set in docs/crossword-clue-search/phase-0.md",
   licenseSet: ["wordnet-3.0"],
   sources: [{ bit: 1, id: "wordnet-3.0", notice: "/third-party-notices#wordnet-heading" }],
-  index: { file: indexFile, bytes: indexBytes.byteLength, sha256: digest(indexBytes) },
+  index: { file: indexFile, bytes: indexBytes.byteLength, sha256: digest(indexBytes), synonymTerms: Object.keys(synonymPostings).length },
   shards
 };
-await writeFile(new URL("manifest.clues-v1.json", OUTPUT), `${JSON.stringify(manifest)}\n`, "utf8");
+await writeFile(new URL("manifest.clues-v2.json", OUTPUT), `${JSON.stringify(manifest)}\n`, "utf8");
 console.log(`Built ${records.length} approved filtered clue records in ${byLength.size} length shards.`);

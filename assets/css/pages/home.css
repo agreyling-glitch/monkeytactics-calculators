@@ -148,7 +148,8 @@
 .featured-tool__topline { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
 .featured-tool__number { color: var(--accent); font: 750 0.68rem/1 monospace; }
 .featured-tool__category { display: inline-flex; align-items: center; gap: 0.45rem; color: var(--muted); font-size: 0.68rem; text-align: right; }
-.featured-tool__new { padding: 0.22rem 0.42rem; border: 1px solid rgba(251, 191, 36, 0.58); border-radius: 999px; background: rgba(245, 158, 11, 0.14); color: #fcd34d; font-size: 0.59rem; font-weight: 850; letter-spacing: 0.09em; line-height: 1; text-transform: uppercase; }
+.featured-tool__new,
+.featured-tool__updated { padding: 0.22rem 0.42rem; border: 1px solid rgba(251, 191, 36, 0.58); border-radius: 999px; background: rgba(245, 158, 11, 0.14); color: #fcd34d; font-size: 0.59rem; font-weight: 850; letter-spacing: 0.09em; line-height: 1; text-transform: uppercase; }
 
 .featured-tool__symbol {
   display: grid;
