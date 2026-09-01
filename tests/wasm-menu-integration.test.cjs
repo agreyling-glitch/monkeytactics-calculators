@@ -189,12 +189,15 @@ test("site-wide references describe the Batt and Blown Insulation Calculator", (
   assert.match(construction, /batt packages or blown-in bags, R-value, depth, load, and cost/i);
 });
 
-test("the homepage features the six designated popular tools", () => {
+test("the homepage features nine designated popular tools", () => {
   const html = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
   const titles = [...html.matchAll(/<article class="featured-tool[^>]*>[\s\S]*?<h3>([^<]+)<\/h3>/g)]
     .map((match) => match[1]);
 
   assert.deepEqual(titles, [
+    "Crossword Solver",
+    "Compound Interest Calculator",
+    "Loan Mortgage Calculator",
     "Word Unscrambler",
     "Words With Friends Solver",
     "Wordle Solver",
@@ -204,12 +207,16 @@ test("the homepage features the six designated popular tools", () => {
   ]);
 
   assert.match(html, /featured-tool--sedecordle[\s\S]*?featured-tool__new">New<[\s\S]*?<h3>Sedecordle Solver<\/h3>/);
-  assert.equal((html.match(/class="capability-list"/g) || []).length, 6);
-  assert.equal((html.match(/<li>/g) || []).length, 24);
+  assert.match(html, /featured-tool--crossword[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Crossword Solver<\/h3>/);
+  assert.equal((html.match(/class="capability-list"/g) || []).length, 9);
+  assert.equal((html.match(/<li>/g) || []).length, 36);
   assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 3);
   assert.match(html, /featured-tool--quordle[\s\S]*?featured-tool__new">New/);
   assert.match(html, /featured-tool--octordle[\s\S]*?featured-tool__new">New/);
   assert.match(html, /href="\/tools\/sedecordle-solver"/);
+  assert.match(html, /href="\/tools\/crossword-solver"/);
+  assert.match(html, /href="\/tools\/compound-interest-calculator"/);
+  assert.match(html, /href="\/tools\/loan-mortgage-calculator"/);
 });
 
 test("the flagship word and QR tools use the mortgage-inspired presentation", () => {

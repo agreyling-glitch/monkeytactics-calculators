@@ -24,20 +24,43 @@
   const resultsRegion = byId("results");
   const clearButton = byId("clear-search");
   const activeFilterCount = byId("active-filter-count");
+  const resetFiltersButton = byId("reset-crossword-filters");
   const dictionaryModal = byId("dictionary-modal");
   const dictionaryModalTitle = byId("dictionary-modal-title");
   const dictionaryModalBody = byId("dictionary-modal-body");
   const dictionaryModalClose = byId("dictionary-modal-close");
-  const dictionaryFullLink = byId("dictionary-full-link");
+  const dictionaryMerriamLink = byId("dictionary-merriam-link");
+  const dictionaryCollinsLink = byId("dictionary-collins-link");
   const dictionaryCopyButton = byId("dictionary-copy-word");
   const dictionaryCopyLabel = byId("dictionary-copy-label");
+  const dictionaryPickButton = byId("dictionary-pick-word");
+  const dictionaryPickLabel = byId("dictionary-pick-label");
+  const pickListPanel = byId("crossword-pick-list");
+  const pickListCount = byId("crossword-pick-count");
+  const pickListSort = byId("crossword-pick-sort");
+  const pickListClear = byId("crossword-pick-clear");
+  const pickListEmpty = byId("crossword-pick-empty");
+  const pickListEntriesElement = byId("crossword-pick-entries");
+  const shareModal = byId("crossword-share-modal");
+  const shareModalTitle = byId("crossword-share-title");
+  const shareModalClose = byId("crossword-share-close");
+  const shareWord = byId("crossword-share-word");
+  const shareMeta = byId("crossword-share-meta");
+  const shareClue = byId("crossword-share-clue");
+  const sharePattern = byId("crossword-share-pattern");
+  const shareDefinition = byId("crossword-share-definition");
+  const shareCopySummary = byId("crossword-share-copy-summary");
+  const shareUrl = byId("crossword-share-url");
+  const shareQrCanvas = byId("crossword-share-qr");
+  const shareCopyQr = byId("crossword-share-copy-qr");
   const sampleButtons = document.querySelectorAll("[data-pattern]");
   const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
   const DICTIONARY_BITS = { enable: 1, sowpods: 2, both: 3 };
+  const PickListStore = window.MonkeyTacticsCrosswordPickList;
   const MANIFEST_URL = "/assets/data/words/manifest.enable-sowpods-v2.json";
   const CHUNK_BASE_URL = "/assets/data/words/";
   const CLUE_BASE_URL = "/assets/data/crossword-clues/";
-  const CLUE_MANIFEST_URL = `${CLUE_BASE_URL}manifest.clues-v1.json?v=wordnet-3.0-filtered-v1`;
+  const CLUE_MANIFEST_URL = `${CLUE_BASE_URL}manifest.clues-v2.json?v=wordnet-3.0-filtered-v2`;
   let manifest;
   let clueManifest;
   let clueIndex;
@@ -51,6 +74,12 @@
   let dictionaryAbortController = null;
   let dictionaryWord = "";
   let copyFeedbackTimeout = 0;
+  let dictionaryHoverTimeout = 0;
+  const DICTIONARY_HOVER_DELAY = 650;
+  let pickListEntries = PickListStore?.read() || [];
+  let currentPickContext = null;
+  let currentShareEntry = null;
+  let shareReturnFocus = null;
 
   function normalizePattern(value) {
     return value.toLowerCase().replace(/[._-]/g, "?").replace(/\s+/g, "").replace(/[^a-z?*]/g, "");
@@ -68,6 +97,22 @@
     const stopWords = new Set(clueIndex?.stopWords || []);
     return [...new Set((value.toLowerCase().normalize("NFKD").match(/[a-z0-9]+/g) || [])
       .filter((token) => token.length > 1 && !stopWords.has(token)))];
+  }
+
+  function queryForms(token) {
+    const forms = new Set([token]);
+    if (token.length > 4 && token.endsWith("ies")) forms.add(`${token.slice(0, -3)}y`);
+    if (token.length > 4 && token.endsWith("es")) forms.add(token.slice(0, -2));
+    if (token.length > 3 && token.endsWith("s") && !token.endsWith("ss")) forms.add(token.slice(0, -1));
+    if (token.length > 5 && token.endsWith("ing")) {
+      forms.add(token.slice(0, -3));
+      forms.add(`${token.slice(0, -3)}e`);
+    }
+    if (token.length > 4 && token.endsWith("ed")) {
+      forms.add(token.slice(0, -2));
+      forms.add(`${token.slice(0, -1)}`);
+    }
+    return [...forms];
   }
 
   function globMatches(word, pattern) {
@@ -97,6 +142,7 @@
   function updateActiveFilterCount() {
     const active = [
       Number.parseInt(lengthInput.value || "0", 10) > 0,
+      sortInput.value !== "alpha",
       normalizeLetters(poolInput.value).length > 0,
       startsInput.value.trim().length > 0,
       endsInput.value.trim().length > 0,
@@ -104,6 +150,19 @@
       excludeInput.value.trim().length > 0
     ].filter(Boolean).length;
     activeFilterCount.textContent = `(${active} active)`;
+    resetFiltersButton.hidden = active === 0;
+  }
+
+  function resetFilters() {
+    lengthInput.value = "0";
+    sortInput.value = "alpha";
+    poolInput.value = "";
+    startsInput.value = "";
+    endsInput.value = "";
+    includeInput.value = "";
+    excludeInput.value = "";
+    showMessage("");
+    updateActiveFilterCount();
   }
 
   async function decodeChunk(response) {
@@ -119,7 +178,7 @@
     const response = await fetch(CLUE_MANIFEST_URL);
     if (!response.ok) throw new Error("Clue manifest failed.");
     const data = await response.json();
-    if (data?.formatVersion !== 1 || !data.index || !data.shards) throw new Error("Clue manifest is invalid.");
+    if (data?.formatVersion !== 2 || !data.index || !data.shards) throw new Error("Clue manifest is invalid.");
     clueManifest = data;
     return data;
   }
@@ -236,18 +295,47 @@
     return fragment;
   }
 
-  async function openDictionary(word, trigger) {
+  function cancelDictionaryHover() {
+    window.clearTimeout(dictionaryHoverTimeout);
+    dictionaryHoverTimeout = 0;
+  }
+
+  function bindDictionaryTrigger(trigger, word, context) {
+    trigger.addEventListener("click", () => {
+      cancelDictionaryHover();
+      openDictionary(word, trigger, true, context);
+    });
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    const schedulePreview = () => {
+      cancelDictionaryHover();
+      dictionaryHoverTimeout = window.setTimeout(() => {
+        dictionaryHoverTimeout = 0;
+        if (trigger.matches(":hover") && !dictionaryModal.open) openDictionary(word, trigger, false, context);
+      }, DICTIONARY_HOVER_DELAY);
+    };
+    trigger.addEventListener("pointerenter", schedulePreview);
+    trigger.addEventListener("pointermove", schedulePreview);
+    trigger.addEventListener("pointerleave", cancelDictionaryHover);
+  }
+
+  async function openDictionary(word, trigger, returnFocus, context) {
     const request = ++dictionaryRequest;
     dictionaryAbortController?.abort();
     dictionaryAbortController = new AbortController();
     const requestTimeout = window.setTimeout(() => dictionaryAbortController?.abort(), 8000);
-    dictionaryReturnFocus = trigger;
+    dictionaryReturnFocus = returnFocus ? trigger : null;
     dictionaryWord = word;
+    currentPickContext = { word, ...context };
+    updateDictionaryPickButton();
     window.clearTimeout(copyFeedbackTimeout);
     dictionaryCopyLabel.textContent = "Copy word";
     dictionaryCopyButton.classList.remove("is-copied");
     dictionaryModalTitle.textContent = word;
-    dictionaryFullLink.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
+    const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+    dictionaryMerriamLink.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
+    dictionaryMerriamLink.hidden = selectedDictionary === "sowpods";
+    dictionaryCollinsLink.hidden = selectedDictionary === "enable";
     const loading = document.createElement("p");
     loading.className = "dictionary-modal-status";
     loading.textContent = `Looking up ${word}…`;
@@ -269,7 +357,7 @@
       if (request !== dictionaryRequest || !dictionaryModal.open) return;
       const unavailable = document.createElement("p");
       unavailable.className = "dictionary-modal-status";
-      unavailable.textContent = `A definition for ${word} is not available here. Use the Merriam-Webster link below to continue.`;
+      unavailable.textContent = `A definition for ${word} is not available here. Use the dictionary links below to continue.`;
       dictionaryModalBody.replaceChildren(unavailable);
     } finally {
       window.clearTimeout(requestTimeout);
@@ -308,6 +396,259 @@
     }
   }
 
+  function dictionaryMembership(bits) {
+    return ({ 1: "ENABLE", 2: "SOWPODS", 3: "ENABLE + SOWPODS" })[bits] || "Selected dictionary";
+  }
+
+  function updateDictionaryPickButton() {
+    const picked = Boolean(currentPickContext && PickListStore?.find(currentPickContext));
+    dictionaryPickButton.classList.toggle("is-picked", picked);
+    dictionaryPickButton.setAttribute("aria-pressed", String(picked));
+    dictionaryPickLabel.textContent = picked ? "Picked" : "Add to Pick List";
+  }
+
+  function sortPickList(entries) {
+    const mode = pickListSort.value;
+    return [...entries].sort((left, right) => {
+      if (mode === "strength") return right.relevance - left.relevance || right.timestamp - left.timestamp;
+      if (mode === "answer") return left.word.localeCompare(right.word) || right.timestamp - left.timestamp;
+      return right.timestamp - left.timestamp || left.word.localeCompare(right.word);
+    });
+  }
+
+  function createPickField(labelText, control) {
+    const label = document.createElement("label");
+    const text = document.createElement("span");
+    text.textContent = labelText;
+    label.append(text, control);
+    return label;
+  }
+
+  function createPickContextRow(labelText, value) {
+    const row = document.createElement("p");
+    const label = document.createElement("strong");
+    label.textContent = `${labelText}: `;
+    row.append(label, document.createTextNode(value));
+    return row;
+  }
+
+  function buildPickShareUrl(entry) {
+    const url = new URL("https://monkeytactics.com/tools/crossword-solver");
+    url.searchParams.set("pick", "1");
+    url.searchParams.set("word", entry.word);
+    url.searchParams.set("clue", entry.clue);
+    url.searchParams.set("pattern", entry.pattern || "None");
+    url.searchParams.set("dictionary", entry.dictionaryMembership.replace(" + ", " "));
+    return url.toString();
+  }
+
+  function pickShareMeta(entry) {
+    return `${Math.round(entry.relevance)} strength · ${entry.matchedTokens} clue ${entry.matchedTokens === 1 ? "word" : "words"} · ${entry.dictionaryMembership} · ${new Date(entry.timestamp).toLocaleString()}`;
+  }
+
+  function buildPickSummaryText(entry) {
+    return [
+      "🐒 MonkeyTactics.com",
+      "🧩 CROSSWORD PICK",
+      `🔤 Answer: ${entry.word}`,
+      `💡 Clue: ${entry.clue || "None"}`,
+      `🧱 Pattern: ${entry.pattern || "None"}`,
+      `📖 Matched definition: ${entry.definition || "None"}`,
+      `🎯 Match strength: ${Math.round(entry.relevance)}`,
+      `🔎 Clue words matched: ${entry.matchedTokens}`,
+      `📚 Dictionary: ${entry.dictionaryMembership}`,
+      `🕒 Saved: ${new Date(entry.timestamp).toLocaleString()}`,
+      `🔗 Try this pick: ${buildPickShareUrl(entry)}`
+    ].join("\n");
+  }
+
+  function renderShareQr(payload) {
+    const context = shareQrCanvas.getContext("2d");
+    context.clearRect(0, 0, shareQrCanvas.width, shareQrCanvas.height);
+    if (!window.QRCode?.toCanvas) return;
+    window.QRCode.toCanvas(shareQrCanvas, payload, {
+      errorCorrectionLevel: "M", margin: 2, width: 280,
+      color: { dark: "#07150d", light: "#ffffff" }
+    }, (error) => {
+      if (error) console.error("Pick share QR generation failed:", error);
+    });
+  }
+
+  function openPickShare(entry, trigger) {
+    currentShareEntry = entry;
+    shareReturnFocus = trigger;
+    shareModalTitle.textContent = `Share ${entry.word}`;
+    shareWord.textContent = entry.word;
+    shareMeta.textContent = pickShareMeta(entry);
+    shareClue.textContent = entry.clue || "None";
+    sharePattern.textContent = entry.pattern || "None";
+    shareDefinition.textContent = entry.definition || "None";
+    shareCopySummary.textContent = "Copy to clipboard";
+    const payload = buildPickShareUrl(entry);
+    shareUrl.href = payload;
+    shareUrl.textContent = payload;
+    shareCopyQr.textContent = "Copy QR code";
+    if (!shareModal.open) shareModal.showModal();
+    renderShareQr(payload);
+    shareModalClose.focus();
+  }
+
+  async function copyShareSummary() {
+    if (!currentShareEntry) return;
+    try {
+      await navigator.clipboard.writeText(buildPickSummaryText(currentShareEntry));
+      shareCopySummary.textContent = "Copied to clipboard";
+    } catch (_error) { shareCopySummary.textContent = "Copy failed"; }
+  }
+
+  async function copyShareQrCode() {
+    try {
+      if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") throw new Error("Image clipboard unavailable.");
+      const blob = await new Promise((resolve, reject) => shareQrCanvas.toBlob((value) => value ? resolve(value) : reject(new Error("QR export failed.")), "image/png"));
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      shareCopyQr.textContent = "QR code copied";
+    } catch (_error) { shareCopyQr.textContent = "Copy unavailable"; }
+  }
+
+  function populateSearchFromPick(entry) {
+    const restoredPattern = normalizePattern(entry.pattern || "");
+    const selectedDictionary = entry.dictionaryBits === 3 ? "both" : entry.dictionaryBits === 2 ? "sowpods" : "enable";
+    clueInput.value = (entry.clue || "").trim().replace(/\s+/g, " ");
+    patternInput.value = restoredPattern.toUpperCase();
+    lengthInput.value = String(fixedPatternLength(restoredPattern) || entry.word.length);
+    poolInput.value = "";
+    startsInput.value = "";
+    endsInput.value = "";
+    includeInput.value = "";
+    excludeInput.value = "";
+    dictionaryInputs.forEach((input) => { input.checked = input.value === selectedDictionary; });
+    const patternLength = fixedPatternLength(restoredPattern);
+    byId("pattern-length-preview").textContent = patternLength
+      ? `${patternLength}-letter pattern`
+      : restoredPattern ? "Flexible-length pattern" : "Use ? for one blank";
+    updateActiveFilterCount();
+  }
+
+  function insertPickSearch(entry) {
+    populateSearchFromPick(entry);
+    form.requestSubmit();
+  }
+
+  function importSharedPickFromUrl() {
+    const parameters = new URLSearchParams(window.location.search);
+    if (!parameters.has("pick")) return false;
+    const word = (parameters.get("word") || "").trim().toUpperCase();
+    if (!/^[A-Z]{2,30}$/.test(word)) return false;
+    const rawDictionary = (parameters.get("dictionary") || "").trim();
+    const hasEnable = /ENABLE/i.test(rawDictionary);
+    const hasSowpods = /SOWPODS/i.test(rawDictionary);
+    const dictionaryBits = hasEnable && hasSowpods ? 3 : hasSowpods ? 2 : hasEnable ? 1 : 0;
+    const timestampValue = Number.parseInt(parameters.get("timestamp") || "", 10);
+    const strengthValue = Number.parseFloat(parameters.get("strength") || "0");
+    const matchedValue = Number.parseInt(parameters.get("matched") || "0", 10);
+    const patternValue = parameters.get("pattern") || "";
+    const sharedPattern = patternValue.toLowerCase() === "none" ? "" : normalizePattern(patternValue);
+    const sharedClue = (parameters.get("clue") || "").trim().replace(/\s+/g, " ");
+    const sharedEntry = {
+      word,
+      clue: sharedClue,
+      pattern: sharedPattern,
+      definition: parameters.get("definition") || "",
+      relevance: Number.isFinite(strengthValue) ? Math.max(0, Math.min(strengthValue, 10000)) : 0,
+      matchedTokens: Number.isFinite(matchedValue) ? Math.max(0, Math.min(matchedValue, 50)) : 0,
+      dictionaryBits,
+      dictionaryMembership: dictionaryMembership(dictionaryBits),
+      timestamp: Number.isSafeInteger(timestampValue) && timestampValue > 0 ? timestampValue : Date.now()
+    };
+    pickListEntries = PickListStore.add(sharedEntry);
+    populateSearchFromPick(sharedEntry);
+    pickListPanel.open = true;
+    return true;
+  }
+
+  function renderPickList() {
+    const entries = sortPickList(pickListEntries);
+    pickListCount.textContent = `${entries.length} ${entries.length === 1 ? "pick" : "picks"}`;
+    pickListClear.disabled = entries.length === 0;
+    pickListEmpty.hidden = entries.length > 0;
+    const fragment = document.createDocumentFragment();
+
+    entries.forEach((entry) => {
+      const item = document.createElement("article");
+      const header = document.createElement("div");
+      const word = document.createElement("strong");
+      const actions = document.createElement("div");
+      const insert = document.createElement("button");
+      const share = document.createElement("button");
+      const remove = document.createElement("button");
+      const meta = document.createElement("p");
+      const context = document.createElement("div");
+      const fields = document.createElement("div");
+      const gridPosition = document.createElement("input");
+      const note = document.createElement("textarea");
+
+      item.className = "crossword-pick-entry";
+      header.className = "crossword-pick-entry-header";
+      actions.className = "crossword-pick-entry-actions";
+      meta.className = "crossword-pick-meta";
+      context.className = "crossword-pick-context";
+      fields.className = "crossword-pick-fields";
+      word.textContent = entry.word;
+      insert.className = "crossword-pick-insert";
+      insert.type = "button";
+      insert.textContent = "Insert";
+      insert.setAttribute("aria-label", `Insert ${entry.word} search filters`);
+      insert.addEventListener("click", () => insertPickSearch(entry));
+      share.className = "crossword-pick-share";
+      share.type = "button";
+      share.textContent = "Share";
+      share.setAttribute("aria-label", `Share ${entry.word}`);
+      share.addEventListener("click", () => openPickShare(entry, share));
+      remove.className = "crossword-pick-remove";
+      remove.type = "button";
+      remove.textContent = "Remove";
+      remove.setAttribute("aria-label", `Remove ${entry.word} from the pick list`);
+      remove.addEventListener("click", () => {
+        pickListEntries = PickListStore.remove(entry.id);
+        renderPickList();
+        updateDictionaryPickButton();
+      });
+      const matchLabel = `${Math.round(entry.relevance)} strength · ${entry.matchedTokens} clue ${entry.matchedTokens === 1 ? "word" : "words"} · ${entry.dictionaryMembership}`;
+      meta.textContent = `${matchLabel} · ${new Date(entry.timestamp).toLocaleString()}`;
+      gridPosition.type = "text";
+      gridPosition.maxLength = PickListStore.GRID_POSITION_MAX_LENGTH;
+      gridPosition.value = entry.gridPosition;
+      gridPosition.placeholder = "e.g. 14-Down";
+      note.rows = 3;
+      note.maxLength = PickListStore.NOTE_MAX_LENGTH;
+      note.value = entry.note;
+      note.placeholder = "Why this fits or crossings to check…";
+      const saveFields = () => { pickListEntries = PickListStore.update(entry.id, { gridPosition: gridPosition.value, note: note.value }); };
+      gridPosition.addEventListener("input", saveFields);
+      note.addEventListener("input", saveFields);
+      actions.append(insert, share, remove);
+      header.append(word, actions);
+      context.append(
+        createPickContextRow("Clue", entry.clue || "Pattern-only search"),
+        createPickContextRow("Pattern", entry.pattern || "None"),
+        createPickContextRow("Matched definition", entry.definition || "No WordNet definition for this pattern-only result")
+      );
+      fields.append(createPickField("Grid position", gridPosition), createPickField("Notes", note));
+      item.append(header, meta, context, fields);
+      fragment.append(item);
+    });
+    pickListEntriesElement.replaceChildren(fragment);
+  }
+
+  function toggleCurrentPick() {
+    if (!currentPickContext || !PickListStore) return;
+    const existing = PickListStore.find(currentPickContext);
+    pickListEntries = existing ? PickListStore.remove(existing.id) : PickListStore.add(currentPickContext);
+    renderPickList();
+    updateDictionaryPickButton();
+    if (!existing) pickListPanel.open = true;
+  }
+
   function canBuildFromPool(answer, pool) {
     if (!pool) return true;
     const counts = new Map();
@@ -339,7 +680,19 @@
       for (const id of posting) {
         const lengthKey = lengthRanges.find(([, [firstId, lastId]]) => id >= firstId && id <= lastId)?.[0];
         const length = lengthKey === "16-plus" ? 16 : Number.parseInt(lengthKey || "0", 10);
-        candidateScores.set(id, (candidateScores.get(id) || 0) + tokenWeight);
+        const score = candidateScores.get(id) || { direct: 0, expanded: 0 };
+        score.direct += tokenWeight;
+        candidateScores.set(id, score);
+        candidateLengths.set(id, length);
+      }
+      const synonymIds = [...new Set(queryForms(token).flatMap((form) => index.synonymPostings?.[form] || []))];
+      const synonymWeight = Math.max(1, Math.log2((clueManifest.recordCount + 1) / (synonymIds.length + 1))) * 0.35;
+      for (const id of synonymIds) {
+        const lengthKey = lengthRanges.find(([, [firstId, lastId]]) => id >= firstId && id <= lastId)?.[0];
+        const length = lengthKey === "16-plus" ? 16 : Number.parseInt(lengthKey || "0", 10);
+        const score = candidateScores.get(id) || { direct: 0, expanded: 0 };
+        score.expanded = Math.max(score.expanded, synonymWeight);
+        candidateScores.set(id, score);
         candidateLengths.set(id, length);
       }
     }
@@ -364,13 +717,14 @@
       if (!canBuildFromPool(answer, filters.pool)) continue;
       const clueTokens = new Set(tokenizeClue(record.clue));
       const matchedTokens = tokens.filter((token) => clueTokens.has(token)).length;
-      let relevance = candidateScores.get(record.id) * 10;
+      const candidateScore = candidateScores.get(record.id);
+      let relevance = (candidateScore.direct + candidateScore.expanded) * 10;
       if (record.clue.toLowerCase().replace(/[^a-z0-9]+/g, " ").includes(normalizedQuery)) relevance += 100;
       if (matchedTokens === tokens.length) relevance += 50;
       relevance += (record.quality / 100) * 20;
       relevance += [...pattern].filter((letter) => /[a-z]/.test(letter)).length * 4;
       if (inferredLength && record.length === inferredLength) relevance += 20;
-      const result = { ...record, relevance, matchedTokens };
+      const result = { ...record, relevance, matchedTokens, synonymMatch: candidateScore.direct === 0 && candidateScore.expanded > 0 };
       const prior = bestByAnswer.get(answer);
       if (!prior || result.relevance > prior.relevance) bestByAnswer.set(answer, result);
     }
@@ -390,10 +744,18 @@
       button.className = "result-word";
       button.setAttribute("aria-label", `Look up the definition of ${match.answer}`);
       button.append(highlightWord(match.answer.toUpperCase(), pattern.toUpperCase()));
-      button.addEventListener("click", () => openDictionary(match.answer, button));
+      bindDictionaryTrigger(button, match.answer, {
+        clue,
+        pattern,
+        definition: match.clue,
+        relevance: match.relevance,
+        matchedTokens: match.matchedTokens,
+        dictionaryBits: match.dictionaryBits,
+        dictionaryMembership: dictionaryMembership(match.dictionaryBits)
+      });
       const explanation = document.createElement("span");
       explanation.className = "clue-result-match";
-      explanation.textContent = index === 0 ? "Best match" : `${match.matchedTokens} clue ${match.matchedTokens === 1 ? "word" : "words"} matched`;
+      explanation.textContent = index === 0 ? "Best match" : match.synonymMatch ? "Related meaning" : `${match.matchedTokens} clue ${match.matchedTokens === 1 ? "word" : "words"} matched`;
       const matchedClue = document.createElement("p");
       matchedClue.className = "clue-result-clue";
       matchedClue.textContent = match.clue;
@@ -422,7 +784,17 @@
       link.className = "result-word";
       link.setAttribute("aria-label", `Look up the definition of ${word}`);
       link.append(highlightWord(word.toUpperCase(), pattern.toUpperCase()));
-      link.addEventListener("click", () => openDictionary(word, link));
+      const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+      const dictionaryBits = DICTIONARY_BITS[selectedDictionary];
+      bindDictionaryTrigger(link, word, {
+        clue: clueInput.value.trim(),
+        pattern,
+        definition: "",
+        relevance: 0,
+        matchedTokens: 0,
+        dictionaryBits,
+        dictionaryMembership: dictionaryName
+      });
       item.setAttribute("aria-label", `${word}, ${word.length} letters`);
       item.append(link);
       if (hasMixedLengths) {
@@ -505,6 +877,7 @@
 
   function clearSearch() {
     searchRequest += 1;
+    cancelDictionaryHover();
     form.reset();
     patternInput.value = "";
     poolInput.value = "";
@@ -525,7 +898,7 @@
     updateActiveFilterCount();
     form.requestSubmit();
   }));
-  [lengthInput, poolInput, startsInput, endsInput, includeInput, excludeInput]
+  [lengthInput, sortInput, poolInput, startsInput, endsInput, includeInput, excludeInput]
     .forEach((control) => control.addEventListener("input", updateActiveFilterCount));
   patternInput.addEventListener("input", () => {
     const normalized = normalizePattern(patternInput.value);
@@ -533,22 +906,43 @@
     byId("pattern-length-preview").textContent = length ? `${length}-letter pattern` : normalized ? "Flexible-length pattern" : "Use ? for one blank";
   });
   clearButton.addEventListener("click", clearSearch);
+  resetFiltersButton.addEventListener("click", resetFilters);
+  dictionaryPickButton.addEventListener("click", toggleCurrentPick);
   dictionaryCopyButton.addEventListener("click", copyDictionaryWord);
+  shareCopyQr.addEventListener("click", copyShareQrCode);
+  shareCopySummary.addEventListener("click", copyShareSummary);
+  shareModalClose.addEventListener("click", () => shareModal.close());
+  shareModal.addEventListener("click", (event) => { if (event.target === shareModal) shareModal.close(); });
+  shareModal.addEventListener("close", () => {
+    currentShareEntry = null;
+    if (shareReturnFocus?.isConnected) shareReturnFocus.focus();
+    shareReturnFocus = null;
+  });
+  pickListSort.addEventListener("change", renderPickList);
+  pickListClear.addEventListener("click", () => {
+    pickListEntries = PickListStore.clear();
+    renderPickList();
+    updateDictionaryPickButton();
+  });
   dictionaryModalClose.addEventListener("click", () => dictionaryModal.close());
   dictionaryModal.addEventListener("click", (event) => {
     if (event.target === dictionaryModal) dictionaryModal.close();
   });
   dictionaryModal.addEventListener("close", () => {
+    cancelDictionaryHover();
     dictionaryRequest += 1;
     dictionaryAbortController?.abort();
     dictionaryAbortController = null;
     window.clearTimeout(copyFeedbackTimeout);
     dictionaryWord = "";
+    currentPickContext = null;
     if (dictionaryReturnFocus?.isConnected) dictionaryReturnFocus.focus();
     dictionaryReturnFocus = null;
   });
   form.addEventListener("submit", handleSubmit);
   updateActiveFilterCount();
+  const sharedSearchPending = importSharedPickFromUrl();
+  renderPickList();
 
   setBusy(true, "Loading dictionary…");
   Promise.all([Engine.ready, fetch(MANIFEST_URL).then((response) => {
@@ -558,6 +952,7 @@
     if (!data?.chunks) throw new Error("Dictionary manifest is invalid.");
     manifest = data;
     setBusy(false);
+    if (sharedSearchPending) form.requestSubmit();
   }).catch((error) => {
     console.error(error);
     showMessage("The crossword dictionary could not be initialized.");
