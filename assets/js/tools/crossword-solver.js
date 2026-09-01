@@ -37,10 +37,18 @@
   const dictionaryPickLabel = byId("dictionary-pick-label");
   const pickListPanel = byId("crossword-pick-list");
   const pickListCount = byId("crossword-pick-count");
+  const pickListMenuToggle = byId("crossword-pick-menu-toggle");
+  const pickListMenu = byId("crossword-pick-menu");
   const pickListSort = byId("crossword-pick-sort");
+  const pickListExport = byId("crossword-pick-export");
+  const pickListImport = byId("crossword-pick-import");
+  const pickListImportMode = byId("crossword-pick-import-mode");
+  const pickListImportFile = byId("crossword-pick-import-file");
+  const pickListImportStatus = byId("crossword-pick-import-status");
   const pickListClear = byId("crossword-pick-clear");
   const pickListEmpty = byId("crossword-pick-empty");
   const pickListEntriesElement = byId("crossword-pick-entries");
+  const gridPositionOptions = byId("crossword-grid-positions");
   const shareModal = byId("crossword-share-modal");
   const shareModalTitle = byId("crossword-share-title");
   const shareModalClose = byId("crossword-share-close");
@@ -57,10 +65,11 @@
   const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
   const DICTIONARY_BITS = { enable: 1, sowpods: 2, both: 3 };
   const PickListStore = window.MonkeyTacticsCrosswordPickList;
+  const PICK_GROUP_STATE_PREFIX = "monkeytactics.crossword-solver.pick-group.";
   const MANIFEST_URL = "/assets/data/words/manifest.enable-sowpods-v2.json";
   const CHUNK_BASE_URL = "/assets/data/words/";
   const CLUE_BASE_URL = "/assets/data/crossword-clues/";
-  const CLUE_MANIFEST_URL = `${CLUE_BASE_URL}manifest.clues-v2.json?v=wordnet-3.0-filtered-v2`;
+  const CLUE_MANIFEST_URL = `${CLUE_BASE_URL}manifest.clues-v4.json?v=wordnet-3.0-phrases-v4`;
   let manifest;
   let clueManifest;
   let clueIndex;
@@ -69,6 +78,7 @@
   const chunkPromises = new Map();
   const clueShards = new Map();
   const clueShardPromises = new Map();
+  const dictionaryDefinitionCache = new Map();
   let dictionaryRequest = 0;
   let dictionaryReturnFocus = null;
   let dictionaryAbortController = null;
@@ -178,7 +188,7 @@
     const response = await fetch(CLUE_MANIFEST_URL);
     if (!response.ok) throw new Error("Clue manifest failed.");
     const data = await response.json();
-    if (data?.formatVersion !== 2 || !data.index || !data.shards) throw new Error("Clue manifest is invalid.");
+    if (data?.formatVersion !== 4 || !data.index || !data.shards) throw new Error("Clue manifest is invalid.");
     clueManifest = data;
     return data;
   }
@@ -205,8 +215,8 @@
         const response = await fetch(`${CLUE_BASE_URL}${part.file}?v=${data.datasetVersion}`);
         if (!response.ok) throw new Error(`Clue shard ${key} failed.`);
         return JSON.parse(await decodeChunk(response));
-      }))).flat().map(([id, clue, answer, answerLength, quality, sourceBits, dictionaryBits]) =>
-        ({ id, clue, answer, length: answerLength, quality, sourceBits, dictionaryBits }));
+      }))).flat().map(([id, clue, answer, displayAnswer, wordCount, answerLength, quality, sourceBits, dictionaryBits]) =>
+        ({ id, clue, answer, displayAnswer, wordCount, length: answerLength, quality, sourceBits, dictionaryBits }));
       clueShards.set(key, records);
       return records;
     })();
@@ -252,19 +262,36 @@
 
   function highlightWord(word, pattern) {
     const fragment = document.createDocumentFragment();
-    const exactPattern = !pattern.includes("*") && pattern.length === word.length;
-    [...word].forEach((letter, index) => {
+    const gridWord = word.replace(/[^A-Z]/g, "");
+    const exactPattern = !pattern.includes("*") && pattern.length === gridWord.length;
+    let gridIndex = 0;
+    [...word].forEach((letter) => {
       const span = document.createElement("span");
       span.textContent = letter;
-      span.className = exactPattern && pattern[index] !== "?" ? "known-letter" : "found-letter";
+      if (!/[A-Z]/.test(letter)) span.className = "phrase-separator";
+      else {
+        span.className = exactPattern && pattern[gridIndex] !== "?" ? "known-letter" : "found-letter";
+        gridIndex += 1;
+      }
       fragment.append(span);
     });
     return fragment;
   }
 
-  function renderDictionaryEntries(entries, requestedWord) {
+  function renderDictionaryEntries(entries, requestedWord, fromCache = false) {
     const fragment = document.createDocumentFragment();
-    const entry = entries.find(({ word }) => word.toLowerCase() === requestedWord.toLowerCase()) || entries[0];
+    const normalizeHeadword = (value) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const requestedHeadword = normalizeHeadword(requestedWord);
+    const entry = entries.find(({ word }) => normalizeHeadword(word) === requestedHeadword);
+    if (entry && fromCache) {
+      const cacheBlock = document.createElement("div");
+      cacheBlock.className = "dictionary-cache-block";
+      const cacheStatus = document.createElement("p");
+      cacheStatus.className = "dictionary-cache-status";
+      cacheStatus.textContent = "Cached this session";
+      cacheBlock.append(cacheStatus);
+      fragment.append(cacheBlock);
+    }
     const partNames = { n: "noun", v: "verb", adj: "adjective", adv: "adverb", u: "definition" };
     const groupedDefinitions = new Map();
     (entry?.defs || []).forEach((rawDefinition) => {
@@ -293,6 +320,66 @@
       fragment.append(section);
     });
     return fragment;
+  }
+
+  function renderMatchedDefinition(definition) {
+    if (!definition) return null;
+    const section = document.createElement("section");
+    section.className = "dictionary-entry dictionary-entry-local";
+    const heading = document.createElement("div");
+    heading.className = "dictionary-entry-heading";
+    const source = document.createElement("strong");
+    source.textContent = "Matched WordNet definition";
+    heading.append(source);
+    const list = document.createElement("ol");
+    list.className = "dictionary-definitions";
+    const item = document.createElement("li");
+    item.textContent = definition;
+    list.append(item);
+    section.append(heading, list);
+    return section;
+  }
+
+  const SCORE_LABELS = {
+    directClue: "Direct clue meaning", synonym: "Same-synset meaning", graph: "WordNet graph relation",
+    exactPhrase: "Exact clue phrase", allClueTerms: "All clue terms", sourceQuality: "Source quality",
+    knownLetters: "Known pattern letters", lengthFit: "Answer length"
+  };
+
+  function renderScoreBreakdown(scoreBreakdown, matchExplanation) {
+    if (!scoreBreakdown) return null;
+    const section = document.createElement("section");
+    section.className = "crossword-score-breakdown";
+    const heading = document.createElement("div");
+    heading.className = "crossword-score-heading";
+    const title = document.createElement("strong");
+    title.textContent = "Why this result?";
+    const total = document.createElement("span");
+    total.textContent = `${Math.round(scoreBreakdown.total)} strength`;
+    heading.append(title, total);
+    const summary = document.createElement("p");
+    summary.className = "crossword-score-summary";
+    summary.textContent = matchExplanation || "Ranked from clue meaning and crossword constraints";
+    const rows = document.createElement("div");
+    rows.className = "crossword-score-rows";
+    const active = Object.entries(SCORE_LABELS).filter(([key]) => scoreBreakdown[key] > 0);
+    const maximum = Math.max(...active.map(([key]) => scoreBreakdown[key]), 1);
+    active.forEach(([key, label]) => {
+      const row = document.createElement("div");
+      row.className = "crossword-score-row";
+      const name = document.createElement("span");
+      name.textContent = label;
+      const track = document.createElement("i");
+      const bar = document.createElement("b");
+      bar.style.width = `${Math.max(4, (scoreBreakdown[key] / maximum) * 100)}%`;
+      track.append(bar);
+      const value = document.createElement("em");
+      value.textContent = `+${Math.round(scoreBreakdown[key])}`;
+      row.append(name, track, value);
+      rows.append(row);
+    });
+    section.append(heading, summary, rows);
+    return section;
   }
 
   function cancelDictionaryHover() {
@@ -336,25 +423,46 @@
     dictionaryMerriamLink.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
     dictionaryMerriamLink.hidden = selectedDictionary === "sowpods";
     dictionaryCollinsLink.hidden = selectedDictionary === "enable";
+    const matchedDefinition = renderMatchedDefinition(context?.definition);
+    const scoreBreakdown = renderScoreBreakdown(context?.scoreBreakdown, context?.matchExplanation);
+    const localContent = [matchedDefinition, scoreBreakdown].filter(Boolean);
     const loading = document.createElement("p");
     loading.className = "dictionary-modal-status";
-    loading.textContent = `Looking up ${word}…`;
-    dictionaryModalBody.replaceChildren(loading);
+    loading.textContent = matchedDefinition ? "Checking for an additional dictionary definition…" : `Looking up ${word}…`;
+    dictionaryModalBody.replaceChildren(...localContent, loading);
     if (!dictionaryModal.open) dictionaryModal.showModal();
     dictionaryModalClose.focus();
+    if (matchedDefinition && /[\s'-]/.test(word)) {
+      dictionaryModalBody.replaceChildren(...localContent);
+      window.clearTimeout(requestTimeout);
+      dictionaryAbortController = null;
+      return;
+    }
     try {
-      const parameters = new URLSearchParams({ sp: word, md: "d", max: "1" });
-      const response = await fetch(`https://api.datamuse.com/words?${parameters}`, {
-        signal: dictionaryAbortController.signal
-      });
-      if (!response.ok) throw new Error("Definition unavailable");
-      const entries = await response.json();
+      const cacheKey = word.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, " ").trim();
+      const fromCache = dictionaryDefinitionCache.has(cacheKey);
+      let entries = dictionaryDefinitionCache.get(cacheKey);
+      if (!entries) {
+        const parameters = new URLSearchParams({ sp: word, md: "d", max: "1" });
+        const response = await fetch(`https://api.datamuse.com/words?${parameters}`, {
+          signal: dictionaryAbortController.signal
+        });
+        if (!response.ok) throw new Error("Definition unavailable");
+        entries = await response.json();
+        dictionaryDefinitionCache.set(cacheKey, entries);
+      }
       if (request !== dictionaryRequest || !dictionaryModal.open) return;
-      const definitions = renderDictionaryEntries(entries, word);
-      if (!definitions.childNodes.length) throw new Error("Definition unavailable");
-      dictionaryModalBody.replaceChildren(definitions);
+      const definitions = renderDictionaryEntries(entries, word, fromCache);
+      if (!definitions.childNodes.length) {
+        if (!matchedDefinition) throw new Error("Definition unavailable");
+        dictionaryModalBody.replaceChildren(...localContent);
+      } else dictionaryModalBody.replaceChildren(...localContent, definitions);
     } catch (error) {
       if (request !== dictionaryRequest || !dictionaryModal.open) return;
+      if (matchedDefinition) {
+        dictionaryModalBody.replaceChildren(...localContent);
+        return;
+      }
       const unavailable = document.createElement("p");
       unavailable.className = "dictionary-modal-status";
       unavailable.textContent = `A definition for ${word} is not available here. Use the dictionary links below to continue.`;
@@ -414,6 +522,77 @@
       if (mode === "answer") return left.word.localeCompare(right.word) || right.timestamp - left.timestamp;
       return right.timestamp - left.timestamp || left.word.localeCompare(right.word);
     });
+  }
+
+  function showPickImportStatus(text, isError = false) {
+    pickListImportStatus.hidden = !text;
+    pickListImportStatus.textContent = text;
+    pickListImportStatus.classList.toggle("is-error", isError);
+  }
+
+  function closePickListMenu(restoreFocus = false) {
+    pickListMenu.hidden = true;
+    pickListMenuToggle.setAttribute("aria-expanded", "false");
+    if (restoreFocus) pickListMenuToggle.focus();
+  }
+
+  function exportPickList() {
+    closePickListMenu();
+    const payload = PickListStore.exportData(pickListEntries);
+    const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `crossword-picks-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showPickImportStatus(`Exported ${pickListEntries.length} ${pickListEntries.length === 1 ? "pick" : "picks"}.`);
+  }
+
+  async function importPickListFile(file) {
+    if (!file) return;
+    try {
+      const payload = JSON.parse(await file.text());
+      const mode = pickListImportMode.value === "replace" ? "replace" : "merge";
+      if (mode === "replace" && pickListEntries.length && !window.confirm("Replace the current Pick List with the imported file?")) {
+        showPickImportStatus("Import cancelled.");
+        return;
+      }
+      const result = PickListStore.importData(payload, mode);
+      pickListEntries = result.entries;
+      renderPickList();
+      updateDictionaryPickButton();
+      pickListPanel.open = true;
+      showPickImportStatus(`${mode === "replace" ? "Replaced the Pick List with" : "Imported"} ${result.added} ${result.added === 1 ? "pick" : "picks"}${result.skipped ? `; skipped ${result.skipped} duplicate${result.skipped === 1 ? "" : "s"}` : ""}.`);
+    } catch (error) {
+      showPickImportStatus(error instanceof Error ? error.message : "The Pick List file could not be imported.", true);
+    } finally {
+      pickListImportFile.value = "";
+    }
+  }
+
+  function pickGroupLabel(entry) {
+    return entry.gridPosition.trim() || "Unassigned";
+  }
+
+  function pickGroupStorageKey(label) {
+    return `${PICK_GROUP_STATE_PREFIX}${label.toLowerCase()}`;
+  }
+
+  function renderGridPositionOptions(entries) {
+    const positions = new Map();
+    entries.forEach((entry) => {
+      const position = entry.gridPosition.trim();
+      if (position && !positions.has(position.toLowerCase())) positions.set(position.toLowerCase(), position);
+    });
+    const options = [...positions.values()]
+      .sort((left, right) => left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" }))
+      .map((position) => {
+        const option = document.createElement("option");
+        option.value = position;
+        return option;
+      });
+    gridPositionOptions.replaceChildren(...options);
   }
 
   function createPickField(labelText, control) {
@@ -515,7 +694,7 @@
     const selectedDictionary = entry.dictionaryBits === 3 ? "both" : entry.dictionaryBits === 2 ? "sowpods" : "enable";
     clueInput.value = (entry.clue || "").trim().replace(/\s+/g, " ");
     patternInput.value = restoredPattern.toUpperCase();
-    lengthInput.value = String(fixedPatternLength(restoredPattern) || entry.word.length);
+    lengthInput.value = String(fixedPatternLength(restoredPattern) || entry.word.replace(/[^A-Z]/gi, "").length);
     poolInput.value = "";
     startsInput.value = "";
     endsInput.value = "";
@@ -538,7 +717,7 @@
     const parameters = new URLSearchParams(window.location.search);
     if (!parameters.has("pick")) return false;
     const word = (parameters.get("word") || "").trim().toUpperCase();
-    if (!/^[A-Z]{2,30}$/.test(word)) return false;
+    if (!/^[A-Z]+(?:[ '-][A-Z]+)*$/.test(word) || word.replace(/[^A-Z]/g, "").length > 30) return false;
     const rawDictionary = (parameters.get("dictionary") || "").trim();
     const hasEnable = /ENABLE/i.test(rawDictionary);
     const hasSowpods = /SOWPODS/i.test(rawDictionary);
@@ -568,12 +747,44 @@
 
   function renderPickList() {
     const entries = sortPickList(pickListEntries);
+    renderGridPositionOptions(entries);
     pickListCount.textContent = `${entries.length} ${entries.length === 1 ? "pick" : "picks"}`;
     pickListClear.disabled = entries.length === 0;
+    pickListExport.disabled = entries.length === 0;
     pickListEmpty.hidden = entries.length > 0;
     const fragment = document.createDocumentFragment();
-
+    const groupedEntries = new Map();
     entries.forEach((entry) => {
+      const label = pickGroupLabel(entry);
+      if (!groupedEntries.has(label)) groupedEntries.set(label, []);
+      groupedEntries.get(label).push(entry);
+    });
+    const groups = [...groupedEntries].sort(([left], [right]) => {
+      if (left === "Unassigned") return 1;
+      if (right === "Unassigned") return -1;
+      return left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" });
+    });
+
+    groups.forEach(([groupLabel, groupEntries]) => {
+      const group = document.createElement("details");
+      const groupSummary = document.createElement("summary");
+      const groupTitle = document.createElement("strong");
+      const groupCount = document.createElement("span");
+      const groupItems = document.createElement("div");
+      let storedState = null;
+      try { storedState = sessionStorage.getItem(pickGroupStorageKey(groupLabel)); } catch (_error) { /* Open groups by default. */ }
+      group.className = "crossword-pick-group";
+      group.open = storedState !== "closed";
+      groupTitle.textContent = groupLabel;
+      groupCount.textContent = `${groupEntries.length} ${groupEntries.length === 1 ? "candidate" : "candidates"}`;
+      groupItems.className = "crossword-pick-group-entries";
+      groupSummary.append(groupTitle, groupCount);
+      group.append(groupSummary, groupItems);
+      group.addEventListener("toggle", () => {
+        try { sessionStorage.setItem(pickGroupStorageKey(groupLabel), group.open ? "open" : "closed"); } catch (_error) { /* Session storage may be unavailable. */ }
+      });
+
+      groupEntries.forEach((entry) => {
       const item = document.createElement("article");
       const header = document.createElement("div");
       const word = document.createElement("strong");
@@ -584,6 +795,7 @@
       const meta = document.createElement("p");
       const context = document.createElement("div");
       const fields = document.createElement("div");
+      const scoreDetails = document.createElement("details");
       const gridPosition = document.createElement("input");
       const note = document.createElement("textarea");
 
@@ -593,6 +805,7 @@
       meta.className = "crossword-pick-meta";
       context.className = "crossword-pick-context";
       fields.className = "crossword-pick-fields";
+      scoreDetails.className = "crossword-pick-score-details";
       word.textContent = entry.word;
       insert.className = "crossword-pick-insert";
       insert.type = "button";
@@ -613,9 +826,12 @@
         renderPickList();
         updateDictionaryPickButton();
       });
-      const matchLabel = `${Math.round(entry.relevance)} strength · ${entry.matchedTokens} clue ${entry.matchedTokens === 1 ? "word" : "words"} · ${entry.dictionaryMembership}`;
+      const matchLabel = entry.matchExplanation
+        ? `${entry.matchExplanation} · ${entry.dictionaryMembership}`
+        : `${Math.round(entry.relevance)} strength · ${entry.matchedTokens} clue ${entry.matchedTokens === 1 ? "word" : "words"} · ${entry.dictionaryMembership}`;
       meta.textContent = `${matchLabel} · ${new Date(entry.timestamp).toLocaleString()}`;
       gridPosition.type = "text";
+      gridPosition.setAttribute("list", "crossword-grid-positions");
       gridPosition.maxLength = PickListStore.GRID_POSITION_MAX_LENGTH;
       gridPosition.value = entry.gridPosition;
       gridPosition.placeholder = "e.g. 14-Down";
@@ -625,6 +841,7 @@
       note.placeholder = "Why this fits or crossings to check…";
       const saveFields = () => { pickListEntries = PickListStore.update(entry.id, { gridPosition: gridPosition.value, note: note.value }); };
       gridPosition.addEventListener("input", saveFields);
+      gridPosition.addEventListener("change", renderPickList);
       note.addEventListener("input", saveFields);
       actions.append(insert, share, remove);
       header.append(word, actions);
@@ -633,9 +850,16 @@
         createPickContextRow("Pattern", entry.pattern || "None"),
         createPickContextRow("Matched definition", entry.definition || "No WordNet definition for this pattern-only result")
       );
+      if (entry.scoreBreakdown) {
+        const scoreSummary = document.createElement("summary");
+        scoreSummary.textContent = "Score details";
+        scoreDetails.append(scoreSummary, renderScoreBreakdown(entry.scoreBreakdown, entry.matchExplanation));
+      }
       fields.append(createPickField("Grid position", gridPosition), createPickField("Notes", note));
-      item.append(header, meta, context, fields);
-      fragment.append(item);
+      item.append(header, meta, context, ...(entry.scoreBreakdown ? [scoreDetails] : []), fields);
+      groupItems.append(item);
+      });
+      fragment.append(group);
     });
     pickListEntriesElement.replaceChildren(fragment);
   }
@@ -680,7 +904,7 @@
       for (const id of posting) {
         const lengthKey = lengthRanges.find(([, [firstId, lastId]]) => id >= firstId && id <= lastId)?.[0];
         const length = lengthKey === "16-plus" ? 16 : Number.parseInt(lengthKey || "0", 10);
-        const score = candidateScores.get(id) || { direct: 0, expanded: 0 };
+        const score = candidateScores.get(id) || { direct: 0, expanded: 0, graph: 0 };
         score.direct += tokenWeight;
         candidateScores.set(id, score);
         candidateLengths.set(id, length);
@@ -690,8 +914,21 @@
       for (const id of synonymIds) {
         const lengthKey = lengthRanges.find(([, [firstId, lastId]]) => id >= firstId && id <= lastId)?.[0];
         const length = lengthKey === "16-plus" ? 16 : Number.parseInt(lengthKey || "0", 10);
-        const score = candidateScores.get(id) || { direct: 0, expanded: 0 };
+        const score = candidateScores.get(id) || { direct: 0, expanded: 0, graph: 0 };
         score.expanded = Math.max(score.expanded, synonymWeight);
+        candidateScores.set(id, score);
+        candidateLengths.set(id, length);
+      }
+      const graphEntries = queryForms(token).flatMap((form) => index.graphPostings?.[form] || []);
+      const graphCandidateCount = Math.max(1, graphEntries.length / 2);
+      const graphBaseWeight = Math.max(1, Math.log2((clueManifest.recordCount + 1) / (graphCandidateCount + 1))) * 0.20;
+      for (let entry = 0; entry < graphEntries.length; entry += 2) {
+        const id = graphEntries[entry];
+        const relationWeight = graphEntries[entry + 1] / 100;
+        const lengthKey = lengthRanges.find(([, [firstId, lastId]]) => id >= firstId && id <= lastId)?.[0];
+        const length = lengthKey === "16-plus" ? 16 : Number.parseInt(lengthKey || "0", 10);
+        const score = candidateScores.get(id) || { direct: 0, expanded: 0, graph: 0 };
+        score.graph = Math.max(score.graph, graphBaseWeight * relationWeight);
         candidateScores.set(id, score);
         candidateLengths.set(id, length);
       }
@@ -709,6 +946,7 @@
     for (const record of records) {
       if (!candidateScores.has(record.id) || record.dictionaryBits & dictionaryBit === 0) continue;
       const answer = record.answer;
+      const displayAnswer = record.displayAnswer || answer;
       if ((filters.wordLength && record.length !== filters.wordLength) || !globMatches(answer, pattern)) continue;
       if (filters.startsWith && !answer.startsWith(filters.startsWith)) continue;
       if (filters.endsWith && !answer.endsWith(filters.endsWith)) continue;
@@ -718,15 +956,35 @@
       const clueTokens = new Set(tokenizeClue(record.clue));
       const matchedTokens = tokens.filter((token) => clueTokens.has(token)).length;
       const candidateScore = candidateScores.get(record.id);
-      let relevance = (candidateScore.direct + candidateScore.expanded) * 10;
-      if (record.clue.toLowerCase().replace(/[^a-z0-9]+/g, " ").includes(normalizedQuery)) relevance += 100;
-      if (matchedTokens === tokens.length) relevance += 50;
-      relevance += (record.quality / 100) * 20;
-      relevance += [...pattern].filter((letter) => /[a-z]/.test(letter)).length * 4;
-      if (inferredLength && record.length === inferredLength) relevance += 20;
-      const result = { ...record, relevance, matchedTokens, synonymMatch: candidateScore.direct === 0 && candidateScore.expanded > 0 };
-      const prior = bestByAnswer.get(answer);
-      if (!prior || result.relevance > prior.relevance) bestByAnswer.set(answer, result);
+      const exactPhrase = record.clue.toLowerCase().replace(/[^a-z0-9]+/g, " ").includes(normalizedQuery);
+      const scoreBreakdown = {
+        directClue: candidateScore.direct * 10,
+        synonym: candidateScore.expanded * 10,
+        graph: candidateScore.graph * 10,
+        exactPhrase: exactPhrase ? 100 : 0,
+        allClueTerms: matchedTokens === tokens.length ? 50 : 0,
+        sourceQuality: (record.quality / 100) * 20,
+        knownLetters: [...pattern].filter((letter) => /[a-z]/.test(letter)).length * 4,
+        lengthFit: inferredLength && record.length === inferredLength ? 20 : 0
+      };
+      const relevance = Object.values(scoreBreakdown).reduce((total, value) => total + value, 0);
+      scoreBreakdown.total = relevance;
+      const matchSignals = [];
+      if (exactPhrase) matchSignals.push("Exact phrase");
+      else if (candidateScore.direct > 0) matchSignals.push("Direct clue meaning");
+      else if (candidateScore.expanded > 0) matchSignals.push("Same-synset meaning");
+      else if (candidateScore.graph > 0) matchSignals.push("WordNet graph relation");
+      if (scoreBreakdown.knownLetters > 0) matchSignals.push("pattern");
+      else if (scoreBreakdown.lengthFit > 0) matchSignals.push("length");
+      const strengthLabel = relevance >= 120 ? "Strong match" : relevance >= 70 ? "Good match" : "Possible match";
+      const matchExplanation = `${strengthLabel} · ${matchSignals.join(" + ") || "Source quality"}`;
+      const result = { ...record, relevance, matchedTokens,
+        scoreBreakdown, matchExplanation,
+        synonymMatch: candidateScore.direct === 0 && candidateScore.expanded > 0,
+        graphMatch: candidateScore.direct === 0 && candidateScore.expanded === 0 && candidateScore.graph > 0 };
+      const answerKey = `${answer}\0${displayAnswer}`;
+      const prior = bestByAnswer.get(answerKey);
+      if (!prior || result.relevance > prior.relevance) bestByAnswer.set(answerKey, result);
     }
     return [...bestByAnswer.values()].sort((a, b) => b.relevance - a.relevance || b.quality - a.quality || a.answer.localeCompare(b.answer)).slice(0, 100);
   }
@@ -742,20 +1000,23 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = "result-word";
-      button.setAttribute("aria-label", `Look up the definition of ${match.answer}`);
-      button.append(highlightWord(match.answer.toUpperCase(), pattern.toUpperCase()));
-      bindDictionaryTrigger(button, match.answer, {
+      const displayAnswer = match.displayAnswer || match.answer;
+      button.setAttribute("aria-label", `Look up the definition of ${displayAnswer}`);
+      button.append(highlightWord(displayAnswer.toUpperCase(), pattern.toUpperCase()));
+      bindDictionaryTrigger(button, displayAnswer, {
         clue,
         pattern,
         definition: match.clue,
         relevance: match.relevance,
         matchedTokens: match.matchedTokens,
+        scoreBreakdown: match.scoreBreakdown,
+        matchExplanation: match.matchExplanation,
         dictionaryBits: match.dictionaryBits,
         dictionaryMembership: dictionaryMembership(match.dictionaryBits)
       });
       const explanation = document.createElement("span");
       explanation.className = "clue-result-match";
-      explanation.textContent = index === 0 ? "Best match" : match.synonymMatch ? "Related meaning" : `${match.matchedTokens} clue ${match.matchedTokens === 1 ? "word" : "words"} matched`;
+      explanation.textContent = index === 0 ? "Best match" : match.graphMatch ? "WordNet graph match" : match.synonymMatch ? "Related meaning" : `${match.matchedTokens} clue ${match.matchedTokens === 1 ? "word" : "words"} matched`;
       const matchedClue = document.createElement("p");
       matchedClue.className = "clue-result-clue";
       matchedClue.textContent = match.clue;
@@ -919,7 +1180,29 @@
     shareReturnFocus = null;
   });
   pickListSort.addEventListener("change", renderPickList);
-  pickListClear.addEventListener("click", () => {
+  pickListMenuToggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!pickListPanel.open) pickListPanel.open = true;
+    const open = pickListMenu.hidden;
+    pickListMenu.hidden = !open;
+    pickListMenuToggle.setAttribute("aria-expanded", String(open));
+  });
+  document.addEventListener("click", (event) => {
+    if (pickListMenu.hidden || pickListMenu.contains(event.target) || event.target === pickListMenuToggle) return;
+    closePickListMenu();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || pickListMenu.hidden) return;
+    closePickListMenu(true);
+  });
+  pickListExport.addEventListener("click", exportPickList);
+  pickListImport.addEventListener("click", () => {
+    closePickListMenu();
+    pickListImportFile.click();
+  });
+  pickListImportFile.addEventListener("change", () => importPickListFile(pickListImportFile.files?.[0]));
+  pickListClear.addEventListener("click", (event) => {
+    event.stopPropagation();
     pickListEntries = PickListStore.clear();
     renderPickList();
     updateDictionaryPickButton();

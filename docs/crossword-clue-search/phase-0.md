@@ -3,8 +3,8 @@
 ## Scope decision
 
 The feasibility spike targets ordinary, straight English-language crossword clues.
-Cryptic clue interpretation, phrases, punctuation-bearing answers, and proper names
-outside ENABLE/SOWPODS remain out of scope. WordNet alone is used; Moby is omitted
+Cryptic clue interpretation and proper names outside ENABLE/SOWPODS remain out of
+scope. Phrase answers were added after the initial feasibility gate. WordNet alone is used; Moby is omitted
 until an evaluation demonstrates a coverage need.
 
 ## Source and transformation
@@ -61,9 +61,21 @@ the static production index and shards:
 
 ```powershell
 node scripts/build-crossword-clue-spike.mjs --source="$env:TEMP\WNdb-3.0.tar.gz" --output=tmp/crossword-clue-full --limit=all
-npm run build:crossword-clues -- --input=tmp/crossword-clue-full/wordnet-3.0-spike-94856.jsonl
+npm run build:crossword-clues -- --input=tmp/crossword-clue-full/wordnet-3.0-spike-129492.jsonl
 ```
 
-The pinned WordNet 3.0 input currently produces 94,856 unique eligible records.
+The pinned WordNet 3.0 input currently produces 129,492 unique eligible records,
+including 34,636 multi-word answers whose component words share ENABLE or SOWPODS
+membership. Phrase spacing is preserved for display while answer length and grid
+patterns operate on letters only.
 The production builder refuses to run without an explicit approved input path so
 an ordinary build cannot accidentally replace the full dataset with the old sample.
+
+## Graph similarity
+
+The production pipeline also retains selected semantic pointers between eligible
+WordNet synsets: hypernyms, hyponyms, similar terms, derivational forms, verb
+entailments, and member/substance/part relationships. The builder packages these
+as compact weighted record postings. Browser search considers graph candidates
+after direct keyword and same-synset matches, with relation-specific discounts so
+semantic distance broadens recall without displacing strong literal results.

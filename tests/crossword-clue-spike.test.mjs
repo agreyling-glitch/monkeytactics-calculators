@@ -13,11 +13,23 @@ test("WordNet feasibility spike contains 1,000 valid, attributed candidates", as
     assert.match(record.source_id, /^wn30:\d{8}-[nvar]$/);
     assert.match(record.answer, /^[a-z]{3,15}$/);
     assert.equal(record.length, record.answer.length);
+    assert.equal(record.display_answer.replace(/[^a-z]/g, ""), record.answer);
+    assert.equal(record.word_count, record.display_answer.split(/[ '-]+/).length);
     assert.equal(record.source, "wordnet-3.0");
     assert.ok(record.dictionary_bits >= 1 && record.dictionary_bits <= 3);
     assert.ok(record.quality >= 70 && record.quality <= 100);
+    assert.ok(Array.isArray(record.graph_edges));
+    record.graph_edges.forEach(({ relation, targetSourceId }) => {
+      assert.match(relation, /^(?:@|~|&|\+|\*|%[msp])$/);
+      assert.match(targetSourceId, /^wn30:\d{8}-[nvar]$/);
+    });
     assert.ok(!(record.clue.toLowerCase().match(/[a-z]+/g) || []).includes(record.answer));
   });
+});
+
+test("full production data includes eligible multi-word WordNet answers", async () => {
+  const manifest = JSON.parse(await readFile(new URL("../assets/data/crossword-clues/manifest.clues-v4.json", import.meta.url), "utf8"));
+  assert.ok(manifest.phraseCount >= 30_000);
 });
 
 test("WordNet feasibility report records reproducibility and open review status", async () => {
