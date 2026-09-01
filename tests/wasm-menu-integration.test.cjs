@@ -97,9 +97,9 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "text-data", "batch-automation"]);
   assert.deepEqual(
     groups.find(({ id }) => id === "word-games").children.map(({ id }) => id),
-    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordle-helper", "antiwordle-helper", "quordle-solver", "octordle-solver", "sedecordle-solver"],
+    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-helper", "quordle-solver", "octordle-solver", "sedecordle-solver"],
   );
-  assert.equal(leaves.length, 35);
+  assert.equal(leaves.length, 36);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
 });
 
@@ -153,7 +153,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
   for (const [id, label, count] of [
-    ["word-games", "Word Games", 8],
+    ["word-games", "Word Games", 9],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
     ["text-data", "Text &amp; Data", 5],
@@ -166,7 +166,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 35);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 36);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 

@@ -101,3 +101,15 @@ test("collapsed filter summary reports the live number of narrowing criteria", (
   assert.match(script, /activeFilterCount\.textContent = `\(\$\{active\} active\)`;/);
   assert.match(script, /\[lengthInput, poolInput, startsInput, endsInput, includeInput, excludeInput\]/);
 });
+
+test("dictionary modal can copy the selected answer", () => {
+  assert.match(html, /id="dictionary-copy-word"/);
+  assert.match(html, /id="dictionary-copy-label">Copy word<\/span>/);
+  assert.match(script, /async function copyDictionaryWord\(\)/);
+  assert.match(script, /navigator\.clipboard\?\.writeText/);
+  assert.match(script, /await navigator\.clipboard\.writeText\(text\)/);
+  assert.match(script, /document\.execCommand\("copy"\)/);
+  assert.match(script, /dictionaryCopyLabel\.textContent = "Copied"/);
+  assert.match(script, /dictionaryCopyButton\.addEventListener\("click", copyDictionaryWord\)/);
+  assert.match(css, /#dictionary-copy-word\.is-copied/);
+});

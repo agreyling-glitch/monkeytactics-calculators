@@ -29,6 +29,8 @@
   const dictionaryModalBody = byId("dictionary-modal-body");
   const dictionaryModalClose = byId("dictionary-modal-close");
   const dictionaryFullLink = byId("dictionary-full-link");
+  const dictionaryCopyButton = byId("dictionary-copy-word");
+  const dictionaryCopyLabel = byId("dictionary-copy-label");
   const sampleButtons = document.querySelectorAll("[data-pattern]");
   const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
   const DICTIONARY_BITS = { enable: 1, sowpods: 2, both: 3 };
@@ -47,6 +49,8 @@
   let dictionaryRequest = 0;
   let dictionaryReturnFocus = null;
   let dictionaryAbortController = null;
+  let dictionaryWord = "";
+  let copyFeedbackTimeout = 0;
 
   function normalizePattern(value) {
     return value.toLowerCase().replace(/[._-]/g, "?").replace(/\s+/g, "").replace(/[^a-z?*]/g, "");
@@ -238,6 +242,10 @@
     dictionaryAbortController = new AbortController();
     const requestTimeout = window.setTimeout(() => dictionaryAbortController?.abort(), 8000);
     dictionaryReturnFocus = trigger;
+    dictionaryWord = word;
+    window.clearTimeout(copyFeedbackTimeout);
+    dictionaryCopyLabel.textContent = "Copy word";
+    dictionaryCopyButton.classList.remove("is-copied");
     dictionaryModalTitle.textContent = word;
     dictionaryFullLink.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
     const loading = document.createElement("p");
@@ -266,6 +274,37 @@
     } finally {
       window.clearTimeout(requestTimeout);
       if (request === dictionaryRequest) dictionaryAbortController = null;
+    }
+  }
+
+  async function copyDictionaryWord() {
+    if (!dictionaryWord) return;
+    const text = dictionaryWord.toUpperCase();
+    let temporary;
+    try {
+      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+      else {
+        temporary = document.createElement("textarea");
+        temporary.value = text;
+        temporary.setAttribute("readonly", "");
+        temporary.style.position = "fixed";
+        temporary.style.opacity = "0";
+        document.body.append(temporary);
+        temporary.select();
+        if (!document.execCommand("copy")) throw new Error("Copy command failed.");
+      }
+      dictionaryCopyLabel.textContent = "Copied";
+      dictionaryCopyButton.classList.add("is-copied");
+      window.clearTimeout(copyFeedbackTimeout);
+      copyFeedbackTimeout = window.setTimeout(() => {
+        if (!dictionaryCopyButton.isConnected) return;
+        dictionaryCopyLabel.textContent = "Copy word";
+        dictionaryCopyButton.classList.remove("is-copied");
+      }, 1600);
+    } catch (error) {
+      dictionaryCopyLabel.textContent = "Copy failed";
+    } finally {
+      temporary?.remove();
     }
   }
 
@@ -494,6 +533,7 @@
     byId("pattern-length-preview").textContent = length ? `${length}-letter pattern` : normalized ? "Flexible-length pattern" : "Use ? for one blank";
   });
   clearButton.addEventListener("click", clearSearch);
+  dictionaryCopyButton.addEventListener("click", copyDictionaryWord);
   dictionaryModalClose.addEventListener("click", () => dictionaryModal.close());
   dictionaryModal.addEventListener("click", (event) => {
     if (event.target === dictionaryModal) dictionaryModal.close();
@@ -502,6 +542,8 @@
     dictionaryRequest += 1;
     dictionaryAbortController?.abort();
     dictionaryAbortController = null;
+    window.clearTimeout(copyFeedbackTimeout);
+    dictionaryWord = "";
     if (dictionaryReturnFocus?.isConnected) dictionaryReturnFocus.focus();
     dictionaryReturnFocus = null;
   });

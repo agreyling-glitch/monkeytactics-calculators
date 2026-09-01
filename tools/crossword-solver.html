@@ -63,8 +63,8 @@
   </script>
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
-  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260831-clue-search-1">
-  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260829-2">
+  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260831-modal-copy-2">
+  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260831-stable-mobile-7">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/shared/ads.js" defer></script>
@@ -151,6 +151,7 @@
         <p class="premium-section-kicker">02 / Narrow the possibilities</p>
         <h2>How to Use the Crossword Solver</h2>
         <ol>
+          <li><strong>Choose a dictionary:</strong> select ENABLE for a broad public-domain list geared toward North American word games, SOWPODS for international British and North American vocabulary, or Both for the widest combined results with duplicates removed. Hover over or focus an option for a short explanation.</li>
           <li>Enter the crossword clue as written. Straight definition clues work best; cryptic wordplay is not interpreted.</li>
           <li>Add the answer pattern from your grid. Keep known letters in position and use <code>?</code> for each unknown square.</li>
           <li>If you only know part of the answer, use <code>*</code> for a flexible number of letters or set an exact Word Length.</li>
@@ -218,7 +219,7 @@
         <button class="dictionary-modal-close" id="dictionary-modal-close" type="button" aria-label="Close dictionary">&times;</button>
       </header>
       <div class="dictionary-modal-body" id="dictionary-modal-body" aria-live="polite"></div>
-      <footer class="dictionary-modal-footer"><span>Definitions via <a href="https://www.datamuse.com/api/" target="_blank" rel="noopener noreferrer">Datamuse</a></span><a id="dictionary-full-link" href="https://www.merriam-webster.com/" target="_blank" rel="noopener noreferrer">View on Merriam-Webster <span aria-hidden="true">↗</span></a></footer>
+      <footer class="dictionary-modal-footer"><span>Definitions via <a href="https://www.datamuse.com/api/" target="_blank" rel="noopener noreferrer">Datamuse</a></span><div class="dictionary-modal-actions"><button id="dictionary-copy-word" type="button"><span aria-hidden="true">⧉</span> <span id="dictionary-copy-label">Copy word</span></button><a id="dictionary-full-link" href="https://www.merriam-webster.com/" target="_blank" rel="noopener noreferrer">View on Merriam-Webster <span aria-hidden="true">↗</span></a></div></footer>
     </div>
   </dialog>
 
@@ -226,6 +227,6 @@
   <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-crossword-1" defer></script>
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
-  <script src="../assets/js/tools/crossword-solver.js?v=20260831-clue-search-3" defer></script>
+  <script src="../assets/js/tools/crossword-solver.js?v=20260831-modal-copy-4" defer></script>
 </body>
 </html>

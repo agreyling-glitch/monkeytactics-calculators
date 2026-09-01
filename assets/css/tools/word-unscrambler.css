@@ -53,7 +53,7 @@
 }
 
 .tool-heading-row .dictionary-selector {
-  flex: 0 1 27rem;
+  flex: 0 1 auto;
   margin: 0;
 }
 
@@ -403,6 +403,7 @@
 }
 
 .dictionary-selector {
+  width: min(100%, 27rem);
   margin: 0 0 1.1rem;
   padding: 0;
   border: 0;
@@ -411,7 +412,8 @@
 .segmented-control {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  width: min(100%, 27rem);
+  width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--border);
   border-radius: 0.65rem;
 }
@@ -419,11 +421,6 @@
 .segmented-control label {
   position: relative;
   cursor: pointer;
-}
-
-.segmented-control label:hover,
-.segmented-control label:focus-within {
-  z-index: 2;
 }
 
 .segmented-control label + label {
@@ -469,51 +466,31 @@
   border-radius: 0 0.6rem 0.6rem 0;
 }
 
-.segmented-control label::after {
-  position: absolute;
-  top: calc(100% + 0.55rem);
-  left: 50%;
-  width: max-content;
-  max-width: min(17rem, calc(100vw - 3rem));
-  padding: 0.55rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 0.45rem;
-  background: #020617;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38);
-  color: var(--text);
-  content: attr(data-tooltip);
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.45;
-  opacity: 0;
-  pointer-events: none;
-  text-align: left;
-  transform: translate(-50%, -0.2rem);
-  transition: opacity 120ms ease, transform 120ms ease;
+.dictionary-selector::after {
+  display: block;
+  max-width: 27rem;
+  height: 4.1em;
+  margin-top: 0.45rem;
+  overflow: hidden;
+  color: var(--muted);
+  content: "ENABLE: North American · SOWPODS: British + North American · Both: combined";
+  font-size: 0.72rem;
+  line-height: 1.35;
 }
 
-.segmented-control label:hover::after,
-.segmented-control label:focus-within::after {
-  opacity: 1;
-  transform: translate(-50%, 0);
+.dictionary-selector:has(label:hover .dictionary-icon--enable)::after,
+.dictionary-selector:has(label:focus-within .dictionary-icon--enable)::after {
+  content: "ENABLE — a broad, public-domain English list geared toward North American word games.";
 }
 
-.segmented-control label:first-child::after {
-  left: 0;
-  transform: translateY(-0.2rem);
+.dictionary-selector:has(label:hover .dictionary-icon--sowpods)::after,
+.dictionary-selector:has(label:focus-within .dictionary-icon--sowpods)::after {
+  content: "SOWPODS — an international word-game list with British and North American vocabulary.";
 }
 
-.segmented-control label:last-child::after {
-  right: 0;
-  left: auto;
-  transform: translateY(-0.2rem);
-}
-
-.segmented-control label:first-child:hover::after,
-.segmented-control label:first-child:focus-within::after,
-.segmented-control label:last-child:hover::after,
-.segmented-control label:last-child:focus-within::after {
-  transform: translateY(0);
+.dictionary-selector:has(label:hover .dictionary-icon--both)::after,
+.dictionary-selector:has(label:focus-within .dictionary-icon--both)::after {
+  content: "Both — combines ENABLE and SOWPODS, removes duplicates, and returns the widest set of matches.";
 }
 
 .visually-hidden {
@@ -3195,6 +3172,10 @@
     gap: 0.25rem;
     padding: 0.55rem 0.25rem;
     font-size: 0.76rem;
+  }
+
+  .dictionary-selector::after {
+    height: 5.5em;
   }
 
   .breakdown-summary-hint {
