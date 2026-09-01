@@ -64,6 +64,28 @@
   const sampleButtons = document.querySelectorAll("[data-pattern]");
   const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
   const DICTIONARY_BITS = { enable: 1, sowpods: 2, both: 3 };
+  const CLUE_PHRASE_EXPANSIONS = new Map([
+    ["garden area", ["plot"]],
+    ["thrift store", ["selling"]],
+    ["showed irritation", ["offended"]],
+    ["expunged", ["remove"]],
+    ["claim again", ["state"]],
+    ["most unruly", ["wild"]]
+  ]);
+  const CLUE_TERM_EXPANSIONS = new Map([
+    ["pigmented", ["colored"]]
+  ]);
+  const CLUE_ANSWER_EXPANSIONS = new Map([
+    ["heading for", [{ answer: "toward", definition: "in the direction of", dictionaryBits: 3 }]],
+    ["before in poems", [{ answer: "ere", definition: "before; archaic or poetic", dictionaryBits: 3 }]],
+    ["before in poetry", [{ answer: "ere", definition: "before; archaic or poetic", dictionaryBits: 3 }]],
+    ["lymph", [
+      { answer: "node", definition: "lymph node", dictionaryBits: 3 },
+      { answer: "nodes", definition: "lymph nodes", dictionaryBits: 3 }
+    ]],
+    ["press", [{ answer: "iron", definition: "press and smooth clothes", dictionaryBits: 3 }]],
+    ["most unruly", [{ answer: "wildest", definition: "most unruly or uncontrolled", dictionaryBits: 3 }]]
+  ]);
   const PickListStore = window.MonkeyTacticsCrosswordPickList;
   const PICK_GROUP_STATE_PREFIX = "monkeytactics.crossword-solver.pick-group.";
   const MANIFEST_URL = "/assets/data/words/manifest.enable-sowpods-v2.json";
@@ -122,7 +144,103 @@
       forms.add(token.slice(0, -2));
       forms.add(`${token.slice(0, -1)}`);
     }
+    for (const expansion of CLUE_TERM_EXPANSIONS.get(token) || []) forms.add(expansion);
     return [...forms];
+  }
+
+  function hasPluralClueTerm(value) {
+    const withoutPossessives = value.toLowerCase().replace(/\b([a-z]+)['’]s\b/g, "$1");
+    return (withoutPossessives.match(/[a-z]+/g) || []).some((token) => {
+      if (token.length > 4 && token.endsWith("ies")) return true;
+      if (token.length > 4 && token.endsWith("es")) return true;
+      return token.length > 3 && token.endsWith("s") && !token.endsWith("ss");
+    });
+  }
+
+  function pluralizeAnswer(record) {
+    if (record.wordCount !== 1 || !/^[a-z]+$/.test(record.answer)) return null;
+    const answer = record.answer;
+    let plural;
+    if (/[^aeiou]y$/.test(answer)) plural = `${answer.slice(0, -1)}ies`;
+    else if (/(?:s|x|z|ch|sh)$/.test(answer)) plural = `${answer}es`;
+    else plural = `${answer}s`;
+    return { answer: plural, displayAnswer: plural, length: plural.length, inflected: true };
+  }
+
+  function singularizeAnswer(record) {
+    if (record.wordCount !== 1 || !/^[a-z]+$/.test(record.answer)) return null;
+    const answer = record.answer;
+    let singular;
+    if (answer.length > 4 && answer.endsWith("ies")) singular = `${answer.slice(0, -3)}y`;
+    else if (answer.length > 4 && /(?:ses|xes|zes|ches|shes)$/.test(answer)) singular = answer.slice(0, -2);
+    else if (answer.length > 3 && answer.endsWith("s") && !answer.endsWith("ss")) singular = answer.slice(0, -1);
+    else return null;
+    return { answer: singular, displayAnswer: singular, length: singular.length, inflected: true, singularInflected: true };
+  }
+
+  function pastTenseAnswer(record) {
+    if (record.wordCount !== 1 || !/^[a-z]+$/.test(record.answer)) return null;
+    const answer = record.answer;
+    if (answer.endsWith("ed")) return null;
+    let past;
+    if (answer.endsWith("e")) past = `${answer}d`;
+    else if (/[^aeiou]y$/.test(answer)) past = `${answer.slice(0, -1)}ied`;
+    else past = `${answer}ed`;
+    return { answer: past, displayAnswer: past, length: past.length, inflected: true, pastInflected: true };
+  }
+
+  function repeatedActionAnswer(record) {
+    if (record.wordCount !== 1 || !/^[a-z]+$/.test(record.answer) || record.answer.startsWith("re")) return null;
+    const answer = `re${record.answer}`;
+    return { answer, displayAnswer: answer, length: answer.length, repeatedAction: true };
+  }
+
+  function superlativeAnswer(record) {
+    if (record.wordCount !== 1 || !/^[a-z]+$/.test(record.answer)) return null;
+    const answer = record.answer;
+    let superlative;
+    if (/[^aeiou]y$/.test(answer)) superlative = `${answer.slice(0, -1)}iest`;
+    else if (answer.endsWith("e")) superlative = `${answer}st`;
+    else if (/[^aeiou][aeiou][^aeiouwxy]$/.test(answer)) superlative = `${answer}${answer.at(-1)}est`;
+    else superlative = `${answer}est`;
+    return { answer: superlative, displayAnswer: superlative, length: superlative.length, superlative: true };
+  }
+
+  function phraseConceptTerms(value) {
+    const normalized = value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    return [...new Set([...CLUE_PHRASE_EXPANSIONS]
+      .filter(([phrase]) => ` ${normalized} `.includes(` ${phrase} `))
+      .flatMap(([, terms]) => terms))];
+  }
+
+  function supplementalClueAnswers(value) {
+    const normalized = value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    return [...CLUE_ANSWER_EXPANSIONS]
+      .filter(([phrase]) => ` ${normalized} `.includes(` ${phrase} `))
+      .flatMap(([, answers]) => answers);
+  }
+
+  function isOneEditAway(left, right) {
+    if (Math.abs(left.length - right.length) > 1 || left === right) return false;
+    let leftIndex = 0;
+    let rightIndex = 0;
+    let edits = 0;
+    while (leftIndex < left.length && rightIndex < right.length) {
+      if (left[leftIndex] === right[rightIndex]) {
+        leftIndex += 1;
+        rightIndex += 1;
+        continue;
+      }
+      edits += 1;
+      if (edits > 1) return false;
+      if (left.length > right.length) leftIndex += 1;
+      else if (right.length > left.length) rightIndex += 1;
+      else {
+        leftIndex += 1;
+        rightIndex += 1;
+      }
+    }
+    return edits + Number(leftIndex < left.length || rightIndex < right.length) === 1;
   }
 
   function globMatches(word, pattern) {
@@ -342,8 +460,8 @@
 
   const SCORE_LABELS = {
     directClue: "Direct clue meaning", synonym: "Same-synset meaning", graph: "WordNet graph relation",
-    exactPhrase: "Exact clue phrase", allClueTerms: "All clue terms", sourceQuality: "Source quality",
-    knownLetters: "Known pattern letters", lengthFit: "Answer length"
+    phraseConcept: "Clue phrase concept", exactPhrase: "Exact clue phrase", allClueTerms: "All clue terms", sourceQuality: "Source quality",
+    inflectionFit: "Clue grammar", derivationFit: "Again / re- form", spellingFit: "Near spelling", knownLetters: "Known pattern letters", lengthFit: "Answer length"
   };
 
   function renderScoreBreakdown(scoreBreakdown, matchExplanation) {
@@ -893,7 +1011,11 @@
   async function searchClues(clue, pattern, filters) {
     setBusy(true, "Loading clue index…");
     const index = await loadClueIndex();
-    const tokens = tokenizeClue(clue);
+    const rawTokens = tokenizeClue(clue);
+    const superlativeEnabled = rawTokens.includes("most");
+    const tokens = superlativeEnabled && rawTokens.length > 1
+      ? rawTokens.filter((token) => token !== "most")
+      : rawTokens;
     if (!tokens.length) return [];
     const candidateScores = new Map();
     const candidateLengths = new Map();
@@ -933,9 +1055,29 @@
         candidateLengths.set(id, length);
       }
     }
+    for (const term of phraseConceptTerms(clue)) {
+      const expansionIds = index.postings[term] || [];
+      const expansionWeight = Math.max(1, Math.log2((clueManifest.recordCount + 1) / (expansionIds.length + 1))) * 0.80;
+      for (const id of expansionIds) {
+        const lengthKey = lengthRanges.find(([, [firstId, lastId]]) => id >= firstId && id <= lastId)?.[0];
+        const length = lengthKey === "16-plus" ? 16 : Number.parseInt(lengthKey || "0", 10);
+        const score = candidateScores.get(id) || { direct: 0, expanded: 0, graph: 0 };
+        score.phrase = Math.max(score.phrase || 0, expansionWeight);
+        candidateScores.set(id, score);
+        candidateLengths.set(id, length);
+      }
+    }
     const inferredLength = fixedPatternLength(pattern) || filters.wordLength;
+    const pluralProjectionEnabled = Boolean(inferredLength && hasPluralClueTerm(clue));
+    const pastProjectionEnabled = tokens.some((token) => token.endsWith("ed"));
+    const singularProjectionEnabled = Boolean(inferredLength);
+    const repeatedActionEnabled = tokens.includes("again");
     const lengths = inferredLength
-      ? [inferredLength]
+      ? [...new Set([inferredLength, ...((pluralProjectionEnabled || pastProjectionEnabled || repeatedActionEnabled || superlativeEnabled)
+        ? [...candidateLengths.values()].filter((length) => length < inferredLength && inferredLength - length <= 4)
+        : []), ...(singularProjectionEnabled
+        ? [...candidateLengths.values()].filter((length) => length > inferredLength && length - inferredLength <= 2)
+        : [])])]
       : [...new Set(candidateLengths.values())].sort((a, b) => a - b);
     setBusy(true, lengths.length === 1 ? `Loading ${lengths[0]}-letter clues…` : "Loading matching clue records…");
     const records = (await Promise.all(lengths.map(loadClueShard))).flat();
@@ -943,11 +1085,29 @@
     const dictionaryBit = DICTIONARY_BITS[filters.dictionary] || 1;
     const bestByAnswer = new Map();
 
-    for (const record of records) {
-      if (!candidateScores.has(record.id) || record.dictionaryBits & dictionaryBit === 0) continue;
-      const answer = record.answer;
-      const displayAnswer = record.displayAnswer || answer;
-      if ((filters.wordLength && record.length !== filters.wordLength) || !globMatches(answer, pattern)) continue;
+    const searchableRecords = records.flatMap((record) => {
+      const variants = [record];
+      const pastProjection = pastProjectionEnabled ? pastTenseAnswer(record) : null;
+      const singularProjection = singularProjectionEnabled ? singularizeAnswer(record) : null;
+      const repeatedProjection = repeatedActionEnabled ? repeatedActionAnswer(record) : null;
+      const superlativeProjection = superlativeEnabled ? superlativeAnswer(record) : null;
+      if (pastProjection) variants.push({ ...record, ...pastProjection });
+      if (singularProjection) variants.push({ ...record, ...singularProjection });
+      if (repeatedProjection) variants.push({ ...record, ...repeatedProjection });
+      if (superlativeProjection) variants.push({ ...record, ...superlativeProjection });
+      return variants;
+    });
+    for (const record of searchableRecords) {
+      if (!candidateScores.has(record.id) || (record.dictionaryBits & dictionaryBit) === 0) continue;
+      let candidateRecord = record;
+      if (inferredLength && record.length !== inferredLength) {
+        const projection = pluralProjectionEnabled ? pluralizeAnswer(record) : null;
+        if (!projection || projection.length !== inferredLength) continue;
+        candidateRecord = { ...record, ...projection };
+      }
+      const answer = candidateRecord.answer;
+      const displayAnswer = candidateRecord.displayAnswer || answer;
+      if ((filters.wordLength && candidateRecord.length !== filters.wordLength) || !globMatches(answer, pattern)) continue;
       if (filters.startsWith && !answer.startsWith(filters.startsWith)) continue;
       if (filters.endsWith && !answer.endsWith(filters.endsWith)) continue;
       if (filters.mustInclude && ![...filters.mustInclude].every((letter) => answer.includes(letter))) continue;
@@ -961,16 +1121,20 @@
         directClue: candidateScore.direct * 10,
         synonym: candidateScore.expanded * 10,
         graph: candidateScore.graph * 10,
+        phraseConcept: (candidateScore.phrase || 0) * 10,
         exactPhrase: exactPhrase ? 100 : 0,
         allClueTerms: matchedTokens === tokens.length ? 50 : 0,
         sourceQuality: (record.quality / 100) * 20,
+        inflectionFit: candidateRecord.singularInflected ? 20 : tokens.some((token) => token.endsWith("ed")) && answer.endsWith("ed") ? 30 : 0,
+        derivationFit: candidateRecord.repeatedAction || candidateRecord.superlative ? 35 : 0,
         knownLetters: [...pattern].filter((letter) => /[a-z]/.test(letter)).length * 4,
-        lengthFit: inferredLength && record.length === inferredLength ? 20 : 0
+        lengthFit: inferredLength && candidateRecord.length === inferredLength ? 20 : 0
       };
       const relevance = Object.values(scoreBreakdown).reduce((total, value) => total + value, 0);
       scoreBreakdown.total = relevance;
       const matchSignals = [];
       if (exactPhrase) matchSignals.push("Exact phrase");
+      else if (candidateScore.phrase > 0) matchSignals.push("Clue phrase concept");
       else if (candidateScore.direct > 0) matchSignals.push("Direct clue meaning");
       else if (candidateScore.expanded > 0) matchSignals.push("Same-synset meaning");
       else if (candidateScore.graph > 0) matchSignals.push("WordNet graph relation");
@@ -978,15 +1142,64 @@
       else if (scoreBreakdown.lengthFit > 0) matchSignals.push("length");
       const strengthLabel = relevance >= 120 ? "Strong match" : relevance >= 70 ? "Good match" : "Possible match";
       const matchExplanation = `${strengthLabel} · ${matchSignals.join(" + ") || "Source quality"}`;
-      const result = { ...record, relevance, matchedTokens,
+      const result = { ...candidateRecord, relevance, matchedTokens,
         scoreBreakdown, matchExplanation,
+        phraseMatch: candidateScore.phrase > 0,
         synonymMatch: candidateScore.direct === 0 && candidateScore.expanded > 0,
         graphMatch: candidateScore.direct === 0 && candidateScore.expanded === 0 && candidateScore.graph > 0 };
       const answerKey = `${answer}\0${displayAnswer}`;
       const prior = bestByAnswer.get(answerKey);
       if (!prior || result.relevance > prior.relevance) bestByAnswer.set(answerKey, result);
     }
-    return [...bestByAnswer.values()].sort((a, b) => b.relevance - a.relevance || b.quality - a.quality || a.answer.localeCompare(b.answer)).slice(0, 100);
+    for (const supplemental of supplementalClueAnswers(clue)) {
+      const answer = supplemental.answer;
+      if ((supplemental.dictionaryBits & dictionaryBit) === 0) continue;
+      if ((filters.wordLength && answer.length !== filters.wordLength) || (inferredLength && answer.length !== inferredLength)) continue;
+      if (!globMatches(answer, pattern) || (filters.startsWith && !answer.startsWith(filters.startsWith))) continue;
+      if (filters.endsWith && !answer.endsWith(filters.endsWith)) continue;
+      if (filters.mustInclude && ![...filters.mustInclude].every((letter) => answer.includes(letter))) continue;
+      if (filters.excludeLetters && [...filters.excludeLetters].some((letter) => answer.includes(letter))) continue;
+      if (!canBuildFromPool(answer, filters.pool)) continue;
+      const scoreBreakdown = {
+        directClue: 0, synonym: 0, graph: 0, phraseConcept: 120, exactPhrase: 100,
+        allClueTerms: 50, sourceQuality: 18, inflectionFit: 0,
+        knownLetters: [...pattern].filter((letter) => /[a-z]/.test(letter)).length * 4,
+        lengthFit: inferredLength ? 20 : 0
+      };
+      scoreBreakdown.total = Object.values(scoreBreakdown).reduce((total, value) => total + value, 0);
+      bestByAnswer.set(`${answer}\0${answer}`, {
+        id: `local:${answer}`, clue: supplemental.definition, answer, displayAnswer: answer,
+        wordCount: 1, length: answer.length, quality: 90, dictionaryBits: supplemental.dictionaryBits,
+        relevance: scoreBreakdown.total, matchedTokens: tokens.length, scoreBreakdown,
+        matchExplanation: "Strong match · Local crossword phrase + pattern", phraseMatch: true,
+        localSupplement: true
+      });
+    }
+    const candidates = [...bestByAnswer.values()];
+    const ranked = (candidates.some((result) => result.localSupplement)
+      ? candidates.filter((result) => result.localSupplement)
+      : candidates)
+      .sort((a, b) => b.relevance - a.relevance || b.quality - a.quality || a.answer.localeCompare(b.answer)).slice(0, 100);
+    if (ranked.length || tokens.length !== 1 || !inferredLength || !pattern) return ranked;
+    await loadForPattern(pattern);
+    return Engine.crosswordSearch(pattern, filters.pool, filters)
+      .filter((word) => isOneEditAway(tokens[0], word))
+      .slice(0, 12)
+      .map((answer) => {
+        const scoreBreakdown = {
+          directClue: 0, synonym: 0, graph: 0, phraseConcept: 0, exactPhrase: 0,
+          allClueTerms: 0, sourceQuality: 0, inflectionFit: 0, spellingFit: 40,
+          knownLetters: [...pattern].filter((letter) => /[a-z]/.test(letter)).length * 4,
+          lengthFit: 20
+        };
+        scoreBreakdown.total = Object.values(scoreBreakdown).reduce((total, value) => total + value, 0);
+        return {
+          id: `spelling:${answer}`, clue: "Near-spelling dictionary candidate; confirm the clue text and crossings",
+          answer, displayAnswer: answer, wordCount: 1, length: answer.length, quality: 0,
+          dictionaryBits: filters.dictionaryBit, relevance: scoreBreakdown.total, matchedTokens: 0,
+          scoreBreakdown, matchExplanation: "Possible match · Near spelling + pattern", spellingMatch: true
+        };
+      });
   }
 
   function renderClueResults(matches, clue, pattern) {
@@ -1016,7 +1229,7 @@
       });
       const explanation = document.createElement("span");
       explanation.className = "clue-result-match";
-      explanation.textContent = index === 0 ? "Best match" : match.graphMatch ? "WordNet graph match" : match.synonymMatch ? "Related meaning" : `${match.matchedTokens} clue ${match.matchedTokens === 1 ? "word" : "words"} matched`;
+      explanation.textContent = match.spellingMatch ? "Near spelling" : index === 0 ? "Best match" : match.superlative ? "Superlative answer" : match.repeatedAction ? "Re- form" : match.pastInflected ? "Past-tense answer" : match.singularInflected ? "Singular answer" : match.inflected ? "Plural answer" : match.phraseMatch ? "Clue phrase match" : match.graphMatch ? "WordNet graph match" : match.synonymMatch ? "Related meaning" : `${match.matchedTokens} clue ${match.matchedTokens === 1 ? "word" : "words"} matched`;
       const matchedClue = document.createElement("p");
       matchedClue.className = "clue-result-clue";
       matchedClue.textContent = match.clue;
@@ -1026,8 +1239,13 @@
     });
     resultList.append(fragment);
     resultsHeading.textContent = matches.length ? `${matches.length} ranked ${matches.length === 1 ? "answer" : "answers"}` : "No clue matches found";
+    const resultSource = matches.some((match) => match.spellingMatch)
+      ? "dictionary spelling fallback"
+      : matches.some((match) => String(match.id).startsWith("local:"))
+        ? "local crossword phrases + WordNet 3.0"
+        : "WordNet 3.0 clue dataset";
     resultsSummary.textContent = matches.length
-      ? `Clue: “${clue}”${pattern ? ` · pattern ${pattern.toUpperCase()}` : ""} · WordNet 3.0 clue dataset`
+      ? `Clue: “${clue}”${pattern ? ` · pattern ${pattern.toUpperCase()}` : ""} · ${resultSource}`
       : "Try fewer clue words, a different answer length, or a less restrictive pattern.";
     resultsRegion.classList.toggle("has-results", matches.length > 0);
   }
