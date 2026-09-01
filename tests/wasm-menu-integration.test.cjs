@@ -97,7 +97,7 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "text-data", "batch-automation"]);
   assert.deepEqual(
     groups.find(({ id }) => id === "word-games").children.map(({ id }) => id),
-    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-helper", "quordle-solver", "octordle-solver", "sedecordle-solver"],
+    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-solver", "quordle-solver", "octordle-solver", "sedecordle-solver"],
   );
   assert.equal(leaves.length, 36);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
@@ -547,7 +547,7 @@ test("the All Tools directory reinforces the compound calculator search intent",
   assert.match(html, /<small>Calculate future savings and investment growth with monthly contributions\.<\/small>/);
   assert.match(manifest, /"description":"Calculate future savings and investment growth with monthly contributions\."/);
   assert.match(manifest, /"compound interest with monthly contributions","investment growth calculator"/);
-  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>2026-08-31<\/lastmod>/);
+  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>2026-09-01<\/lastmod>/);
 });
 
 test("the Mortgage Calculator identifies its author and review scope", () => {
@@ -596,7 +596,7 @@ test("the Compound Interest Calculator uses the premium growth presentation", ()
   assert.match(html, /id="compoundChartsSection"/);
   assert.match(html, /id="printScenarioSelect"/);
   assert.match(html, /id="compoundPrintReport"/);
-  assert.match(html, /<span>MonkeyTactics<\/span><h1 id="compoundPrintTitle">/);
+  assert.match(html, /<span>MonkeyTactics<\/span><h2 id="compoundPrintTitle">/);
   assert.doesNotMatch(html, /MonkeyTactics Finance/);
   assert.match(html, /id="compoundPrintScenarioUrl"/);
   assert.match(html, /body\.print-growth > footer,/);

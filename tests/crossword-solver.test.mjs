@@ -7,7 +7,7 @@ const script = fs.readFileSync(new URL("../assets/js/tools/crossword-solver.js",
 const css = fs.readFileSync(new URL("../assets/css/tools/crossword-solver.css", import.meta.url), "utf8");
 
 test("crossword solver publishes distinct metadata and structured application data", () => {
-  assert.match(html, /<title>Crossword Clue Solver &amp; Letter Pattern Finder \| MonkeyTactics<\/title>/);
+  assert.match(html, /<title>Crossword Clue &amp; Pattern Solver \| MonkeyTactics<\/title>/);
   assert.match(html, /<link rel="canonical" href="https:\/\/monkeytactics\.com\/tools\/crossword-solver">/);
   assert.match(html, /"@type": "SoftwareApplication"/);
   assert.match(html, /"@type": "FAQPage"/);

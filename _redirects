@@ -24,5 +24,9 @@
 # Calculator pages use extensionless URLs without trailing slashes.
 /tools/calorie-calculator/  /tools/calorie-calculator  301
 
+# Preserve the original Antiwordle Helper URL after the Solver rebrand.
+/tools/antiwordle-helper  /tools/antiwordle-solver  301
+/tools/antiwordle-helper/  /tools/antiwordle-solver  301
+
 # Preserve the pre-refactor password generator module URL for cached pages and crawlers.
 /assets/js/password-generator.js  /assets/js/tools/password-generator/password-generator.js  301

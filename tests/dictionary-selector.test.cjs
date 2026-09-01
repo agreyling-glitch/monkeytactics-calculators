@@ -39,7 +39,7 @@ test("every page using the shared dictionary selector loads the fixed version", 
 
 test("every dictionary solver explains the word-list choice in its usage guide", () => {
   const pages = [
-    "antiwordle-helper.html", "crossword-solver.html", "octordle-solver.html",
+    "antiwordle-solver.html", "crossword-solver.html", "octordle-solver.html",
     "quordle-solver.html", "sedecordle-solver.html", "word-unscrambler.html",
     "wordiply-solver.html", "wordle-helper.html", "words-with-friends-solver.html",
   ];

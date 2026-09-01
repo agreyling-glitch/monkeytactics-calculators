@@ -1658,7 +1658,7 @@
 .compound-print-report { display: none; }
 .compound-print-heading { padding-bottom: 0.14in; border-bottom: 2px solid #222222; }
 .compound-print-heading > span { color: #176d39; font-size: 9pt; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
-.compound-print-heading h1 { margin: 0.04in 0; font-size: 22pt; }
+.compound-print-heading h2 { margin: 0.04in 0; font-size: 22pt; }
 .compound-print-heading p { margin: 0; color: #333333; font-size: 9pt; }
 .compound-print-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.08in; margin: 0.14in 0 0.18in; }
 .compound-print-summary > div { padding: 0.08in; border: 1px solid #cccccc; }

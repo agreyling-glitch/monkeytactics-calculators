@@ -763,7 +763,7 @@
     font: 10pt/1.4 Arial, sans-serif;
   }
   body.print-insulation .insulation-print-report header { padding-bottom: 0.18in; border-bottom: 2px solid #166534; }
-  body.print-insulation .insulation-print-report h1 { margin: 0 0 0.02in; color: #111; font-size: 21pt; }
+  body.print-insulation .insulation-print-report header h2 { margin: 0 0 0.02in; color: #111; font-size: 21pt; }
   body.print-insulation .insulation-print-report header p { margin: 0; color: #555; font-size: 8.5pt; }
   body.print-insulation .insulation-print-report section { margin-top: 0.2in; break-inside: avoid; }
   body.print-insulation .insulation-print-report h2 { margin: 0 0 0.08in; color: #166534; font-size: 11pt; }
