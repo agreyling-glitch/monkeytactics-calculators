@@ -97,9 +97,9 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "text-data", "batch-automation"]);
   assert.deepEqual(
     groups.find(({ id }) => id === "word-games").children.map(({ id }) => id),
-    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-solver", "quordle-solver", "octordle-solver", "sedecordle-solver"],
+    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-solver", "absurdle-solver", "quordle-solver", "octordle-solver", "sedecordle-solver"],
   );
-  assert.equal(leaves.length, 36);
+  assert.equal(leaves.length, 37);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
 });
 
@@ -153,7 +153,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
   for (const [id, label, count] of [
-    ["word-games", "Word Games", 9],
+    ["word-games", "Word Games", 10],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
     ["text-data", "Text &amp; Data", 5],
@@ -166,7 +166,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 36);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 37);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -189,7 +189,7 @@ test("site-wide references describe the Batt and Blown Insulation Calculator", (
   assert.match(construction, /batt packages or blown-in bags, R-value, depth, load, and cost/i);
 });
 
-test("the homepage features nine designated popular tools", () => {
+test("the homepage features eleven designated popular tools", () => {
   const html = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
   const homeCss = fs.readFileSync(path.join(siteRoot, "assets", "css", "pages", "home.css"), "utf8");
   const titles = [...html.matchAll(/<article class="featured-tool[^>]*>[\s\S]*?<h3>([^<]+)<\/h3>/g)]
@@ -199,15 +199,20 @@ test("the homepage features nine designated popular tools", () => {
     "Crossword Solver",
     "Compound Interest Calculator",
     "Loan Mortgage Calculator",
+    "Wordle Solver",
+    "Antiwordle Solver",
+    "Absurdle Solver",
     "Word Unscrambler",
     "Words With Friends Solver",
-    "Wordle Solver",
     "Quordle Solver",
     "Octordle Solver",
     "Sedecordle Solver",
   ]);
 
-  assert.match(html, /featured-tool--sedecordle[\s\S]*?featured-tool__new">New<[\s\S]*?<h3>Sedecordle Solver<\/h3>/);
+  assert.match(html, /featured-tool--absurdle[\s\S]*?featured-tool__new">New<[\s\S]*?<h3>Absurdle Solver<\/h3>/);
+  assert.match(html, /featured-tool--quordle[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Quordle Solver<\/h3>/);
+  assert.match(html, /featured-tool--octordle[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Octordle Solver<\/h3>/);
+  assert.match(html, /featured-tool--sedecordle[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Sedecordle Solver<\/h3>/);
   assert.match(html, /featured-tool--crossword[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Crossword Solver<\/h3>/);
   assert.match(html, /Find single- and multi-word crossword answers using WordNet clue similarity/);
   assert.match(html, /Rank definitions, synonyms, and WordNet graph relationships/);
@@ -215,15 +220,32 @@ test("the homepage features nine designated popular tools", () => {
   assert.match(html, /Import, export, restore, and share complete Pick Lists/);
   assert.match(html, /home\.css\?v=20260901-featured-spacing-1/);
   assert.match(homeCss, /\.featured-tool > p \{ min-height: 5\.25rem; margin: 0\.6rem 0 0\.75rem;/);
-  assert.equal((html.match(/class="capability-list"/g) || []).length, 9);
-  assert.equal((html.match(/<li>/g) || []).length, 36);
-  assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 3);
-  assert.match(html, /featured-tool--quordle[\s\S]*?featured-tool__new">New/);
-  assert.match(html, /featured-tool--octordle[\s\S]*?featured-tool__new">New/);
+  assert.equal((html.match(/class="capability-list"/g) || []).length, 11);
+  assert.equal((html.match(/<li>/g) || []).length, 44);
+  assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 1);
+  assert.equal((html.match(/class="featured-tool__updated">Updated/g) || []).length, 4);
+  assert.match(html, /featured-tool--wordle[\s\S]*?featured-tool--antiwordle[\s\S]*?featured-tool--absurdle/);
+  assert.match(html, /href="\/tools\/antiwordle-solver"/);
+  assert.match(html, /href="\/tools\/absurdle-solver"/);
   assert.match(html, /href="\/tools\/sedecordle-solver"/);
   assert.match(html, /href="\/tools\/crossword-solver"/);
   assert.match(html, /href="\/tools\/compound-interest-calculator"/);
   assert.match(html, /href="\/tools\/loan-mortgage-calculator"/);
+});
+
+test("the homepage collection links every menu category with matching counts", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
+  const expected = [
+    ["word-games", "Word Games", 10],
+    ["generators", "Generators", 2],
+    ["calculators", "Calculators", 15],
+    ["text-data", "Text &amp; Data", 5],
+    ["batch-automation", "Batch &amp; Automation", 5],
+  ];
+  for (const [id, label, count] of expected) {
+    assert.match(html, new RegExp(`href="/tools/#${id}"[\\s\\S]*?<strong>${label}</strong>[\\s\\S]*?<em>${count}</em>`));
+  }
+  assert.equal((html.match(/class="home-directory__item"/g) || []).length, expected.length);
 });
 
 test("the flagship word and QR tools use the mortgage-inspired presentation", () => {
@@ -649,7 +671,7 @@ test("the About page lists the Rust WebAssembly apps", () => {
   const html = fs.readFileSync(path.join(siteRoot, "about.html"), "utf8");
   const css = fs.readFileSync(path.join(siteRoot, "assets", "css", "pages", "about.css"), "utf8");
   assert.match(html, /seven distinct first-party <code>Rust<\/code> crates compiled to <code>WebAssembly<\/code>/);
-  assert.match(html, /seven compiled components power the 14 browser experiences listed below/);
+  assert.match(html, /seven compiled components power the 15 browser experiences listed below/);
   assert.match(html, /href="\/tools\/qr-code-decoder">QR Code Decoder<\/a>/);
   assert.match(html, /href="\/tools\/compound-interest-calculator">Compound Interest Calculator<\/a>/);
   assert.match(html, /href="\/tools\/password-generator">Password Generator<\/a>/);
@@ -657,6 +679,7 @@ test("the About page lists the Rust WebAssembly apps", () => {
   assert.match(html, /href="\/tools\/words-with-friends-solver">Words With Friends Solver<\/a>/);
   assert.match(html, /href="\/tools\/crossword-solver">Crossword Solver<\/a>/);
   assert.match(html, /href="\/tools\/wordle-helper">Wordle Solver<\/a>/);
+  assert.match(html, /href="\/tools\/absurdle-solver">Absurdle Solver<\/a>/);
   assert.match(html, /href="\/tools\/quordle-solver">Quordle Solver<\/a>/);
   assert.match(html, /href="\/tools\/sedecordle-solver">Sedecordle Solver<\/a>/);
   assert.match(html, /href="\/tools\/word-character-counter">Word &amp; Character Counter<\/a>/);
@@ -679,7 +702,7 @@ test("featured pages are ad-free and top tools invite Trustpilot reviews", () =>
     .map((name) => `tools/${name}`)
     .filter((name) => fs.readFileSync(path.join(siteRoot, name), "utf8").includes('class="review-collector"'));
 
-  assert.equal(reviewPages.length, 27, "all review prompts should be covered");
+  assert.equal(reviewPages.length, 28, "all review prompts should be covered");
 
   for (const name of reviewPages) {
     const html = fs.readFileSync(path.join(siteRoot, name), "utf8");
