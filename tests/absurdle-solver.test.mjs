@@ -1,0 +1,22 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import test from "node:test";
+import vm from "node:vm";
+
+const html=fs.readFileSync(new URL("../tools/absurdle-solver.html",import.meta.url),"utf8");
+const script=fs.readFileSync(new URL("../assets/js/tools/absurdle-solver.js",import.meta.url),"utf8");
+const manifest=JSON.parse(fs.readFileSync(new URL("../assets/wasm/menu/tools-manifest.json",import.meta.url),"utf8"));
+const about=fs.readFileSync(new URL("../about.html",import.meta.url),"utf8");
+const readme=fs.readFileSync(new URL("../README.md",import.meta.url),"utf8");
+const sitemapPage=fs.readFileSync(new URL("../sitemap.html",import.meta.url),"utf8");
+const utilities=fs.readFileSync(new URL("../tools/utilities.html",import.meta.url),"utf8");
+
+function core(){const sandbox={window:{MonkeyTacticsWasm:{}},document:{querySelector:()=>null,querySelectorAll:()=>[]}};try{vm.runInNewContext(script,sandbox)}catch{}return sandbox.window.AbsurdleSolverCore}
+
+test("Absurdle solver publishes an indexed standalone tool",()=>{assert.match(html,/<title>Absurdle Solver &amp; Helper: Best Next Guess/);assert.match(html,/name="description" content="Use this free Absurdle solver/);assert.match(html,/name="author" content="MonkeyTactics"/);assert.match(html,/canonical" href="https:\/\/monkeytactics\.com\/tools\/absurdle-solver/);assert.match(html,/id="absurdle-keyboard"/);const structured=JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]),types=structured["@graph"].map(item=>item["@type"]);assert.deepEqual(types,["WebPage","BreadcrumbList","SoftwareApplication","FAQPage"]);assert.equal(structured["@graph"][2].name,"Absurdle Solver and Helper")});
+test("feedback scoring handles exact, misplaced, absent, and duplicate letters",()=>{const api=core();assert.equal(api.scoreGuess("cigar","cigar"),"ccccc");assert.equal(api.scoreGuess("abbey","babes"),"ppcca");assert.equal(api.scoreGuess("cigar","array"),"apaca")});
+test("partition analysis reports the adversary's largest response group",()=>{const api=core(),result=api.partitionGuess(["cigar","rebut","sissy"],"cigar");assert.equal(result.worstCase,1);assert.equal(result.partitions,3)});
+test("Absurdle is registered in the shared tools manifest",()=>{const tool=manifest.find(group=>group.id==="word-games").children.find(item=>item.id==="absurdle-solver");assert.equal(tool.url,"/tools/absurdle-solver");assert.equal(tool.capabilities.length,3)});
+test("ranked guesses use non-overflowing responsive result rows",()=>{assert.match(html,/\.absurdle-page \.candidate-list\{grid-template-columns:minmax\(0,1fr\)/);assert.match(html,/\.absurdle-page \.candidate-list small\{[^}]*white-space:normal/);assert.match(html,/@media\(max-width:520px\)\{\.absurdle-page \.candidate-list button\{[^}]*flex-direction:column/)});
+test("SEO entities describe content that is visible on the page",()=>{const structured=JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]),faq=structured["@graph"].find(item=>item["@type"]==="FAQPage");for(const entry of faq.mainEntity){assert.ok(html.includes(`<h3>${entry.name}</h3>`));assert.ok(html.includes(`<p>${entry.acceptedAnswer.text}</p>`))}assert.match(html,/href="\/tools\/#word-games"/)});
+test("site documentation and collection pages include Absurdle",()=>{for(const source of [about,readme,sitemapPage,utilities])assert.match(source,/Absurdle Solver/);const collection=JSON.parse(utilities.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])["@graph"][0].mainEntity.itemListElement;assert.equal(collection.length,12);assert.deepEqual(collection.map(item=>item.position),Array.from({length:12},(_,index)=>index+1));assert.ok(collection.some(item=>item.url.endsWith("/tools/absurdle-solver")))});

@@ -30,7 +30,7 @@ test("every page using the shared dictionary selector loads the fixed version", 
     .map((name) => path.join(siteRoot, "tools", name))
     .filter((file) => fs.readFileSync(file, "utf8").includes("dictionary-selector.css"));
 
-  assert.equal(pages.length, 8);
+  assert.equal(pages.length, 9);
   for (const page of pages) {
     const html = fs.readFileSync(page, "utf8");
     assert.match(html, /dictionary-selector\.css\?v=20260831-stable-mobile-7/);
@@ -39,7 +39,7 @@ test("every page using the shared dictionary selector loads the fixed version", 
 
 test("every dictionary solver explains the word-list choice in its usage guide", () => {
   const pages = [
-    "antiwordle-solver.html", "crossword-solver.html", "octordle-solver.html",
+    "absurdle-solver.html", "antiwordle-solver.html", "crossword-solver.html", "octordle-solver.html",
     "quordle-solver.html", "sedecordle-solver.html", "word-unscrambler.html",
     "wordiply-solver.html", "wordle-helper.html", "words-with-friends-solver.html",
   ];
