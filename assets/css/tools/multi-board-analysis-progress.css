@@ -1,0 +1,55 @@
+.analysis-progress {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .65rem;
+  margin: .8rem 0 .25rem;
+}
+
+.analysis-progress-item {
+  display: grid;
+  gap: .3rem;
+  padding: .6rem .7rem;
+  border: 1px solid #294838;
+  border-radius: 10px;
+  background: rgba(13, 28, 21, .72);
+}
+
+.analysis-progress-item > span {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  color: #8fa99a;
+  font-size: .7rem;
+  font-weight: 750;
+}
+
+.analysis-progress-item strong {
+  color: #dff7e7;
+}
+
+.analysis-progress-item progress {
+  width: 100%;
+  height: 7px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  background: #26352d;
+  accent-color: #66e894;
+}
+
+.analysis-progress-item progress::-webkit-progress-bar { background: #26352d; }
+.analysis-progress-item progress::-webkit-progress-value { background: linear-gradient(90deg,#3d9955,#66e894); }
+.analysis-progress-item progress::-moz-progress-bar { background: linear-gradient(90deg,#3d9955,#66e894); }
+.analysis-progress-item[data-feasibility="at-risk"] strong { color: #fcd34d; }
+.analysis-progress-item[data-feasibility="at-risk"] progress { accent-color: #d6aa3e; }
+.analysis-progress-item[data-feasibility="at-risk"] progress::-webkit-progress-value { background: linear-gradient(90deg,#b58b22,#fcd34d); }
+.analysis-progress-item[data-feasibility="at-risk"] progress::-moz-progress-bar { background: linear-gradient(90deg,#b58b22,#fcd34d); }
+.analysis-progress-item[data-feasibility="impossible"] strong { color: #ff8f87; }
+.analysis-progress-item[data-feasibility="impossible"] progress { accent-color: #dc4f4f; }
+.analysis-progress-item[data-feasibility="impossible"] progress::-webkit-progress-value { background: linear-gradient(90deg,#a92f35,#ef6461); }
+.analysis-progress-item[data-feasibility="impossible"] progress::-moz-progress-bar { background: linear-gradient(90deg,#a92f35,#ef6461); }
+.analysis-update-status { min-height: 1em; margin: .2rem 0 .75rem; color: #789283; font-size: .68rem; text-align: right; }
+
+@media (max-width: 520px) {
+  .analysis-progress { grid-template-columns: 1fr; }
+}

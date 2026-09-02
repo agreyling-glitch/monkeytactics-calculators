@@ -7,6 +7,15 @@ const config=fs.readFileSync(new URL("../assets/js/tools/sedecordle-solver.js",i
 const engine=fs.readFileSync(new URL("../assets/js/tools/multi-board-word-solver.js",import.meta.url),"utf8");
 const css=fs.readFileSync(new URL("../assets/css/tools/sedecordle-solver.css",import.meta.url),"utf8");
 
+test("Sedecordle targets solver intent with consistent metadata and structured data",()=>{
+  assert.match(html,/<title>Sedecordle Solver: 4, 5 &amp; 6 Letters \| MonkeyTactics<\/title>/);
+  assert.match(html,/<h1 id="tool-heading">Sedecordle Solver for 4, 5 &amp; 6-Letter Games<\/h1>/);
+  assert.match(html,/"@type":"WebPage"/);
+  assert.match(html,/"inLanguage":"en"/);
+  assert.match(html,/Related Word-Game Solvers/);
+  assert.match(html,/href="\/tools\/octordle-solver"/);
+});
+
 test("Sedecordle models sixteen boards and twenty-one shared guesses",()=>{
   assert.equal((html.match(/class="board-tab"/g)||[]).length,16);
   assert.equal((html.match(/class="feedback-board"/g)||[]).length,16);
@@ -19,11 +28,34 @@ test("Sedecordle models sixteen boards and twenty-one shared guesses",()=>{
 
 test("all variants use the configurable multi-board engine",()=>{
   assert.match(engine,/function initMultiBoardWordSolver\(config\)/);
-  assert.match(engine,/boardIndices\.map\(candidatesFor\)/);
+  assert.match(engine,/boardIndices\.map\(board=>candidatesFor\(board\)\)/);
   assert.match(engine,/guesses\.length>=guessLimit/);
   assert.match(engine,/Array\(boardCount\)\.fill/);
   assert.match(engine,/function groupCandidateSets/);
   assert.match(html,/multi-board-word-solver\.js/);
+});
+
+test("Sedecordle supports four, five, and six letter games",()=>{
+  assert.match(config,/"wordLengths":\[4,5,6\]/);
+  assert.match(config,/"defaultWordLength":5/);
+  assert.match(html,/id="word-length"/);
+  assert.match(html,/<option value="4">4 letters<\/option>/);
+  assert.match(html,/<option value="5" selected>5 letters<\/option>/);
+  assert.match(html,/<option value="6">6 letters<\/option>/);
+  assert.match(engine,/Array\(wordLength\)\.fill\("neutral"\)/);
+  assert.match(engine,/Array\(wordLength\)\.fill\("absent"\)/);
+  assert.match(engine,/Engine\.crosswordSearch\("\?"\.repeat\(wordLength\)/);
+  assert.match(engine,/pattern\.length===entryWordLength/);
+  assert.match(engine,/Enter exactly \$\{wordLength\} letters first/);
+  assert.match(html,/multi-board-word-solver\.js\?v=20260902-no-match-highlight-1/);
+  assert.match(html,/sedecordle-solver\.js\?v=20260902-word-length-2/);
+});
+
+test("Sedecordle treats unmarked tiles as gray and skips explicit gray while cycling",()=>{
+  assert.match(config,/"implicitAbsent":true/);
+  assert.match(engine,/cycleStates=config\.implicitAbsent\?\["neutral","present","correct"\]:states/);
+  assert.match(html,/Unmarked tiles count as gray when you add the guess/);
+  assert.match(html,/mark only the yellow and green tiles\. Leave gray tiles unmarked/);
 });
 
 test("Sedecordle supports sixteen-way keyboard feedback and focused boards",()=>{
@@ -49,7 +81,7 @@ test("one layout control changes both sixteen-board grids",()=>{
 });
 
 test("Sedecordle publishes distinct metadata",()=>{
-  assert.match(html,/<title>Free Sedecordle Solver: Solve All 16 Boards \| MonkeyTactics<\/title>/);
+  assert.match(html,/<title>Sedecordle Solver: 4, 5 &amp; 6 Letters \| MonkeyTactics<\/title>/);
   assert.match(html,/canonical" href="https:\/\/monkeytactics\.com\/tools\/sedecordle-solver"/);
   assert.match(html,/"name":"Sedecordle Solver"/);
   assert.match(html,/Twenty-one shared guesses/);

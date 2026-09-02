@@ -7,6 +7,15 @@ const configScript=fs.readFileSync(new URL("../assets/js/tools/octordle-solver.j
 const script=configScript+fs.readFileSync(new URL("../assets/js/tools/multi-board-word-solver.js",import.meta.url),"utf8");
 const css=fs.readFileSync(new URL("../assets/css/tools/octordle-solver.css",import.meta.url),"utf8");
 
+test("Octordle targets solver intent with consistent metadata and structured data",()=>{
+  assert.match(html,/<title>Octordle Solver \(4, 5 &amp; 6 Letters\) \| MonkeyTactics<\/title>/);
+  assert.match(html,/<h1 id="tool-heading">Octordle Solver for 4, 5 &amp; 6-Letter Games<\/h1>/);
+  assert.match(html,/"@type":"WebPage"/);
+  assert.match(html,/"inLanguage":"en"/);
+  assert.match(html,/How Entropy Improves an Octordle Guess/);
+  assert.match(html,/href="\/tools\/sedecordle-solver"/);
+});
+
 test("Octordle solver models eight boards and thirteen shared guesses",()=>{
   assert.equal((html.match(/class="board-tab"/g)||[]).length,8);
   assert.equal((html.match(/class="feedback-board"/g)||[]).length,8);
@@ -16,8 +25,25 @@ test("Octordle solver models eight boards and thirteen shared guesses",()=>{
   assert.match(configScript,/"guessLimit":13/);
 });
 
+test("Octordle supports four, five, and six letter games",()=>{
+  assert.match(configScript,/"wordLengths":\[4,5,6\]/);
+  assert.match(configScript,/"defaultWordLength":5/);
+  assert.match(html,/id="word-length"/);
+  assert.match(html,/<option value="4">4 letters<\/option>/);
+  assert.match(html,/<option value="6">6 letters<\/option>/);
+  assert.match(html,/multi-board-word-solver\.js\?v=20260902-no-match-highlight-1/);
+  assert.match(html,/octordle-solver\.js\?v=20260902-word-length-2/);
+});
+
+test("Octordle treats unmarked tiles as gray and skips explicit gray while cycling",()=>{
+  assert.match(configScript,/"implicitAbsent":true/);
+  assert.match(script,/cycleStates=config\.implicitAbsent\?\["neutral","present","correct"\]:states/);
+  assert.match(html,/Unmarked tiles count as gray when you add the guess/);
+  assert.match(html,/mark only the yellow and green tiles\. Leave gray tiles unmarked/);
+});
+
 test("Octordle filters and ranks all eight boards independently",()=>{
-  assert.match(script,/boardIndices\.map\(candidatesFor\)/);
+  assert.match(script,/boardIndices\.map\(board=>candidatesFor\(board\)\)/);
   assert.match(script,/function boardEntropy\(word,words\)/);
   assert.match(script,/function entropyScore\(word,candidateSets\)/);
   assert.match(script,/function renderSuggestion\(candidateSets\)/);
@@ -45,12 +71,12 @@ test("Octordle completed boards retain and display their solved word",()=>{
   assert.match(script,/const answer=completedWord\(board\),displayedState=answer\?"correct":feedback\[board\]\[i\]/);
   assert.match(script,/Solved · \$\{completedWord\(i\)\.toUpperCase\(\)\}/);
   assert.match(script,/function syncCompletedHistory\(\)/);
-  assert.match(script,/answer\?scoreGuess\(answer,guesses\[index\]\.word\)\[i\]/);
+  assert.match(script,/index<=solvedAt\?scoreGuess\(answer,guess\.word\)\[i\]:guess\.feedback\[board\]\[i\]/);
   assert.match(script,/boardIndices\.map\(solved\)\.every\(Boolean\).*completionDialog\.showModal\(\)/);
 });
 
 test("Octordle page publishes distinct metadata and helpful content",()=>{
-  assert.match(html,/<title>Free Octordle Solver: Solve All 8 Boards \| MonkeyTactics<\/title>/);
+  assert.match(html,/<title>Octordle Solver \(4, 5 &amp; 6 Letters\) \| MonkeyTactics<\/title>/);
   assert.match(html,/canonical" href="https:\/\/monkeytactics\.com\/tools\/octordle-solver"/);
   assert.match(html,/"name":"Octordle Solver"/);
   assert.match(html,/Thirteen shared guesses/);

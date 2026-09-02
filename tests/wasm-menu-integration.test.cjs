@@ -554,7 +554,7 @@ test("the All Tools directory reinforces the compound calculator search intent",
   assert.match(html, /<small>Calculate future savings and investment growth with monthly contributions\.<\/small>/);
   assert.match(manifest, /"description":"Calculate future savings and investment growth with monthly contributions\."/);
   assert.match(manifest, /"compound interest with monthly contributions","investment growth calculator"/);
-  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>2026-09-01<\/lastmod>/);
+  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>2026-09-02<\/lastmod>/);
 });
 
 test("the Mortgage Calculator identifies its author and review scope", () => {
