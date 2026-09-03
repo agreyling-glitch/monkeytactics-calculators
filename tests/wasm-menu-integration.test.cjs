@@ -214,6 +214,8 @@ test("the homepage features eleven designated popular tools", () => {
   assert.match(html, /featured-tool--octordle[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Octordle Solver<\/h3>/);
   assert.match(html, /featured-tool--sedecordle[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Sedecordle Solver<\/h3>/);
   assert.match(html, /featured-tool--crossword[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Crossword Solver<\/h3>/);
+  assert.match(html, /featured-tool--word[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Word Unscrambler<\/h3>/);
+  assert.match(html, /featured-tool--wwf[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Words With Friends Solver<\/h3>/);
   assert.match(html, /Find single- and multi-word crossword answers using WordNet clue similarity/);
   assert.match(html, /Rank definitions, synonyms, and WordNet graph relationships/);
   assert.match(html, /Group candidate answers by reusable Grid Positions/);
@@ -223,7 +225,7 @@ test("the homepage features eleven designated popular tools", () => {
   assert.equal((html.match(/class="capability-list"/g) || []).length, 11);
   assert.equal((html.match(/<li>/g) || []).length, 44);
   assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 1);
-  assert.equal((html.match(/class="featured-tool__updated">Updated/g) || []).length, 4);
+  assert.equal((html.match(/class="featured-tool__updated">Updated/g) || []).length, 6);
   assert.match(html, /featured-tool--wordle[\s\S]*?featured-tool--antiwordle[\s\S]*?featured-tool--absurdle/);
   assert.match(html, /href="\/tools\/antiwordle-solver"/);
   assert.match(html, /href="\/tools\/absurdle-solver"/);

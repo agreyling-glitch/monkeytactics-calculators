@@ -70,6 +70,12 @@ const HistoryStore = window.MonkeyTacticsHistory;
 const PickListStore = window.MonkeyTacticsPickList;
 const InputRules = window.MonkeyTacticsWordInputRules;
 const Engine = window.MonkeyTacticsWasm;
+const DefinitionService = window.MonkeyTacticsWordDefinitions;
+const offlineToggle = document.querySelector("#word-tool-offline-toggle");
+const offlineStatus = document.querySelector("#word-tool-offline-status");
+const offlineProgress = document.querySelector("#word-tool-offline-progress");
+const rackSortTrigger = document.querySelector("#rack-sort-trigger");
+const rackSortMenu = document.querySelector("#rack-sort-menu");
 const IS_WWF = document.body.dataset.wordGame === "wwf";
 const GAME_NAME = IS_WWF ? "Words With Friends Solver" : "Word Unscrambler";
 const analyzeWord = (word) => IS_WWF ? Engine.analyzeWwfWord(word) : Engine.analyzeWord(word);
@@ -77,6 +83,12 @@ const analyzeWord = (word) => IS_WWF ? Engine.analyzeWwfWord(word) : Engine.anal
 const MANIFEST_URL =
   "../assets/data/words/manifest.enable-sowpods-v2.json?v=enable-sowpods-v2";
 const CHUNK_BASE_URL = "../assets/data/words/";
+const DEFINITION_MANIFEST_URL = "/assets/data/word-definitions/manifest.wordnet-definitions-v1.json?v=wordnet-3.0-definitions-v1";
+const DEFINITION_BASE_URL = "/assets/data/word-definitions/";
+const OFFLINE_VERSION = "20260903-word-tools-offline-1";
+const OFFLINE_CACHE_PREFIX = "monkeytactics-word-tool-offline-";
+const OFFLINE_TOOL_ID = IS_WWF ? "words-with-friends-solver" : "word-unscrambler";
+const OFFLINE_STORAGE_KEY = `monkeytactics.${OFFLINE_TOOL_ID}.offline-cache`;
 const VOWELS = "aeiou";
 const HIGH_VALUE_LETTERS = "jqxz";
 const SCRABBLE_TILE_VALUES = Object.freeze({
@@ -153,6 +165,258 @@ let historySwipeStartY = null;
 let pendingHistorySearch = false;
 let pickListEntries = PickListStore.read();
 let pickListHookCache = new Map();
+let dictionaryDirectoryDialog = null;
+let dictionaryDirectoryTitle = null;
+let dictionaryDirectoryLinks = null;
+let dictionaryDirectoryReturnFocus = null;
+let offlineCacheName = "";
+try { offlineCacheName = localStorage.getItem(OFFLINE_STORAGE_KEY) || ""; } catch (_error) { /* Storage may be unavailable. */ }
+let offlineModeEnabled = Boolean(offlineCacheName);
+
+function stableRackSort(letters, rank) {
+  return [...letters].map((letter, index) => ({ letter, index }))
+    .sort((left, right) => rank(left.letter) - rank(right.letter) || left.index - right.index)
+    .map(({ letter }) => letter).join("");
+}
+
+function stemRackSort(letters, stem) {
+  const order = new Map([...stem].map((letter, index) => [letter, index]));
+  return stableRackSort(letters, (letter) => order.has(letter) ? order.get(letter) : 100 + (letter === "?" ? 30 : letter.charCodeAt(0) - 97));
+}
+
+function tileFunctionSort(letters) {
+  const remaining = [...letters];
+  let grouped = "";
+  for (const pair of ["ch", "sh", "th", "qu", "er", "in"]) {
+    const first = remaining.indexOf(pair[0]);
+    const second = remaining.findIndex((letter, index) => letter === pair[1] && index !== first);
+    if (first < 0 || second < 0) continue;
+    remaining.splice(Math.max(first, second), 1);
+    remaining.splice(Math.min(first, second), 1);
+    grouped += pair;
+  }
+  const regular = remaining.filter((letter) => !"jqxz?".includes(letter)).sort().join("");
+  const power = remaining.filter((letter) => "jqxz".includes(letter)).sort().join("");
+  const blanks = remaining.filter((letter) => letter === "?").join("");
+  return grouped + regular + power + blanks;
+}
+
+function sortRack(letters, method) {
+  const vowels = new Set("aeiou");
+  if (method === "vowels-first") return stableRackSort(letters, (letter) => vowels.has(letter) ? 0 : letter === "?" ? 2 : 1);
+  if (method === "alphabetical") return [...letters].sort((a, b) => a === "?" ? 1 : b === "?" ? -1 : a.localeCompare(b)).join("");
+  if (method === "grouped-alphabetical") return stableRackSort(letters, (letter) => vowels.has(letter) ? letter.charCodeAt(0) - 97 : letter === "?" ? 200 : 100 + letter.charCodeAt(0) - 97);
+  if (method === "blanks-left") return stableRackSort(letters, (letter) => letter === "?" ? 0 : 1);
+  if (method === "blanks-right") return stableRackSort(letters, (letter) => letter === "?" ? 1 : 0);
+  if (method === "s-right") return stableRackSort(letters, (letter) => letter === "s" ? 2 : letter === "?" ? 1 : 0);
+  if (method === "tile-function") return tileFunctionSort(letters);
+  if (method === "duplicates") {
+    const counts = [...letters].reduce((map, letter) => map.set(letter, (map.get(letter) || 0) + 1), new Map());
+    return stableRackSort(letters, (letter) => -(counts.get(letter) || 0));
+  }
+  if (method.startsWith("stem-")) return stemRackSort(letters, method.slice(5));
+  if (method === "frequency") return stemRackSort(letters, "eaionrstludcmpghbyfvkwxzjq");
+  return letters;
+}
+
+function closeRackSortMenu({ restoreFocus = false } = {}) {
+  rackSortMenu.hidden = true;
+  rackSortTrigger.setAttribute("aria-expanded", "false");
+  if (restoreFocus) rackSortTrigger.focus();
+}
+
+function applyRackSort(method) {
+  const slashIndex = input.value.indexOf("/");
+  const rackSource = slashIndex < 0 ? input.value : input.value.slice(0, slashIndex);
+  const pattern = slashIndex < 0 ? "" : input.value.slice(slashIndex + 1).trim();
+  const rack = rackSource.toLowerCase().replace(/[^a-z?]/g, "");
+  if (!rack) return;
+  input.value = `${sortRack(rack, method).toUpperCase()}${slashIndex < 0 ? "" : ` / ${pattern}`}`;
+  renderRackTiles();
+  closeHistoryDropdown();
+  closeRackSortMenu({ restoreFocus: true });
+}
+
+function initializeRackSortMenu() {
+  for (const definition of RACK_SORT_GROUPS) {
+    const group = document.createElement("section");
+    const label = document.createElement("span");
+    group.className = "rack-sort-menu-group";
+    label.className = "rack-sort-menu-label";
+    label.textContent = definition.label;
+    group.append(label);
+    for (const [value, text] of definition.options) {
+      const option = document.createElement("button");
+      option.type = "button";
+      option.role = "menuitem";
+      option.dataset.rackSort = value;
+      option.textContent = text;
+      option.addEventListener("click", () => applyRackSort(value));
+      group.append(option);
+    }
+    rackSortMenu.append(group);
+  }
+}
+
+function renderOfflineState(message = "") {
+  if (!offlineToggle || !offlineStatus) return;
+  offlineToggle.textContent = offlineModeEnabled ? "Disable Offline Mode" : "Enable Offline Mode";
+  offlineStatus.textContent = message || (offlineModeEnabled
+    ? "Ready offline. Word searches, hooks, and definitions use downloaded local data."
+    : `Download the complete ${IS_WWF ? "WWF solver" : "word finder"} for use without an internet connection (about 7 MB).`);
+  document.querySelectorAll(".dictionary-directory-trigger").forEach((trigger) => { trigger.hidden = offlineModeEnabled; });
+  document.querySelectorAll(".word-game-related-guides").forEach((section) => { section.hidden = offlineModeEnabled; });
+  if (offlineModeEnabled && dictionaryDirectoryDialog?.open) dictionaryDirectoryDialog.close();
+}
+
+async function buildOfflineUrls() {
+  const [wordResponse, definitionResponse] = await Promise.all([
+    fetch(MANIFEST_URL, { cache: "no-store" }),
+    fetch(DEFINITION_MANIFEST_URL, { cache: "no-store" })
+  ]);
+  if (!wordResponse.ok || !definitionResponse.ok) throw new Error("Offline data manifests could not be loaded.");
+  const [wordData, definitionData] = await Promise.all([wordResponse.json(), definitionResponse.json()]);
+  const loadedAssets = [...document.querySelectorAll("script[src], link[href]")].map((element) => element.src || element.href)
+    .filter((url) => url && new URL(url, location.href).origin === location.origin);
+  return [...new Set([
+    location.pathname,
+    "/crossword-offline-sw.js",
+    ...loadedAssets,
+    "/assets/wasm/menu/menu.css?v=20260828-menu-manifest-v1",
+    "/assets/wasm/menu/menu_bg.wasm?v=20260828-menu-manifest-v1",
+    "/assets/wasm/menu/tools-manifest.json",
+    "/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=20260827-wwf-1",
+    "/assets/wasm/word-unscrambler/word_unscrambler_engine_bg.wasm?v=20260827-wwf-1",
+    MANIFEST_URL,
+    ...Object.values(wordData.chunks || {}).map(({ file }) => `${CHUNK_BASE_URL}${file}`),
+    DEFINITION_MANIFEST_URL,
+    ...Object.values(definitionData.shards || {}).map(({ file }) => `${DEFINITION_BASE_URL}${file}?v=${definitionData.datasetVersion}`)
+  ])];
+}
+
+async function cacheOfflineUrl(cache, url) {
+  const request = new Request(url, { cache: "reload", credentials: "same-origin" });
+  const response = await fetch(request);
+  if (!response.ok) throw new Error(`Offline download failed for ${url}.`);
+  await cache.put(request, response);
+}
+
+async function enableOfflineMode() {
+  if (!("serviceWorker" in navigator) || !("caches" in window)) throw new Error("Offline Mode is not supported by this browser.");
+  await navigator.serviceWorker.register("/crossword-offline-sw.js", { scope: "/" });
+  await navigator.serviceWorker.ready;
+  const urls = await buildOfflineUrls();
+  const nextCacheName = `${OFFLINE_CACHE_PREFIX}${OFFLINE_TOOL_ID}-${OFFLINE_VERSION}-${Date.now()}`;
+  const cache = await caches.open(nextCacheName);
+  offlineProgress.hidden = false;
+  offlineProgress.max = urls.length;
+  offlineProgress.value = 0;
+  let completed = 0;
+  let cursor = 0;
+  try {
+    const workers = Array.from({ length: Math.min(4, urls.length) }, async () => {
+      while (cursor < urls.length) {
+        await cacheOfflineUrl(cache, urls[cursor++]);
+        offlineProgress.value = ++completed;
+        offlineStatus.textContent = `Downloading offline data: ${completed} of ${urls.length} files…`;
+      }
+    });
+    await Promise.all(workers);
+    const cachedPage = await cache.match(location.pathname);
+    if (!cachedPage) throw new Error("The offline page could not be verified.");
+    await cache.put(`/tools/${OFFLINE_TOOL_ID}`, cachedPage.clone());
+    await cache.put(`/tools/${OFFLINE_TOOL_ID}.html`, cachedPage.clone());
+    localStorage.setItem(OFFLINE_STORAGE_KEY, nextCacheName);
+    if (offlineCacheName) await caches.delete(offlineCacheName);
+    offlineCacheName = nextCacheName;
+    offlineModeEnabled = true;
+    try { await navigator.storage?.persist?.(); } catch (_error) { /* Persistence is optional. */ }
+    renderOfflineState(`Ready offline. ${urls.length} files downloaded; external dictionary links are disabled.`);
+  } catch (error) {
+    await caches.delete(nextCacheName);
+    throw error;
+  } finally {
+    offlineProgress.hidden = true;
+  }
+}
+
+async function disableOfflineMode() {
+  if (offlineCacheName) await caches.delete(offlineCacheName);
+  localStorage.removeItem(OFFLINE_STORAGE_KEY);
+  offlineCacheName = "";
+  offlineModeEnabled = false;
+  renderOfflineState("Offline data removed. Enable Offline Mode to download it again.");
+}
+
+async function toggleOfflineMode() {
+  offlineToggle.disabled = true;
+  try {
+    if (offlineModeEnabled) await disableOfflineMode();
+    else await enableOfflineMode();
+  } catch (error) {
+    console.error("Unable to change Offline Mode:", error);
+    offlineStatus.textContent = "Offline Mode could not be changed. Check available storage and try again.";
+  } finally {
+    offlineToggle.disabled = false;
+  }
+}
+
+function ensureDictionaryDirectoryDialog() {
+  if (dictionaryDirectoryDialog) return;
+  dictionaryDirectoryDialog = document.createElement("dialog");
+  dictionaryDirectoryDialog.className = "dictionary-directory-modal";
+  dictionaryDirectoryDialog.setAttribute("aria-labelledby", "dictionary-directory-title");
+
+  const card = document.createElement("div");
+  card.className = "dictionary-directory-card";
+  const header = document.createElement("header");
+  header.className = "dictionary-directory-header";
+  dictionaryDirectoryTitle = document.createElement("h2");
+  dictionaryDirectoryTitle.id = "dictionary-directory-title";
+  const closeButton = document.createElement("button");
+  closeButton.type = "button";
+  closeButton.className = "dictionary-directory-close";
+  closeButton.setAttribute("aria-label", "Close dictionary lookups");
+  closeButton.textContent = "×";
+  closeButton.addEventListener("click", () => dictionaryDirectoryDialog.close());
+  header.append(dictionaryDirectoryTitle, closeButton);
+
+  const introduction = document.createElement("p");
+  introduction.textContent = "Choose an external dictionary to continue your lookup.";
+  dictionaryDirectoryLinks = document.createElement("div");
+  dictionaryDirectoryLinks.className = "dictionary-directory-links";
+  card.append(header, introduction, dictionaryDirectoryLinks);
+  dictionaryDirectoryDialog.append(card);
+  dictionaryDirectoryDialog.addEventListener("click", (event) => {
+    if (event.target === dictionaryDirectoryDialog) dictionaryDirectoryDialog.close();
+  });
+  dictionaryDirectoryDialog.addEventListener("close", () => {
+    dictionaryDirectoryReturnFocus?.focus();
+    dictionaryDirectoryReturnFocus = null;
+  });
+  document.body.append(dictionaryDirectoryDialog);
+}
+
+function openDictionaryDirectory(word, trigger) {
+  if (offlineModeEnabled) return;
+  ensureDictionaryDirectoryDialog();
+  dictionaryDirectoryReturnFocus = trigger;
+  dictionaryDirectoryTitle.textContent = `Look up ${word.toUpperCase()}`;
+  dictionaryDirectoryLinks.replaceChildren();
+  for (const dictionary of DICTIONARY_LINKS) {
+    const link = document.createElement("a");
+    link.href = dictionary.getUrl(word);
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    const abbreviation = document.createElement("strong");
+    abbreviation.textContent = dictionary.abbreviation;
+    const name = document.createElement("span");
+    name.textContent = dictionary.name;
+    link.append(abbreviation, name);
+    dictionaryDirectoryLinks.append(link);
+  }
+  dictionaryDirectoryDialog.showModal();
+}
 let pickListHookRefreshQueued = false;
 let resetConfirmReturnFocus = null;
 
@@ -1375,6 +1639,10 @@ function createWordItem(word, letters, options) {
   const dictionaryPopoverHeader = document.createElement("div");
   const dictionaryPopoverActions = document.createElement("div");
   const dictionaryPopoverTitle = document.createElement("span");
+  const dictionaryDirectoryButton = document.createElement("button");
+  const localDefinition = document.createElement("section");
+  const localDefinitionLabel = document.createElement("span");
+  const localDefinitionResult = document.createElement("div");
   const points = getScrabbleScore(word);
   const highValueLetters = getHighValueLetters(word);
 
@@ -1385,7 +1653,7 @@ function createWordItem(word, letters, options) {
   wordLabel.className = "word-label";
   wordLabel.type = "button";
   appendHighlightedWord(wordLabel, word, letters);
-  wordLabel.title = `Show dictionary links for ${word}`;
+  wordLabel.title = `Show definition and hooks for ${word}`;
   wordLabel.setAttribute("aria-haspopup", "dialog");
 
   linkMeta.className = "word-link-meta";
@@ -1442,34 +1710,31 @@ function createWordItem(word, letters, options) {
   dictionaryPopoverActions.className = "dictionary-popover-actions";
   dictionaryPopoverTitle.className = "dictionary-popover-title";
   dictionaryPopoverTitle.textContent = word.toUpperCase();
-  dictionaryPopoverActions.append(insertButton, pickButton);
+  dictionaryDirectoryButton.className = "dictionary-directory-trigger";
+  dictionaryDirectoryButton.type = "button";
+  dictionaryDirectoryButton.title = `Show external dictionary lookups for ${word}`;
+  dictionaryDirectoryButton.setAttribute("aria-label", `Show external dictionary lookups for ${word}`);
+  dictionaryDirectoryButton.hidden = offlineModeEnabled;
+  const spyglassIcon = document.createElement("span");
+  spyglassIcon.className = "spyglass-icon";
+  spyglassIcon.setAttribute("aria-hidden", "true");
+  dictionaryDirectoryButton.append(spyglassIcon);
+  dictionaryDirectoryButton.addEventListener("click", () => openDictionaryDirectory(word, dictionaryDirectoryButton));
+  dictionaryPopoverActions.append(insertButton, pickButton, dictionaryDirectoryButton);
   dictionaryPopoverHeader.append(dictionaryPopoverActions, dictionaryPopoverTitle);
   dictionaryLinks.append(dictionaryPopoverHeader);
 
-  const dictionaryLinkRow = document.createElement("div");
-  dictionaryLinkRow.className = "dictionary-links";
-
-  DICTIONARY_LINKS.forEach((dictionary, index) => {
-    if (index > 0) {
-      const separator = document.createElement("span");
-      separator.className = "dictionary-link-separator";
-      separator.setAttribute("aria-hidden", "true");
-      separator.textContent = "–";
-      dictionaryLinkRow.append(separator);
-    }
-
-    const dictionaryLink = document.createElement("a");
-    const hoverText = `Look up ${word} on ${dictionary.name}`;
-    dictionaryLink.href = dictionary.getUrl(word);
-    dictionaryLink.target = "_blank";
-    dictionaryLink.rel = "noopener noreferrer";
-    dictionaryLink.textContent = dictionary.abbreviation;
-    dictionaryLink.title = hoverText;
-    dictionaryLink.setAttribute("aria-label", hoverText);
-    dictionaryLinkRow.append(dictionaryLink);
-  });
-
-  dictionaryLinks.append(dictionaryLinkRow);
+  let localDefinitionLoaded = false;
+  let localDefinitionLoading = false;
+  localDefinition.className = "local-definition-lookup";
+  localDefinition.setAttribute("aria-label", `Local definition for ${word}`);
+  localDefinitionLabel.className = "local-definition-label";
+  localDefinitionLabel.textContent = "Local definition:";
+  localDefinitionResult.className = "local-definition-result";
+  localDefinitionResult.setAttribute("aria-live", "polite");
+  localDefinitionResult.textContent = "Open this word to load its definition.";
+  localDefinition.append(localDefinitionLabel, localDefinitionResult);
+  dictionaryLinks.append(localDefinition);
 
   const hookLookup = document.createElement("section");
   const hookLookupLabel = document.createElement("span");
@@ -1487,10 +1752,6 @@ function createWordItem(word, letters, options) {
   hookLookup.append(hookLookupLabel, hookLookupResult);
 
   const positionDictionaryPopover = () => {
-    if (!window.matchMedia("(max-width: 900px), (max-height: 600px)").matches) {
-      return;
-    }
-
     const viewportPadding = 12;
     const triggerRect = wordLabel.getBoundingClientRect();
     const popoverRect = dictionaryLinks.getBoundingClientRect();
@@ -1552,8 +1813,46 @@ function createWordItem(word, letters, options) {
     }
   };
 
+  const loadLocalDefinition = async () => {
+    if (localDefinitionLoaded || localDefinitionLoading) return;
+    localDefinitionLoading = true;
+    localDefinitionResult.className = "local-definition-result is-loading";
+    localDefinitionResult.textContent = "Loading local definition…";
+    try {
+      if (!DefinitionService) throw new Error("Local definition service unavailable");
+      const lookup = await DefinitionService.lookup(word, { allowRemote: false });
+      const definitions = lookup.entries
+        .flatMap((entry) => entry.defs || [])
+        .map((definition) => String(definition).replace(/^[a-z]\t/i, "").trim())
+        .filter(Boolean);
+      localDefinitionResult.className = "local-definition-result";
+      localDefinitionResult.replaceChildren();
+      if (!definitions.length) {
+        localDefinitionResult.textContent = "No local WordNet definition is available. Use the lookup button to check external dictionaries.";
+      } else {
+        const definitionList = document.createElement("ol");
+        for (const definition of [...new Set(definitions)].slice(0, 3)) {
+          const item = document.createElement("li");
+          item.textContent = definition;
+          definitionList.append(item);
+        }
+        localDefinitionResult.append(definitionList);
+      }
+      localDefinitionLoaded = true;
+      positionDictionaryPopover();
+    } catch (error) {
+      console.error(`Unable to load a local definition for ${word}:`, error);
+      localDefinitionResult.className = "local-definition-result is-error";
+      localDefinitionResult.textContent = "The local definition could not be loaded. Use the lookup button to check external dictionaries.";
+      positionDictionaryPopover();
+    } finally {
+      localDefinitionLoading = false;
+    }
+  };
+
   const openDictionaryPopover = () => {
     positionDictionaryPopover();
+    loadLocalDefinition();
     loadHookLookup();
   };
 
@@ -2747,6 +3046,26 @@ wordBreakdown.addEventListener("toggle", () => {
     breakdownCharts.replaceChildren();
   }
 });
+const RACK_SORT_GROUPS = Object.freeze([
+  { label: "Common rack sorting", options: [
+    ["vowels-first", "Vowels left, consonants right"],
+    ["alphabetical", "Alphabetical (A → Z)"],
+    ["grouped-alphabetical", "Alphabetical inside vowel/consonant groups"],
+    ["blanks-left", "Blanks at far left"],
+    ["blanks-right", "Blanks at far right"],
+    ["s-right", "S at far right"]
+  ] },
+  { label: "Strategic rack sorting", options: [
+    ["tile-function", "Digraphs, regular tiles, then power tiles"],
+    ["duplicates", "Cluster duplicate letters"],
+    ["stem-retina", "Stem order: RETINA"],
+    ["stem-satine", "Stem order: SATINE"],
+    ["stem-tisane", "Stem order: TISANE"],
+    ["stem-senior", "Stem order: SENIOR"],
+    ["stem-latrine", "Stem order: LATRINE"],
+    ["frequency", "English tile frequency order"]
+  ] }
+]);
 function focusRackInput() {
   window.scrollTo({ top: 0, behavior: "auto" });
   const focusModePanel = input.closest("[data-focus-mode].is-focus-mode");
@@ -2945,8 +3264,41 @@ resetConfirmModal.addEventListener("keydown", (event) => {
 });
 resetBasicFiltersButton.addEventListener("click", resetBasicFilters);
 resetAdvancedFiltersButton.addEventListener("click", resetAdvancedFilters);
+rackSortTrigger.addEventListener("click", () => {
+  const opening = rackSortMenu.hidden;
+  rackSortMenu.hidden = !opening;
+  rackSortTrigger.setAttribute("aria-expanded", String(opening));
+  if (opening) rackSortMenu.querySelector("button")?.focus();
+});
+rackSortMenu.addEventListener("keydown", (event) => {
+  const options = [...rackSortMenu.querySelectorAll("button")];
+  const index = options.indexOf(document.activeElement);
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeRackSortMenu({ restoreFocus: true });
+  } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+    event.preventDefault();
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    options[(index + direction + options.length) % options.length]?.focus();
+  }
+});
+document.addEventListener("click", (event) => {
+  if (!rackSortMenu.hidden && !event.target.closest("#rack-sort-picker")) closeRackSortMenu();
+});
 syncSectionFilterResetButtons();
 renderAllHistory();
 renderAllPickList();
 renderRackTiles();
+initializeRackSortMenu();
+offlineToggle?.addEventListener("click", toggleOfflineMode);
+renderOfflineState();
+if (offlineModeEnabled && "caches" in window) {
+  caches.has(offlineCacheName).then((available) => {
+    if (available) return;
+    try { localStorage.removeItem(OFFLINE_STORAGE_KEY); } catch (_error) { /* Storage may be unavailable. */ }
+    offlineCacheName = "";
+    offlineModeEnabled = false;
+    renderOfflineState("Offline data was cleared by the browser. Enable Offline Mode to download it again.");
+  });
+}
 window.addEventListener("DOMContentLoaded", loadManifest, { once: true });

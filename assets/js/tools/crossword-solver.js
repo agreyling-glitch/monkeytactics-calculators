@@ -2,8 +2,9 @@
 
 (function initializeCrosswordSolver() {
   const Engine = window.MonkeyTacticsWasm;
+  const WordDefinitions = window.MonkeyTacticsWordDefinitions;
   const form = document.querySelector("#crossword-form");
-  if (!form || !Engine) return;
+  if (!form || !Engine || !WordDefinitions) return;
 
   const byId = (id) => document.getElementById(id);
   const clueInput = byId("crossword-clue");
@@ -29,6 +30,12 @@
   const dictionaryModalTitle = byId("dictionary-modal-title");
   const dictionaryModalBody = byId("dictionary-modal-body");
   const dictionaryModalClose = byId("dictionary-modal-close");
+  const debugPanel = byId("crossword-debug-panel");
+  const debugLast = byId("crossword-debug-last");
+  const debugPie = byId("crossword-debug-pie");
+  const debugCacheState = byId("crossword-debug-cache-state");
+  const debugLastShards = byId("crossword-debug-last-shards");
+  const debugLoadedShards = byId("crossword-debug-loaded-shards");
   const dictionaryMerriamLink = byId("dictionary-merriam-link");
   const dictionaryCollinsLink = byId("dictionary-collins-link");
   const dictionaryCopyButton = byId("dictionary-copy-word");
@@ -63,7 +70,112 @@
   const shareCopyQr = byId("crossword-share-copy-qr");
   const sampleButtons = document.querySelectorAll("[data-pattern]");
   const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
+  const offlineToggle = byId("crossword-offline-toggle");
+  const offlineStatus = byId("crossword-offline-status");
+  const offlineProgress = byId("crossword-offline-progress");
+  const relatedGuides = byId("crossword-related-guides");
   const DICTIONARY_BITS = { enable: 1, sowpods: 2, both: 3 };
+  const OFFLINE_VERSION = "20260903-wordnet-definitions-18";
+  const OFFLINE_CACHE_PREFIX = "monkeytactics-crossword-offline-";
+  const OFFLINE_STORAGE_KEY = "monkeytactics.crossword-solver.offline-cache";
+  const DEBUG_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+  const debugEnabled = DEBUG_HOSTS.has(window.location.hostname)
+    && new URL(window.location.href).searchParams.get("DEBUG")?.toUpperCase() === "YES";
+  const debugCounters = debugEnabled ? Object.create(null) : null;
+  const debugResolutionCounts = debugEnabled ? { local: 0, api: 0, apiCache: 0 } : null;
+  const debugTimings = debugEnabled ? { localTotal: 0, localCount: 0, apiTotal: 0, apiCount: 0, pipelineTotal: 0 } : null;
+  const debugShardState = debugEnabled ? { loaded: new Set(), current: [], required: [] } : null;
+  const DEBUG_COUNTER_EVENTS = {
+    localLookup: "localLookups", localCacheHit: "localCacheHits", localShardLoad: "localShardLoads",
+    localShardCacheHit: "localShardCacheHits", localMiss: "localMisses", datamuseCall: "datamuseCalls",
+    datamuseCacheHit: "datamuseCacheHits", baseFormMatch: "baseFormMatches", localError: "lookupFailures"
+  };
+
+  function updateDebug(event, detail = {}) {
+    if (!debugCounters) return;
+    if (event === "lookupStart") {
+      debugShardState.current = [];
+      debugShardState.required = [];
+      debugLastShards.textContent = "None";
+      return;
+    }
+    if (event === "localLookupPlan") {
+      debugShardState.required = detail.shards || [];
+      updateDebugCacheState();
+      return;
+    }
+    if (event === "localShardLoad" || event === "localShardCacheHit" || event === "localShardReady") {
+      const shard = String(detail.shard);
+      if (!debugShardState.current.includes(shard)) debugShardState.current.push(shard);
+      debugLastShards.textContent = debugShardState.current.join(" → ");
+      if (event === "localShardLoad") setDebugCacheState("Warming");
+      if (event === "localShardReady") {
+        debugShardState.loaded.add(shard);
+        debugLoadedShards.textContent = [...debugShardState.loaded]
+          .sort((left, right) => Number.parseInt(left, 10) - Number.parseInt(right, 10)).join(", ");
+        updateDebugCacheState();
+        return;
+      }
+    }
+    if (event === "localDuration" || event === "datamuseDuration" || event === "pipelineDuration") {
+      const milliseconds = Math.max(0, Number(detail.milliseconds) || 0);
+      if (event === "localDuration") {
+        debugTimings.localTotal += milliseconds;
+        debugTimings.localCount += 1;
+        debugPanel.querySelector('[data-debug-timing="localAverage"]').textContent = `${Math.round(debugTimings.localTotal / debugTimings.localCount)} ms`;
+      } else if (event === "datamuseDuration") {
+        debugTimings.apiTotal += milliseconds;
+        debugTimings.apiCount += 1;
+        debugPanel.querySelector('[data-debug-timing="apiAverage"]').textContent = `${Math.round(debugTimings.apiTotal / debugTimings.apiCount)} ms`;
+      } else {
+        debugTimings.pipelineTotal += milliseconds;
+        debugPanel.querySelector('[data-debug-timing="pipelineTotal"]').textContent = `${Math.round(debugTimings.pipelineTotal)} ms`;
+      }
+      return;
+    }
+    if (event === "resolution") {
+      const key = detail.source === "local" ? "local" : detail.cached ? "apiCache" : "api";
+      if (key === "local") setDebugCacheState("Warm");
+      debugResolutionCounts[key] += 1;
+      const total = Object.values(debugResolutionCounts).reduce((sum, count) => sum + count, 0);
+      const localPercent = (debugResolutionCounts.local / total) * 100;
+      const apiPercent = (debugResolutionCounts.api / total) * 100;
+      const apiCachePercent = (debugResolutionCounts.apiCache / total) * 100;
+      debugPie.style.background = `conic-gradient(#4ade80 0 ${localPercent}%, #facc15 ${localPercent}% ${localPercent + apiPercent}%, #60a5fa ${localPercent + apiPercent}% 100%)`;
+      debugPie.setAttribute("aria-label", `Definition sources: Local ${Math.round(localPercent)}%, API ${Math.round(apiPercent)}%, API cache ${Math.round(apiCachePercent)}%`);
+      [["local", localPercent], ["api", apiPercent], ["apiCache", apiCachePercent]].forEach(([name, percent]) => {
+        debugPanel.querySelector(`[data-debug-share="${name}"]`).textContent = `${Math.round(percent)}%`;
+      });
+      if (detail.outcome) debugLast.textContent = detail.outcome;
+      return;
+    }
+    const counter = DEBUG_COUNTER_EVENTS[event] || event;
+    debugCounters[counter] = (debugCounters[counter] || 0) + 1;
+    const output = debugPanel.querySelector(`[data-debug-counter="${counter}"]`);
+    if (output) output.textContent = String(debugCounters[counter]);
+    if (detail.outcome) debugLast.textContent = detail.outcome;
+  }
+
+  if (debugEnabled) debugPanel.hidden = false;
+
+  function setDebugCacheState(state) {
+    if (!debugEnabled) return;
+    debugCacheState.textContent = state;
+    debugCacheState.dataset.state = state.toLowerCase();
+  }
+
+  function updateDebugCacheState() {
+    if (!debugEnabled) return;
+    const loadedRequired = debugShardState.required.filter((shard) => debugShardState.loaded.has(shard)).length;
+    if (!debugShardState.loaded.size) setDebugCacheState("Cold");
+    else if (debugShardState.required.length && loadedRequired === debugShardState.required.length) setDebugCacheState("Warm");
+    else setDebugCacheState("Partial");
+  }
+
+  function recordPipelineDuration(started) {
+    if (!debugEnabled) return;
+    updateDebug("pipelineDuration", { milliseconds: performance.now() - started });
+  }
   const CLUE_PHRASE_EXPANSIONS = new Map([
     ["garden area", ["plot"]],
     ["thrift store", ["selling"]],
@@ -92,6 +204,35 @@
   const CHUNK_BASE_URL = "/assets/data/words/";
   const CLUE_BASE_URL = "/assets/data/crossword-clues/";
   const CLUE_MANIFEST_URL = `${CLUE_BASE_URL}manifest.clues-v4.json?v=wordnet-3.0-phrases-v4`;
+  const DEFINITION_BASE_URL = "/assets/data/word-definitions/";
+  const DEFINITION_MANIFEST_URL = `${DEFINITION_BASE_URL}manifest.wordnet-definitions-v1.json?v=wordnet-3.0-definitions-v1`;
+  const OFFLINE_CORE_URLS = [
+    "/tools/crossword-solver.html",
+    "/crossword-offline-sw.js",
+    "/assets/css/shared/style.css?v=20260903-branded-scrollbars",
+    "/assets/css/shared/premium-tool.css?v=20260807-2",
+    "/assets/css/tools/crossword-solver.css?v=20260903-tight-offline-17",
+    "/assets/css/shared/dictionary-selector.css?v=20260831-stable-mobile-7",
+    "/assets/css/shared/focus-mode.css?v=20260829-2",
+    "/assets/css/shared/trustpilot-review-collector.css?v=20260731-2",
+    "/assets/js/shared/ads.js",
+    "/assets/wasm/menu/menu.js?v=20260828-menu-manifest-v1",
+    "/assets/wasm/menu/menu.css?v=20260828-menu-manifest-v1",
+    "/assets/wasm/menu/menu_bg.wasm?v=20260828-menu-manifest-v1",
+    "/assets/wasm/menu/tools-manifest.json",
+    "/assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-crossword-1",
+    "/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=20260827-wwf-1",
+    "/assets/wasm/word-unscrambler/word_unscrambler_engine_bg.wasm?v=20260827-wwf-1",
+    "/assets/js/vendor/qrcode-1.1.0.min.js",
+    "/assets/js/tools/crossword-pick-list-store.js?v=20260901-grid-positions-1",
+    "/assets/js/shared/focus-mode.js?v=20260829-2",
+    "/assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10",
+    "/assets/js/shared/related-guides.js?v=20260903-priority-1",
+    "/assets/js/tools/crossword-solver.js?v=20260903-wordnet-definitions-18",
+    "/assets/images/trustpilot-review.svg",
+    MANIFEST_URL,
+    CLUE_MANIFEST_URL
+  ];
   let manifest;
   let clueManifest;
   let clueIndex;
@@ -100,18 +241,128 @@
   const chunkPromises = new Map();
   const clueShards = new Map();
   const clueShardPromises = new Map();
-  const dictionaryDefinitionCache = new Map();
   let dictionaryRequest = 0;
   let dictionaryReturnFocus = null;
   let dictionaryAbortController = null;
   let dictionaryWord = "";
   let copyFeedbackTimeout = 0;
   let dictionaryHoverTimeout = 0;
-  const DICTIONARY_HOVER_DELAY = 650;
+  const DICTIONARY_HOVER_DELAY = 550;
   let pickListEntries = PickListStore?.read() || [];
   let currentPickContext = null;
   let currentShareEntry = null;
   let shareReturnFocus = null;
+  let offlineCacheName = "";
+  try { offlineCacheName = localStorage.getItem(OFFLINE_STORAGE_KEY) || ""; } catch (_error) { /* Storage may be unavailable. */ }
+  let offlineModeEnabled = Boolean(offlineCacheName);
+
+  function renderOfflineState(message = "") {
+    if (!offlineToggle || !offlineStatus) return;
+    offlineToggle.textContent = offlineModeEnabled ? "Disable Offline Mode" : "Enable Offline Mode";
+    offlineStatus.textContent = message || (offlineModeEnabled
+      ? "Ready offline. Definition lookups use local WordNet only; Datamuse is disabled."
+      : "Download the complete solver for use without an internet connection (about 15 MB).");
+    if (relatedGuides) relatedGuides.hidden = offlineModeEnabled;
+    if (offlineModeEnabled) {
+      dictionaryMerriamLink.hidden = true;
+      dictionaryCollinsLink.hidden = true;
+    } else if (dictionaryModal.open) {
+      const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+      dictionaryMerriamLink.hidden = selectedDictionary === "sowpods";
+      dictionaryCollinsLink.hidden = selectedDictionary === "enable";
+    }
+  }
+
+  async function buildOfflineUrls() {
+    const [wordResponse, clueResponse, definitionResponse] = await Promise.all([
+      fetch(MANIFEST_URL, { cache: "no-store" }),
+      fetch(CLUE_MANIFEST_URL, { cache: "no-store" }),
+      fetch(DEFINITION_MANIFEST_URL, { cache: "no-store" })
+    ]);
+    if (!wordResponse.ok || !clueResponse.ok || !definitionResponse.ok) throw new Error("Offline data manifests could not be loaded.");
+    const [wordData, clueData, definitionData] = await Promise.all([wordResponse.json(), clueResponse.json(), definitionResponse.json()]);
+    const wordUrls = Object.values(wordData.chunks || {}).map(({ file }) => `${CHUNK_BASE_URL}${file}`);
+    const clueUrls = [
+      `${CLUE_BASE_URL}${clueData.index.file}?v=${clueData.datasetVersion}`,
+      ...Object.values(clueData.shards || {}).flatMap((shard) => (shard.parts || [shard])
+        .map(({ file }) => `${CLUE_BASE_URL}${file}?v=${clueData.datasetVersion}`))
+    ];
+    const definitionUrls = [
+      DEFINITION_MANIFEST_URL,
+      ...Object.values(definitionData.shards || {}).map(({ file }) => `${DEFINITION_BASE_URL}${file}?v=${definitionData.datasetVersion}`)
+    ];
+    return [...new Set([...OFFLINE_CORE_URLS, ...wordUrls, ...clueUrls, ...definitionUrls])];
+  }
+
+  async function cacheOfflineUrl(cache, url) {
+    const request = new Request(url, { cache: "reload", credentials: "same-origin" });
+    const response = await fetch(request);
+    if (!response.ok) throw new Error(`Offline download failed for ${url}.`);
+    await cache.put(request, response);
+  }
+
+  async function enableOfflineMode() {
+    if (!("serviceWorker" in navigator) || !("caches" in window)) throw new Error("Offline Mode is not supported by this browser.");
+    await navigator.serviceWorker.register("/crossword-offline-sw.js", { scope: "/" });
+    await navigator.serviceWorker.ready;
+    const urls = await buildOfflineUrls();
+    const nextCacheName = `${OFFLINE_CACHE_PREFIX}${OFFLINE_VERSION}-${Date.now()}`;
+    const cache = await caches.open(nextCacheName);
+    offlineProgress.hidden = false;
+    offlineProgress.max = urls.length;
+    offlineProgress.value = 0;
+    let completed = 0;
+    let cursor = 0;
+    try {
+      const workers = Array.from({ length: Math.min(4, urls.length) }, async () => {
+        while (cursor < urls.length) {
+          const url = urls[cursor++];
+          await cacheOfflineUrl(cache, url);
+          completed += 1;
+          offlineProgress.value = completed;
+          offlineStatus.textContent = `Downloading offline data: ${completed} of ${urls.length} files…`;
+        }
+      });
+      await Promise.all(workers);
+      const page = await cache.match("/tools/crossword-solver.html");
+      if (!page) throw new Error("The offline page could not be verified.");
+      await cache.put("/tools/crossword-solver", page.clone());
+      localStorage.setItem(OFFLINE_STORAGE_KEY, nextCacheName);
+      for (const name of await caches.keys()) {
+        if (name.startsWith(OFFLINE_CACHE_PREFIX) && name !== nextCacheName) await caches.delete(name);
+      }
+      offlineCacheName = nextCacheName;
+      offlineModeEnabled = true;
+      try { await navigator.storage?.persist?.(); } catch (_error) { /* Persistence is optional. */ }
+      renderOfflineState(`Ready offline. ${urls.length} files downloaded; Datamuse is disabled.`);
+    } catch (error) {
+      await caches.delete(nextCacheName);
+      throw error;
+    } finally {
+      offlineProgress.hidden = true;
+    }
+  }
+
+  async function disableOfflineMode() {
+    if (offlineCacheName) await caches.delete(offlineCacheName);
+    try { localStorage.removeItem(OFFLINE_STORAGE_KEY); } catch (_error) { /* Storage may be unavailable. */ }
+    offlineCacheName = "";
+    offlineModeEnabled = false;
+    renderOfflineState("Offline data removed. Datamuse fallback is available again when online.");
+  }
+
+  async function toggleOfflineMode() {
+    offlineToggle.disabled = true;
+    try {
+      if (offlineModeEnabled) await disableOfflineMode();
+      else await enableOfflineMode();
+    } catch (error) {
+      console.error("Offline Mode failed:", error);
+      renderOfflineState("Offline Mode could not be enabled. Check your connection and available browser storage, then try again.");
+    } finally {
+      offlineToggle.disabled = false;
+    }
+  }
 
   function normalizePattern(value) {
     return value.toLowerCase().replace(/[._-]/g, "?").replace(/\s+/g, "").replace(/[^a-z?*]/g, "");
@@ -335,6 +586,7 @@
         return JSON.parse(await decodeChunk(response));
       }))).flat().map(([id, clue, answer, displayAnswer, wordCount, answerLength, quality, sourceBits, dictionaryBits]) =>
         ({ id, clue, answer, displayAnswer, wordCount, length: answerLength, quality, sourceBits, dictionaryBits }));
+      records.forEach((record) => WordDefinitions.register(record.answer, record.clue));
       clueShards.set(key, records);
       return records;
     })();
@@ -396,20 +648,11 @@
     return fragment;
   }
 
-  function renderDictionaryEntries(entries, requestedWord, fromCache = false) {
+  function renderDictionaryEntries(entries, requestedWord, sourceName = "Datamuse", matchedWord = requestedWord) {
     const fragment = document.createDocumentFragment();
     const normalizeHeadword = (value) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
     const requestedHeadword = normalizeHeadword(requestedWord);
     const entry = entries.find(({ word }) => normalizeHeadword(word) === requestedHeadword);
-    if (entry && fromCache) {
-      const cacheBlock = document.createElement("div");
-      cacheBlock.className = "dictionary-cache-block";
-      const cacheStatus = document.createElement("p");
-      cacheStatus.className = "dictionary-cache-status";
-      cacheStatus.textContent = "Cached this session";
-      cacheBlock.append(cacheStatus);
-      fragment.append(cacheBlock);
-    }
     const partNames = { n: "noun", v: "verb", adj: "adjective", adv: "adverb", u: "definition" };
     const groupedDefinitions = new Map();
     (entry?.defs || []).forEach((rawDefinition) => {
@@ -425,7 +668,10 @@
       const heading = document.createElement("div");
       heading.className = "dictionary-entry-heading";
       const partOfSpeech = document.createElement("strong");
-      partOfSpeech.textContent = partNames[part] || part;
+      const baseFormLabel = normalizeHeadword(matchedWord) !== requestedHeadword ? ` for ${matchedWord} (base form)` : "";
+      partOfSpeech.textContent = sourceName === "WordNet 3.0"
+        ? `Local WordNet ${partNames[part] || part}${baseFormLabel}`
+        : `${partNames[part] || part}${baseFormLabel}`;
       heading.append(partOfSpeech);
       const list = document.createElement("ol");
       list.className = "dictionary-definitions";
@@ -525,6 +771,9 @@
   }
 
   async function openDictionary(word, trigger, returnFocus, context) {
+    const pipelineStarted = debugEnabled ? performance.now() : 0;
+    updateDebug("lookupStart");
+    updateDebug("definitionOpens");
     const request = ++dictionaryRequest;
     dictionaryAbortController?.abort();
     dictionaryAbortController = new AbortController();
@@ -539,53 +788,57 @@
     dictionaryModalTitle.textContent = word;
     const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
     dictionaryMerriamLink.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
-    dictionaryMerriamLink.hidden = selectedDictionary === "sowpods";
-    dictionaryCollinsLink.hidden = selectedDictionary === "enable";
+    dictionaryMerriamLink.hidden = offlineModeEnabled || selectedDictionary === "sowpods";
+    dictionaryCollinsLink.hidden = offlineModeEnabled || selectedDictionary === "enable";
     const matchedDefinition = renderMatchedDefinition(context?.definition);
+    const additionalLocalEntries = WordDefinitions.getLocal(word).map((entry) => ({
+      ...entry,
+      defs: entry.defs.filter((rawDefinition) => rawDefinition.slice(rawDefinition.indexOf("\t") + 1).trim() !== context?.definition)
+    }));
+    const additionalLocalDefinitions = renderDictionaryEntries(additionalLocalEntries, word, "WordNet 3.0");
     const scoreBreakdown = renderScoreBreakdown(context?.scoreBreakdown, context?.matchExplanation);
-    const localContent = [matchedDefinition, scoreBreakdown].filter(Boolean);
+    const localContent = [matchedDefinition, ...(additionalLocalDefinitions.childNodes.length ? [additionalLocalDefinitions] : []), scoreBreakdown].filter(Boolean);
     const loading = document.createElement("p");
     loading.className = "dictionary-modal-status";
-    loading.textContent = matchedDefinition ? "Checking for an additional dictionary definition…" : `Looking up ${word}…`;
+    loading.textContent = matchedDefinition ? "Using the matched local definition…" : `Checking local definitions for ${word}…`;
     dictionaryModalBody.replaceChildren(...localContent, loading);
     if (!dictionaryModal.open) dictionaryModal.showModal();
     dictionaryModalClose.focus();
-    if (matchedDefinition && /[\s'-]/.test(word)) {
+    if (matchedDefinition) {
+      updateDebug("matchedDefinitionHits", { outcome: `${word}: matched WordNet definition` });
+      updateDebug("resolution", { source: "local", cached: true, outcome: `${word}: matched WordNet definition` });
+      if (debugEnabled) updateDebug("localDuration", { milliseconds: performance.now() - pipelineStarted });
+      recordPipelineDuration(pipelineStarted);
       dictionaryModalBody.replaceChildren(...localContent);
       window.clearTimeout(requestTimeout);
       dictionaryAbortController = null;
       return;
     }
     try {
-      const cacheKey = word.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, " ").trim();
-      const fromCache = dictionaryDefinitionCache.has(cacheKey);
-      let entries = dictionaryDefinitionCache.get(cacheKey);
-      if (!entries) {
-        const parameters = new URLSearchParams({ sp: word, md: "d", max: "1" });
-        const response = await fetch(`https://api.datamuse.com/words?${parameters}`, {
-          signal: dictionaryAbortController.signal
-        });
-        if (!response.ok) throw new Error("Definition unavailable");
-        entries = await response.json();
-        dictionaryDefinitionCache.set(cacheKey, entries);
-      }
+      const result = await WordDefinitions.lookup(word, {
+        signal: dictionaryAbortController.signal,
+        allowRemote: !offlineModeEnabled,
+        debug: debugEnabled ? updateDebug : undefined
+      });
       if (request !== dictionaryRequest || !dictionaryModal.open) return;
-      const definitions = renderDictionaryEntries(entries, word, fromCache);
+      const definitions = renderDictionaryEntries(result.entries, word, result.source === "local" ? "WordNet 3.0" : "Datamuse", result.matchedWord);
       if (!definitions.childNodes.length) {
-        if (!matchedDefinition) throw new Error("Definition unavailable");
-        dictionaryModalBody.replaceChildren(...localContent);
-      } else dictionaryModalBody.replaceChildren(...localContent, definitions);
+        throw new Error("Definition unavailable");
+      } else {
+        dictionaryModalBody.replaceChildren(...localContent, definitions);
+        updateDebug("resolution", { source: result.source, cached: result.cached, outcome: `${word}: ${result.source}${result.matchedWord !== WordDefinitions.normalizeWord(word) ? ` via ${result.matchedWord}` : ""}` });
+      }
     } catch (error) {
       if (request !== dictionaryRequest || !dictionaryModal.open) return;
-      if (matchedDefinition) {
-        dictionaryModalBody.replaceChildren(...localContent);
-        return;
-      }
+      updateDebug("lookupFailures", { outcome: `${word}: definition unavailable` });
       const unavailable = document.createElement("p");
       unavailable.className = "dictionary-modal-status";
-      unavailable.textContent = `A definition for ${word} is not available here. Use the dictionary links below to continue.`;
+      unavailable.textContent = offlineModeEnabled
+        ? `A local definition for ${word} is not available in Offline Mode.`
+        : `A definition for ${word} is not available here. Use the dictionary links below to continue.`;
       dictionaryModalBody.replaceChildren(unavailable);
     } finally {
+      recordPipelineDuration(pipelineStarted);
       window.clearTimeout(requestTimeout);
       if (request === dictionaryRequest) dictionaryAbortController = null;
     }
@@ -1441,9 +1694,20 @@
     dictionaryReturnFocus = null;
   });
   form.addEventListener("submit", handleSubmit);
+  offlineToggle?.addEventListener("click", toggleOfflineMode);
   updateActiveFilterCount();
   const sharedSearchPending = importSharedPickFromUrl();
   renderPickList();
+  renderOfflineState();
+  if (offlineModeEnabled && "caches" in window) {
+    caches.has(offlineCacheName).then((available) => {
+      if (available) return;
+      try { localStorage.removeItem(OFFLINE_STORAGE_KEY); } catch (_error) { /* Storage may be unavailable. */ }
+      offlineCacheName = "";
+      offlineModeEnabled = false;
+      renderOfflineState("Offline data is no longer available in browser storage. Enable it again to redownload.");
+    });
+  }
 
   setBusy(true, "Loading dictionary…");
   Promise.all([Engine.ready, fetch(MANIFEST_URL).then((response) => {

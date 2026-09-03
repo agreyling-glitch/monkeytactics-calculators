@@ -11,6 +11,7 @@
     "build:word-wasm": "wasm-pack build wasm/word-unscrambler-engine --target web --release --out-dir ../../assets/wasm/word-unscrambler --out-name word_unscrambler_engine && node -e \"require('fs').rmSync('assets/wasm/word-unscrambler/.gitignore',{force:true})\"",
     "build:crossword-clue-spike": "node scripts/build-crossword-clue-spike.mjs",
     "build:crossword-clues": "node scripts/build-crossword-clue-data.mjs",
+    "build:wordnet-definitions": "node scripts/build-wordnet-definitions.mjs",
     "build:text-wasm": "wasm-pack build wasm/text-analyzer-engine --target web --release --out-dir ../../assets/wasm/text-analyzer --out-name text_analyzer && node -e \"require('fs').rmSync('assets/wasm/text-analyzer/.gitignore',{force:true})\"",
     "build:menu-wasm": "node wasm/menu-engine/build.mjs",
     "build:tools-directory": "node scripts/generate-tools-directory-capabilities.mjs",

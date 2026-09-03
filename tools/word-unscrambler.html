@@ -10,16 +10,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Word Unscrambler &amp; Scrabble Finder | MonkeyTactics</title>
-  <meta name="description" content="Unscramble letters into words with wildcards, patterns, Scrabble scores, hooks, filters, private history, a Pick List, and in-browser rack analysis.">
+  <meta name="description" content="Free word unscrambler with Scrabble scores, rack sorting, wildcards, hooks, local definitions, advanced filters, and an optional offline mode.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-08-29">
+  <meta name="date" content="2026-09-03">
   <meta name="theme-color" content="#0f172a">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/word-unscrambler">
 
   <meta property="og:title" content="Free Word Unscrambler &amp; Scrabble Word Finder">
-  <meta property="og:description" content="Find words from rack letters with wildcards, patterns, scores, hooks, advanced filters, private History, Pick List, and rack analysis.">
+  <meta property="og:description" content="Find Scrabble words, organize rack letters strategically, check local definitions and hooks, or install the word finder for offline use.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://monkeytactics.com/tools/word-unscrambler">
   <meta property="og:site_name" content="MonkeyTactics">
@@ -27,7 +27,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Free Word Unscrambler &amp; Scrabble Word Finder">
-  <meta name="twitter:description" content="Find words from rack letters with wildcards, patterns, scores, hooks, advanced filters, private History, Pick List, and rack analysis.">
+  <meta name="twitter:description" content="Find Scrabble words, sort rack letters strategically, check local definitions and hooks, and use the word finder offline.">
 
   <script type="application/ld+json">
   {
@@ -47,7 +47,7 @@
         "@id": "https://monkeytactics.com/tools/word-unscrambler#app",
         "name": "Free Word Unscrambler and Scrabble Word Finder",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
-        "description": "A free browser-based word unscrambler and Scrabble word finder with wildcard patterns, ENABLE and SOWPODS selection, advanced filters, scored hook lookups, private History, a saved Pick List, strategic sorting, and rack-analysis charts.",
+        "description": "A free browser-based word unscrambler and Scrabble word finder with rack sorting, wildcard patterns, ENABLE and SOWPODS selection, local WordNet definitions, scored hooks, advanced filters, private lists, and optional offline use.",
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Word Game Utility",
         "operatingSystem": "Any",
@@ -76,7 +76,11 @@
           "Respect repeated-letter frequency",
           "Group results by word length",
           "Calculate English Scrabble tile scores",
-          "Open Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge links from each result",
+          "Rearrange rack tiles with vowel, alphabetical, blank, S, duplicate, digraph, frequency, and stem-based sorting",
+          "Load local WordNet definitions from each result without an API call",
+          "Open Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge from a separate lookup menu",
+          "Download the complete word finder, dictionaries, hooks, and definitions for offline use",
+          "Expand the solver into a distraction-free Focus Mode",
           "Run privately in the browser"
         ],
         "offers": {
@@ -87,20 +91,30 @@
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-08-29"
+        "dateModified": "2026-09-03"
       },
       {
         "@type": "WebPage",
         "@id": "https://monkeytactics.com/tools/word-unscrambler#webpage",
         "url": "https://monkeytactics.com/tools/word-unscrambler",
         "name": "Free Word Unscrambler and Scrabble Word Finder",
-        "description": "Unscramble letters into playable words with wildcard patterns, dictionary selection, advanced filters, scored hook lookups, strategic sorts, private History, a Pick List, charts, and keyboard shortcuts.",
+        "description": "Unscramble letters into playable words with rack sorting, wildcard patterns, Scrabble scores, local definitions, hooks, advanced filters, private lists, charts, and offline support.",
         "inLanguage": "en-US",
         "isPartOf": { "@id": "https://monkeytactics.com/#website" },
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/word-unscrambler#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/word-unscrambler#app" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-08-29"
+        "dateModified": "2026-09-03"
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://monkeytactics.com/tools/word-unscrambler#related-guides",
+        "name": "Related Word Unscrambler Guides",
+        "numberOfItems": 2,
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "How to Win at Scrabble With a Smarter Word-Finder Strategy", "url": "https://blog.monkeytactics.com/posts/how-to-win-at-scrabble-with-a-word-unscrambler/" },
+          { "@type": "ListItem", "position": 2, "name": "The Most Difficult Scrabble Words to Unscramble", "url": "https://blog.monkeytactics.com/posts/most-difficult-scrabble-words-to-unscramble/" }
+        ]
       }
     ]
   }
@@ -164,7 +178,7 @@
       {
         "@type": "Question",
         "name": "How do I look up definitions and hooks for a result word?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Hover over, focus, or select a result word to open links for Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge. The same popup automatically loads complete front and back hook words with inline Scrabble scores." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Hover over, focus, or select a result word to load its local WordNet definition and complete front and back hook words with inline Scrabble scores. Select the spyglass button to open a separate menu of external dictionary lookups." }
       },
       {
         "@type": "Question",
@@ -198,6 +212,21 @@
       },
       {
         "@type": "Question",
+        "name": "How can I sort the letters on my Scrabble rack?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Select the rack-sort icon between the input and Unscramble button. You can arrange vowels and consonants, alphabetize letters, separate blanks or S, cluster duplicates and digraphs, isolate power tiles, use English frequency order, or follow RETINA, SATINE, TISANE, SENIOR, and LATRINE stem order. An optional pattern after the slash is preserved." }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use the Word Unscrambler offline?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enable Offline Mode to download the word finder, ENABLE and SOWPODS lists, scoring engine, hooks, and local WordNet definitions to this browser. Searches then work without an internet connection; external dictionary links and related web guides are disabled while offline." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does the Word Unscrambler have a Focus Mode?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select the expand icon in the upper-right corner of the solver to open a distraction-free Focus Mode. The rack, filters, results, History, Pick List, definitions, and sorting tools remain available. Select the collapse icon to return to the full page." }
+      },
+      {
+        "@type": "Question",
         "name": "Are my searches private?",
         "acceptedAnswer": { "@type": "Answer", "text": "Yes. Matching runs entirely in your browser. History and Pick List data are stored only in local browser storage and are never uploaded." }
       }
@@ -205,10 +234,10 @@
   }
   </script>
 
-  <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260807-wasm-menu">
-  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260831-stable-width-21">
+  <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
+  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260903-compact-rack-sort-30">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
-  <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
+  <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260903-word-heading-align-3">
   <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260831-stable-mobile-7">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
   <script src="../assets/js/shared/ads.js" defer></script>
@@ -233,8 +262,8 @@
         <div>
           <p class="premium-eyebrow">Private, local word-game analysis</p>
           <h1 id="tool-heading">Word Unscrambler &amp; Scrabble Word Finder</h1>
-          <p class="premium-hero-copy">Turn rack letters into playable words with wildcards, smart patterns, tile scores, dictionary-aware hooks, and strategic filters. Matching runs entirely in your browser.</p>
-          <div class="premium-hero-pills" aria-label="Word finder features"><span>ENABLE &amp; SOWPODS</span><span>History stays local</span></div>
+          <p class="premium-hero-copy">Turn rack letters into playable Scrabble words with strategic rack sorting, wildcards, smart patterns, tile scores, local definitions, and dictionary-aware hooks. Install the complete word finder for offline use.</p>
+          <div class="premium-hero-pills" aria-label="Word finder features"><span>ENABLE &amp; SOWPODS</span><span>Local WordNet definitions</span><span>Optional offline mode</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>Find the advantage</span><strong>Rack <i>meets</i> board</strong><small>Filter the possibilities. Surface the strongest play.</small></div>
       </div>
@@ -289,6 +318,11 @@
               <span class="visually-hidden" id="dictionary-enable-description">A broad, public-domain English word list used for North American word-game searches.</span>
               <span class="visually-hidden" id="dictionary-sowpods-description">An international English word list containing British and North American word-game vocabulary.</span>
               <span class="visually-hidden" id="dictionary-both-description">Search the combined ENABLE and SOWPODS lists with duplicate words removed.</span>
+              <div class="word-tool-offline-control">
+                <button class="word-tool-offline-toggle" id="word-tool-offline-toggle" type="button">Enable Offline Mode</button>
+                <div class="word-tool-offline-copy"><strong>Offline Mode</strong><span id="word-tool-offline-status" role="status">Download the complete word finder for use without an internet connection (about 7 MB).</span></div>
+                <progress id="word-tool-offline-progress" value="0" max="1" hidden>0%</progress>
+              </div>
             </fieldset>
           </div>
 
@@ -336,6 +370,12 @@
                     hidden
                   ></div>
                   <span class="visually-hidden" id="input-hint">Use English letters, spaces, question marks, one slash, and asterisks only. Use up to 2 rack question-mark wildcards. After the slash, use question mark for one letter or up to 3 stars for any number of letters: ABCDE?? / a*e. Press Down Arrow to browse recent searches.</span>
+                </div>
+                <div class="rack-sort-picker" id="rack-sort-picker">
+                  <button class="rack-sort-trigger" id="rack-sort-trigger" type="button" aria-label="Sort rack letters" aria-haspopup="menu" aria-expanded="false" aria-controls="rack-sort-menu" title="Sort rack letters">
+                    <span class="rack-sort-icon" aria-hidden="true"></span>
+                  </button>
+                  <div class="rack-sort-menu" id="rack-sort-menu" role="menu" aria-label="Rack sorting options" hidden></div>
                 </div>
                 <div class="primary-search-actions">
                   <button
@@ -887,6 +927,8 @@
             compact menu keeps common sorts visible, while More options reveals grouped choices.</li>
         <li><strong>Accurate repeats:</strong> a letter is never used more times than you entered it.</li>
         <li><strong>Scrabble scores:</strong> compare standard tile values before board bonuses.</li>
+        <li><strong>Rack sorting:</strong> rearrange tiles by vowels, alphabet, blanks, S placement,
+            duplicates, digraphs, power tiles, letter frequency, or common anagram stems.</li>
         <li><strong>Word Breakdown:</strong> explore rack balance, tile values, entropy, pattern,
             length, and score charts after the search returns matches.</li>
         <li><strong>Private Pick List:</strong> save, annotate, sort, compare, and reinsert useful
@@ -895,11 +937,28 @@
             search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, open analysis with
             <kbd>Ctrl</kbd>+<kbd>B</kbd>, and open History with <kbd>Ctrl</kbd>+<kbd>H</kbd>
             (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> on Mac).</li>
-        <li><strong>Definition and hook lookup:</strong> hover over or focus a result word to open links for
-            Merriam-Webster, Collins, Wiktionary, Wordnik, Lexico's Dictionary.com successor,
-            and Cambridge, along with scored front and back hook words.</li>
+        <li><strong>Definition and hook lookup:</strong> hover over or focus a result word to load a local WordNet definition and scored front and back hook words. Select the spyglass button to open external lookups for Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge.</li>
+        <li><strong>Optional Offline Mode:</strong> download the complete solver, word lists, hooks,
+            and WordNet definitions for searches without an internet connection.</li>
+        <li><strong>Focus Mode:</strong> select the expand icon to give the interactive solver the
+            full browser workspace while keeping rack sorting, filters, results, History, and the
+            Pick List available.</li>
         <li><strong>Dictionary choice:</strong> search ENABLE, SOWPODS, or their deduplicated union.</li>
       </ul>
+    </section>
+
+    <section class="seo-section" id="rack-sorting-and-offline-use">
+      <h2>Sort Scrabble rack letters and solve offline</h2>
+      <p>Select the rack-sort icon between the letter input and <strong>Unscramble</strong> to
+         rearrange tiles without changing the letters in your rack or an optional pattern after
+         <code>/</code>. Common layouts place vowels first, alphabetize tiles, separate blanks, or
+         move S to the far right. Strategic layouts cluster duplicates, keep common digraphs near
+         each other, separate J, Q, X, and Z, follow English letter frequency, or organize letters
+         around RETINA, SATINE, TISANE, SENIOR, and LATRINE stems.</p>
+      <p><strong>Enable Offline Mode</strong> downloads the word finder, ENABLE and SOWPODS lists,
+         scoring engine, hook data, and local WordNet definitions to this browser. After the
+         download, searches and definition lookups work without an internet connection. External
+         dictionary links and related web guides remain unavailable until Offline Mode is disabled.</p>
     </section>
 
     <section class="seo-section">
@@ -1068,9 +1127,7 @@
             </li>
             <li class="faq-item">
               <h3>How do I look up definitions and hooks for a result word?</h3>
-              <p>Hover over, focus, or select a result word to open links for Merriam-Webster,
-                 Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge. The same popup
-                 automatically loads complete front and back hook words with inline Scrabble scores.</p>
+              <p>Hover over, focus, or select a result word to load its local WordNet definition and complete front and back hook words with inline Scrabble scores. Select the spyglass button to open a separate list of external dictionary lookups.</p>
             </li>
             <li class="faq-item">
               <h3>What does Word Breakdown show?</h3>
@@ -1121,6 +1178,27 @@
                  everything unchanged. Your dictionary and sorting selections are preserved.</p>
             </li>
             <li class="faq-item">
+              <h3>How can I sort the letters on my Scrabble rack?</h3>
+              <p>Select the rack-sort icon between the input and <strong>Unscramble</strong>. Choose
+                 a common vowel, alphabet, blank, or S layout; cluster duplicates and digraphs;
+                 separate power tiles; use letter-frequency order; or follow a named anagram stem.
+                 Sorting changes only the rack and preserves an optional pattern after <code>/</code>.</p>
+            </li>
+            <li class="faq-item">
+              <h3>Can I use the Word Unscrambler offline?</h3>
+              <p>Yes. Select <strong>Enable Offline Mode</strong> to download the solver, ENABLE and
+                 SOWPODS lists, scoring engine, hook data, and local WordNet definitions. Searches
+                 then work without an internet connection. External dictionaries and related web
+                 guides are hidden until you disable Offline Mode.</p>
+            </li>
+            <li class="faq-item">
+              <h3>Does the Word Unscrambler have a Focus Mode?</h3>
+              <p>Yes. Select the expand icon in the solver's upper-right corner to open a
+                 distraction-free workspace. Rack sorting, filters, results, History, the Pick
+                 List, hooks, and definitions remain available. Select the collapse icon to
+                 return to the complete page.</p>
+            </li>
+            <li class="faq-item">
               <h3>Are my searches private?</h3>
               <p>Yes. The dictionary and unscrambling logic run entirely in your browser.
                  History and Pick List data stay only in this browser's local storage and are never
@@ -1130,6 +1208,28 @@
           </ul>
         </div>
       </details>
+    </section>
+
+    <section class="word-game-related-guides" id="word-unscrambler-related-guides" aria-labelledby="word-unscrambler-guides-heading" data-related-guides-tool="word-unscrambler" data-related-guides-limit="2">
+      <div class="word-game-related-guides-heading">
+        <p class="premium-section-kicker">Learn more</p>
+        <h2 id="word-unscrambler-guides-heading">Related Word Unscrambler Guides</h2>
+        <p>Learn how to turn scrambled racks into stronger shortlists, recognize difficult letter patterns, and compare the plays that fit your board.</p>
+      </div>
+      <div class="word-game-guide-grid">
+        <article class="word-game-guide-card">
+          <span>Word-finder strategy</span>
+          <h3><a href="https://blog.monkeytactics.com/posts/how-to-win-at-scrabble-with-a-word-unscrambler/">How to Win at Scrabble With a Smarter Word-Finder Strategy</a></h3>
+          <p>Use patterns, hooks, scores, rack balance, History, and the Pick List to narrow a search into practical candidate plays.</p>
+          <a class="word-game-guide-link" href="https://blog.monkeytactics.com/posts/how-to-win-at-scrabble-with-a-word-unscrambler/">Read guide <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="word-game-guide-card">
+          <span>Advanced unscrambling</span>
+          <h3><a href="https://blog.monkeytactics.com/posts/most-difficult-scrabble-words-to-unscramble/">The Most Difficult Scrabble Words to Unscramble</a></h3>
+          <p>See why anagram families, repeated letters, consonant clusters, and misleading vowel patterns make certain racks difficult.</p>
+          <a class="word-game-guide-link" href="https://blog.monkeytactics.com/posts/most-difficult-scrabble-words-to-unscramble/">Read guide <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
     </section>
 
     <section class="related-tools" aria-labelledby="related-heading" style="margin-top:2rem;">
@@ -1227,6 +1327,8 @@
   <script src="../assets/js/tools/word-unscrambler/pick-list-store.js?v=20260803-3" defer></script>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-wwf-1" defer></script>
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
-  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260829-focus-rack-2" defer></script>
+  <script src="../assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10" defer></script>
+  <script src="../assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
+  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260903-rack-sort-6" defer></script>
 </body>
 </html>
