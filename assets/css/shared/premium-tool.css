@@ -147,7 +147,7 @@
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.15);
 }
 
-.word-tool-page .tool-heading-row { align-items: flex-end; }
+.word-tool-page .tool-heading-row { align-items: flex-start; }
 .word-tool-page .tool-heading-row h2 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.1rem); }
 .word-tool-page .segmented-control { border-color: var(--premium-line); background: rgba(255, 255, 255, 0.025); }
 .word-tool-page .calc-panel,

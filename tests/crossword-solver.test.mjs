@@ -1,14 +1,18 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
+import vm from "node:vm";
 
 const html = fs.readFileSync(new URL("../tools/crossword-solver.html", import.meta.url), "utf8");
 const script = fs.readFileSync(new URL("../assets/js/tools/crossword-solver.js", import.meta.url), "utf8");
+const definitionsScript = fs.readFileSync(new URL("../assets/js/shared/word-definitions.js", import.meta.url), "utf8");
 const css = fs.readFileSync(new URL("../assets/css/tools/crossword-solver.css", import.meta.url), "utf8");
+const offlineWorker = fs.readFileSync(new URL("../crossword-offline-sw.js", import.meta.url), "utf8");
 
 test("crossword solver cache-busts the WordNet graph release", () => {
-  assert.match(html, /crossword-solver\.js\?v=20260901-plural-normalization-21/);
-  assert.match(html, /crossword-solver\.css\?v=20260901-grid-positions-1/);
+  assert.match(html, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
+  assert.match(html, /crossword-solver\.js\?v=20260903-wordnet-definitions-18/);
+  assert.match(html, /crossword-solver\.css\?v=20260903-tight-offline-17/);
   assert.match(html, /crossword-pick-list-store\.js\?v=20260901-grid-positions-1/);
 });
 
@@ -22,15 +26,19 @@ test("crossword solver publishes distinct metadata and structured application da
   assert.match(html, /Find single- and multi-word crossword answers/);
   assert.match(html, /"isAccessibleForFree": true/);
   assert.match(html, /129,000\+ clue records/);
+  assert.match(html, /meta name="description" content="[^"]*offline searches with local definitions and no API calls/);
+  assert.match(html, /"dateModified": "2026-09-03"/);
   const jsonLd = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
   assert.ok(jsonLd);
   assert.doesNotThrow(() => JSON.parse(jsonLd));
   assert.match(html, /WordNet definition and graph similarity ranking/);
   assert.match(html, /Versioned JSON Pick List export and import/);
+  assert.match(html, /"Opt-in downloadable offline crossword solver"/);
+  assert.match(html, /"Local-only offline definition lookup with no API calls"/);
 });
 
 test("new crossword workflows are described in visible and structured content", () => {
-  assert.match(html, /Build a Crossword Candidate Pick List/);
+  assert.match(html, /Build, Export, and Import a Crossword Pick List/);
   assert.match(html, /Share Crossword Answers by Link or QR Code/);
   assert.equal((html.match(/How do I reopen a saved crossword search\?/g) || []).length, 2);
   assert.equal((html.match(/Can I reset only the crossword filters\?/g) || []).length, 2);
@@ -38,8 +46,11 @@ test("new crossword workflows are described in visible and structured content", 
   assert.equal((html.match(/Does the crossword solver support multi-word answers\?/g) || []).length, 2);
   assert.equal((html.match(/How does WordNet graph similarity rank crossword answers\?/g) || []).length, 2);
   assert.equal((html.match(/Can I export or import a crossword Pick List\?/g) || []).length, 2);
-  assert.equal((html.match(/What does Cached this session mean\?/g) || []).length, 2);
-  assert.match(html, /Export and Import a Crossword Pick List/);
+  assert.equal((html.match(/Can I use the crossword solver offline\?/g) || []).length, 2);
+  assert.equal((html.match(/What does API cache mean in debug mode\?/g) || []).length, 0);
+  assert.match(html, /Optional offline mode/);
+  assert.match(html, /install the complete crossword solver for offline searches/);
+  assert.equal((html.match(/Build, Export, and Import a Crossword Pick List/g) || []).length, 1);
 });
 
 test("crossword solver currently omits advertising slots", () => {
@@ -260,28 +271,238 @@ test("clue and pattern fields share a restrained input treatment", () => {
   assert.match(css, /\.pattern-label-row label \{[^}]*color: var\(--premium-muted\)/);
 });
 
-test("Datamuse definitions are cached for the current page session", () => {
-  assert.match(script, /const dictionaryDefinitionCache = new Map\(\)/);
-  assert.match(script, /const cacheKey = word\.toLowerCase\(\)\.normalize\("NFKD"\)/);
-  assert.match(script, /let entries = dictionaryDefinitionCache\.get\(cacheKey\)/);
-  assert.match(script, /const fromCache = dictionaryDefinitionCache\.has\(cacheKey\)/);
-  assert.match(script, /if \(!entries\) \{/);
-  assert.match(script, /dictionaryDefinitionCache\.set\(cacheKey, entries\)/);
-  assert.match(script, /cacheStatus\.textContent = "Cached this session"/);
-  assert.match(css, /\.dictionary-cache-status \{/);
-  assert.match(css, /\.dictionary-cache-block \+ \.dictionary-entry \{[^}]*border-top:/);
-  assert.doesNotMatch(script, /dictionaryDefinitionCache\.set\([^\n]+catch/);
+test("shared definitions use local WordNet before a cached Datamuse fallback", () => {
+  assert.match(definitionsScript, /global\.MonkeyTacticsWordDefinitions/);
+  assert.match(definitionsScript, /async function loadLocalDefinitions\(word, debug\)/);
+  assert.match(definitionsScript, /function lookupForms\(value\)/);
+  assert.match(definitionsScript, /word\.endsWith\("s"\).*forms\.push\(word\.slice\(0, -1\)\)/);
+  assert.match(definitionsScript, /for \(const form of lookupForms\(requestedWord\)\)/);
+  assert.match(definitionsScript, /const remoteCache = new Map\(\)/);
+  assert.match(definitionsScript, /remoteCache\.set\(form, entries\)/);
+  assert.match(definitionsScript, /https:\/\/api\.datamuse\.com\/words/);
+  assert.match(script, /WordDefinitions\.lookup\(word/);
+  assert.match(script, /if \(matchedDefinition\) \{/);
+  assert.doesNotMatch(script, /Cached this session/);
 });
 
-test("phrase lookups keep the matched WordNet definition and reject partial remote headwords", () => {
+test("crossword search examples cover flexible patterns and narrowing filters", () => {
+  assert.match(html, /<code>S\*<\/code>/);
+  assert.match(html, /<code>\*ING<\/code>/);
+  assert.match(html, /“Feline” \+ <code>\?A\?\?<\/code>/);
+  assert.match(html, /Multi-word answer/);
+  assert.match(html, /Exclude Letters: <code>RST<\/code>/);
+});
+
+test("related crossword guides are crawlable, structured, and hidden in Offline Mode", () => {
+  assert.match(html, /id="crossword-related-guides"[\s\S]*Related Crossword Guides/);
+  assert.ok(html.indexOf('id="crossword-related-guides"') < html.indexOf('class="related-tools"'));
+  assert.equal((html.match(/https:\/\/blog\.monkeytactics\.com\/posts\/why-monkeytactics-crossword-solver-is-different\//g) || []).length, 3);
+  assert.equal((html.match(/https:\/\/blog\.monkeytactics\.com\/posts\/when-does-a-crossword-solver-become-a-spoiler\//g) || []).length, 3);
+  assert.match(html, /"@type": "ItemList"/);
+  assert.match(html, /"@id": "https:\/\/monkeytactics\.com\/tools\/crossword-solver#related-guides"/);
+  assert.match(script, /relatedGuides\.hidden = offlineModeEnabled/);
+  assert.match(css, /\.crossword-related-guides\[hidden\] \{ display: none; \}/);
+});
+
+test("crossword FAQ matches the collapsible word-solver FAQ treatment", () => {
+  assert.match(html, /<section class="faq-section"[^>]*>[\s\S]*?<details open>/);
+  assert.match(html, /<span class="faq-info-icon"[^>]*>\?<\/span>/);
+  assert.match(html, /<div class="faq-content">[\s\S]*class="faq-list"/);
+  assert.equal((html.match(/class="faq-item"/g) || []).length, 15);
+  assert.match(css, /\.crossword-page \.faq-section summary::after[^}]*content: "\+"/);
+  assert.match(css, /\.crossword-page \.faq-section details\[open\] summary::after[^}]*content: "−"/);
+});
+
+test("supporting guide cards use the quiet FAQ background", () => {
+  assert.match(css, /\.content-card\s*\{[^}]*background:\s*rgba\(255,255,255,\.02\)/);
+  assert.match(css, /\.crossword-page \.tool-widget\s*\{[^}]*background:\s*#101b16/);
+});
+
+test("dictionary guidance and Offline Mode use compact vertical spacing", () => {
+  assert.match(css, /\.crossword-page \.dictionary-selector::after\s*\{[^}]*height:\s*3em/);
+  assert.match(css, /\.crossword-offline-control\s*\{[^}]*margin-top:\s*\.45rem;[^}]*padding-top:\s*\.5rem/);
+  assert.match(css, /@media \(max-width: 760px\)[^{]*\{\s*\.crossword-page \.dictionary-selector::after\s*\{\s*height:\s*4\.2em/);
+});
+
+test("opt-in Offline Mode downloads the complete solver and disables Datamuse", () => {
+  assert.match(html, /id="crossword-offline-toggle"[^>]*>Enable Offline Mode/);
+  assert.match(html, /id="crossword-offline-status" role="status"/);
+  assert.match(html, /id="crossword-offline-progress"/);
+  assert.match(script, /navigator\.serviceWorker\.register\("\/crossword-offline-sw\.js", \{ scope: "\/" \}\)/);
+  assert.match(script, /Object\.values\(wordData\.chunks/);
+  assert.match(script, /Object\.values\(clueData\.shards/);
+  assert.match(script, /Object\.values\(definitionData\.shards/);
+  assert.match(script, /allowRemote: !offlineModeEnabled/);
+  assert.match(script, /dictionaryMerriamLink\.hidden = offlineModeEnabled \|\| selectedDictionary === "sowpods"/);
+  assert.match(script, /dictionaryCollinsLink\.hidden = offlineModeEnabled \|\| selectedDictionary === "enable"/);
+  assert.match(script, /A local definition for \$\{word\} is not available in Offline Mode/);
+  assert.match(script, /navigator\.storage\?\.persist\?\.\(\)/);
+  assert.match(offlineWorker, /request\.mode === "navigate"/);
+  assert.match(offlineWorker, /matchCrosswordCache/);
+  assert.doesNotMatch(offlineWorker, /caches\.match/);
+});
+
+test("URL debug mode exposes opt-in in-memory definition counters below the Pick List", () => {
+  assert.match(html, /id="crossword-pick-list"[\s\S]*id="crossword-debug-panel"[^>]* hidden/);
+  assert.match(html, /data-debug-counter="datamuseCalls"/);
+  assert.match(html, /data-debug-counter="datamuseCacheHits"/);
+  assert.match(html, /data-debug-counter="localLookups"/);
+  assert.match(html, /data-debug-timing="localAverage"/);
+  assert.match(html, /data-debug-timing="apiAverage"/);
+  assert.match(html, /data-debug-timing="pipelineTotal"/);
+  assert.match(html, /id="crossword-debug-cache-state"[^>]*>Cold</);
+  assert.match(html, /id="crossword-debug-last-shards"/);
+  assert.match(html, /id="crossword-debug-loaded-shards"/);
+  assert.match(html, /id="crossword-debug-pie"/);
+  assert.match(html, /data-debug-share="local"/);
+  assert.match(html, /data-debug-share="apiCache"/);
+  assert.match(script, /searchParams\.get\("DEBUG"\)\?\.toUpperCase\(\) === "YES"/);
+  assert.match(script, /DEBUG_HOSTS\.has\(window\.location\.hostname\)/);
+  assert.match(script, /const debugCounters = debugEnabled \? Object\.create\(null\) : null/);
+  assert.match(script, /debug: debugEnabled \? updateDebug : undefined/);
+  assert.match(script, /event === "resolution"/);
+  assert.match(script, /conic-gradient/);
+  assert.match(definitionsScript, /typeof debug === "function"/);
+  assert.match(definitionsScript, /"datamuseDuration"/);
+  assert.match(definitionsScript, /"localDuration"/);
+  assert.match(definitionsScript, /"localLookupPlan"/);
+  assert.match(definitionsScript, /"localShardReady"/);
+  assert.match(script, /setDebugCacheState\("Warming"\)/);
+  assert.match(script, /setDebugCacheState\("Partial"\)/);
+  assert.match(script, /setDebugCacheState\("Warm"\)/);
+});
+
+test("base-form definitions preserve the selected Pick List answer", () => {
+  assert.match(definitionsScript, /sourceWord: form, word: requestedWord/);
+  assert.match(definitionsScript, /sourceWord: entry\.word, word: requestedWord/);
+  assert.match(script, /currentPickContext = \{ word, \.\.\.context \}/);
+  assert.match(script, /for \$\{matchedWord\} \(base form\)/);
+});
+
+test("ALE resolves from the dedicated local WordNet definition shard without Datamuse", async () => {
+  const window = { Blob, DecompressionStream, Response, TextDecoder, performance };
+  let datamuseCalls = 0;
+  const fetch = async (url) => {
+    const value = String(url);
+    if (value.includes("api.datamuse.com")) {
+      datamuseCalls += 1;
+      return new Response("[]", { headers: { "content-type": "application/json" } });
+    }
+    const pathname = new URL(value, "https://example.test").pathname;
+    return new Response(await fs.promises.readFile(new URL(`..${pathname}`, import.meta.url)));
+  };
+  vm.runInNewContext(definitionsScript, { window, fetch, URLSearchParams, Blob, DecompressionStream, Response, TextDecoder });
+  const result = await window.MonkeyTacticsWordDefinitions.lookup("ale");
+  assert.equal(result.source, "local");
+  assert.equal(result.matchedWord, "ale");
+  assert.ok(result.entries[0].defs.some((definition) => /beer/i.test(definition)));
+  assert.equal(datamuseCalls, 0);
+});
+
+test("iceboatings can use the iceboating definition without changing its answer", async () => {
+  const window = {};
+  const fetch = async (url) => ({
+    ok: true,
+    json: async () => String(url).includes("api.datamuse.com")
+      ? [{ word: "iceboating", defs: ["n\tThe act of travelling in an iceboat."] }]
+      : { formatVersion: 4, shards: {} }
+  });
+  vm.runInNewContext(definitionsScript, { window, fetch, URLSearchParams });
+  const result = await window.MonkeyTacticsWordDefinitions.lookup("iceboatings");
+  assert.equal(result.matchedWord, "iceboating");
+  assert.equal(result.entries[0].word, "iceboatings");
+  assert.equal(result.entries[0].sourceWord, "iceboating");
+});
+
+test("derived forms recover dogeys and dogsledding definitions without changing either answer", async () => {
+  const window = {};
+  const calls = [];
+  const fetch = async (url) => {
+    const value = String(url);
+    if (!value.includes("api.datamuse.com")) return { ok: true, json: async () => ({ formatVersion: 4, shards: {} }) };
+    calls.push(value);
+    const spelling = new URL(value).searchParams.get("sp");
+    const entries = {
+      dogeys: [{ word: "bogeys", defs: ["n\tunrelated"] }],
+      dogey: [{ word: "dogey", defs: ["n\tAlternative spelling of dogie."] }],
+      dogsledding: [{ word: "dogsledding" }],
+      dogsledd: [],
+      dogsled: [{ word: "dogsled", defs: ["n\tA sled pulled by dogs."] }]
+    };
+    return { ok: true, json: async () => entries[spelling] || [] };
+  };
+  vm.runInNewContext(definitionsScript, { window, fetch, URLSearchParams });
+  const dogeys = await window.MonkeyTacticsWordDefinitions.lookup("dogeys");
+  const dogsledding = await window.MonkeyTacticsWordDefinitions.lookup("dogsledding");
+  assert.equal(dogeys.matchedWord, "dogey");
+  assert.equal(dogeys.entries[0].word, "dogeys");
+  assert.equal(dogsledding.matchedWord, "dogsled");
+  assert.equal(dogsledding.entries[0].word, "dogsledding");
+  assert.ok(calls.some((url) => new URL(url).searchParams.get("sp") === "dogey"));
+  assert.ok(calls.some((url) => new URL(url).searchParams.get("sp") === "dogsled"));
+});
+
+test("superlative forms recover doggonedest without changing the selected answer", async () => {
+  const window = {};
+  const calls = [];
+  const fetch = async (url) => {
+    const value = String(url);
+    if (!value.includes("api.datamuse.com")) return { ok: true, json: async () => ({ formatVersion: 4, shards: {} }) };
+    calls.push(value);
+    const spelling = new URL(value).searchParams.get("sp");
+    return {
+      ok: true,
+      json: async () => spelling === "doggoned"
+        ? [{ word: "doggoned", defs: ["adj\tAlternative form of doggone."] }]
+        : []
+    };
+  };
+  vm.runInNewContext(definitionsScript, { window, fetch, URLSearchParams });
+  const result = await window.MonkeyTacticsWordDefinitions.lookup("doggonedest");
+  assert.equal(result.matchedWord, "doggoned");
+  assert.equal(result.entries[0].word, "doggonedest");
+  assert.equal(result.entries[0].sourceWord, "doggoned");
+  assert.ok(calls.some((url) => new URL(url).searchParams.get("sp") === "doggoned"));
+});
+
+test("successful empty Datamuse lookups are cached but request failures are retryable", async () => {
+  const window = {};
+  const calls = [];
+  const fetch = async (url) => {
+    const value = String(url);
+    if (!value.includes("api.datamuse.com")) return { ok: true, json: async () => ({ formatVersion: 4, shards: {} }) };
+    calls.push(value);
+    return { ok: true, json: async () => [] };
+  };
+  vm.runInNewContext(definitionsScript, { window, fetch, URLSearchParams });
+  await window.MonkeyTacticsWordDefinitions.lookup("zzqxjkv");
+  const firstLookupCalls = calls.length;
+  await window.MonkeyTacticsWordDefinitions.lookup("zzqxjkv");
+  assert.equal(calls.length, firstLookupCalls);
+
+  const retryWindow = {};
+  let apiAttempts = 0;
+  const retryFetch = async (url) => {
+    if (!String(url).includes("api.datamuse.com")) return { ok: true, json: async () => ({ formatVersion: 4, shards: {} }) };
+    apiAttempts += 1;
+    if (apiAttempts === 1) throw new Error("Temporary network failure");
+    return { ok: true, json: async () => [] };
+  };
+  vm.runInNewContext(definitionsScript, { window: retryWindow, fetch: retryFetch, URLSearchParams });
+  await assert.rejects(retryWindow.MonkeyTacticsWordDefinitions.lookup("retryword"));
+  await retryWindow.MonkeyTacticsWordDefinitions.lookup("retryword");
+  assert.equal(apiAttempts, 2);
+});
+
+test("matched WordNet definitions avoid remote lookup", () => {
   assert.match(script, /const normalizeHeadword = \(value\) => value\.toLowerCase\(\)\.replace\(\/\[\^a-z0-9\]\/g, ""\)/);
   assert.match(script, /entries\.find\(\(\{ word \}\) => normalizeHeadword\(word\) === requestedHeadword\)/);
   assert.doesNotMatch(script, /\|\| entries\[0\]/);
   assert.match(script, /function renderMatchedDefinition\(definition\)/);
   assert.match(script, /source\.textContent = "Matched WordNet definition"/);
-  assert.match(script, /if \(matchedDefinition && \/\[\\s'-\]\/\.test\(word\)\) \{/);
+  assert.match(script, /if \(matchedDefinition\) \{/);
   assert.match(script, /dictionaryModalBody\.replaceChildren\(\.\.\.localContent\);\s+window\.clearTimeout\(requestTimeout\);\s+dictionaryAbortController = null;\s+return;/);
-  assert.match(script, /if \(!definitions\.childNodes\.length\) \{\s+if \(!matchedDefinition\) throw new Error/);
+  assert.match(script, /if \(!definitions\.childNodes\.length\) \{\s+throw new Error/);
 });
 
 test("synonym expansion is documented in visible and structured page content", () => {
@@ -291,7 +512,7 @@ test("synonym expansion is documented in visible and structured page content", (
 });
 
 test("dictionary definitions open after a stationary fine-pointer hover", () => {
-  assert.match(script, /const DICTIONARY_HOVER_DELAY = 650/);
+  assert.match(script, /const DICTIONARY_HOVER_DELAY = 550/);
   assert.match(script, /matchMedia\("\(hover: hover\) and \(pointer: fine\)"\)/);
   assert.match(script, /trigger\.addEventListener\("pointermove", schedulePreview\)/);
   assert.match(script, /trigger\.addEventListener\("pointerleave", cancelDictionaryHover\)/);
@@ -327,6 +548,13 @@ test("semantic score explanations render in the lookup modal and Pick List", () 
   assert.match(css, /\.crossword-score-row \{/);
   assert.match(css, /\.crossword-score-breakdown \+ \.dictionary-entry \{[^}]*border-top: 1px solid var\(--premium-line\);/);
   assert.match(css, /\.crossword-pick-score-details \{/);
+});
+
+test("ranking guidance explains signals and how to verify candidates", () => {
+  assert.match(html, /Open a candidate to see which signals contributed to its position/);
+  assert.match(html, /Crossing letters are usually the strongest way to confirm a result/);
+  assert.match(html, /tense, plurality, abbreviation, or theme/);
+  assert.match(html, /plausible alternatives instead of treating the first result as certain/);
 });
 
 test("Pick List groups Grid Positions and supports JSON export and import", () => {
@@ -383,4 +611,9 @@ test("pick list shares deep links and QR codes and imports shared URL parameters
   assert.match(script, /parameters\.has\("pick"\)/);
   assert.match(script, /pickListEntries = PickListStore\.add/);
   assert.equal((html.match(/Can I share a crossword pick\?/g) || []).length, 2);
+});
+
+test("the sharing guide explains practical QR handoff benefits", () => {
+  assert.match(html, /moving a candidate from a laptop to a phone or tablet/);
+  assert.match(html, /without copying a URL, sending yourself a message, signing in/);
 });
