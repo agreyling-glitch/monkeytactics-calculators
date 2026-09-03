@@ -125,7 +125,7 @@ test("word result popovers use local definitions and move external links behind 
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
-    assert.match(page, /word-unscrambler\.js\?v=20260903-rack-sort-6/);
+    assert.match(page, /word-unscrambler\.js\?v=20260903-offline-cache-reuse-7/);
     assert.match(page, /word-unscrambler\.css\?v=20260903-compact-rack-sort-30/);
   }
 });
@@ -150,6 +150,12 @@ test("word solvers offer opt-in offline downloads with local definitions", () =>
   assert.match(wordSolverScript, /Object\.values\(definitionData\.shards/);
   assert.match(wordSolverScript, /dictionaryDirectoryButton\.hidden = offlineModeEnabled/);
   assert.match(wordSolverScript, /section\.hidden = offlineModeEnabled/);
+  assert.match(wordSolverScript, /const nextCacheName = `\$\{OFFLINE_CACHE_PREFIX\}\$\{OFFLINE_TOOL_ID\}-\$\{OFFLINE_VERSION\}`/);
+  assert.doesNotMatch(wordSolverScript, /OFFLINE_VERSION\}-\$\{Date\.now\(\)\}/);
+  assert.match(wordSolverScript, /if \(await cache\.match\(request\)\) return false/);
+  assert.match(wordSolverScript, /const sharedResponse = await caches\.match\(request\)/);
+  assert.match(wordSolverScript, /Promise\.all\(urls\.map\(\(url\) => cache\.match\(url\)\)\)/);
+  assert.match(wordSolverScript, /Downloaded files are retained for fast re-enabling/);
 });
 
 test("word solvers provide common and strategic rack sorting", () => {

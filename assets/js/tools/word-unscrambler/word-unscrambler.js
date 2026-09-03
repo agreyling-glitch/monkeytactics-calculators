@@ -269,13 +269,20 @@ function renderOfflineState(message = "") {
   if (offlineModeEnabled && dictionaryDirectoryDialog?.open) dictionaryDirectoryDialog.close();
 }
 
-async function buildOfflineUrls() {
-  const [wordResponse, definitionResponse] = await Promise.all([
-    fetch(MANIFEST_URL, { cache: "no-store" }),
-    fetch(DEFINITION_MANIFEST_URL, { cache: "no-store" })
+async function readOfflineManifest(cache, url) {
+  const cached = await cache.match(url);
+  if (cached) return cached.json();
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) throw new Error("An offline data manifest could not be loaded.");
+  await cache.put(url, response.clone());
+  return response.json();
+}
+
+async function buildOfflineUrls(cache) {
+  const [wordData, definitionData] = await Promise.all([
+    readOfflineManifest(cache, MANIFEST_URL),
+    readOfflineManifest(cache, DEFINITION_MANIFEST_URL)
   ]);
-  if (!wordResponse.ok || !definitionResponse.ok) throw new Error("Offline data manifests could not be loaded.");
-  const [wordData, definitionData] = await Promise.all([wordResponse.json(), definitionResponse.json()]);
   const loadedAssets = [...document.querySelectorAll("script[src], link[href]")].map((element) => element.src || element.href)
     .filter((url) => url && new URL(url, location.href).origin === location.origin);
   return [...new Set([
@@ -295,28 +302,37 @@ async function buildOfflineUrls() {
 }
 
 async function cacheOfflineUrl(cache, url) {
-  const request = new Request(url, { cache: "reload", credentials: "same-origin" });
-  const response = await fetch(request);
+  const request = new Request(url, { credentials: "same-origin" });
+  if (await cache.match(request)) return false;
+  const sharedResponse = await caches.match(request);
+  if (sharedResponse) {
+    await cache.put(request, sharedResponse.clone());
+    return false;
+  }
+  const response = await fetch(new Request(url, { cache: "reload", credentials: "same-origin" }));
   if (!response.ok) throw new Error(`Offline download failed for ${url}.`);
   await cache.put(request, response);
+  return true;
 }
 
 async function enableOfflineMode() {
   if (!("serviceWorker" in navigator) || !("caches" in window)) throw new Error("Offline Mode is not supported by this browser.");
   await navigator.serviceWorker.register("/crossword-offline-sw.js", { scope: "/" });
   await navigator.serviceWorker.ready;
-  const urls = await buildOfflineUrls();
-  const nextCacheName = `${OFFLINE_CACHE_PREFIX}${OFFLINE_TOOL_ID}-${OFFLINE_VERSION}-${Date.now()}`;
+  const nextCacheName = `${OFFLINE_CACHE_PREFIX}${OFFLINE_TOOL_ID}-${OFFLINE_VERSION}`;
+  const cacheAlreadyExists = (await caches.keys()).includes(nextCacheName);
   const cache = await caches.open(nextCacheName);
+  const urls = await buildOfflineUrls(cache);
   offlineProgress.hidden = false;
   offlineProgress.max = urls.length;
   offlineProgress.value = 0;
   let completed = 0;
+  let downloaded = 0;
   let cursor = 0;
   try {
     const workers = Array.from({ length: Math.min(4, urls.length) }, async () => {
       while (cursor < urls.length) {
-        await cacheOfflineUrl(cache, urls[cursor++]);
+        if (await cacheOfflineUrl(cache, urls[cursor++])) downloaded += 1;
         offlineProgress.value = ++completed;
         offlineStatus.textContent = `Downloading offline data: ${completed} of ${urls.length} files…`;
       }
@@ -324,16 +340,22 @@ async function enableOfflineMode() {
     await Promise.all(workers);
     const cachedPage = await cache.match(location.pathname);
     if (!cachedPage) throw new Error("The offline page could not be verified.");
+    const missing = (await Promise.all(urls.map((url) => cache.match(url)))).filter((response) => !response);
+    if (missing.length) throw new Error("The offline download could not be verified.");
     await cache.put(`/tools/${OFFLINE_TOOL_ID}`, cachedPage.clone());
     await cache.put(`/tools/${OFFLINE_TOOL_ID}.html`, cachedPage.clone());
     localStorage.setItem(OFFLINE_STORAGE_KEY, nextCacheName);
-    if (offlineCacheName) await caches.delete(offlineCacheName);
+    for (const name of await caches.keys()) {
+      if (name.startsWith(`${OFFLINE_CACHE_PREFIX}${OFFLINE_TOOL_ID}-`) && name !== nextCacheName) await caches.delete(name);
+    }
     offlineCacheName = nextCacheName;
     offlineModeEnabled = true;
     try { await navigator.storage?.persist?.(); } catch (_error) { /* Persistence is optional. */ }
-    renderOfflineState(`Ready offline. ${urls.length} files downloaded; external dictionary links are disabled.`);
+    renderOfflineState(downloaded
+      ? `Ready offline. ${downloaded} files downloaded and ${urls.length - downloaded} reused; external dictionary links are disabled.`
+      : `Ready offline. All ${urls.length} files were already downloaded; external dictionary links are disabled.`);
   } catch (error) {
-    await caches.delete(nextCacheName);
+    if (!cacheAlreadyExists) await caches.delete(nextCacheName);
     throw error;
   } finally {
     offlineProgress.hidden = true;
@@ -341,11 +363,10 @@ async function enableOfflineMode() {
 }
 
 async function disableOfflineMode() {
-  if (offlineCacheName) await caches.delete(offlineCacheName);
   localStorage.removeItem(OFFLINE_STORAGE_KEY);
   offlineCacheName = "";
   offlineModeEnabled = false;
-  renderOfflineState("Offline data removed. Enable Offline Mode to download it again.");
+  renderOfflineState("Offline Mode disabled. Downloaded files are retained for fast re-enabling.");
 }
 
 async function toggleOfflineMode() {
