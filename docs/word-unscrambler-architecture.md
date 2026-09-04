@@ -27,8 +27,8 @@ tools/word-unscrambler.html
   +-- assets/js/tools/word-unscrambler/word-unscrambler.js
         UI state, dictionary fetching, DOM rendering, and bridge calls
           |
-          +-- assets/data/words/manifest.enable-v1.json
-          +-- assets/data/words/[a-z].enable-v1.txt.gz
+          +-- assets/data/words/manifest.wiktionary-v1.json
+          +-- assets/data/words/[a-z].wiktionary-v1.txt.gz
 
 Rust source:
 wasm/word-unscrambler-engine/src/lib.rs
@@ -79,7 +79,7 @@ This check prevents the application from enabling its engine on an unapproved ho
 
 ## Dictionary Storage
 
-The Standard dictionary contains 172,820 unique words sourced from ENABLE. It is split into 26 gzip-compressed shards based on the first letter of each word. An Expanded Wiktionary-based dictionary is planned but is not currently bundled.
+The Standard dictionary contains 172,820 words sourced from ENABLE. Expanded contains 854,775 normalized ASCII words derived from Wiktionary. Their 867,177-word union is split into 26 gzip-compressed shards based on the first letter of each word.
 
 The manifest describes:
 
@@ -99,6 +99,8 @@ Membership is a bit mask:
 | Value | Meaning |
 | ---: | --- |
 | `1` | ENABLE |
+| `2` | Wiktionary (Expanded) |
+| `3` | ENABLE + Wiktionary (Both) |
 
 Search selection uses the same bit values. A word belongs to the selected dictionary when:
 
@@ -106,7 +108,7 @@ Search selection uses the same bit values. A word belongs to the selected dictio
 word_membership & selected_dictionary_bit != 0
 ```
 
-The current data uses bit `1` exclusively. Additional membership values are reserved for the future Expanded dictionary.
+Words present in both sources carry membership value `3`, so either individual dictionary and the combined option can find them without duplicate records.
 
 ## Lazy Dictionary Loading
 

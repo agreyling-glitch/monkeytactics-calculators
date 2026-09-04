@@ -29,7 +29,7 @@ self.addEventListener("fetch", (event) => {
         const fallback = await matchCrosswordCache("/tools/crossword-solver.html");
         if (fallback) return fallback;
       }
-      if (event.request.mode === "navigate" && /^\/tools\/(word-unscrambler|words-with-friends-solver)\/?(?:\.html)?$/.test(requestUrl.pathname)) {
+      if (event.request.mode === "navigate" && /^\/tools\/(absurdle-solver|antiwordle-solver|octordle-solver|quordle-solver|sedecordle-solver|word-unscrambler|wordiply-solver|wordle-helper|words-with-friends-solver)\/?(?:\.html)?$/.test(requestUrl.pathname)) {
         const pagePath = requestUrl.pathname.replace(/\/$/, "").replace(/\.html$/, "") + ".html";
         const fallback = await matchCrosswordCache(pagePath);
         if (fallback) return fallback;

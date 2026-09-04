@@ -11,9 +11,30 @@ const offlineWorker = fs.readFileSync(new URL("../crossword-offline-sw.js", impo
 
 test("crossword solver cache-busts the WordNet graph release", () => {
   assert.match(html, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
-  assert.match(html, /crossword-solver\.js\?v=20260904-dictionary-tooltip-33/);
-  assert.match(html, /crossword-solver\.css\?v=20260904-controls-right-32/);
+  assert.match(html, /crossword-solver\.js\?v=20260904-both-default-39/);
+  assert.match(html, /crossword-solver\.css\?v=20260904-active-dictionary-icon-34/);
   assert.match(html, /crossword-pick-list-store\.js\?v=20260901-grid-positions-1/);
+});
+
+test("dictionary trigger displays the active dictionary icon", () => {
+  assert.match(html, /id="dictionary-choice-trigger"[^>]*>[\s\S]*?dictionary-active-symbol/);
+  assert.match(script, /class="dictionary-active-flag"/);
+  assert.match(script, /dictionaryChoiceTrigger\.innerHTML = dictionaryChoiceIcon\(selected\)/);
+  assert.match(script, /selected === "expanded" \? "◎" : "⊕"/);
+});
+
+test("crossword offline preflight can recover from transient manifest failures", () => {
+  assert.match(script, /const cachedResponse = await caches\.match\(url\)/);
+  assert.match(script, /if \(!offlineModal\.open\) offlineModal\.showModal\(\)/);
+  assert.match(script, /offlinePackageSummary\.textContent = "Unavailable"/);
+  assert.match(script, /offlineModalConfirm\.textContent = "Retry"/);
+  assert.match(script, /if \(!pendingOfflinePlan\) \{\s*await openOfflineDialog\(\)/);
+});
+
+test("crossword offline activation closes quietly when every file can be reused", () => {
+  assert.match(script, /const reuseOnly = !forceDownload && pendingOfflineInventory\?\.remainingCount === 0/);
+  assert.match(script, /offlineDownloadProgress\.hidden = reuseOnly/);
+  assert.match(script, /if \(reuseOnly\) \{\s*offlineModal\.close\(\)/);
 });
 
 test("crossword solver publishes distinct metadata and structured application data", () => {
@@ -27,7 +48,7 @@ test("crossword solver publishes distinct metadata and structured application da
   assert.match(html, /"isAccessibleForFree": true/);
   assert.match(html, /129,000\+ clue records/);
   assert.match(html, /meta name="description" content="[^"]*offline searches with local definitions and no API calls/);
-  assert.match(html, /"dateModified": "2026-09-03"/);
+  assert.match(html, /"dateModified": "2026-09-04"/);
   const jsonLd = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
   assert.ok(jsonLd);
   assert.doesNotThrow(() => JSON.parse(jsonLd));
@@ -60,17 +81,19 @@ test("crossword solver currently omits advertising slots", () => {
 test("crossword solver exposes pattern-first controls and an optional letter pool", () => {
   assert.match(html, /id="crossword-clue"/);
   assert.match(html, /id="crossword-pattern"/);
+  assert.match(html, /id="crossword-pattern"[^>]*type="search"/);
   assert.match(html, /id="available-letters"/);
   assert.match(html, /id="word-length"/);
-  assert.match(html, /name="dictionary" value="enable"[^>]* checked/);
-  assert.match(html, /name="dictionary" value="expanded" disabled/);
-  assert.doesNotMatch(html, /name="dictionary" value="both"/);
-  assert.match(html, /id="dictionary-choice-trigger"[^>]*aria-label="Choose dictionary\. Current: Standard \(ENABLE\)"/);
-  assert.match(html, /id="dictionary-choice-trigger"[^>]*title="Dictionary selected: Standard \(ENABLE\)"/);
+  assert.match(html, /name="dictionary" value="both"[^>]* checked/);
+  assert.match(html, /name="dictionary" value="expanded">/);
+  assert.match(html, /id="dictionary-choice-trigger"[^>]*aria-label="Choose dictionary\. Current: Both \(ENABLE \+ Wiktionary\)"/);
+  assert.match(html, /id="dictionary-choice-trigger"[^>]*title="Dictionary selected: Both \(ENABLE \+ Wiktionary\)"/);
   assert.match(html, /id="dictionary-choice-modal"[^>]*aria-labelledby="dictionary-choice-title"/);
-  assert.match(html, /href="#flag-us"[\s\S]*Standard[\s\S]*Expanded[\s\S]*Coming soon[\s\S]*Wiktionary/);
+  assert.match(html, /href="#flag-us"[\s\S]*Standard[\s\S]*Expanded[\s\S]*Wiktionary/);
+  assert.doesNotMatch(html, /Expanded <em>Coming soon<\/em>/);
   assert.doesNotMatch(html, /class="dictionary-selector"/);
   assert.match(script, /const dictionaryInputs = document\.querySelectorAll/);
+  assert.match(script, /both: "Both \(ENABLE \+ Wiktionary\)"/);
   assert.match(script, /dictionaryChoiceModal\.showModal\(\)/);
   assert.match(script, /dictionaryChoiceModal\.close\(\)/);
   assert.match(script, /renderDictionaryChoice\(\)/);
@@ -336,6 +359,12 @@ test("dictionary icon and Offline Mode share one control row", () => {
   assert.doesNotMatch(css, /\.crossword-offline-control\s*\{[^}]*(?:border-top|padding-top|margin-top):/);
 });
 
+test("Crossword alone previews the green Offline Mode control treatment", () => {
+  assert.match(css, /\.offline-switch-track \{[^}]*border: 1px solid #22c55e;[^}]*background: rgba\(34,197,94,\.15\)/);
+  assert.match(css, /\.offline-switch-thumb \{[^}]*background: #4ade80/);
+  assert.match(css, /\.crossword-offline-control > strong \{ color: #4ade80/);
+});
+
 test("opt-in Offline Mode downloads the complete solver and disables Datamuse", () => {
   assert.match(html, /id="crossword-offline-toggle"[^>]*role="switch"[^>]*aria-checked="false"/);
   assert.match(html, /class="offline-switch-track"[^>]*>[\s\S]*?class="offline-switch-thumb"/);
@@ -363,7 +392,8 @@ test("opt-in Offline Mode downloads the complete solver and disables Datamuse", 
   assert.match(script, /cacheOfflineUrl\(cache, url, forceDownload\)/);
   assert.match(script, /offlineSimulationControls\.hidden = !localSimulationEnabled/);
   assert.match(script, /const SHOW_LOCAL_DOWNLOAD_SIMULATION = false/);
-  assert.match(script, /forceDownload: offlineForceDownload\.checked \|\| offlineSimulateDownload\.checked/);
+  assert.match(script, /const forceDownload = offlineForceDownload\.checked \|\| offlineSimulateDownload\.checked/);
+  assert.match(script, /forceDownload,\s*speedMbps:/);
   assert.match(script, /offlineForceDownload\?\.addEventListener\("change", renderOfflineRequirement\)/);
   assert.match(script, /const targetMilliseconds = \(estimatedBytes \* 8 \* 1000\) \/ \(speedMbps \* 1000000\)/);
   assert.match(script, /allowRemote: !offlineModeEnabled/);

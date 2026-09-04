@@ -17,6 +17,14 @@ test("Quordle targets solver intent with consistent metadata and structured data
   assert.match(html,/href="\/tools\/sedecordle-solver"/);
 });
 
+test("Learn More links Quordle guides before related solvers",()=>{
+  assert.match(html,/id="quordle-related-guides"/);
+  assert.match(html,/Wordle vs\. Quordle Strategy: Why Four Boards Change Every Guess/);
+  assert.match(html,/How to Win at Wordle: Tips, Tricks &amp; Strategy/);
+  assert.ok(html.indexOf('id="quordle-related-guides"')<html.indexOf('<section class="related-tools">'));
+  assert.match(css,/\.word-game-guide-grid\{display:grid/);
+});
+
 test("Quordle solver models four boards and nine shared guesses",()=>{
   assert.equal((html.match(/class="board-tab"/g)||[]).length,4);
   assert.equal((html.match(/class="feedback-board"/g)||[]).length,4);
@@ -31,7 +39,7 @@ test("Quordle supports four, five, and six letter games",()=>{
   assert.match(html,/id="word-length"/);
   assert.match(html,/<option value="4">4 letters<\/option>/);
   assert.match(html,/<option value="6">6 letters<\/option>/);
-  assert.match(html,/multi-board-word-solver\.js\?v=20260902-no-match-highlight-1/);
+  assert.match(html,/multi-board-word-solver\.js\?v=20260904-wiktionary-4/);
   assert.match(html,/quordle-solver\.js\?v=20260902-word-length-2/);
 });
 

@@ -10,10 +10,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Free Words With Friends Solver &amp; Word Finder | MonkeyTactics</title>
-  <meta name="description" content="Free Words With Friends solver with WWF scores, rack sorting, wildcards, hooks, local definitions, advanced filters, and optional offline mode.">
+  <meta name="description" content="Free Words With Friends solver with WWF scores, rack sorting, wildcards, local definitions, offline mode, and Standard, Expanded, or combined dictionaries.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-09-03">
+  <meta name="date" content="2026-09-04">
   <meta name="theme-color" content="#0f172a">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/words-with-friends-solver">
@@ -47,7 +47,7 @@
         "@id": "https://monkeytactics.com/tools/words-with-friends-solver#app",
         "name": "Free Words With Friends Solver and Word Finder",
         "url": "https://monkeytactics.com/tools/words-with-friends-solver",
-        "description": "A free browser-based Words With Friends solver with rack sorting, wildcard patterns, Standard (ENABLE) dictionary selection, local WordNet definitions, WWF-scored hooks, advanced filters, private lists, and optional offline use.",
+        "description": "A free browser-based Words With Friends solver with rack sorting, wildcard patterns, Standard ENABLE and Expanded Wiktionary-derived dictionaries, 867,000+ unique combined entries, local WordNet definitions, WWF-scored hooks, advanced filters, private lists, and optional offline use.",
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Word Game Utility",
         "operatingSystem": "Any",
@@ -56,7 +56,7 @@
         "inLanguage": "en-US",
         "featureList": [
           "Find words made from some or all supplied letters",
-          "Search the Standard (ENABLE) dictionary",
+          "Search Standard ENABLE, Expanded Wiktionary-derived, or 867,000+ unique combined dictionary entries",
           "Combine rack letters, wildcard tiles, and a positional pattern in one smart input",
           "Filter by exact word length, starting letters, or ending letters",
           "Match visible letter patterns with question-mark and variable-length asterisk wildcards",
@@ -91,7 +91,7 @@
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-09-03"
+        "dateModified": "2026-09-04"
       },
       {
         "@type": "WebPage",
@@ -104,7 +104,7 @@
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/words-with-friends-solver#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/words-with-friends-solver#app" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-09-03"
+        "dateModified": "2026-09-04"
       },
       {
         "@type": "ItemList",
@@ -143,7 +143,7 @@
       {
         "@type": "Question",
         "name": "Which dictionary does the Words With Friends Solver use?",
-        "acceptedAnswer": { "@type": "Answer", "text": "You can search the public-domain Standard (ENABLE) dictionary. These lists may contain uncommon, historical, regional, or offensive terms." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Choose Standard for 172,000+ focused ENABLE entries, Expanded for 854,000+ Wiktionary-derived entries, or Both for 867,000+ unique combined entries. The lists may include uncommon, historical, regional, specialist, or offensive terms." }
       },
       {
         "@type": "Question",
@@ -218,7 +218,7 @@
       {
         "@type": "Question",
         "name": "Can I use the Words With Friends Solver offline?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enable Offline Mode to download the WWF solver, Standard (ENABLE) dictionary, scoring engine, hooks, and local WordNet definitions to this browser. Searches then work without an internet connection; external dictionary links and related web guides are disabled while offline." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Enable Offline Mode to download the WWF solver, all dictionary options, scoring engine, hooks, and local WordNet definitions to this browser. Searches then work without an internet connection; external dictionary links and related web guides are disabled while offline." }
       },
       {
         "@type": "Question",
@@ -235,8 +235,8 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
-  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260904-offline-switch-4">
-  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260904-reference-10">
+  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260904-offline-green-5">
+  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260904-wiktionary-check-14">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260903-word-heading-align-3">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
@@ -262,7 +262,7 @@
         <div>
           <p class="premium-eyebrow">Private, local word-game analysis</p>
           <h1 id="tool-heading">Words With Friends Solver &amp; Word Finder</h1>
-          <p class="premium-hero-copy">Turn rack letters into playable Words With Friends moves with strategic rack sorting, wildcards, smart patterns, WWF scores, local definitions, and dictionary-aware hooks. Install the complete solver for offline use.</p>
+          <p class="premium-hero-copy">Turn rack letters into playable Words With Friends moves with WWF scores, wildcards, hooks, and 867,000+ unique entries across Standard and Expanded dictionaries. Install the complete solver for offline use.</p>
           <div class="premium-hero-pills" aria-label="Word finder features"><span>ENABLE &amp; EXPANDED</span><span>Local WordNet definitions</span><span>Optional offline mode</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>Find the advantage</span><strong>Rack <i>meets</i> board</strong><small>Filter the possibilities. Surface the strongest play.</small></div>
@@ -291,7 +291,7 @@
                     <span>ENABLE</span>
                   </span>
                 </label>
-                <label data-tooltip="Choose EXPANDED for this search: an international English word list containing British and North American word-game vocabulary.">
+                <label data-tooltip="Choose EXPANDED for this search: 854,000+ regional, uncommon, historical, and specialist entries derived from Wiktionary.">
                   <input
                     type="radio"
                     name="dictionary"
@@ -303,7 +303,7 @@
                     <span>EXPANDED</span>
                   </span>
                 </label>
-                <label data-tooltip="Choose Both for this search to combine the Standard (ENABLE) dictionary with duplicate words removed.">
+                <label data-tooltip="Choose Both to search 867,000+ unique ENABLE and Wiktionary-derived entries with duplicates removed.">
                   <input
                     type="radio"
                     name="dictionary"
@@ -317,8 +317,8 @@
                 </label>
               </div>
               <span class="visually-hidden" id="dictionary-enable-description">A broad, public-domain English word list used for North American word-game searches.</span>
-              <span class="visually-hidden" id="dictionary-expanded-description">An international English word list containing British and North American word-game vocabulary.</span>
-              <span class="visually-hidden" id="dictionary-both-description">Search the combined Standard (ENABLE) dictionary with duplicate words removed.</span>
+              <span class="visually-hidden" id="dictionary-expanded-description">Search 854,000+ regional, uncommon, historical, and specialist entries derived from Wiktionary.</span>
+              <span class="visually-hidden" id="dictionary-both-description">Search 867,000+ unique ENABLE and Wiktionary-derived entries with duplicates removed.</span>
             </fieldset>
             <div class="word-tool-offline-control">
               <button class="word-tool-offline-toggle offline-switch" id="word-tool-offline-toggle" type="button" role="switch" aria-checked="false" aria-label="Offline Mode" aria-describedby="word-tool-offline-status"><span class="offline-switch-track" aria-hidden="true"><span class="offline-switch-thumb"></span></span></button>
@@ -845,7 +845,7 @@
       <p class="crossword-link-callout">Working from green, yellow, and gray tile feedback? Use the <a href="/tools/wordle-helper">Wordle Solver &amp; Helper →</a></p>
       <h2 id="how-to-heading">How to use the Words With Friends solver</h2>
       <ol class="feature-list">
-        <li><strong>Choose a dictionary:</strong> select ENABLE for a broad public-domain list geared toward North American word games, EXPANDED for international British and North American vocabulary, or Both for the widest combined results with duplicates removed. Hover over or focus a dictionary option for a short explanation.</li>
+        <li><strong>Choose a dictionary:</strong> select Standard for 172,000+ focused ENABLE public-domain entries, Expanded for 854,000+ Wiktionary-derived entries, or Both for 867,000+ unique entries after duplicates are removed. Hover over or focus the selector to confirm the active choice.</li>
         <li><strong>Enter rack letters and a pattern:</strong> type repeated tiles exactly as they
             appear. Use <code>?</code> for a wildcard rack tile and add an optional pattern after
             <code>/</code>. In the pattern, <code>?</code> matches one letter and <code>*</code>
@@ -945,7 +945,7 @@
         <li><strong>Focus Mode:</strong> select the expand icon to give the interactive solver the
             full browser workspace while keeping rack sorting, filters, results, History, and the
             Pick List available.</li>
-        <li><strong>Dictionary choice:</strong> search the Standard (ENABLE) dictionary.</li>
+        <li><strong>Dictionary choice:</strong> search Standard ENABLE, Expanded Wiktionary-derived, or Both across 867,000+ unique entries.</li>
       </ul>
     </section>
 
@@ -957,7 +957,7 @@
          move S to the far right. Strategic layouts cluster duplicates, keep common digraphs near
          each other, separate J, Q, X, and Z, follow English letter frequency, or organize letters
          around RETINA, SATINE, TISANE, SENIOR, and LATRINE stems.</p>
-      <p><strong>Enable Offline Mode</strong> downloads the WWF solver, Standard (ENABLE) dictionary,
+      <p><strong>Enable Offline Mode</strong> downloads the WWF solver and all Standard, Expanded, and combined dictionary options,
          scoring engine, hook data, and local WordNet definitions to this browser. After the
          download, searches and definition lookups work without an internet connection. External
          dictionary links and related web guides remain unavailable until Offline Mode is disabled.</p>
@@ -1010,7 +1010,7 @@
          definition popup and see complete front and back hook words. Each hook is shown with its
          base Words With Friends score, such as <code>PANE (+6)</code>. The complete dictionary index loads
          only when the lookup window opens.</p>
-      <p>Hook detection respects the selected Standard (ENABLE) dictionary. Because a front hook
+      <p>Hook detection respects the selected Standard, Expanded, or combined dictionary. Because a front hook
          may begin with any letter, hook filtering and sorting load the complete selected index
          on demand; ordinary unscramble searches continue loading only relevant chunks.</p>
     </section>
@@ -1029,11 +1029,11 @@
 
     <section class="seo-section" id="dictionary-sources">
       <h2>Dictionary sources and usage notes</h2>
-      <p>The Standard dictionary uses
+      <p>Standard uses 172,000+ entries from
          <a href="https://www.norvig.com/ngrams/enable1.txt" rel="external">ENABLE</a>,
-         a public-domain North American word list. A future Expanded dictionary is planned using
-         Wiktionary-derived data. The current Standard word-game list may
-         include uncommon, historical, regional, offensive, or general-dictionary-absent terms.
+         a public-domain North American word list. Expanded uses 854,000+ Wiktionary-derived
+         entries. Both removes overlap and searches 867,000+ unique entries. These lists may
+         include uncommon, historical, regional, specialist, offensive, or general-dictionary-absent terms.
          A result is not a guarantee of acceptance by every edition, region, tournament, or ruleset.</p>
       <aside class="third-party-callout" aria-labelledby="third-party-heading">
         <div class="third-party-callout-copy">
@@ -1077,8 +1077,8 @@
             </li>
             <li class="faq-item">
               <h3>Which dictionary does the Words With Friends Solver use?</h3>
-              <p>You can search the public-domain Standard (ENABLE) dictionary. An Expanded
-                 Wiktionary-based dictionary is coming soon. Word-game lexicons may contain
+              <p>Choose Standard for 172,000+ focused ENABLE entries, Expanded for 854,000+
+                 Wiktionary-derived entries, or Both for 867,000+ unique entries. These word lists may contain
                  uncommon, historical, regional, offensive, or general-dictionary-absent terms.</p>
             </li>
             <li class="faq-item">
@@ -1234,7 +1234,7 @@
     </section>
 
     <section class="related-tools" aria-labelledby="related-heading" style="margin-top:2rem;">
-      <h2 id="related-heading">Related Word Tools</h2>
+      <h2 id="related-heading">Related Word-Game Solvers</h2>
       <div class="related-grid">
         <a href="/tools/word-unscrambler" class="related-card">
           <strong>Word Unscrambler</strong>
@@ -1330,7 +1330,7 @@
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
   <script src="../assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10" defer></script>
   <script src="../assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
-  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260904-offline-modal-9" defer></script>
-<script src="../assets/js/shared/dictionary-offline-controls.js?v=20260904-reference-2" defer></script>
+  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260904-wiktionary-11" defer></script>
+<script src="../assets/js/shared/dictionary-offline-controls.js?v=20260904-active-dictionary-icon-10" defer></script>
 </body>
 </html>

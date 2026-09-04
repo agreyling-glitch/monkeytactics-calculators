@@ -16,6 +16,14 @@ test("Sedecordle targets solver intent with consistent metadata and structured d
   assert.match(html,/href="\/tools\/octordle-solver"/);
 });
 
+test("Learn More links Sedecordle guides before related solvers",()=>{
+  assert.match(html,/id="sedecordle-related-guides"/);
+  assert.match(html,/Wordle vs\. Quordle Strategy: Why Four Boards Change Every Guess/);
+  assert.match(html,/How to Win at Wordle: Tips, Tricks &amp; Strategy/);
+  assert.ok(html.indexOf('id="sedecordle-related-guides"')<html.indexOf('<section class="related-tools">'));
+  assert.match(css,/\.word-game-guide-grid\{display:grid/);
+});
+
 test("Sedecordle models sixteen boards and twenty-one shared guesses",()=>{
   assert.equal((html.match(/class="board-tab"/g)||[]).length,16);
   assert.equal((html.match(/class="feedback-board"/g)||[]).length,16);
@@ -47,7 +55,7 @@ test("Sedecordle supports four, five, and six letter games",()=>{
   assert.match(engine,/Engine\.crosswordSearch\("\?"\.repeat\(wordLength\)/);
   assert.match(engine,/pattern\.length===entryWordLength/);
   assert.match(engine,/Enter exactly \$\{wordLength\} letters first/);
-  assert.match(html,/multi-board-word-solver\.js\?v=20260902-no-match-highlight-1/);
+  assert.match(html,/multi-board-word-solver\.js\?v=20260904-wiktionary-4/);
   assert.match(html,/sedecordle-solver\.js\?v=20260902-word-length-2/);
 });
 

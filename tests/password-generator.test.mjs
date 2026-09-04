@@ -68,6 +68,27 @@ test("password generator control exposes the 2,048-character maximum", () => {
   assert.match(html, /endsWith: passwordEndsWith\.value/);
 });
 
+test("password generator supports shared focus mode", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "tools", "password-generator.html"), "utf8");
+
+  assert.match(html, /class="tool-widget" data-focus-mode data-focus-mode-label="Password Generator"/);
+  assert.match(html, /assets\/css\/shared\/focus-mode\.css\?v=/);
+  assert.match(html, /assets\/js\/shared\/focus-mode\.js\?v=/);
+  assert.match(html, /\[data-focus-mode\] \.password-app-title \{ padding-right: 2\.75rem; \}/);
+});
+
+test("password generator links related blog guides at the bottom of the page", () => {
+  const html = fs.readFileSync(path.join(siteRoot, "tools", "password-generator.html"), "utf8");
+
+  assert.match(html, /<p class="premium-section-kicker">Learn more<\/p>/);
+  assert.match(html, /<h2 id="password-guides-heading">Related Password Generator Guides<\/h2>/);
+  assert.match(html, /https:\/\/blog\.monkeytactics\.com\/posts\/password-generator-user-guide\//);
+  assert.match(html, /https:\/\/blog\.monkeytactics\.com\/posts\/why-i-built-a-privacy-first-password-generator\//);
+  assert.match(html, /"@type": "ItemList"[\s\S]*"@id": "https:\/\/monkeytactics\.com\/tools\/password-generator#related-guides"/);
+  assert.match(html, /@media \(max-width: 800px\)[\s\S]*\.password-guide-grid \{ grid-template-columns: 1fr; \}/);
+  assert.ok(html.indexOf('id="password-generator-related-guides"') < html.indexOf('id="related-heading"'));
+});
+
 test("password generator publishes capability-aligned SEO metadata and content", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "password-generator.html"), "utf8");
 

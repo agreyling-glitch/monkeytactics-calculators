@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wordiply Solver: Find the Longest Words | MonkeyTactics</title>
-  <meta name="description" content="Enter a Wordiply starter to find the longest matching words. Search the Standard (ENABLE) dictionary, filter by position, and copy answers privately.">
+  <meta name="description" content="Enter a Wordiply starter to find the longest matching words. Search Standard, Expanded Wiktionary-derived, or combined dictionaries privately.">
   <meta name="author" content="MonkeyTactics">
   <meta name="robots" content="index, follow">
-  <meta name="date" content="2026-08-31">
+  <meta name="date" content="2026-09-04">
   <link rel="canonical" href="https://monkeytactics.com/tools/wordiply-solver">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Wordiply Solver: Find the Longest Words">
@@ -26,14 +26,14 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[
     {"@type":"BreadcrumbList","@id":"https://monkeytactics.com/tools/wordiply-solver#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://monkeytactics.com/tools/"},{"@type":"ListItem","position":3,"name":"Wordiply Solver","item":"https://monkeytactics.com/tools/wordiply-solver"}]},
-    {"@type":"SoftwareApplication","@id":"https://monkeytactics.com/tools/wordiply-solver#app","name":"Wordiply Solver","url":"https://monkeytactics.com/tools/wordiply-solver","applicationCategory":"GameApplication","operatingSystem":"Any","isAccessibleForFree":true,"description":"A private browser-based solver that finds long dictionary words containing a Wordiply starter as an uninterrupted sequence.","dateModified":"2026-08-31","publisher":{"@type":"Organization","name":"MonkeyTactics","url":"https://monkeytactics.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Longest words first","Anywhere, prefix, and suffix matching","the Standard (ENABLE) dictionary","One-click answer copying","Private in-browser search"]},
+    {"@type":"SoftwareApplication","@id":"https://monkeytactics.com/tools/wordiply-solver#app","name":"Wordiply Solver","url":"https://monkeytactics.com/tools/wordiply-solver","applicationCategory":"GameApplication","operatingSystem":"Any","isAccessibleForFree":true,"description":"A private browser-based solver that finds long dictionary words containing a Wordiply starter as an uninterrupted sequence.","dateModified":"2026-09-04","publisher":{"@type":"Organization","name":"MonkeyTactics","url":"https://monkeytactics.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Longest words first","Anywhere, prefix, and suffix matching","the Standard (ENABLE) dictionary","One-click answer copying","Private in-browser search"]},
     {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does the starter have to stay together?","acceptedAnswer":{"@type":"Answer","text":"Yes. It must appear as one uninterrupted sequence in the same order."}},{"@type":"Question","name":"Which dictionary should I choose?","acceptedAnswer":{"@type":"Answer","text":"EXPANDED is the best starting point for British vocabulary. ENABLE is a broad North American list, while Both provides the widest combined set of suggestions."}},{"@type":"Question","name":"Will every result be accepted by Wordiply?","acceptedAnswer":{"@type":"Answer","text":"No. This helper uses independent public word lists rather than Wordiply's private answer list, so results should be confirmed in the game."}}]}
   ]}
   </script>
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
   <link rel="stylesheet" href="../assets/css/tools/wordiply-solver.css?v=20260831-hero-fit-4">
-  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260904-reference-10">
+  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260904-wiktionary-check-14">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
 </head>
 <body class="premium-tool-page wordiply-page">
@@ -52,8 +52,8 @@
       <form id="wordiply-form" novalidate>
         <div class="solver-heading"><div><div class="premium-section-kicker">01 / Stretch the starter</div><h2 id="solver-heading">Find Your Longest Word</h2><p>Type the exact starter shown in Wordiply. We’ll search for it as one continuous block.</p></div>
           <fieldset class="dictionary-selector"><legend class="visually-hidden">Dictionary</legend><div class="segmented-control">
-            <label><input type="radio" name="dictionary" value="expanded"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--expanded" aria-hidden="true"></span><span>EXPANDED</span></span></label>
-            <label><input type="radio" name="dictionary" value="enable" checked><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span><span>ENABLE</span></span></label>
+            <label><input type="radio" name="dictionary" value="expanded" checked><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--expanded" aria-hidden="true"></span><span>EXPANDED</span></span></label>
+            <label><input type="radio" name="dictionary" value="enable"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span><span>ENABLE</span></span></label>
             <label><input type="radio" name="dictionary" value="both"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--both" aria-hidden="true"></span><span>Both</span></span></label>
           </div></fieldset>
         </div>
@@ -122,12 +122,12 @@
       </div>
       <p class="wordiply-disclaimer">MonkeyTactics is an independent helper and is not affiliated with or endorsed by Wordiply or Guardian News &amp; Media.</p>
     </section>
-    <section class="related-tools"><h2>Related Word Tools</h2><div class="related-grid"><a href="/tools/crossword-solver" class="related-card"><strong>Crossword Solver</strong><span>Search by clue, pattern, and crossing letters.</span></a><a href="/tools/word-unscrambler" class="related-card"><strong>Word Unscrambler</strong><span>Build words from a fixed rack of letters.</span></a><a href="/tools/wordle-helper" class="related-card"><strong>Wordle Solver</strong><span>Narrow five-letter words from tile feedback.</span></a></div></section>
+    <section class="related-tools"><h2>Related Word-Game Solvers</h2><div class="related-grid"><a href="/tools/crossword-solver" class="related-card"><strong>Crossword Solver</strong><span>Search by clue, pattern, and crossing letters.</span></a><a href="/tools/word-unscrambler" class="related-card"><strong>Word Unscrambler</strong><span>Build words from a fixed rack of letters.</span></a><a href="/tools/wordle-helper" class="related-card"><strong>Wordle Solver</strong><span>Narrow five-letter words from tile feedback.</span></a></div></section>
   </main>
   <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-wordiply-1" defer></script>
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
-  <script src="../assets/js/tools/wordiply-solver.js?v=20260831-gold-copy-2" defer></script>
-<script src="../assets/js/shared/dictionary-offline-controls.js?v=20260904-reference-2" defer></script>
+  <script src="../assets/js/tools/wordiply-solver.js?v=20260904-expanded-default-4" defer></script>
+<script src="../assets/js/shared/dictionary-offline-controls.js?v=20260904-active-dictionary-icon-10" defer></script>
 </body>
 </html>

@@ -2936,13 +2936,13 @@
 .word-tool-offline-toggle:hover { background: transparent; }
 .word-tool-offline-toggle:focus-visible { outline: 2px solid #fde68a; outline-offset: 2px; }
 .word-tool-offline-toggle:disabled { cursor: wait; opacity: .65; }
-.word-tool-offline-toggle .offline-switch-track { position: absolute; inset: 0; border: 1px solid rgba(148, 163, 184, .55); border-radius: inherit; background: rgba(148, 163, 184, .18); transition: border-color .18s ease, background .18s ease; }
-.word-tool-offline-toggle .offline-switch-thumb { position: absolute; top: .2rem; left: .2rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #cbd5e1; box-shadow: 0 1px 3px rgba(0, 0, 0, .45); transition: transform .18s ease, background .18s ease; }
-.word-tool-offline-toggle[aria-checked="true"] .offline-switch-track { border-color: #22c55e; background: rgba(34, 197, 94, .35); }
+.word-tool-offline-toggle .offline-switch-track { position: absolute; inset: 0; border: 1px solid #22c55e; border-radius: inherit; background: rgba(34, 197, 94, .15); transition: border-color .18s ease, background .18s ease; }
+.word-tool-offline-toggle .offline-switch-thumb { position: absolute; top: .2rem; left: .2rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #4ade80; box-shadow: 0 1px 3px rgba(0, 0, 0, .45); transition: transform .18s ease, background .18s ease; }
+.word-tool-offline-toggle[aria-checked="true"] .offline-switch-track { border-color: #22c55e; background: rgba(34, 197, 94, .45); }
 .word-tool-offline-toggle[aria-checked="true"] .offline-switch-thumb { background: #4ade80; transform: translateX(1.35rem); }
 .word-tool-offline-copy { display: grid; gap: .1rem; min-width: 0; text-align: left; }
 .word-tool-offline-copy strong { color: var(--text); font-size: .78rem; }
-.word-tool-offline-copy span { color: var(--muted); font-size: .7rem; line-height: 1.4; }
+.word-tool-offline-copy span { color: #4ade80; font-size: .7rem; line-height: 1.4; }
 .word-tool-offline-control progress { grid-column: 2; width: 100%; height: .35rem; accent-color: #facc15; }
 
 @media (max-width: 480px) {

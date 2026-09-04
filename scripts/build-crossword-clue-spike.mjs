@@ -75,7 +75,7 @@ function parseSenseRanks(text) {
 
 async function loadDictionaryMembership() {
   const base = new URL("../assets/data/words/", import.meta.url);
-  const manifest = JSON.parse(await readFile(new URL("manifest.enable-v1.json", base), "utf8"));
+  const manifest = JSON.parse(await readFile(new URL("manifest.wiktionary-v1.json", base), "utf8"));
   const membership = new Map();
   await Promise.all(Object.values(manifest.chunks).map(async ({ file }) => {
     const text = gunzipSync(await readFile(new URL(file, base))).toString("utf8");

@@ -31,9 +31,10 @@
     .breadcrumb { display:flex; align-items:center; gap:.5rem; font-size:.8rem; margin-bottom:.8rem; }
     .breadcrumb a { color:inherit; }
     .qr-app-wrap { max-width:1440px; margin:0 auto; padding:1.5rem 1.25rem 2.5rem; }
-    .qr-app-intro { display:flex; justify-content:space-between; gap:1rem; align-items:end; margin-bottom:1rem; }
+    .qr-app-intro { display:flex; justify-content:space-between; gap:1rem; align-items:center; margin:0; padding:1.15rem 4.25rem 1.15rem 1.25rem; background:#0b1324; border:1px solid rgba(148,163,184,.2); border-bottom:0; border-radius:1.25rem 1.25rem 0 0; }
     .qr-app-intro h2 { margin:0 0 .25rem; }
     .qr-app-intro p { margin:0; color:var(--text-muted, #9fb0c7); }
+    .qr-app-wrap .qr-studio-shell { border-radius:0 0 1.25rem 1.25rem; }
     .qr-info { max-width:1100px; margin:0 auto; padding:0 1.25rem 2.5rem; }
     .qr-info > h2 { margin:0 0 .4rem; font-size:1.35rem; }
     .qr-info > p { max-width:850px; margin:.2rem 0 1.1rem; color:var(--text-muted, #9fb0c7); line-height:1.7; }
@@ -51,17 +52,39 @@
     .qr-faq details { padding:.85rem 0; border-bottom:1px solid var(--border, #24324a); }
     .qr-faq summary { color:var(--text, #f8fafc); cursor:pointer; font-weight:700; }
     .qr-faq details p { margin:.5rem 0 0; }
-    .qr-related { display:flex; flex-wrap:wrap; gap:.7rem; }
-    .qr-related a { padding:.65rem .85rem; color:var(--text, #f8fafc); background:var(--surface, #111827); border:1px solid var(--border, #24324a); border-radius:10px; }
-    @media (max-width:760px) { .hero--inner{padding:1.25rem}.qr-app-intro{align-items:start;flex-direction:column}.qr-info-grid,.qr-steps{grid-template-columns:1fr}.qr-types{columns:1} }
+    .qr-related-tools { max-width:1100px; box-sizing:border-box; margin:0 auto; padding:0 1.25rem 2.5rem; }
+    .qr-related-tools h2 { margin:0; color:var(--premium-ink); font:500 clamp(1.45rem,2.6vw,2rem)/1.15 Georgia,serif; }
+    .qr-related-tools .related-card { border-color:var(--premium-line); background:rgba(16,27,22,.72); text-decoration:none; }
+    .qr-learn-more { max-width:1100px; box-sizing:border-box; margin:0 auto 2.5rem; padding:clamp(1rem,3vw,2rem); border:1px solid var(--premium-line); border-radius:1.25rem; background:#0d1812; }
+    .qr-learn-more h2 { margin:.2rem 0 .45rem; color:var(--premium-ink); font:500 clamp(1.45rem,2.6vw,2rem)/1.15 Georgia,serif; }
+    .qr-learn-more-heading > p:last-child { max-width:52rem; margin:0; color:var(--premium-muted); }
+    .qr-guide-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.9rem; margin-top:1.15rem; }
+    .qr-guide-card { display:flex; min-width:0; flex-direction:column; padding:1rem; border:1px solid rgba(183,247,207,.12); border-radius:.85rem; background:rgba(255,255,255,.018); }
+    .qr-guide-card > span { color:var(--premium-green); font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    .qr-guide-card h3 { margin:.45rem 0; font-size:1.05rem; line-height:1.3; }
+    .qr-guide-card h3 a { color:var(--premium-ink); text-decoration:none; }
+    .qr-guide-card h3 a:hover { color:var(--premium-green); }
+    .qr-guide-card p { flex:1; margin:0 0 .8rem; color:var(--premium-muted); font-size:.84rem; line-height:1.55; }
+    .qr-guide-link { align-self:flex-start; color:var(--premium-green); font-size:.8rem; font-weight:800; text-decoration:none; }
+    .qr-guide-link:hover { text-decoration:underline; }
+    @media (max-width:900px) { .qr-guide-grid{grid-template-columns:1fr} }
+    @media (max-width:760px) { .hero--inner{padding:1.25rem}.qr-app-intro{align-items:start;flex-direction:column;padding:1rem 3.75rem 1rem 1rem}.qr-info-grid,.qr-steps{grid-template-columns:1fr}.qr-types{columns:1} }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-2">
+  <link rel="stylesheet" href="/assets/css/shared/focus-mode.css?v=20260829-2">
+  <style>
+    .qr-tool-page .qr-app-intro { margin-bottom: 0; }
+    .qr-tool-page [data-focus-mode]:not(.is-focus-mode) > .focus-mode-toggle { top: 3.25rem; right: 1.25rem; }
+  </style>
   <link rel="stylesheet" href="/assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"WebApplication","@id":"https://monkeytactics.com/tools/qr-code-generator#app","name":"MonkeyTactics QR Code Generator","alternateName":"MonkeyTactics QR Studio","url":"https://monkeytactics.com/tools/qr-code-generator","description":"A free browser-based QR code generator for custom single and batch QR codes with safe frames, advanced styling, reliability analysis, project saving, and PNG, SVG, PDF and ZIP exports.","applicationCategory":"UtilitiesApplication","applicationSubCategory":"QR Code Generator","operatingSystem":"Any","browserRequirements":"Requires JavaScript and a modern web browser","isAccessibleForFree":true,"dateModified":"2026-08-06","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["URL, text and Wi-Fi QR codes","vCard, email, SMS, phone, geo and calendar QR codes","TOTP, cryptocurrency and social profile QR codes","Custom module and finder-eye shapes","Safe frames with labels, presets, gradients, patterns and icons","Gradients, colors, effects, image logos and text logos","Live scan reliability analysis and heatmap","PNG, SVG and PDF export","CSV batch ZIP export with frame overrides and printable layouts","Offline project save and JSON import or export"]}
   </script>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Utilities","item":"https://monkeytactics.com/tools/utilities"},{"@type":"ListItem","position":3,"name":"QR Code Generator","item":"https://monkeytactics.com/tools/qr-code-generator"}]}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"ItemList","@id":"https://monkeytactics.com/tools/qr-code-generator#related-guides","name":"Related QR Code Guides","numberOfItems":3,"itemListElement":[{"@type":"ListItem","position":1,"name":"How to Design a Beautiful QR Code Without Breaking Scanability","url":"https://blog.monkeytactics.com/posts/design-beautiful-qr-code-without-breaking-scanability/"},{"@type":"ListItem","position":2,"name":"QR Code Reliability: Quiet Zones, ECC Levels, and Why Most Styled QRs Fail","url":"https://blog.monkeytactics.com/posts/qr-code-reliability-quiet-zones-ecc-levels/"},{"@type":"ListItem","position":3,"name":"Batch QR Code Workflows: CSV Validation, Reliable Styling, and Production-Ready Exports","url":"https://blog.monkeytactics.com/posts/batch-qr-code-workflows-csv-validation-production-export/"}]}
   </script>
 </head>
 <body class="premium-tool-page qr-tool-page">
@@ -82,7 +105,7 @@
       </div>
     </section>
 
-    <section class="qr-app-wrap" aria-labelledby="studio-heading">
+    <section class="qr-app-wrap" aria-labelledby="studio-heading" data-focus-mode data-focus-mode-label="QR Code Generator">
       <div class="qr-app-intro">
         <div><div class="premium-section-kicker">01 / Create</div><h2 id="studio-heading">Custom QR Code Studio</h2><p>Choose the content, shape the design, test its reliability, and export in the format you need.</p></div>
       </div>
@@ -129,10 +152,41 @@
       <details><summary>Does a QR code expire?</summary><p>The QR image itself does not expire. A QR code that contains a direct URL continues to work while that destination remains available. MonkeyTactics does not add a redirect or subscription between the QR code and your destination.</p></details>
     </section>
 
-    <section class="qr-info" aria-labelledby="related-heading">
+    <section class="qr-learn-more" aria-labelledby="qr-guides-heading">
+      <div class="qr-learn-more-heading">
+        <p class="premium-section-kicker">Learn more</p>
+        <h2 id="qr-guides-heading">Related QR Code Guides</h2>
+        <p>Explore practical guidance for designing dependable QR codes, protecting scanability, and preparing larger production runs.</p>
+      </div>
+      <div class="qr-guide-grid">
+        <article class="qr-guide-card">
+          <span>QR code design</span>
+          <h3><a href="https://blog.monkeytactics.com/posts/design-beautiful-qr-code-without-breaking-scanability/">How to Design a Beautiful QR Code Without Breaking Scanability</a></h3>
+          <p>Use gradients, logos, frames, colors, and custom module shapes without losing the visual structure scanners need.</p>
+          <a class="qr-guide-link" href="https://blog.monkeytactics.com/posts/design-beautiful-qr-code-without-breaking-scanability/">Read guide <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="qr-guide-card">
+          <span>Scan reliability</span>
+          <h3><a href="https://blog.monkeytactics.com/posts/qr-code-reliability-quiet-zones-ecc-levels/">QR Code Reliability: Quiet Zones, ECC Levels, and Why Most Styled QRs Fail</a></h3>
+          <p>Understand quiet zones, error-correction levels, logo coverage, contrast, and the real-world conditions that cause scanning failures.</p>
+          <a class="qr-guide-link" href="https://blog.monkeytactics.com/posts/qr-code-reliability-quiet-zones-ecc-levels/">Read guide <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="qr-guide-card">
+          <span>Batch production</span>
+          <h3><a href="https://blog.monkeytactics.com/posts/batch-qr-code-workflows-csv-validation-production-export/">Batch QR Code Workflows: CSV Validation, Reliable Styling, and Production-Ready Exports</a></h3>
+          <p>Plan, validate, generate, review, package, and print a dependable batch of QR codes from CSV data.</p>
+          <a class="qr-guide-link" href="https://blog.monkeytactics.com/posts/batch-qr-code-workflows-csv-validation-production-export/">Read guide <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="related-tools qr-related-tools" aria-labelledby="related-heading">
       <h2 id="related-heading">Related free tools</h2>
-      <p>Already have a QR image? Inspect its contents before opening the destination, or browse the complete utility collection.</p>
-      <div class="qr-related"><a href="/tools/qr-code-decoder">Decode or scan a QR code</a><a href="/tools/utilities">Browse utility tools</a><a href="/tools/">View all calculators and tools</a></div>
+      <div class="related-grid">
+        <a href="/tools/qr-code-decoder" class="related-card"><strong>QR Code Decoder</strong><span>Decode QR codes and barcodes privately from images, screenshots, URLs, or your camera.</span></a>
+        <a href="/tools/ocr-utility" class="related-card"><strong>OCR Utility</strong><span>Extract editable text from images, screenshots, scans, and PDFs directly in your browser.</span></a>
+        <a href="/tools/password-generator" class="related-card"><strong>Password Generator</strong><span>Create strong passwords and passphrases with local generation, analysis, and QR export.</span></a>
+      </div>
     </section>
 
   </main>
@@ -147,5 +201,6 @@
     <nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav>
   </footer>
   <script type="module" src="/assets/generated/qr-studio/qr-studio.js?v=20260806-60"></script>
+  <script src="/assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
 </body>
 </html>
