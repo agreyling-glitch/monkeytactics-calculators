@@ -15,7 +15,7 @@ export function find_hooks_for_dictionary(word: string, dictionary_bit: number):
 
 /**
  * Adds dictionary records to the engine. Records may be `word`, or `word\tN`
- * where N is the ENABLE/SOWPODS membership bit mask used by the static shards.
+ * where N is the Standard dictionary membership bit mask used by the static shards.
  */
 export function init_engine(dictionary_json: any): void;
 

@@ -36,7 +36,7 @@ const OFFENSIVE_WORDS = new Set([
 
 const dictionaryCache = new Map();
 const DICTIONARY_BASE = "/assets/data/words/";
-const DICTIONARY_SUFFIX = ".enable-sowpods.v1.txt.gz";
+const DICTIONARY_SUFFIX = ".enable-v1.txt.gz";
 
 /**
  * Generate a random password using crypto.getRandomValues.
@@ -236,7 +236,7 @@ async function loadDictionaryChunk(letter) {
 
 /**
  * Return a passphrase word pool. The default curated pool removes extremely
- * obscure terms; disabling that filter draws from bundled ENABLE/SOWPODS data.
+ * obscure terms; disabling that filter draws from bundled Standard ENABLE data.
  */
 export async function getPassphraseWordPool(options = {}) {
   if (options.excludeObscure !== false) {

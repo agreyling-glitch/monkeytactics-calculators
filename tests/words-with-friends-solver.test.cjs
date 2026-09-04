@@ -101,7 +101,7 @@ test("the FAQ above related guides uses the full content width", () => {
   assert.match(wordSolverCss, /\.faq-list\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*none;/s);
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
-    assert.match(page, /word-unscrambler\.css\?v=20260903-compact-rack-sort-30/);
+    assert.match(page, /word-unscrambler\.css\?v=20260904-offline-switch-4/);
   }
 });
 
@@ -111,6 +111,16 @@ test("word solver heading aligns with the top of the expanded dictionary control
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /premium-tool\.css\?v=20260903-word-heading-align-3/);
   }
+});
+
+test("dictionary guidance appears before Offline Mode controls", () => {
+  for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
+    const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
+    assert.match(page, /<div class="tool-heading-controls">[\s\S]*?<\/fieldset>\s*<div class="word-tool-offline-control">/);
+    assert.doesNotMatch(page, /<fieldset class="dictionary-selector">[\s\S]*?<div class="word-tool-offline-control">[\s\S]*?<\/fieldset>/);
+  }
+  assert.match(wordSolverCss, /\.tool-heading-controls \.dictionary-selector::after\s*\{[^}]*height:\s*2\.6em;/s);
+  assert.match(wordSolverCss, /\.word-tool-offline-control\s*\{[^}]*margin-top:\s*\.35rem;[^}]*padding-top:\s*\.45rem;/s);
 });
 
 test("word result popovers use local definitions and move external links behind a spyglass", () => {
@@ -125,8 +135,8 @@ test("word result popovers use local definitions and move external links behind 
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
-    assert.match(page, /word-unscrambler\.js\?v=20260903-offline-cache-reuse-7/);
-    assert.match(page, /word-unscrambler\.css\?v=20260903-compact-rack-sort-30/);
+    assert.match(page, /word-unscrambler\.js\?v=20260904-offline-modal-9/);
+    assert.match(page, /word-unscrambler\.css\?v=20260904-offline-switch-4/);
   }
 });
 
@@ -142,12 +152,14 @@ test("definition popovers are roomier while remaining bounded on mobile", () => 
 test("word solvers offer opt-in offline downloads with local definitions", () => {
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
-    assert.match(page, /id="word-tool-offline-toggle"[^>]*>Enable Offline Mode/);
+    assert.match(page, /id="word-tool-offline-toggle"[^>]*role="switch"[^>]*aria-checked="false"/);
+    assert.match(page, /class="offline-switch-track"[^>]*>[\s\S]*?class="offline-switch-thumb"/);
     assert.match(page, /id="word-tool-offline-progress"/);
   }
   assert.match(wordSolverScript, /navigator\.serviceWorker\.register\("\/crossword-offline-sw\.js", \{ scope: "\/" \}\)/);
   assert.match(wordSolverScript, /Object\.values\(wordData\.chunks/);
   assert.match(wordSolverScript, /Object\.values\(definitionData\.shards/);
+  assert.match(wordSolverScript, /offlineToggle\.setAttribute\("aria-checked", String\(offlineModeEnabled\)\)/);
   assert.match(wordSolverScript, /dictionaryDirectoryButton\.hidden = offlineModeEnabled/);
   assert.match(wordSolverScript, /section\.hidden = offlineModeEnabled/);
   assert.match(wordSolverScript, /const nextCacheName = `\$\{OFFLINE_CACHE_PREFIX\}\$\{OFFLINE_TOOL_ID\}-\$\{OFFLINE_VERSION\}`/);

@@ -81,7 +81,7 @@ const GAME_NAME = IS_WWF ? "Words With Friends Solver" : "Word Unscrambler";
 const analyzeWord = (word) => IS_WWF ? Engine.analyzeWwfWord(word) : Engine.analyzeWord(word);
 
 const MANIFEST_URL =
-  "../assets/data/words/manifest.enable-sowpods-v2.json?v=enable-sowpods-v2";
+  "../assets/data/words/manifest.enable-v1.json?v=enable-v1";
 const CHUNK_BASE_URL = "../assets/data/words/";
 const DEFINITION_MANIFEST_URL = "/assets/data/word-definitions/manifest.wordnet-definitions-v1.json?v=wordnet-3.0-definitions-v1";
 const DEFINITION_BASE_URL = "/assets/data/word-definitions/";
@@ -147,7 +147,7 @@ const SORT_LABELS = Object.freeze({
 });
 const DICTIONARY_BITS = Object.freeze({
   enable: 1,
-  sowpods: 2,
+  expanded: 2,
   both: 3
 });
 // Loaded chunks are indexed once and retained for subsequent searches.
@@ -260,7 +260,8 @@ function initializeRackSortMenu() {
 
 function renderOfflineState(message = "") {
   if (!offlineToggle || !offlineStatus) return;
-  offlineToggle.textContent = offlineModeEnabled ? "Disable Offline Mode" : "Enable Offline Mode";
+  offlineToggle.setAttribute("aria-checked", String(offlineModeEnabled));
+  offlineToggle.title = offlineModeEnabled ? "Disable Offline Mode" : "Enable Offline Mode";
   offlineStatus.textContent = message || (offlineModeEnabled
     ? "Ready offline. Word searches, hooks, and definitions use downloaded local data."
     : `Download the complete ${IS_WWF ? "WWF solver" : "word finder"} for use without an internet connection (about 7 MB).`);
@@ -301,13 +302,15 @@ async function buildOfflineUrls(cache) {
   ])];
 }
 
-async function cacheOfflineUrl(cache, url) {
+async function cacheOfflineUrl(cache, url, forceDownload = false) {
   const request = new Request(url, { credentials: "same-origin" });
-  if (await cache.match(request)) return false;
-  const sharedResponse = await caches.match(request);
-  if (sharedResponse) {
-    await cache.put(request, sharedResponse.clone());
-    return false;
+  if (!forceDownload) {
+    if (await cache.match(request)) return false;
+    const sharedResponse = await caches.match(request);
+    if (sharedResponse) {
+      await cache.put(request, sharedResponse.clone());
+      return false;
+    }
   }
   const response = await fetch(new Request(url, { cache: "reload", credentials: "same-origin" }));
   if (!response.ok) throw new Error(`Offline download failed for ${url}.`);
@@ -315,7 +318,7 @@ async function cacheOfflineUrl(cache, url) {
   return true;
 }
 
-async function enableOfflineMode() {
+async function enableOfflineMode(forceDownload = false) {
   if (!("serviceWorker" in navigator) || !("caches" in window)) throw new Error("Offline Mode is not supported by this browser.");
   await navigator.serviceWorker.register("/crossword-offline-sw.js", { scope: "/" });
   await navigator.serviceWorker.ready;
@@ -332,7 +335,7 @@ async function enableOfflineMode() {
   try {
     const workers = Array.from({ length: Math.min(4, urls.length) }, async () => {
       while (cursor < urls.length) {
-        if (await cacheOfflineUrl(cache, urls[cursor++])) downloaded += 1;
+        if (await cacheOfflineUrl(cache, urls[cursor++], forceDownload)) downloaded += 1;
         offlineProgress.value = ++completed;
         offlineStatus.textContent = `Downloading offline data: ${completed} of ${urls.length} files…`;
       }
@@ -370,10 +373,12 @@ async function disableOfflineMode() {
 }
 
 async function toggleOfflineMode() {
+  const forceDownload = offlineToggle.dataset.forceDownload === "true";
+  delete offlineToggle.dataset.forceDownload;
   offlineToggle.disabled = true;
   try {
     if (offlineModeEnabled) await disableOfflineMode();
-    else await enableOfflineMode();
+    else await enableOfflineMode(forceDownload);
   } catch (error) {
     console.error("Unable to change Offline Mode:", error);
     offlineStatus.textContent = "Offline Mode could not be changed. Check available storage and try again.";

@@ -9,7 +9,7 @@ import wasmModule from "../../../assets/wasm/word-unscrambler/word_unscrambler_e
 const SITE_URL = "https://monkeytactics.com";
 const TOOL_PATH = "/tools/word-unscrambler";
 const WORD_DATA_PATH = "/assets/data/words";
-const WORD_DATA_VERSION = "enable-sowpods-v2";
+const WORD_DATA_VERSION = "enable-v1";
 const DICTIONARY_BIT = 3;
 
 let wasmInitialized = false;
@@ -123,8 +123,8 @@ function renderPageHTML({ word = "", results = [], valid = false }) {
     ? `Unscramble ${safeWord} | MonkeyTactics`
     : "Free Word Unscrambler | MonkeyTactics";
   const description = valid
-    ? `Unscramble ${safeWord} using ENABLE and SOWPODS dictionaries.`
-    : "Unscramble letters into words using ENABLE and SOWPODS dictionaries.";
+    ? `Unscramble ${safeWord} using the Standard (ENABLE) dictionary.`
+    : "Unscramble letters into words using the Standard (ENABLE) dictionary.";
   const content = valid
     ? `<h1>Unscramble &quot;${safeWord}&quot;</h1>
        <p>Words you can make from <strong>${safeWord}</strong>:</p>

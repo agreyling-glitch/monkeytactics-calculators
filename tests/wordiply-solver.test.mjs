@@ -20,7 +20,7 @@ test("Wordiply SEO copy is descriptive, useful, and transparent", () => {
   assert.match(html, /<h1 id="tool-heading">Wordiply Solver: Find the Longest Words<\/h1>/);
   assert.match(html, /<h2>What Is Wordiply\?<\/h2>/);
   assert.match(html, /<h2>How to Improve Your Wordiply Score<\/h2>/);
-  assert.match(html, /<h2>ENABLE, SOWPODS, and Wordiply Answers<\/h2>/);
+  assert.match(html, /<h2>Standard Dictionary and Wordiply Answers<\/h2>/);
   assert.match(html, /<h2>How the Solver Finds Matches<\/h2>/);
   assert.match(html, /href="https:\/\/www\.wordiply\.com\/"/);
   assert.match(html, /href="\/third-party-notices">dictionary sources and licenses<\/a>/);
@@ -50,9 +50,9 @@ test("Wordiply search keeps starter contiguous and sorts longest first", () => {
   assert.match(script, /highlightStarter\(word, starter\)/);
 });
 
-test("Wordiply defaults to the British-friendly SOWPODS dictionary", () => {
-  assert.match(html, /name="dictionary" value="sowpods" checked/);
-  assert.match(script, /dictionaryBits = \{ enable: 1, sowpods: 2, both: 3 \}/);
+test("Wordiply defaults to the Standard ENABLE dictionary", () => {
+  assert.match(html, /name="dictionary" value="enable" checked/);
+  assert.match(script, /dictionaryBits = \{ enable: 1, expanded: 2, both: 3 \}/);
 });
 
 test("each Wordiply result can be copied with visible feedback", () => {

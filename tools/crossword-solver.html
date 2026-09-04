@@ -47,7 +47,7 @@
         "isAccessibleForFree": true,
         "browserRequirements": "Requires JavaScript and a modern web browser. Offline installation requires service worker and Cache Storage support.",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "featureList": ["Crossword clue and answer search", "129,000+ WordNet clue records", "Single- and multi-word answers", "WordNet definition and graph similarity ranking", "WordNet synonym and query expansion", "Explainable semantic score breakdowns", "Known-letter answer patterns", "Exact and flexible answer lengths", "ENABLE and SOWPODS dictionaries", "Opt-in downloadable offline crossword solver", "Offline ENABLE and SOWPODS searches", "Local-only offline definition lookup with no API calls", "Candidates grouped by grid position", "Reusable Grid Position suggestions", "Collapsible Pick List groups", "Versioned JSON Pick List export and import", "Merge or replace imported Pick Lists", "Session-cached dictionary definitions", "Restore and rerun saved searches", "Compact share URLs", "Crossword pick QR codes", "Private in-browser matching"]
+        "featureList": ["Crossword clue and answer search", "129,000+ WordNet clue records", "Single- and multi-word answers", "WordNet definition and graph similarity ranking", "WordNet synonym and query expansion", "Explainable semantic score breakdowns", "Known-letter answer patterns", "Exact and flexible answer lengths", "the Standard (ENABLE) dictionary", "Opt-in downloadable offline crossword solver", "Offline Standard (ENABLE) searches", "Local-only offline definition lookup with no API calls", "Candidates grouped by grid position", "Reusable Grid Position suggestions", "Collapsible Pick List groups", "Versioned JSON Pick List export and import", "Merge or replace imported Pick Lists", "Session-cached dictionary definitions", "Restore and rerun saved searches", "Compact share URLs", "Crossword pick QR codes", "Private in-browser matching"]
       },
       {
         "@type": "ItemList",
@@ -72,11 +72,11 @@
           { "@type": "Question", "name": "Can I reset only the crossword filters?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Reset button inside Filters clears length, sorting, letter-pool, starts-with, ends-with, must-include, and excluded-letter settings without clearing the clue, pattern, dictionary, Pick List, or current results." } },
           { "@type": "Question", "name": "Can I share a crossword pick?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select Share beside a saved pick to create a compact deep link, formatted copyable summary, and URL QR code. The link includes only the answer, clue, pattern, and dictionary. Opening it restores the search controls, runs the search, and adds the candidate to the recipient's browser-local Pick List." } },
           { "@type": "Question", "name": "How do I combine a clue with crossing letters?", "acceptedAnswer": { "@type": "Answer", "text": "Enter the clue, then type the known letters in their grid positions and use a question mark for each unknown square. The solver ranks clue matches that also fit the pattern." } },
-          { "@type": "Question", "name": "Can I search by letter pattern only?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Leave the clue blank and enter a pattern. The solver searches the selected ENABLE or SOWPODS dictionary without loading clue data." } },
+          { "@type": "Question", "name": "Can I search by letter pattern only?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Leave the clue blank and enter a pattern. The solver searches the selected Standard (ENABLE) dictionary without loading clue data." } },
           { "@type": "Question", "name": "What do question marks and asterisks mean?", "acceptedAnswer": { "@type": "Answer", "text": "A question mark matches exactly one unknown letter. An asterisk matches zero or more letters when the answer length is uncertain." } },
-          { "@type": "Question", "name": "Where do the crossword clues come from?", "acceptedAnswer": { "@type": "Answer", "text": "Clue search uses an automatically filtered and transformed dataset derived from Princeton WordNet 3.0. Pattern-only answers come from ENABLE and SOWPODS word lists." } },
-          { "@type": "Question", "name": "Can I use the crossword solver offline?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select Enable Offline Mode to download the crossword solver, ENABLE and SOWPODS word lists, and local WordNet clue data to this browser. Offline Mode disables Datamuse and external dictionary links, so searches and available definitions remain local." } },
-          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Clues, patterns, filters, ranking, and Pick Lists stay in your browser. Standard definition lookup checks local WordNet first and uses Datamuse only when needed. Offline Mode keeps definition lookup entirely local and makes no Datamuse API calls." } }
+          { "@type": "Question", "name": "Where do the crossword clues come from?", "acceptedAnswer": { "@type": "Answer", "text": "Clue search uses an automatically filtered and transformed dataset derived from Princeton WordNet 3.0. Pattern-only answers come from the Standard (ENABLE) word list." } },
+          { "@type": "Question", "name": "Can I use the crossword solver offline?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select Enable Offline Mode to download the crossword solver, the Standard (ENABLE) word list, and local WordNet clue data to this browser. Offline Mode disables external word-definition lookups and dictionary links, so searches and available definitions remain local." } },
+          { "@type": "Question", "name": "Are crossword searches private?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Clues, patterns, filters, ranking, and Pick Lists stay in your browser. Standard definition lookup checks local WordNet first and uses an external word-definition lookup only when needed. Offline Mode keeps definition lookup entirely local and makes no external requests." } }
         ]
       }
     ]
@@ -84,8 +84,7 @@
   </script>
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
-  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260903-tight-offline-17">
-  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260831-stable-mobile-7">
+  <link rel="stylesheet" href="../assets/css/tools/crossword-solver.css?v=20260904-controls-right-32">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <script src="../assets/js/shared/ads.js" defer></script>
@@ -116,22 +115,13 @@
       <form id="crossword-form" novalidate>
         <div class="solver-heading">
           <div><div class="premium-section-kicker">01 / Find the answer</div><h2 id="solver-heading">Search Crossword Clues and Answer Patterns</h2><p>Enter a clue, known crossing letters, or both. Add the answer length and filters when you need a tighter result list.</p></div>
-          <fieldset class="dictionary-selector">
-            <legend class="visually-hidden">Dictionary</legend>
-            <div class="segmented-control">
-              <label data-tooltip="Choose ENABLE for this search: a broad, public-domain English word list used for North American word-game searches."><input type="radio" name="dictionary" value="enable" aria-describedby="dictionary-enable-description" checked><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span><span>ENABLE</span></span></label>
-              <label data-tooltip="Choose SOWPODS for this search: an international English word list containing British and North American word-game vocabulary."><input type="radio" name="dictionary" value="sowpods" aria-describedby="dictionary-sowpods-description"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--sowpods" aria-hidden="true"></span><span>SOWPODS</span></span></label>
-              <label data-tooltip="Choose Both for this search to combine the ENABLE and SOWPODS lists with duplicate words removed."><input type="radio" name="dictionary" value="both" aria-describedby="dictionary-both-description"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--both" aria-hidden="true"></span><span>Both</span></span></label>
-            </div>
-            <span class="visually-hidden" id="dictionary-enable-description">A broad, public-domain English word list used for North American word-game searches.</span>
-            <span class="visually-hidden" id="dictionary-sowpods-description">An international English word list containing British and North American word-game vocabulary.</span>
-            <span class="visually-hidden" id="dictionary-both-description">Search the combined ENABLE and SOWPODS lists with duplicate words removed.</span>
+          <div class="crossword-dictionary-controls">
+            <button class="dictionary-choice-trigger" id="dictionary-choice-trigger" type="button" aria-label="Choose dictionary. Current: Standard (ENABLE)" title="Dictionary selected: Standard (ENABLE)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5c2.7-.8 5.3-.3 8 1.4v14c-2.7-1.7-5.3-2.2-8-1.4zM20 4.5c-2.7-.8-5.3-.3-8 1.4v14c2.7-1.7 5.3-2.2 8-1.4z"></path><path d="M12 5.9v14"></path></svg></button>
             <div class="crossword-offline-control">
-              <button id="crossword-offline-toggle" type="button" aria-describedby="crossword-offline-status">Enable Offline Mode</button>
-              <div class="crossword-offline-copy"><strong>Offline Mode</strong><span id="crossword-offline-status" role="status">Download the complete solver for use without an internet connection (about 15 MB).</span></div>
-              <progress id="crossword-offline-progress" max="1" value="0" hidden>0%</progress>
+              <button class="offline-switch" id="crossword-offline-toggle" type="button" role="switch" aria-checked="false" aria-label="Offline Mode" aria-describedby="crossword-offline-status"><span class="offline-switch-track" aria-hidden="true"><span class="offline-switch-thumb"></span></span></button>
+              <strong id="crossword-offline-status" role="status">Offline Mode [Disabled]</strong>
             </div>
-          </fieldset>
+          </div>
         </div>
 
         <div class="crossword-layout">
@@ -223,8 +213,8 @@
         <p class="premium-section-kicker">02 / Narrow the possibilities</p>
         <h2>How to Use the Crossword Solver</h2>
         <ol>
-          <li><strong>Choose a dictionary:</strong> select ENABLE for a broad public-domain list geared toward North American word games, SOWPODS for international British and North American vocabulary, or Both for the widest combined results with duplicates removed. Hover over or focus an option for a short explanation.</li>
-          <li>For dependable use without an internet connection, select <strong>Enable Offline Mode</strong> to download the complete solver and local definition data to this browser. Datamuse and external dictionary links stay disabled until you turn Offline Mode off.</li>
+          <li><strong>Choose a dictionary:</strong> Standard uses the focused ENABLE public-domain North American word list. Expanded will add regional, uncommon, historical, and specialist English words from Wiktionary when that dataset becomes available.</li>
+          <li>For dependable use without an internet connection, select <strong>Enable Offline Mode</strong> to download the complete solver and local definition data to this browser. External word-definition lookups and dictionary links stay disabled until you turn Offline Mode off.</li>
           <li>Enter the crossword clue as written. Straight definition clues work best; cryptic wordplay is not interpreted.</li>
           <li>Add the answer pattern from your grid. Keep known letters in position and use <code>?</code> for each unknown square.</li>
           <li>If you only know part of the answer, use <code>*</code> for a flexible number of letters or set an exact Word Length.</li>
@@ -285,8 +275,8 @@
       <article class="content-card">
         <p class="premium-section-kicker">Data and privacy</p>
         <h2>Private, Browser-Based Crossword Search</h2>
-        <p>The clue index contains more than 129,000 automatically filtered records derived from Princeton WordNet 3.0, including over 34,000 multi-word answers. Phrase spacing is shown in results while patterns and answer length count letters as crossword grid cells. Semantic graph relationships—including broader, narrower, and similar concepts—help find answers beyond exact clue words. Answer validation uses the ENABLE and SOWPODS word lists. Data loads in compressed pieces only when needed, or you can install the complete crossword solver for offline searches.</p>
-        <p>Your clue, pattern, filters, Pick List, grid positions, notes, and exported JSON files remain under your control. A share link contains only the answer, clue, pattern, and dictionary selection. Standard definition lookup uses matched and local WordNet definitions before Datamuse. Offline Mode disables Datamuse and external dictionary links, keeping all available definition lookup local. See <a href="/third-party-notices#wordnet-heading">data sources and licensing</a>.</p>
+        <p>The clue index contains more than 129,000 automatically filtered records derived from Princeton WordNet 3.0, including over 34,000 multi-word answers. Phrase spacing is shown in results while patterns and answer length count letters as crossword grid cells. Semantic graph relationships—including broader, narrower, and similar concepts—help find answers beyond exact clue words. Answer validation uses the the Standard (ENABLE) word list. Data loads in compressed pieces only when needed, or you can install the complete crossword solver for offline searches.</p>
+        <p>Your clue, pattern, filters, Pick List, grid positions, notes, and exported JSON files remain under your control. A share link contains only the answer, clue, pattern, and dictionary selection. Standard definition lookup uses matched and local WordNet definitions before an external word-definition lookup. Offline Mode disables external lookups and dictionary links, keeping all available definition lookup local. See <a href="/third-party-notices#wordnet-heading">data sources and licensing</a>.</p>
       </article>
     </section>
 
@@ -308,11 +298,11 @@
             <li class="faq-item"><h3>Can I reset only the crossword filters?</h3><p>Yes. The <strong>Reset</strong> button inside Filters clears length, sorting, letter-pool, starts-with, ends-with, must-include, and excluded-letter settings without clearing the clue, pattern, dictionary, Pick List, or current results.</p></li>
             <li class="faq-item"><h3>Can I share a crossword pick?</h3><p>Yes. Select <strong>Share</strong> beside a saved pick to create a compact deep link, formatted copyable summary, and URL QR code. The link includes only the answer, clue, pattern, and dictionary. Opening it restores the search controls, runs the search, and adds the candidate to the recipient's browser-local Pick List.</p></li>
             <li class="faq-item"><h3>How do I combine a clue with crossing letters?</h3><p>Enter the clue, then type the known letters in their grid positions and use a question mark for each unknown square. The solver ranks clue matches that also fit the pattern.</p></li>
-            <li class="faq-item"><h3>Can I search by letter pattern only?</h3><p>Yes. Leave the clue blank and enter a pattern. The solver searches the selected ENABLE or SOWPODS dictionary without loading clue data.</p></li>
+            <li class="faq-item"><h3>Can I search by letter pattern only?</h3><p>Yes. Leave the clue blank and enter a pattern. The solver searches the selected Standard (ENABLE) dictionary without loading clue data.</p></li>
             <li class="faq-item"><h3>What do question marks and asterisks mean?</h3><p>A question mark matches exactly one unknown letter. An asterisk matches zero or more letters when the answer length is uncertain.</p></li>
-            <li class="faq-item"><h3>Where do the crossword clues come from?</h3><p>Clue search uses an automatically filtered and transformed dataset derived from Princeton WordNet 3.0. Pattern-only answers come from ENABLE and SOWPODS word lists.</p></li>
-            <li class="faq-item"><h3>Can I use the crossword solver offline?</h3><p>Yes. Select Enable Offline Mode to download the crossword solver, ENABLE and SOWPODS word lists, and local WordNet clue data to this browser. Offline Mode disables Datamuse and external dictionary links, so searches and available definitions remain local.</p></li>
-            <li class="faq-item"><h3>Are crossword searches private?</h3><p>Yes. Clues, patterns, filters, ranking, and Pick Lists stay in your browser. Standard definition lookup checks local WordNet first and uses Datamuse only when needed. Offline Mode keeps definition lookup entirely local and makes no Datamuse API calls.</p></li>
+            <li class="faq-item"><h3>Where do the crossword clues come from?</h3><p>Clue search uses an automatically filtered and transformed dataset derived from Princeton WordNet 3.0. Pattern-only answers come from the Standard (ENABLE) word list.</p></li>
+            <li class="faq-item"><h3>Can I use the crossword solver offline?</h3><p>Yes. Select Enable Offline Mode to download the crossword solver, the Standard (ENABLE) word list, and local WordNet clue data to this browser. Offline Mode disables external word-definition lookups and dictionary links, so searches and available definitions remain local.</p></li>
+            <li class="faq-item"><h3>Are crossword searches private?</h3><p>Yes. Clues, patterns, filters, ranking, and Pick Lists stay in your browser. Standard definition lookup checks local WordNet first and uses an external word-definition lookup only when needed. Offline Mode keeps definition lookup entirely local and makes no external requests.</p></li>
           </ul>
         </div>
       </details>
@@ -350,6 +340,43 @@
     </section>
   </main>
 
+  <dialog class="dictionary-choice-modal" id="dictionary-choice-modal" aria-labelledby="dictionary-choice-title">
+    <div class="dictionary-choice-card">
+      <header class="dictionary-modal-header"><div><span class="premium-section-kicker">Word list</span><h2 id="dictionary-choice-title">Choose a dictionary</h2></div><button class="dictionary-modal-close" id="dictionary-choice-close" type="button" aria-label="Close dictionary selection">&times;</button></header>
+      <fieldset class="dictionary-choice-list"><legend class="visually-hidden">Dictionary options</legend>
+        <label><input type="radio" name="dictionary" value="enable" checked><span class="dictionary-choice-flags" aria-hidden="true"><svg class="dictionary-flag"><use href="#flag-us"></use></svg></span><span><strong>Standard</strong><small>ENABLE · Focused word-game vocabulary with fewer unusual results</small></span><span class="dictionary-choice-check" aria-hidden="true">✓</span></label>
+        <label class="dictionary-choice-coming-soon"><input type="radio" name="dictionary" value="expanded" disabled><span class="dictionary-choice-globe" aria-hidden="true">◎</span><span><strong>Expanded <em>Coming soon</em></strong><small>Standard plus regional, uncommon, historical, and specialist words from Wiktionary</small></span><span class="dictionary-choice-check" aria-hidden="true">✓</span></label>
+      </fieldset>
+      <svg class="dictionary-flag-symbols" aria-hidden="true"><defs><symbol id="flag-us" viewBox="0 0 28 18"><rect width="28" height="18" rx="1" fill="#fff"/><path fill="#c83b45" d="M0 0h28v2H0zm0 4h28v2H0zm0 4h28v2H0zm0 4h28v2H0zm0 4h28v2H0z"/><path fill="#27477d" d="M0 0h12v10H0z"/><path fill="#fff" d="m2 2 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zM4 6l.4 1.1h1.2l-1 .7L5 8.9l-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7L9 8.9l-1-.7-1 .7.4-1.1-1-.7h1.2z"/></symbol><symbol id="flag-gb" viewBox="0 0 28 18"><rect width="28" height="18" rx="1" fill="#24477d"/><path stroke="#fff" stroke-width="5" d="M0 0l28 18M28 0 0 18"/><path stroke="#d23f49" stroke-width="2" d="M0 0l28 18M28 0 0 18"/><path fill="#fff" d="M11 0h6v18h-6zM0 6h28v6H0z"/><path fill="#d23f49" d="M12.5 0h3v18h-3zM0 7.5h28v3H0z"/></symbol></defs></svg>
+    </div>
+  </dialog>
+
+  <dialog class="offline-mode-modal" id="offline-mode-modal" aria-labelledby="offline-mode-modal-title">
+    <form class="offline-mode-card" method="dialog">
+      <header class="dictionary-modal-header"><div><span class="premium-section-kicker">Offline access</span><h2 id="offline-mode-modal-title">Enable Offline Mode?</h2></div></header>
+      <div class="offline-mode-body">
+        <p>Download the complete Crossword Solver so clues, patterns, dictionaries, and definitions remain available without an internet connection.</p>
+        <dl class="offline-mode-summary" aria-live="polite">
+          <div><dt>Package</dt><dd id="offline-package-summary">Checking requirements…</dd></div>
+          <div><dt>Already downloaded</dt><dd id="offline-cached-summary">Checking browser storage…</dd></div>
+          <div><dt>Download required</dt><dd id="offline-required-summary">Calculating…</dd></div>
+        </dl>
+        <section class="offline-mode-impact" aria-labelledby="offline-mode-impact-title"><h3 id="offline-mode-impact-title">While Offline Mode is enabled</h3><ul><li>External word-definition lookups are disabled.</li><li>External Merriam-Webster and Collins dictionary links are hidden.</li><li>Related online guides are hidden.</li></ul></section>
+        <label class="offline-force-option"><input id="offline-force-download" type="checkbox" role="switch"><span class="offline-force-track" aria-hidden="true"><span></span></span><span><strong>Download files again</strong><small>Ignore saved copies and replace every Offline Mode file with a fresh download.</small></span></label>
+        <section class="offline-simulation-controls" id="offline-simulation-controls" aria-label="Local download simulation" hidden>
+          <label class="offline-simulate-option"><input id="offline-simulate-download" type="checkbox"> <span><strong>Simulate download speed</strong><small>Local testing only: download every file using the selected Wi-Fi profile.</small></span></label>
+          <fieldset class="offline-speed-options" id="offline-speed-options" disabled><legend>Simulated Wi-Fi speed</legend><label><input type="radio" name="offline-simulate-speed" value="50"><span><strong>Fast</strong><small>50 Mbps · about 3 seconds</small></span></label><label><input type="radio" name="offline-simulate-speed" value="10" checked><span><strong>Average</strong><small>10 Mbps · about 12 seconds</small></span></label><label><input type="radio" name="offline-simulate-speed" value="2"><span><strong>Slow</strong><small>2 Mbps · about 1 minute</small></span></label></fieldset>
+        </section>
+        <div class="offline-download-progress" id="offline-download-progress" hidden>
+          <div><strong>Downloading files</strong><span id="offline-progress-label">0 of 0</span></div>
+          <progress id="crossword-offline-progress" max="1" value="0">0%</progress>
+        </div>
+        <p class="offline-mode-message" id="offline-mode-message" role="status" aria-live="polite"></p>
+      </div>
+      <footer class="dictionary-modal-footer"><div class="dictionary-modal-actions"><button class="offline-modal-cancel" id="offline-modal-cancel" type="button">Cancel</button><button class="offline-modal-confirm" id="offline-modal-confirm" type="button" disabled>OK</button></div></footer>
+    </form>
+  </dialog>
+
   <dialog class="dictionary-modal" id="dictionary-modal" aria-labelledby="dictionary-modal-title">
     <div class="dictionary-modal-card">
       <header class="dictionary-modal-header">
@@ -385,6 +412,6 @@
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
   <script src="../assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10" defer></script>
   <script src="../assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
-  <script src="../assets/js/tools/crossword-solver.js?v=20260903-offline-cache-reuse-19" defer></script>
+  <script src="../assets/js/tools/crossword-solver.js?v=20260904-dictionary-tooltip-33" defer></script>
 </body>
 </html>

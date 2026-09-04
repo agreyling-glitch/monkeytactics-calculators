@@ -29,7 +29,7 @@ test("restores rack, pattern, every filter, and sort without a dictionary", () =
     entropy: 0.8,
     leaveValue: 55,
     pinned: false,
-    dictionary: "sowpods"
+    dictionary: "expanded"
   });
   assert.equal(restored.inputValue, "RETAINS / A*E");
   assert.deepEqual(restored.filters, filters);

@@ -3,7 +3,7 @@
 ## Scope decision
 
 The feasibility spike targets ordinary, straight English-language crossword clues.
-Cryptic clue interpretation and proper names outside ENABLE/SOWPODS remain out of
+Cryptic clue interpretation and proper names outside the Standard dictionary remain out of
 scope. Phrase answers were added after the initial feasibility gate. WordNet alone is used; Moby is omitted
 until an evaluation demonstrates a coverage need.
 
@@ -16,7 +16,7 @@ recorded in `wordnet-3.0-source.json`. The exact license is retained at
 
 `scripts/build-crossword-clue-spike.mjs` verifies the archive checksum before
 processing it. It parses WordNet synsets and sense frequency metadata, joins each
-answer against the existing ENABLE/SOWPODS membership data, removes unsupported
+answer against the existing Standard dictionary membership data, removes unsupported
 answer shapes and direct answer leakage, extracts the definition portion of each
 gloss, scores records using deterministic quality rules, deduplicates clue-answer
 pairs, and emits a stable 1,000-record JSONL review sample plus a JSON report.
@@ -65,7 +65,7 @@ npm run build:crossword-clues -- --input=tmp/crossword-clue-full/wordnet-3.0-spi
 ```
 
 The pinned WordNet 3.0 input currently produces 129,492 unique eligible records,
-including 34,636 multi-word answers whose component words share ENABLE or SOWPODS
+including 34,636 multi-word answers whose component words share Standard (ENABLE)
 membership. Phrase spacing is preserved for display while answer length and grid
 patterns operate on letters only.
 The production builder refuses to run without an explicit approved input path so

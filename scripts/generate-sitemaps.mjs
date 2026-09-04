@@ -21,7 +21,7 @@ const PROJECT_ROOT = path.resolve(SCRIPT_DIR, "..");
 const DICTIONARY_DIR = path.join(PROJECT_ROOT, "assets", "data", "words");
 const DICTIONARY_MANIFEST = path.join(
   DICTIONARY_DIR,
-  "manifest.enable-sowpods-v2.json",
+  "manifest.enable-v1.json",
 );
 const WASM_FILE = path.join(
   PROJECT_ROOT,
@@ -60,7 +60,7 @@ export async function loadDictionaryFiles() {
   const manifest = JSON.parse(await readFile(DICTIONARY_MANIFEST, "utf8"));
 
   if (manifest.encoding !== "gzip-newline-membership" || !manifest.chunks) {
-    throw new Error("The ENABLE/SOWPODS dictionary manifest is invalid.");
+    throw new Error("The Standard ENABLE dictionary manifest is invalid.");
   }
 
   const chunkFiles = Object.values(manifest.chunks)

@@ -75,7 +75,7 @@ function parseSenseRanks(text) {
 
 async function loadDictionaryMembership() {
   const base = new URL("../assets/data/words/", import.meta.url);
-  const manifest = JSON.parse(await readFile(new URL("manifest.enable-sowpods-v2.json", base), "utf8"));
+  const manifest = JSON.parse(await readFile(new URL("manifest.enable-v1.json", base), "utf8"));
   const membership = new Map();
   await Promise.all(Object.values(manifest.chunks).map(async ({ file }) => {
     const text = gunzipSync(await readFile(new URL(file, base))).toString("utf8");
@@ -145,7 +145,7 @@ for (const pos of ["n", "v", "a", "r"]) {
       const dictionaryBits = wordCount === 1
         ? membership.get(answer) || 0
         : words.reduce((bits, word) => bits & (membership.get(word) || 0), 3);
-      if (!dictionaryBits) { exclude("not-in-enable-or-sowpods"); continue; }
+      if (!dictionaryBits) { exclude("not-in-enable-or-expanded"); continue; }
       const clue = normalizeClue(synset.rawGloss);
       if (clue.length < 8 || clue.length > 140) { exclude("clue-length"); continue; }
       if (containsAnswer(clue, displayAnswer)) { exclude("answer-leakage"); continue; }

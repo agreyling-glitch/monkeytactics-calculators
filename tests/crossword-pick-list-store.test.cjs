@@ -9,7 +9,7 @@ function memoryStorage(initial = {}) {
 
 const candidate = {
   word: "chagrin", clue: "abase", pattern: "?H?????", definition: "cause to feel shame; hurt the pride of",
-  relevance: 88.7, matchedTokens: 0, dictionaryBits: 3, dictionaryMembership: "ENABLE + SOWPODS", timestamp: 1234
+  relevance: 88.7, matchedTokens: 0, dictionaryBits: 3, dictionaryMembership: "ENABLE + EXPANDED", timestamp: 1234
 };
 
 test("crossword picks preserve solving context and use isolated storage", () => {
@@ -20,7 +20,7 @@ test("crossword picks preserve solving context and use isolated storage", () => 
     id: entries[0].id, timestamp: 1234, word: "CHAGRIN", clue: "abase", pattern: "?H?????",
     definition: "cause to feel shame; hurt the pride of", relevance: 88.7, matchedTokens: 0,
     matchExplanation: "", scoreBreakdown: null, dictionaryBits: 3,
-    dictionaryMembership: "ENABLE + SOWPODS", gridPosition: "", note: ""
+    dictionaryMembership: "ENABLE + EXPANDED", gridPosition: "", note: ""
   });
 });
 
