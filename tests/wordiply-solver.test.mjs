@@ -12,7 +12,7 @@ test("Wordiply solver has distinct metadata and structured data", () => {
   assert.match(html, /<meta name="author" content="MonkeyTactics">/);
   assert.match(html, /"@type":"SoftwareApplication"/);
   assert.match(html, /"@type":"FAQPage"/);
-  assert.match(html, /"dateModified":"2026-08-31"/);
+  assert.match(html, /"dateModified":"2026-09-04"/);
   assert.match(html, /"isAccessibleForFree":true/);
 });
 
@@ -50,8 +50,8 @@ test("Wordiply search keeps starter contiguous and sorts longest first", () => {
   assert.match(script, /highlightStarter\(word, starter\)/);
 });
 
-test("Wordiply defaults to the Standard ENABLE dictionary", () => {
-  assert.match(html, /name="dictionary" value="enable" checked/);
+test("Wordiply defaults to the Expanded Wiktionary-derived dictionary", () => {
+  assert.match(html, /name="dictionary" value="expanded" checked/);
   assert.match(script, /dictionaryBits = \{ enable: 1, expanded: 2, both: 3 \}/);
 });
 

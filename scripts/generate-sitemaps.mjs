@@ -21,7 +21,7 @@ const PROJECT_ROOT = path.resolve(SCRIPT_DIR, "..");
 const DICTIONARY_DIR = path.join(PROJECT_ROOT, "assets", "data", "words");
 const DICTIONARY_MANIFEST = path.join(
   DICTIONARY_DIR,
-  "manifest.enable-v1.json",
+  "manifest.wiktionary-v1.json",
 );
 const WASM_FILE = path.join(
   PROJECT_ROOT,

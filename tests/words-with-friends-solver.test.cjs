@@ -25,7 +25,7 @@ test("WWF mode uses its tile table, engine scoring, and 35-point bingo", () => {
   assert.match(script, /scoring: IS_WWF \? "wwf" : "scrabble"/);
 });
 
-test("all four word solvers cross-link in Related Word Tools", () => {
+test("all four word solvers cross-link in Related Word-Game Solvers", () => {
   const tools = [
     ["word-unscrambler.html", "/tools/word-unscrambler"],
     ["words-with-friends-solver.html", "/tools/words-with-friends-solver"],
@@ -36,8 +36,8 @@ test("all four word solvers cross-link in Related Word Tools", () => {
   for (const [file, ownUrl] of tools) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     const section = page.match(/<section[^>]*class="related-tools"[\s\S]*?<\/section>/)?.[0];
-    assert.ok(section, `${file} should have a Related Word Tools section`);
-    assert.match(section, /<h2[^>]*>Related Word Tools<\/h2>/);
+    assert.ok(section, `${file} should have a Related Word-Game Solvers section`);
+    assert.match(section, /<h2[^>]*>Related Word-Game Solvers<\/h2>/);
 
     for (const [, url] of tools) {
       if (url !== ownUrl) {
@@ -101,7 +101,7 @@ test("the FAQ above related guides uses the full content width", () => {
   assert.match(wordSolverCss, /\.faq-list\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*none;/s);
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
-    assert.match(page, /word-unscrambler\.css\?v=20260904-offline-switch-4/);
+    assert.match(page, /word-unscrambler\.css\?v=20260904-offline-green-5/);
   }
 });
 
@@ -111,6 +111,12 @@ test("word solver heading aligns with the top of the expanded dictionary control
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /premium-tool\.css\?v=20260903-word-heading-align-3/);
   }
+});
+
+test("word solvers use the green Offline Mode control treatment", () => {
+  assert.match(wordSolverCss, /\.word-tool-offline-toggle \.offline-switch-track \{[^}]*border: 1px solid #22c55e;[^}]*background: rgba\(34, 197, 94, \.15\)/);
+  assert.match(wordSolverCss, /\.word-tool-offline-toggle \.offline-switch-thumb \{[^}]*background: #4ade80/);
+  assert.match(wordSolverCss, /\.word-tool-offline-copy span \{ color: #4ade80/);
 });
 
 test("dictionary guidance appears before Offline Mode controls", () => {
@@ -135,8 +141,8 @@ test("word result popovers use local definitions and move external links behind 
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
-    assert.match(page, /word-unscrambler\.js\?v=20260904-offline-modal-9/);
-    assert.match(page, /word-unscrambler\.css\?v=20260904-offline-switch-4/);
+    assert.match(page, /word-unscrambler\.js\?v=20260904-wiktionary-11/);
+    assert.match(page, /word-unscrambler\.css\?v=20260904-offline-green-5/);
   }
 });
 

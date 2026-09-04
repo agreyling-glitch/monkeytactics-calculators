@@ -92,7 +92,7 @@
   const offlineModeMessage = byId("offline-mode-message");
   const relatedGuides = byId("crossword-related-guides");
   const DICTIONARY_BITS = { enable: 1, expanded: 2, both: 3 };
-  const OFFLINE_VERSION = "20260904-dictionary-modal-23";
+  const OFFLINE_VERSION = "20260904-wiktionary-24";
   const OFFLINE_CACHE_PREFIX = "monkeytactics-crossword-offline-";
   const OFFLINE_STORAGE_KEY = "monkeytactics.crossword-solver.offline-cache";
   const DEBUG_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
@@ -219,7 +219,7 @@
   ]);
   const PickListStore = window.MonkeyTacticsCrosswordPickList;
   const PICK_GROUP_STATE_PREFIX = "monkeytactics.crossword-solver.pick-group.";
-  const MANIFEST_URL = "/assets/data/words/manifest.enable-v1.json";
+  const MANIFEST_URL = "/assets/data/words/manifest.wiktionary-v1.json";
   const CHUNK_BASE_URL = "/assets/data/words/";
   const CLUE_BASE_URL = "/assets/data/crossword-clues/";
   const CLUE_MANIFEST_URL = `${CLUE_BASE_URL}manifest.clues-v4.json?v=wordnet-3.0-phrases-v4`;
@@ -279,14 +279,20 @@
 
   const DICTIONARY_LABELS = {
     enable: "Standard (ENABLE)",
-    expanded: "Expanded (Wiktionary)"
+    expanded: "Expanded (Wiktionary)",
+    both: "Both (ENABLE + Wiktionary)"
   };
 
+  const dictionaryChoiceIcon = (selected) => selected === "enable"
+    ? '<svg class="dictionary-active-flag" viewBox="0 0 28 18" aria-hidden="true"><use href="#flag-us"></use></svg>'
+    : `<span class="dictionary-active-symbol" aria-hidden="true">${selected === "expanded" ? "◎" : "⊕"}</span>`;
+
   function renderDictionaryChoice() {
-    const selected = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+    const selected = [...dictionaryInputs].find((input) => input.checked)?.value || "both";
     const label = DICTIONARY_LABELS[selected];
     dictionaryChoiceTrigger.setAttribute("aria-label", `Choose dictionary. Current: ${label}`);
     dictionaryChoiceTrigger.title = `Dictionary selected: ${label}`;
+    dictionaryChoiceTrigger.innerHTML = dictionaryChoiceIcon(selected);
   }
 
   function renderOfflineState() {
@@ -299,16 +305,30 @@
       dictionaryMerriamLink.hidden = true;
       dictionaryCollinsLink.hidden = true;
     } else if (dictionaryModal.open) {
-      const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+      const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "both";
       dictionaryMerriamLink.hidden = selectedDictionary === "expanded";
       dictionaryCollinsLink.hidden = selectedDictionary === "enable";
     }
   }
 
   async function fetchOfflineManifest(url) {
-    const response = await fetch(url, { cache: "no-store" });
-    if (!response.ok) throw new Error("An offline data manifest could not be loaded.");
-    return response.json();
+    let networkError = null;
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (response.ok) return await response.json();
+      networkError = new Error(`HTTP ${response.status}`);
+    } catch (error) {
+      networkError = error;
+    }
+
+    try {
+      const cachedResponse = await caches.match(url);
+      if (cachedResponse) return await cachedResponse.json();
+    } catch (cacheError) {
+      console.warn(`Unable to read cached Offline Mode manifest ${url}:`, cacheError);
+    }
+
+    throw new Error(`Offline Mode manifest unavailable: ${url}`, { cause: networkError });
   }
 
   async function buildOfflinePlan() {
@@ -385,6 +405,8 @@
     offlineModalConfirm.disabled = true;
     offlineModalConfirm.textContent = "OK";
     offlineModalCancel.disabled = false;
+    offlineForceDownload.disabled = false;
+    offlineSimulateDownload.disabled = false;
     offlineForceDownload.checked = false;
     offlineSimulateDownload.checked = false;
     offlineSimulationControls.hidden = !localSimulationEnabled;
@@ -398,7 +420,7 @@
     offlinePackageSummary.textContent = "Checking requirements…";
     offlineCachedSummary.textContent = "Checking browser storage…";
     offlineRequiredSummary.textContent = "Calculating…";
-    offlineModal.showModal();
+    if (!offlineModal.open) offlineModal.showModal();
     try {
       const plan = await buildOfflinePlan();
       const inventory = await inspectOfflinePlan(plan);
@@ -410,7 +432,12 @@
       offlineModalConfirm.disabled = false;
     } catch (error) {
       console.error("Unable to inspect Offline Mode requirements:", error);
-      offlineModeMessage.textContent = "Requirements could not be checked. Check your connection and try again.";
+      offlinePackageSummary.textContent = "Unavailable";
+      offlineCachedSummary.textContent = "Could not inspect browser storage";
+      offlineRequiredSummary.textContent = "Retry required";
+      offlineModeMessage.textContent = "Requirements could not be checked. Check your connection, then retry.";
+      offlineModalConfirm.textContent = "Retry";
+      offlineModalConfirm.disabled = false;
     }
   }
 
@@ -496,26 +523,36 @@
       offlineModal.close();
       return;
     }
-    if (!pendingOfflinePlan || offlineDialogBusy) return;
+    if (offlineDialogBusy) return;
+    if (!pendingOfflinePlan) {
+      await openOfflineDialog();
+      return;
+    }
     offlineDialogBusy = true;
     offlineModalConfirm.disabled = true;
     offlineModalCancel.disabled = true;
     offlineForceDownload.disabled = true;
     offlineSimulateDownload.disabled = true;
     offlineSpeedOptions.disabled = true;
-    offlineDownloadProgress.hidden = false;
+    const forceDownload = offlineForceDownload.checked || offlineSimulateDownload.checked;
+    const reuseOnly = !forceDownload && pendingOfflineInventory?.remainingCount === 0;
+    offlineDownloadProgress.hidden = reuseOnly;
     offlineProgress.max = pendingOfflinePlan.urls.length;
     offlineProgress.value = 0;
     offlineProgressLabel.textContent = `0 of ${pendingOfflinePlan.urls.length}`;
-    offlineModeMessage.textContent = "Preparing download…";
+    offlineModeMessage.textContent = reuseOnly ? "Enabling Offline Mode…" : "Preparing download…";
     try {
       await enableOfflineMode(pendingOfflinePlan, {
         simulate: offlineSimulateDownload.checked,
-        forceDownload: offlineForceDownload.checked || offlineSimulateDownload.checked,
+        forceDownload,
         speedMbps: Number(offlineSimulateSpeeds.find((input) => input.checked)?.value) || 10
       });
-      offlineModalConfirm.textContent = "Close";
-      offlineModalConfirm.disabled = false;
+      if (reuseOnly) {
+        offlineModal.close();
+      } else {
+        offlineModalConfirm.textContent = "Close";
+        offlineModalConfirm.disabled = false;
+      }
     } catch (error) {
       console.error("Offline Mode failed:", error);
       offlineModeMessage.textContent = "Offline Mode could not be enabled. Check your connection and available browser storage, then try again.";
@@ -953,7 +990,7 @@
     dictionaryCopyLabel.textContent = "Copy word";
     dictionaryCopyButton.classList.remove("is-copied");
     dictionaryModalTitle.textContent = word;
-    const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+    const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "both";
     dictionaryMerriamLink.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
     dictionaryMerriamLink.hidden = offlineModeEnabled || selectedDictionary === "expanded";
     dictionaryCollinsLink.hidden = offlineModeEnabled || selectedDictionary === "enable";
@@ -1684,7 +1721,7 @@
       link.className = "result-word";
       link.setAttribute("aria-label", `Look up the definition of ${word}`);
       link.append(highlightWord(word.toUpperCase(), pattern.toUpperCase()));
-      const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+      const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "both";
       const dictionaryBits = DICTIONARY_BITS[selectedDictionary];
       bindDictionaryTrigger(link, word, {
         clue: clueInput.value.trim(),
@@ -1746,7 +1783,7 @@
     showMessage("");
     setBusy(true);
     try {
-      const dictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+      const dictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "both";
       const options = {
         dictionaryBit: DICTIONARY_BITS[dictionary], wordLength, startsWith, endsWith,
         mustInclude, excludeLetters, highValueOnly: false, minimumVowels: 0,

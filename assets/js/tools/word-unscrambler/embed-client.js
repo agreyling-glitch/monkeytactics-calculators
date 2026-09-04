@@ -1,5 +1,5 @@
 const ASSET_VERSION = "20260809-2";
-const MANIFEST_URL = "/assets/data/words/manifest.enable-v1.json?v=enable-v1";
+const MANIFEST_URL = "/assets/data/words/manifest.wiktionary-v1.json?v=wiktionary-v1";
 const CHUNK_BASE_URL = "/assets/data/words/";
 const moduleUrl = new URL(
   `/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=${ASSET_VERSION}`,

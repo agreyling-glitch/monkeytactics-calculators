@@ -89,9 +89,21 @@ The node-qrcode browser bundle contains the following declared dependencies:
 
 “QR Code” is a registered trademark of DENSO WAVE INCORPORATED.
 
+## Wiktionary Expanded dictionary
+
+- Source: <https://en.wiktionary.org/>
+- Processed word list: `@kitschpatrol/dict-en-wiktionary` version `1.5.0`
+- Processor source: <https://github.com/kitschpatrol/dict-en-wiktionary>
+- Wiktionary data licenses: CC BY-SA 4.0 and GFDL
+- Processor license: MIT, Copyright (c) 2024-2026 Eric Mika
+
+The Expanded dictionary is a normalized, lowercase ASCII subset of the May 2026
+Wiktionary-derived word list. Wiktionary contributors are credited collectively;
+the source page history provides individual attribution.
+
 ## Word-list and trademark notice
 
-The merged list is provided for word-finding and word-game reference. It may contain
+The combined list is provided for word-finding and word-game reference. It may contain
 uncommon, historical, regional, offensive, or general-dictionary-absent terms.
 Inclusion does not guarantee acceptance by any particular dictionary, edition,
 region, tournament, or ruleset.

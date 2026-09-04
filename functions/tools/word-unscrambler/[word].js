@@ -9,7 +9,7 @@ import wasmModule from "../../../assets/wasm/word-unscrambler/word_unscrambler_e
 const SITE_URL = "https://monkeytactics.com";
 const TOOL_PATH = "/tools/word-unscrambler";
 const WORD_DATA_PATH = "/assets/data/words";
-const WORD_DATA_VERSION = "enable-v1";
+const WORD_DATA_VERSION = "wiktionary-v1";
 const DICTIONARY_BIT = 3;
 
 let wasmInitialized = false;

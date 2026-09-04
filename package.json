@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "build:word-dictionary": "node scripts/build-word-dictionary.mjs",
     "build:qr": "vite build",
     "build:qr-wasm": "wasm-pack build wasm/qr-code-generator-engine --target web --release --out-dir ../../assets/wasm/qr-code-generator --out-name qr_engine && node -e \"require('fs').rmSync('assets/wasm/qr-code-generator/.gitignore',{force:true})\"",
     "build:qr-decoder-wasm": "node wasm/qr-code-decoder-engine/build.mjs",
@@ -22,15 +23,18 @@
     "test": "node --test tests/*.test.cjs tests/*.test.mjs"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
-    "react": "latest",
-    "react-dom": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
     "heic-to": "1.5.2",
+    "react": "latest",
+    "react-dom": "latest",
+    "typescript": "latest",
+    "vite": "latest",
     "zxing-wasm": "2.2.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@kitschpatrol/dict-en-wiktionary": "^1.5.0",
+    "cspell-trie-lib": "^10.2.2"
+  }
 }

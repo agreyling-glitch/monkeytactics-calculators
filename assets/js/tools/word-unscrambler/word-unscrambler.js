@@ -81,11 +81,11 @@ const GAME_NAME = IS_WWF ? "Words With Friends Solver" : "Word Unscrambler";
 const analyzeWord = (word) => IS_WWF ? Engine.analyzeWwfWord(word) : Engine.analyzeWord(word);
 
 const MANIFEST_URL =
-  "../assets/data/words/manifest.enable-v1.json?v=enable-v1";
+  "../assets/data/words/manifest.wiktionary-v1.json?v=wiktionary-v1";
 const CHUNK_BASE_URL = "../assets/data/words/";
 const DEFINITION_MANIFEST_URL = "/assets/data/word-definitions/manifest.wordnet-definitions-v1.json?v=wordnet-3.0-definitions-v1";
 const DEFINITION_BASE_URL = "/assets/data/word-definitions/";
-const OFFLINE_VERSION = "20260903-word-tools-offline-1";
+const OFFLINE_VERSION = "20260904-wiktionary-2";
 const OFFLINE_CACHE_PREFIX = "monkeytactics-word-tool-offline-";
 const OFFLINE_TOOL_ID = IS_WWF ? "words-with-friends-solver" : "word-unscrambler";
 const OFFLINE_STORAGE_KEY = `monkeytactics.${OFFLINE_TOOL_ID}.offline-cache`;
@@ -329,6 +329,8 @@ async function enableOfflineMode(forceDownload = false) {
   offlineProgress.hidden = false;
   offlineProgress.max = urls.length;
   offlineProgress.value = 0;
+  offlineProgress.dataset.downloaded = "0";
+  offlineProgress.dataset.reused = "0";
   let completed = 0;
   let downloaded = 0;
   let cursor = 0;
@@ -337,7 +339,11 @@ async function enableOfflineMode(forceDownload = false) {
       while (cursor < urls.length) {
         if (await cacheOfflineUrl(cache, urls[cursor++], forceDownload)) downloaded += 1;
         offlineProgress.value = ++completed;
-        offlineStatus.textContent = `Downloading offline data: ${completed} of ${urls.length} files…`;
+        offlineProgress.dataset.downloaded = String(downloaded);
+        offlineProgress.dataset.reused = String(completed - downloaded);
+        offlineStatus.textContent = downloaded
+          ? `Preparing offline data: ${downloaded} downloaded; ${completed - downloaded} reused.`
+          : `Checking offline data: ${completed} of ${urls.length} files reused.`;
       }
     });
     await Promise.all(workers);

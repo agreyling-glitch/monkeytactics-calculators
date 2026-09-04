@@ -16,7 +16,7 @@
   const resultsSummary = byId("results-summary");
   const resultList = byId("word-results");
   const bestLength = byId("best-length");
-  const manifestUrl = "/assets/data/words/manifest.enable-v1.json";
+  const manifestUrl = "/assets/data/words/manifest.wiktionary-v1.json";
   const chunkBaseUrl = "/assets/data/words/";
   const dictionaryBits = { enable: 1, expanded: 2, both: 3 };
   let manifest;
@@ -143,7 +143,7 @@
       await loadAllChunks();
       if (request !== searchRequest) return;
       setBusy(true, "Finding long words…");
-      const dictionary = form.querySelector('input[name="dictionary"]:checked')?.value || "enable";
+      const dictionary = form.querySelector('input[name="dictionary"]:checked')?.value || "expanded";
       const position = form.querySelector('input[name="position"]:checked')?.value || "anywhere";
       const pattern = position === "start" ? `${starter}*` : position === "end" ? `*${starter}` : `*${starter}*`;
       const minimumLength = Number.parseInt(minimumLengthInput.value, 10) || starter.length;
