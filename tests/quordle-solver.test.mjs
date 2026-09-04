@@ -52,8 +52,8 @@ test("Quordle defaults to broad coverage and offers combined fallback matches",(
   assert.match(script,/fallbackSets=combinedWords/);
   assert.match(script,/Use Both dictionaries/);
   assert.match(script,/dictionary:\[1,2,3\]\.includes\(entry\.dictionary\)\?entry\.dictionary:3/);
-  const eWords=zlib.gunzipSync(fs.readFileSync(new URL("../assets/data/words/e.enable-sowpods-v2.txt.gz",import.meta.url))).toString("utf8");
-  assert.match(eWords,/(?:^|\n)email\t2(?:\n|$)/);
+  const eWords=zlib.gunzipSync(fs.readFileSync(new URL("../assets/data/words/e.enable-v1.txt.gz",import.meta.url))).toString("utf8");
+  assert.match(eWords,/(?:^|\n)eager\t1(?:\n|$)/);
 });
 
 test("Quordle solver filters every board independently",()=>{

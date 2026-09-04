@@ -18,7 +18,7 @@
   "exclusionCounts": {
     "answer-leakage": 5731,
     "clue-length": 5888,
-    "not-in-enable-or-sowpods": 43345,
+    "not-in-enable-or-expanded": 43345,
     "quality-below-70": 21262,
     "unsupported-answer-shape": 1231
   }

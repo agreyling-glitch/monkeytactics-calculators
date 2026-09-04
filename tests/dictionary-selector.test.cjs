@@ -19,8 +19,8 @@ test("dictionary selectors use reserved help text instead of floating panels", (
     assert.match(css, /height:\s*4\.1em/);
     assert.match(css, /overflow:\s*hidden/);
     assert.match(css, /ENABLE — a broad, public-domain English list/);
-    assert.match(css, /SOWPODS — an international word-game list/);
-    assert.match(css, /Both — combines ENABLE and SOWPODS/);
+    assert.match(css, /EXPANDED — an international word-game list/);
+    assert.match(css, /Both — combines ENABLE and EXPANDED/);
   }
 });
 
@@ -33,7 +33,8 @@ test("every page using the shared dictionary selector loads the fixed version", 
   assert.equal(pages.length, 9);
   for (const page of pages) {
     const html = fs.readFileSync(page, "utf8");
-    assert.match(html, /dictionary-selector\.css\?v=20260831-stable-mobile-7/);
+    assert.match(html, /dictionary-selector\.css\?v=20260904-reference-10/);
+    assert.match(html, /dictionary-offline-controls\.js\?v=20260904-reference-2/);
   }
 });
 
@@ -47,7 +48,11 @@ test("every dictionary solver explains the word-list choice in its usage guide",
     const html = fs.readFileSync(path.join(siteRoot, "tools", page), "utf8");
     assert.match(html, /<li><strong>Choose a dictionary:<\/strong>/, `${page} needs a dictionary step`);
     assert.match(html, /ENABLE[^<]*(?:North American|public-domain)/, `${page} needs ENABLE guidance`);
-    assert.match(html, /SOWPODS[^<]*British and North American/, `${page} needs SOWPODS guidance`);
+    if (page === "crossword-solver.html") {
+      assert.match(html, /Expanded[^<]*Wiktionary/, `${page} needs Expanded guidance`);
+      continue;
+    }
+    assert.match(html, /EXPANDED[^<]*British and North American/, `${page} needs EXPANDED guidance`);
     assert.match(html, /Hover over or focus/, `${page} needs interaction guidance`);
   }
 });

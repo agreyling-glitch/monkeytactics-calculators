@@ -52,9 +52,19 @@
   font-size: 1.05rem;
 }
 
+.tool-heading-controls {
+  width: min(100%, 27rem);
+  flex: 0 1 auto;
+}
+
 .tool-heading-row .dictionary-selector {
+  width: 100%;
   flex: 0 1 auto;
   margin: 0;
+}
+
+.tool-heading-controls .dictionary-selector::after {
+  height: 2.6em;
 }
 
 .calc-layout {
@@ -473,7 +483,7 @@
   margin-top: 0.45rem;
   overflow: hidden;
   color: var(--muted);
-  content: "ENABLE: North American · SOWPODS: British + North American · Both: combined";
+  content: "ENABLE: North American · EXPANDED: British + North American · Both: combined";
   font-size: 0.72rem;
   line-height: 1.35;
 }
@@ -483,14 +493,14 @@
   content: "ENABLE — a broad, public-domain English list geared toward North American word games.";
 }
 
-.dictionary-selector:has(label:hover .dictionary-icon--sowpods)::after,
-.dictionary-selector:has(label:focus-within .dictionary-icon--sowpods)::after {
-  content: "SOWPODS — an international word-game list with British and North American vocabulary.";
+.dictionary-selector:has(label:hover .dictionary-icon--expanded)::after,
+.dictionary-selector:has(label:focus-within .dictionary-icon--expanded)::after {
+  content: "EXPANDED — an international word-game list with British and North American vocabulary.";
 }
 
 .dictionary-selector:has(label:hover .dictionary-icon--both)::after,
 .dictionary-selector:has(label:focus-within .dictionary-icon--both)::after {
-  content: "Both — combines ENABLE and SOWPODS, removes duplicates, and returns the widest set of matches.";
+  content: "Both — combines ENABLE and EXPANDED, removes duplicates, and returns the widest set of matches.";
 }
 
 .visually-hidden {
@@ -539,13 +549,13 @@
   content: "";
 }
 
-.dictionary-icon--sowpods {
+.dictionary-icon--expanded {
   overflow: hidden;
   border: 1.5px solid currentColor;
   border-radius: 50%;
 }
 
-.dictionary-icon--sowpods::before {
+.dictionary-icon--expanded::before {
   position: absolute;
   top: -0.08rem;
   right: 0.25rem;
@@ -557,7 +567,7 @@
   content: "";
 }
 
-.dictionary-icon--sowpods::after {
+.dictionary-icon--expanded::after {
   position: absolute;
   top: 50%;
   right: 0;
@@ -2906,34 +2916,37 @@
   gap: .35rem .8rem;
   align-items: center;
   width: 100%;
-  margin-top: .55rem;
-  padding-top: .6rem;
+  margin-top: .35rem;
+  padding-top: .45rem;
   border-top: 1px solid rgba(148, 163, 184, .2);
 }
 
 .word-tool-offline-toggle {
   grid-row: 1 / span 2;
-  padding: .55rem .75rem;
-  border: 1px solid rgba(250, 204, 21, .65);
-  border-radius: .55rem;
-  background: rgba(250, 204, 21, .08);
-  color: #fde68a;
-  font: 800 .78rem/1.2 inherit;
+  position: relative;
+  width: 3rem;
+  height: 1.65rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
   cursor: pointer;
 }
 
-.word-tool-offline-toggle:hover { background: rgba(250, 204, 21, .15); }
+.word-tool-offline-toggle:hover { background: transparent; }
 .word-tool-offline-toggle:focus-visible { outline: 2px solid #fde68a; outline-offset: 2px; }
 .word-tool-offline-toggle:disabled { cursor: wait; opacity: .65; }
+.word-tool-offline-toggle .offline-switch-track { position: absolute; inset: 0; border: 1px solid rgba(148, 163, 184, .55); border-radius: inherit; background: rgba(148, 163, 184, .18); transition: border-color .18s ease, background .18s ease; }
+.word-tool-offline-toggle .offline-switch-thumb { position: absolute; top: .2rem; left: .2rem; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: #cbd5e1; box-shadow: 0 1px 3px rgba(0, 0, 0, .45); transition: transform .18s ease, background .18s ease; }
+.word-tool-offline-toggle[aria-checked="true"] .offline-switch-track { border-color: #22c55e; background: rgba(34, 197, 94, .35); }
+.word-tool-offline-toggle[aria-checked="true"] .offline-switch-thumb { background: #4ade80; transform: translateX(1.35rem); }
 .word-tool-offline-copy { display: grid; gap: .1rem; min-width: 0; text-align: left; }
 .word-tool-offline-copy strong { color: var(--text); font-size: .78rem; }
 .word-tool-offline-copy span { color: var(--muted); font-size: .7rem; line-height: 1.4; }
 .word-tool-offline-control progress { grid-column: 2; width: 100%; height: .35rem; accent-color: #facc15; }
 
 @media (max-width: 480px) {
-  .word-tool-offline-control { grid-template-columns: 1fr; }
-  .word-tool-offline-toggle { grid-row: auto; width: 100%; }
-  .word-tool-offline-control progress { grid-column: 1; }
+  .word-tool-offline-control { grid-template-columns: auto minmax(0, 1fr); }
 }
 
 .dictionary-directory-trigger {
@@ -3265,8 +3278,8 @@
     margin-top: 0;
   }
 
+  .tool-heading-controls,
   .tool-heading-row .dictionary-selector {
-    flex: 0 1 auto;
     width: 100%;
   }
 
@@ -3315,8 +3328,8 @@
     font-size: 0.76rem;
   }
 
-  .dictionary-selector::after {
-    height: 5.5em;
+  .tool-heading-controls .dictionary-selector::after {
+    height: 3.8em;
   }
 
   .breakdown-summary-hint {

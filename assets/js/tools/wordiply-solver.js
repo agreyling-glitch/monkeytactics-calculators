@@ -16,9 +16,9 @@
   const resultsSummary = byId("results-summary");
   const resultList = byId("word-results");
   const bestLength = byId("best-length");
-  const manifestUrl = "/assets/data/words/manifest.enable-sowpods-v2.json";
+  const manifestUrl = "/assets/data/words/manifest.enable-v1.json";
   const chunkBaseUrl = "/assets/data/words/";
-  const dictionaryBits = { enable: 1, sowpods: 2, both: 3 };
+  const dictionaryBits = { enable: 1, expanded: 2, both: 3 };
   let manifest;
   let searchRequest = 0;
   const loadedChunks = new Set();
@@ -143,14 +143,14 @@
       await loadAllChunks();
       if (request !== searchRequest) return;
       setBusy(true, "Finding long words…");
-      const dictionary = form.querySelector('input[name="dictionary"]:checked')?.value || "sowpods";
+      const dictionary = form.querySelector('input[name="dictionary"]:checked')?.value || "enable";
       const position = form.querySelector('input[name="position"]:checked')?.value || "anywhere";
       const pattern = position === "start" ? `${starter}*` : position === "end" ? `*${starter}` : `*${starter}*`;
       const minimumLength = Number.parseInt(minimumLengthInput.value, 10) || starter.length;
       const options = { dictionaryBit: dictionaryBits[dictionary], wordLength: 0, startsWith: "", endsWith: "", mustInclude: "", excludeLetters: "", highValueOnly: false, minimumVowels: 0, minimumConsonants: 0, minimumScore: null, maximumScore: null, hookFilter: "", sortBy: "length-desc" };
       const words = Engine.crosswordSearch(pattern, "", options).filter((word) => word.length >= minimumLength).sort((a, b) => b.length - a.length || a.localeCompare(b));
       if (request !== searchRequest) return;
-      renderResults(words, starter, dictionary === "both" ? "ENABLE + SOWPODS" : dictionary.toUpperCase());
+      renderResults(words, starter, dictionary === "both" ? "ENABLE + EXPANDED" : dictionary.toUpperCase());
     } catch (error) {
       console.error("Wordiply search failed:", error);
       resultsHeading.textContent = "Dictionary unavailable";

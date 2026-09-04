@@ -1,8 +1,8 @@
 # Third-Party Notices
 
 MonkeyTactics application source code is licensed separately under the repository's
-MIT License. The Word Unscrambler includes a deduplicated, transformed merge of the
-following third-party word lists.
+MIT License. The Standard dictionary used by the word tools is a transformed copy
+of the following third-party word list.
 
 ## ENABLE
 
@@ -13,35 +13,6 @@ following third-party word lists.
 
 The ENABLE master word list was formally released into the public domain for anyone
 to use, modify, and distribute.
-
-## potch/sowpods
-
-- Source: <https://github.com/potch/sowpods>
-- npm package: `sowpods`
-- Version: `1.1.0`
-- Upstream package author: `potch`
-- License declared in the upstream `package.json`: ISC
-
-The published npm artifact contains `SOWPODS.txt`, `index.js`, and `package.json`.
-It declares the ISC license in its package metadata but does not include a separate
-license file. The following ISC notice is retained with the redistributed and
-transformed word data:
-
-### ISC License
-
-Copyright (c) potch
-
-Permission to use, copy, modify, and/or distribute this software for any purpose
-with or without fee is hereby granted, provided that the above copyright notice
-and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
-FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT,
-OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
-DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
-ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
-SOFTWARE.
 
 ## Princeton WordNet 3.0
 

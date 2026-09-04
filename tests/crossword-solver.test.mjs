@@ -11,8 +11,8 @@ const offlineWorker = fs.readFileSync(new URL("../crossword-offline-sw.js", impo
 
 test("crossword solver cache-busts the WordNet graph release", () => {
   assert.match(html, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
-  assert.match(html, /crossword-solver\.js\?v=20260903-offline-cache-reuse-19/);
-  assert.match(html, /crossword-solver\.css\?v=20260903-tight-offline-17/);
+  assert.match(html, /crossword-solver\.js\?v=20260904-dictionary-tooltip-33/);
+  assert.match(html, /crossword-solver\.css\?v=20260904-controls-right-32/);
   assert.match(html, /crossword-pick-list-store\.js\?v=20260901-grid-positions-1/);
 });
 
@@ -63,8 +63,20 @@ test("crossword solver exposes pattern-first controls and an optional letter poo
   assert.match(html, /id="available-letters"/);
   assert.match(html, /id="word-length"/);
   assert.match(html, /name="dictionary" value="enable"[^>]* checked/);
-  assert.match(html, /name="dictionary" value="sowpods"/);
-  assert.match(html, /name="dictionary" value="both"/);
+  assert.match(html, /name="dictionary" value="expanded" disabled/);
+  assert.doesNotMatch(html, /name="dictionary" value="both"/);
+  assert.match(html, /id="dictionary-choice-trigger"[^>]*aria-label="Choose dictionary\. Current: Standard \(ENABLE\)"/);
+  assert.match(html, /id="dictionary-choice-trigger"[^>]*title="Dictionary selected: Standard \(ENABLE\)"/);
+  assert.match(html, /id="dictionary-choice-modal"[^>]*aria-labelledby="dictionary-choice-title"/);
+  assert.match(html, /href="#flag-us"[\s\S]*Standard[\s\S]*Expanded[\s\S]*Coming soon[\s\S]*Wiktionary/);
+  assert.doesNotMatch(html, /class="dictionary-selector"/);
+  assert.match(script, /const dictionaryInputs = document\.querySelectorAll/);
+  assert.match(script, /dictionaryChoiceModal\.showModal\(\)/);
+  assert.match(script, /dictionaryChoiceModal\.close\(\)/);
+  assert.match(script, /renderDictionaryChoice\(\)/);
+  assert.match(script, /dictionaryChoiceTrigger\.title = `Dictionary selected: \$\{label\}`/);
+  assert.match(css, /\.crossword-page section\[data-focus-mode\] form > \.solver-heading\s*\{[^}]*padding-right:\s*0;/s);
+  assert.match(css, /@media \(max-width:\s*430px\)\s*\{[^}]*\.crossword-page section\[data-focus-mode\] form > \.solver-heading\s*\{[^}]*padding-right:\s*0;/s);
 });
 
 test("crossword clue search lazily loads reviewed static data and supports combined filtering", () => {
@@ -255,7 +267,7 @@ test("dictionary modal can copy the selected answer", () => {
 test("dictionary lookup links follow the selected word list", () => {
   assert.match(html, /id="dictionary-merriam-link"/);
   assert.match(html, /id="dictionary-collins-link"[^>]*scrabble\.collinsdictionary\.com\/check\//);
-  assert.match(script, /dictionaryMerriamLink\.hidden = selectedDictionary === "sowpods"/);
+  assert.match(script, /dictionaryMerriamLink\.hidden = selectedDictionary === "expanded"/);
   assert.match(script, /dictionaryCollinsLink\.hidden = selectedDictionary === "enable"/);
 });
 
@@ -318,22 +330,44 @@ test("supporting guide cards use the quiet FAQ background", () => {
   assert.match(css, /\.crossword-page \.tool-widget\s*\{[^}]*background:\s*#101b16/);
 });
 
-test("dictionary guidance and Offline Mode use compact vertical spacing", () => {
-  assert.match(css, /\.crossword-page \.dictionary-selector::after\s*\{[^}]*height:\s*3em/);
-  assert.match(css, /\.crossword-offline-control\s*\{[^}]*margin-top:\s*\.45rem;[^}]*padding-top:\s*\.5rem/);
-  assert.match(css, /@media \(max-width: 760px\)[^{]*\{\s*\.crossword-page \.dictionary-selector::after\s*\{\s*height:\s*4\.2em/);
+test("dictionary icon and Offline Mode share one control row", () => {
+  assert.match(css, /\.crossword-dictionary-controls\s*\{[^}]*align-self:\s*flex-end;[^}]*justify-content:\s*flex-end;[^}]*margin-left:\s*auto/);
+  assert.match(css, /\.dictionary-choice-trigger\s*\{[^}]*width:\s*2\.75rem;[^}]*height:\s*2\.75rem/);
+  assert.doesNotMatch(css, /\.crossword-offline-control\s*\{[^}]*(?:border-top|padding-top|margin-top):/);
 });
 
 test("opt-in Offline Mode downloads the complete solver and disables Datamuse", () => {
-  assert.match(html, /id="crossword-offline-toggle"[^>]*>Enable Offline Mode/);
+  assert.match(html, /id="crossword-offline-toggle"[^>]*role="switch"[^>]*aria-checked="false"/);
+  assert.match(html, /class="offline-switch-track"[^>]*>[\s\S]*?class="offline-switch-thumb"/);
   assert.match(html, /id="crossword-offline-status" role="status"/);
+  assert.match(html, /Offline Mode \[Disabled\]/);
+  assert.match(html, /id="offline-mode-modal"[^>]*aria-labelledby="offline-mode-modal-title"/);
+  assert.match(html, /id="offline-package-summary"/);
+  assert.match(html, /id="offline-cached-summary"/);
+  assert.match(html, /id="offline-required-summary"/);
+  assert.match(html, /External word-definition lookups are disabled/);
+  assert.match(html, /id="offline-modal-confirm"[^>]*>OK<\/button>/);
+  assert.match(html, /id="offline-modal-cancel"[^>]*>Cancel<\/button>/);
+  assert.match(html, /id="offline-simulate-download" type="checkbox"/);
+  assert.match(html, /id="offline-simulation-controls"[^>]*hidden/);
+  assert.match(html, /id="offline-force-download" type="checkbox" role="switch"/);
+  assert.match(html, /id="offline-speed-options"[^>]*disabled[\s\S]*name="offline-simulate-speed" value="50"[\s\S]*name="offline-simulate-speed" value="10"[\s\S]*name="offline-simulate-speed" value="2"/);
   assert.match(html, /id="crossword-offline-progress"/);
   assert.match(script, /navigator\.serviceWorker\.register\("\/crossword-offline-sw\.js", \{ scope: "\/" \}\)/);
   assert.match(script, /Object\.values\(wordData\.chunks/);
   assert.match(script, /Object\.values\(clueData\.shards/);
   assert.match(script, /Object\.values\(definitionData\.shards/);
+  assert.match(script, /offlineToggle\.setAttribute\("aria-checked", String\(offlineModeEnabled\)\)/);
+  assert.match(script, /Offline Mode \[\$\{offlineModeEnabled \? "Enabled" : "Disabled"\}\]/);
+  assert.match(script, /const workers = Array\.from\(\{ length: simulate \? 1 : Math\.min\(4, urls\.length\) \}/);
+  assert.match(script, /cacheOfflineUrl\(cache, url, forceDownload\)/);
+  assert.match(script, /offlineSimulationControls\.hidden = !localSimulationEnabled/);
+  assert.match(script, /const SHOW_LOCAL_DOWNLOAD_SIMULATION = false/);
+  assert.match(script, /forceDownload: offlineForceDownload\.checked \|\| offlineSimulateDownload\.checked/);
+  assert.match(script, /offlineForceDownload\?\.addEventListener\("change", renderOfflineRequirement\)/);
+  assert.match(script, /const targetMilliseconds = \(estimatedBytes \* 8 \* 1000\) \/ \(speedMbps \* 1000000\)/);
   assert.match(script, /allowRemote: !offlineModeEnabled/);
-  assert.match(script, /dictionaryMerriamLink\.hidden = offlineModeEnabled \|\| selectedDictionary === "sowpods"/);
+  assert.match(script, /dictionaryMerriamLink\.hidden = offlineModeEnabled \|\| selectedDictionary === "expanded"/);
   assert.match(script, /dictionaryCollinsLink\.hidden = offlineModeEnabled \|\| selectedDictionary === "enable"/);
   assert.match(script, /A local definition for \$\{word\} is not available in Offline Mode/);
   assert.match(script, /navigator\.storage\?\.persist\?\.\(\)/);
@@ -342,7 +376,7 @@ test("opt-in Offline Mode downloads the complete solver and disables Datamuse", 
   assert.match(script, /if \(await cache\.match\(request\)\) return false/);
   assert.match(script, /const sharedResponse = await caches\.match\(request\)/);
   assert.match(script, /Promise\.all\(urls\.map\(\(url\) => cache\.match\(url\)\)\)/);
-  assert.match(script, /Downloaded files are retained for fast re-enabling/);
+  assert.match(script, /inspectOfflinePlan\(plan\)/);
   assert.match(offlineWorker, /request\.mode === "navigate"/);
   assert.match(offlineWorker, /matchCrosswordCache/);
   assert.doesNotMatch(offlineWorker, /caches\.match/);

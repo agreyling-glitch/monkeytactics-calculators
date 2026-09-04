@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
 const ENABLE: u8 = 1;
-const SOWPODS: u8 = 2;
+const EXPANDED: u8 = 2;
 const MIN_WORD_LENGTH: usize = 2;
 
 thread_local! {
@@ -18,7 +18,7 @@ struct Engine {
     signatures_by_length: HashMap<usize, Vec<String>>,
     metadata: HashMap<String, WordInfo>,
     enable_words: Vec<String>,
-    sowpods_words: Vec<String>,
+    expanded_words: Vec<String>,
     hook_maps: HashMap<(String, u8), HookInfo>,
 }
 
@@ -96,7 +96,7 @@ pub fn verify_domain(host: String) -> bool {
 }
 
 /// Adds dictionary records to the engine. Records may be `word`, or `word\tN`
-/// where N is the ENABLE/SOWPODS membership bit mask used by the static shards.
+/// where N is the Standard dictionary membership bit mask used by the static shards.
 #[wasm_bindgen]
 pub fn init_engine(dictionary_json: JsValue) -> Result<(), JsValue> {
     let records: Vec<String> = serde_wasm_bindgen::from_value(dictionary_json)
@@ -156,12 +156,12 @@ pub fn score_wwf_word(word: String) -> i32 {
 
 #[wasm_bindgen]
 pub fn is_valid_word(word: String) -> bool {
-    ENGINE.with(|engine| engine.borrow().has_word(&word, ENABLE | SOWPODS))
+    ENGINE.with(|engine| engine.borrow().has_word(&word, ENABLE | EXPANDED))
 }
 
 #[wasm_bindgen]
 pub fn find_hooks(word: String) -> JsValue {
-    find_hooks_for_dictionary(word, ENABLE | SOWPODS)
+    find_hooks_for_dictionary(word, ENABLE | EXPANDED)
 }
 
 #[wasm_bindgen]
@@ -205,8 +205,8 @@ impl Engine {
                 if additions & ENABLE != 0 {
                     self.enable_words.push(word.to_owned());
                 }
-                if additions & SOWPODS != 0 {
-                    self.sowpods_words.push(word.to_owned());
+                if additions & EXPANDED != 0 {
+                    self.expanded_words.push(word.to_owned());
                 }
                 info.membership |= membership;
                 changed |= additions != 0;
@@ -228,8 +228,8 @@ impl Engine {
             if membership & ENABLE != 0 {
                 self.enable_words.push(word.to_owned());
             }
-            if membership & SOWPODS != 0 {
-                self.sowpods_words.push(word.to_owned());
+            if membership & EXPANDED != 0 {
+                self.expanded_words.push(word.to_owned());
             }
             self.metadata
                 .insert(word.to_owned(), make_word_info(word, membership));
@@ -882,7 +882,7 @@ mod tests {
     fn detects_dictionary_specific_hooks() {
         let mut engine = engine();
         assert_eq!(engine.hooks("eat", ENABLE).back, Vec::<String>::new());
-        assert_eq!(engine.hooks("eat", SOWPODS).back, vec!["s"]);
+        assert_eq!(engine.hooks("eat", EXPANDED).back, vec!["s"]);
     }
 
     #[test]

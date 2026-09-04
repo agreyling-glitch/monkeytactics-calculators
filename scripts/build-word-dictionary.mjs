@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { gzipSync } from "node:zlib";
 
-const VERSION = "enable-sowpods-v2";
+const VERSION = "enable-v1";
 const OUTPUT_DIRECTORY = new URL("../assets/data/words/", import.meta.url);
 const MINIMUM_WORD_LENGTH = 2;
 const SOURCES = [
@@ -11,14 +11,6 @@ const SOURCES = [
     name: "ENABLE",
     url: "https://www.norvig.com/ngrams/enable1.txt",
     license: "Public Domain"
-  },
-  {
-    bit: 2,
-    name: "potch/sowpods",
-    version: "1.1.0",
-    url: "https://raw.githubusercontent.com/potch/sowpods/master/SOWPODS.txt",
-    homepage: "https://github.com/potch/sowpods",
-    license: "ISC"
   }
 ];
 
@@ -72,17 +64,14 @@ for (let code = 97; code <= 122; code += 1) {
 }
 
 const sourceCounts = {
-  enable: sourceWordLists[0].length,
-  sowpods: sourceWordLists[1].length,
-  both: words.filter(([, membership]) => membership === 3).length
+  standard: sourceWordLists[0].length
 };
 
 const manifest = {
   version: VERSION,
   encoding: "gzip-newline-membership",
   membership: {
-    enable: 1,
-    sowpods: 2
+    standard: 1
   },
   totalWords: words.length,
   minimumWordLength: MINIMUM_WORD_LENGTH,
@@ -98,8 +87,5 @@ await writeFile(
 );
 
 console.log(
-  `Built ${words.length.toLocaleString()} unique words ` +
-  `(${sourceCounts.enable.toLocaleString()} ENABLE, ` +
-  `${sourceCounts.sowpods.toLocaleString()} SOWPODS, ` +
-  `${sourceCounts.both.toLocaleString()} shared).`
+  `Built ${words.length.toLocaleString()} Standard words from ENABLE.`
 );

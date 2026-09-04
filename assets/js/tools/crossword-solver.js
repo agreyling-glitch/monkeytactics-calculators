@@ -69,17 +69,36 @@
   const shareQrCanvas = byId("crossword-share-qr");
   const shareCopyQr = byId("crossword-share-copy-qr");
   const sampleButtons = document.querySelectorAll("[data-pattern]");
-  const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
+  const dictionaryChoiceTrigger = byId("dictionary-choice-trigger");
+  const dictionaryChoiceModal = byId("dictionary-choice-modal");
+  const dictionaryChoiceClose = byId("dictionary-choice-close");
+  const dictionaryInputs = document.querySelectorAll('input[name="dictionary"]');
   const offlineToggle = byId("crossword-offline-toggle");
   const offlineStatus = byId("crossword-offline-status");
   const offlineProgress = byId("crossword-offline-progress");
+  const offlineModal = byId("offline-mode-modal");
+  const offlineModalConfirm = byId("offline-modal-confirm");
+  const offlineModalCancel = byId("offline-modal-cancel");
+  const offlinePackageSummary = byId("offline-package-summary");
+  const offlineCachedSummary = byId("offline-cached-summary");
+  const offlineRequiredSummary = byId("offline-required-summary");
+  const offlineForceDownload = byId("offline-force-download");
+  const offlineSimulationControls = byId("offline-simulation-controls");
+  const offlineSimulateDownload = byId("offline-simulate-download");
+  const offlineSpeedOptions = byId("offline-speed-options");
+  const offlineSimulateSpeeds = [...document.querySelectorAll('input[name="offline-simulate-speed"]')];
+  const offlineDownloadProgress = byId("offline-download-progress");
+  const offlineProgressLabel = byId("offline-progress-label");
+  const offlineModeMessage = byId("offline-mode-message");
   const relatedGuides = byId("crossword-related-guides");
-  const DICTIONARY_BITS = { enable: 1, sowpods: 2, both: 3 };
-  const OFFLINE_VERSION = "20260903-wordnet-definitions-18";
+  const DICTIONARY_BITS = { enable: 1, expanded: 2, both: 3 };
+  const OFFLINE_VERSION = "20260904-dictionary-modal-23";
   const OFFLINE_CACHE_PREFIX = "monkeytactics-crossword-offline-";
   const OFFLINE_STORAGE_KEY = "monkeytactics.crossword-solver.offline-cache";
   const DEBUG_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
-  const debugEnabled = DEBUG_HOSTS.has(window.location.hostname)
+  const SHOW_LOCAL_DOWNLOAD_SIMULATION = false;
+  const localSimulationEnabled = SHOW_LOCAL_DOWNLOAD_SIMULATION && DEBUG_HOSTS.has(window.location.hostname);
+  const debugEnabled = localSimulationEnabled
     && new URL(window.location.href).searchParams.get("DEBUG")?.toUpperCase() === "YES";
   const debugCounters = debugEnabled ? Object.create(null) : null;
   const debugResolutionCounts = debugEnabled ? { local: 0, api: 0, apiCache: 0 } : null;
@@ -200,7 +219,7 @@
   ]);
   const PickListStore = window.MonkeyTacticsCrosswordPickList;
   const PICK_GROUP_STATE_PREFIX = "monkeytactics.crossword-solver.pick-group.";
-  const MANIFEST_URL = "/assets/data/words/manifest.enable-sowpods-v2.json";
+  const MANIFEST_URL = "/assets/data/words/manifest.enable-v1.json";
   const CHUNK_BASE_URL = "/assets/data/words/";
   const CLUE_BASE_URL = "/assets/data/crossword-clues/";
   const CLUE_MANIFEST_URL = `${CLUE_BASE_URL}manifest.clues-v4.json?v=wordnet-3.0-phrases-v4`;
@@ -211,8 +230,7 @@
     "/crossword-offline-sw.js",
     "/assets/css/shared/style.css?v=20260903-branded-scrollbars",
     "/assets/css/shared/premium-tool.css?v=20260807-2",
-    "/assets/css/tools/crossword-solver.css?v=20260903-tight-offline-17",
-    "/assets/css/shared/dictionary-selector.css?v=20260831-stable-mobile-7",
+    "/assets/css/tools/crossword-solver.css?v=20260904-controls-right-32",
     "/assets/css/shared/focus-mode.css?v=20260829-2",
     "/assets/css/shared/trustpilot-review-collector.css?v=20260731-2",
     "/assets/js/shared/ads.js",
@@ -228,7 +246,7 @@
     "/assets/js/shared/focus-mode.js?v=20260829-2",
     "/assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10",
     "/assets/js/shared/related-guides.js?v=20260903-priority-1",
-    "/assets/js/tools/crossword-solver.js?v=20260903-wordnet-definitions-18",
+    "/assets/js/tools/crossword-solver.js?v=20260904-dictionary-tooltip-33",
     "/assets/images/trustpilot-review.svg",
     MANIFEST_URL,
     CLUE_MANIFEST_URL
@@ -255,59 +273,81 @@
   let offlineCacheName = "";
   try { offlineCacheName = localStorage.getItem(OFFLINE_STORAGE_KEY) || ""; } catch (_error) { /* Storage may be unavailable. */ }
   let offlineModeEnabled = Boolean(offlineCacheName);
+  let pendingOfflinePlan = null;
+  let pendingOfflineInventory = null;
+  let offlineDialogBusy = false;
 
-  function renderOfflineState(message = "") {
+  const DICTIONARY_LABELS = {
+    enable: "Standard (ENABLE)",
+    expanded: "Expanded (Wiktionary)"
+  };
+
+  function renderDictionaryChoice() {
+    const selected = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
+    const label = DICTIONARY_LABELS[selected];
+    dictionaryChoiceTrigger.setAttribute("aria-label", `Choose dictionary. Current: ${label}`);
+    dictionaryChoiceTrigger.title = `Dictionary selected: ${label}`;
+  }
+
+  function renderOfflineState() {
     if (!offlineToggle || !offlineStatus) return;
-    offlineToggle.textContent = offlineModeEnabled ? "Disable Offline Mode" : "Enable Offline Mode";
-    offlineStatus.textContent = message || (offlineModeEnabled
-      ? "Ready offline. Definition lookups use local WordNet only; Datamuse is disabled."
-      : "Download the complete solver for use without an internet connection (about 15 MB).");
+    offlineToggle.setAttribute("aria-checked", String(offlineModeEnabled));
+    offlineToggle.title = offlineModeEnabled ? "Disable Offline Mode" : "Enable Offline Mode";
+    offlineStatus.textContent = `Offline Mode [${offlineModeEnabled ? "Enabled" : "Disabled"}]`;
     if (relatedGuides) relatedGuides.hidden = offlineModeEnabled;
     if (offlineModeEnabled) {
       dictionaryMerriamLink.hidden = true;
       dictionaryCollinsLink.hidden = true;
     } else if (dictionaryModal.open) {
       const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
-      dictionaryMerriamLink.hidden = selectedDictionary === "sowpods";
+      dictionaryMerriamLink.hidden = selectedDictionary === "expanded";
       dictionaryCollinsLink.hidden = selectedDictionary === "enable";
     }
   }
 
-  async function readOfflineManifest(cache, url) {
-    const cached = await cache.match(url);
-    if (cached) return cached.json();
+  async function fetchOfflineManifest(url) {
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error("An offline data manifest could not be loaded.");
-    await cache.put(url, response.clone());
     return response.json();
   }
 
-  async function buildOfflineUrls(cache) {
+  async function buildOfflinePlan() {
     const [wordData, clueData, definitionData] = await Promise.all([
-      readOfflineManifest(cache, MANIFEST_URL),
-      readOfflineManifest(cache, CLUE_MANIFEST_URL),
-      readOfflineManifest(cache, DEFINITION_MANIFEST_URL)
+      fetchOfflineManifest(MANIFEST_URL),
+      fetchOfflineManifest(CLUE_MANIFEST_URL),
+      fetchOfflineManifest(DEFINITION_MANIFEST_URL)
     ]);
-    const wordUrls = Object.values(wordData.chunks || {}).map(({ file }) => `${CHUNK_BASE_URL}${file}`);
-    const clueUrls = [
-      `${CLUE_BASE_URL}${clueData.index.file}?v=${clueData.datasetVersion}`,
+    const wordFiles = Object.values(wordData.chunks || {});
+    const clueFiles = [clueData.index,
       ...Object.values(clueData.shards || {}).flatMap((shard) => (shard.parts || [shard])
-        .map(({ file }) => `${CLUE_BASE_URL}${file}?v=${clueData.datasetVersion}`))
+        .map((part) => part))
     ];
-    const definitionUrls = [
-      DEFINITION_MANIFEST_URL,
-      ...Object.values(definitionData.shards || {}).map(({ file }) => `${DEFINITION_BASE_URL}${file}?v=${definitionData.datasetVersion}`)
-    ];
-    return [...new Set([...OFFLINE_CORE_URLS, ...wordUrls, ...clueUrls, ...definitionUrls])];
+    const definitionFiles = Object.values(definitionData.shards || {});
+    const wordUrls = wordFiles.map(({ file }) => `${CHUNK_BASE_URL}${file}`);
+    const clueUrls = clueFiles.map(({ file }) => `${CLUE_BASE_URL}${file}?v=${clueData.datasetVersion}`);
+    const definitionUrls = definitionFiles.map(({ file }) => `${DEFINITION_BASE_URL}${file}?v=${definitionData.datasetVersion}`);
+    const urls = [...new Set([...OFFLINE_CORE_URLS, ...wordUrls, ...clueUrls, DEFINITION_MANIFEST_URL, ...definitionUrls])];
+    const dataBytes = [...wordFiles, ...clueFiles, ...definitionFiles].reduce((sum, file) => sum + (Number(file.bytes) || 0), 0);
+    const estimatedCoreBytes = 2 * 1024 * 1024;
+    const bytesByUrl = new Map([
+      ...wordFiles.map((file) => [`${CHUNK_BASE_URL}${file.file}`, Number(file.bytes) || 0]),
+      ...clueFiles.map((file) => [`${CLUE_BASE_URL}${file.file}?v=${clueData.datasetVersion}`, Number(file.bytes) || 0]),
+      ...definitionFiles.map((file) => [`${DEFINITION_BASE_URL}${file.file}?v=${definitionData.datasetVersion}`, Number(file.bytes) || 0])
+    ]);
+    const unknownUrls = urls.filter((url) => !bytesByUrl.has(url));
+    const estimatedUnknownBytes = unknownUrls.length ? estimatedCoreBytes / unknownUrls.length : 0;
+    return { urls, bytesByUrl, estimatedUnknownBytes, totalBytes: dataBytes + estimatedCoreBytes };
   }
 
-  async function cacheOfflineUrl(cache, url) {
+  async function cacheOfflineUrl(cache, url, forceDownload = false) {
     const request = new Request(url, { credentials: "same-origin" });
-    if (await cache.match(request)) return false;
-    const sharedResponse = await caches.match(request);
-    if (sharedResponse) {
-      await cache.put(request, sharedResponse.clone());
-      return false;
+    if (!forceDownload) {
+      if (await cache.match(request)) return false;
+      const sharedResponse = await caches.match(request);
+      if (sharedResponse) {
+        await cache.put(request, sharedResponse.clone());
+        return false;
+      }
     }
     const response = await fetch(new Request(url, { cache: "reload", credentials: "same-origin" }));
     if (!response.ok) throw new Error(`Offline download failed for ${url}.`);
@@ -315,14 +355,73 @@
     return true;
   }
 
-  async function enableOfflineMode() {
+  const formatBytes = (bytes) => `${(bytes / (1024 * 1024)).toFixed(bytes >= 10 * 1024 * 1024 ? 1 : 2)} MB`;
+  const delay = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+  async function inspectOfflinePlan(plan) {
+    const cached = await Promise.all(plan.urls.map((url) => caches.match(url)));
+    const cachedIndexes = new Set(cached.map((response, index) => response ? index : -1).filter((index) => index >= 0));
+    const remainingBytes = plan.urls.reduce((sum, url, index) => cachedIndexes.has(index)
+      ? sum
+      : sum + (plan.bytesByUrl.get(url) ?? plan.estimatedUnknownBytes), 0);
+    return { cachedCount: cachedIndexes.size, remainingCount: plan.urls.length - cachedIndexes.size, remainingBytes };
+  }
+
+  function renderOfflineRequirement() {
+    if (!pendingOfflinePlan || !pendingOfflineInventory) return;
+    const forceDownload = offlineForceDownload.checked
+      || (localSimulationEnabled && offlineSimulateDownload.checked);
+    offlineRequiredSummary.textContent = forceDownload
+      ? `${pendingOfflinePlan.urls.length} files · about ${formatBytes(pendingOfflinePlan.totalBytes)}`
+      : pendingOfflineInventory.remainingCount
+        ? `${pendingOfflineInventory.remainingCount} files · about ${formatBytes(pendingOfflineInventory.remainingBytes)}`
+        : "Nothing — all files can be reused";
+  }
+
+  async function openOfflineDialog() {
+    if (!offlineModal || offlineDialogBusy) return;
+    pendingOfflinePlan = null;
+    pendingOfflineInventory = null;
+    offlineModalConfirm.disabled = true;
+    offlineModalConfirm.textContent = "OK";
+    offlineModalCancel.disabled = false;
+    offlineForceDownload.checked = false;
+    offlineSimulateDownload.checked = false;
+    offlineSimulationControls.hidden = !localSimulationEnabled;
+    offlineSimulateSpeeds.forEach((input) => {
+      input.checked = input.value === "10";
+      input.disabled = true;
+    });
+    offlineSpeedOptions.disabled = true;
+    offlineDownloadProgress.hidden = true;
+    offlineModeMessage.textContent = "";
+    offlinePackageSummary.textContent = "Checking requirements…";
+    offlineCachedSummary.textContent = "Checking browser storage…";
+    offlineRequiredSummary.textContent = "Calculating…";
+    offlineModal.showModal();
+    try {
+      const plan = await buildOfflinePlan();
+      const inventory = await inspectOfflinePlan(plan);
+      pendingOfflinePlan = plan;
+      pendingOfflineInventory = inventory;
+      offlinePackageSummary.textContent = `${plan.urls.length} files · about ${formatBytes(plan.totalBytes)}`;
+      offlineCachedSummary.textContent = `${inventory.cachedCount} of ${plan.urls.length} files`;
+      renderOfflineRequirement();
+      offlineModalConfirm.disabled = false;
+    } catch (error) {
+      console.error("Unable to inspect Offline Mode requirements:", error);
+      offlineModeMessage.textContent = "Requirements could not be checked. Check your connection and try again.";
+    }
+  }
+
+  async function enableOfflineMode(plan, { forceDownload = false, simulate = false, speedMbps = 10 } = {}) {
     if (!("serviceWorker" in navigator) || !("caches" in window)) throw new Error("Offline Mode is not supported by this browser.");
     await navigator.serviceWorker.register("/crossword-offline-sw.js", { scope: "/" });
     await navigator.serviceWorker.ready;
     const nextCacheName = `${OFFLINE_CACHE_PREFIX}${OFFLINE_VERSION}`;
     const cacheAlreadyExists = (await caches.keys()).includes(nextCacheName);
     const cache = await caches.open(nextCacheName);
-    const urls = await buildOfflineUrls(cache);
+    const urls = plan.urls;
     offlineProgress.hidden = false;
     offlineProgress.max = urls.length;
     offlineProgress.value = 0;
@@ -330,13 +429,20 @@
     let downloaded = 0;
     let cursor = 0;
     try {
-      const workers = Array.from({ length: Math.min(4, urls.length) }, async () => {
+      const workers = Array.from({ length: simulate ? 1 : Math.min(4, urls.length) }, async () => {
         while (cursor < urls.length) {
           const url = urls[cursor++];
-          if (await cacheOfflineUrl(cache, url)) downloaded += 1;
+          const startedAt = performance.now();
+          if (await cacheOfflineUrl(cache, url, forceDownload)) downloaded += 1;
           completed += 1;
           offlineProgress.value = completed;
-          offlineStatus.textContent = `Downloading offline data: ${completed} of ${urls.length} files…`;
+          offlineProgressLabel.textContent = `${completed} of ${urls.length}`;
+          offlineModeMessage.textContent = `Downloaded ${downloaded}; reused ${completed - downloaded}.`;
+          if (simulate) {
+            const estimatedBytes = plan.bytesByUrl.get(url) ?? plan.estimatedUnknownBytes;
+            const targetMilliseconds = (estimatedBytes * 8 * 1000) / (speedMbps * 1000000);
+            await delay(Math.max(15, targetMilliseconds - (performance.now() - startedAt)));
+          }
         }
       });
       await Promise.all(workers);
@@ -352,14 +458,13 @@
       offlineCacheName = nextCacheName;
       offlineModeEnabled = true;
       try { await navigator.storage?.persist?.(); } catch (_error) { /* Persistence is optional. */ }
-      renderOfflineState(downloaded
-        ? `Ready offline. ${downloaded} files downloaded and ${urls.length - downloaded} reused; Datamuse is disabled.`
-        : `Ready offline. All ${urls.length} files were already downloaded; Datamuse is disabled.`);
+      renderOfflineState();
+      offlineModeMessage.textContent = downloaded
+        ? `Complete. ${downloaded} files downloaded and ${urls.length - downloaded} reused.`
+        : `Complete. All ${urls.length} files were already downloaded.`;
     } catch (error) {
       if (!cacheAlreadyExists) await caches.delete(nextCacheName);
       throw error;
-    } finally {
-      offlineProgress.hidden = true;
     }
   }
 
@@ -367,19 +472,62 @@
     try { localStorage.removeItem(OFFLINE_STORAGE_KEY); } catch (_error) { /* Storage may be unavailable. */ }
     offlineCacheName = "";
     offlineModeEnabled = false;
-    renderOfflineState("Offline Mode disabled. Downloaded files are retained for fast re-enabling; Datamuse fallback is available again.");
+    renderOfflineState();
   }
 
   async function toggleOfflineMode() {
+    if (!offlineModeEnabled) {
+      await openOfflineDialog();
+      return;
+    }
     offlineToggle.disabled = true;
     try {
-      if (offlineModeEnabled) await disableOfflineMode();
-      else await enableOfflineMode();
+      await disableOfflineMode();
     } catch (error) {
       console.error("Offline Mode failed:", error);
-      renderOfflineState("Offline Mode could not be enabled. Check your connection and available browser storage, then try again.");
+      renderOfflineState();
     } finally {
       offlineToggle.disabled = false;
+    }
+  }
+
+  async function confirmOfflineMode() {
+    if (offlineModeEnabled) {
+      offlineModal.close();
+      return;
+    }
+    if (!pendingOfflinePlan || offlineDialogBusy) return;
+    offlineDialogBusy = true;
+    offlineModalConfirm.disabled = true;
+    offlineModalCancel.disabled = true;
+    offlineForceDownload.disabled = true;
+    offlineSimulateDownload.disabled = true;
+    offlineSpeedOptions.disabled = true;
+    offlineDownloadProgress.hidden = false;
+    offlineProgress.max = pendingOfflinePlan.urls.length;
+    offlineProgress.value = 0;
+    offlineProgressLabel.textContent = `0 of ${pendingOfflinePlan.urls.length}`;
+    offlineModeMessage.textContent = "Preparing download…";
+    try {
+      await enableOfflineMode(pendingOfflinePlan, {
+        simulate: offlineSimulateDownload.checked,
+        forceDownload: offlineForceDownload.checked || offlineSimulateDownload.checked,
+        speedMbps: Number(offlineSimulateSpeeds.find((input) => input.checked)?.value) || 10
+      });
+      offlineModalConfirm.textContent = "Close";
+      offlineModalConfirm.disabled = false;
+    } catch (error) {
+      console.error("Offline Mode failed:", error);
+      offlineModeMessage.textContent = "Offline Mode could not be enabled. Check your connection and available browser storage, then try again.";
+      offlineModalConfirm.textContent = "Try again";
+      offlineModalConfirm.disabled = false;
+      offlineModalCancel.disabled = false;
+    } finally {
+      offlineForceDownload.disabled = false;
+      offlineSimulateDownload.disabled = false;
+      offlineSpeedOptions.disabled = !offlineSimulateDownload.checked;
+      offlineSimulateSpeeds.forEach((input) => { input.disabled = !offlineSimulateDownload.checked; });
+      offlineDialogBusy = false;
     }
   }
 
@@ -667,7 +815,7 @@
     return fragment;
   }
 
-  function renderDictionaryEntries(entries, requestedWord, sourceName = "Datamuse", matchedWord = requestedWord) {
+  function renderDictionaryEntries(entries, requestedWord, sourceName = "External lookup", matchedWord = requestedWord) {
     const fragment = document.createDocumentFragment();
     const normalizeHeadword = (value) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
     const requestedHeadword = normalizeHeadword(requestedWord);
@@ -807,7 +955,7 @@
     dictionaryModalTitle.textContent = word;
     const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "enable";
     dictionaryMerriamLink.href = `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`;
-    dictionaryMerriamLink.hidden = offlineModeEnabled || selectedDictionary === "sowpods";
+    dictionaryMerriamLink.hidden = offlineModeEnabled || selectedDictionary === "expanded";
     dictionaryCollinsLink.hidden = offlineModeEnabled || selectedDictionary === "enable";
     const matchedDefinition = renderMatchedDefinition(context?.definition);
     const additionalLocalEntries = WordDefinitions.getLocal(word).map((entry) => ({
@@ -840,7 +988,7 @@
         debug: debugEnabled ? updateDebug : undefined
       });
       if (request !== dictionaryRequest || !dictionaryModal.open) return;
-      const definitions = renderDictionaryEntries(result.entries, word, result.source === "local" ? "WordNet 3.0" : "Datamuse", result.matchedWord);
+      const definitions = renderDictionaryEntries(result.entries, word, result.source === "local" ? "WordNet 3.0" : "External lookup", result.matchedWord);
       if (!definitions.childNodes.length) {
         throw new Error("Definition unavailable");
       } else {
@@ -895,7 +1043,7 @@
   }
 
   function dictionaryMembership(bits) {
-    return ({ 1: "ENABLE", 2: "SOWPODS", 3: "ENABLE + SOWPODS" })[bits] || "Selected dictionary";
+    return ({ 1: "ENABLE", 2: "EXPANDED", 3: "ENABLE + EXPANDED" })[bits] || "Selected dictionary";
   }
 
   function updateDictionaryPickButton() {
@@ -1081,7 +1229,7 @@
 
   function populateSearchFromPick(entry) {
     const restoredPattern = normalizePattern(entry.pattern || "");
-    const selectedDictionary = entry.dictionaryBits === 3 ? "both" : entry.dictionaryBits === 2 ? "sowpods" : "enable";
+    const selectedDictionary = entry.dictionaryBits === 3 ? "both" : entry.dictionaryBits === 2 ? "expanded" : "enable";
     clueInput.value = (entry.clue || "").trim().replace(/\s+/g, " ");
     patternInput.value = restoredPattern.toUpperCase();
     lengthInput.value = String(fixedPatternLength(restoredPattern) || entry.word.replace(/[^A-Z]/gi, "").length);
@@ -1091,6 +1239,7 @@
     includeInput.value = "";
     excludeInput.value = "";
     dictionaryInputs.forEach((input) => { input.checked = input.value === selectedDictionary; });
+    renderDictionaryChoice();
     const patternLength = fixedPatternLength(restoredPattern);
     byId("pattern-length-preview").textContent = patternLength
       ? `${patternLength}-letter pattern`
@@ -1110,8 +1259,8 @@
     if (!/^[A-Z]+(?:[ '-][A-Z]+)*$/.test(word) || word.replace(/[^A-Z]/g, "").length > 30) return false;
     const rawDictionary = (parameters.get("dictionary") || "").trim();
     const hasEnable = /ENABLE/i.test(rawDictionary);
-    const hasSowpods = /SOWPODS/i.test(rawDictionary);
-    const dictionaryBits = hasEnable && hasSowpods ? 3 : hasSowpods ? 2 : hasEnable ? 1 : 0;
+    const hasExpanded = /EXPANDED/i.test(rawDictionary);
+    const dictionaryBits = hasEnable && hasExpanded ? 3 : hasExpanded ? 2 : hasEnable ? 1 : 0;
     const timestampValue = Number.parseInt(parameters.get("timestamp") || "", 10);
     const strengthValue = Number.parseFloat(parameters.get("strength") || "0");
     const matchedValue = Number.parseInt(parameters.get("matched") || "0", 10);
@@ -1613,7 +1762,7 @@
         await loadForPattern(pattern);
         const matches = Engine.crosswordSearch(pattern, pool, options);
         if (request !== searchRequest) return;
-        renderResults(matches, pattern, dictionary === "both" ? "ENABLE + SOWPODS" : dictionary.toUpperCase());
+        renderResults(matches, pattern, dictionary === "both" ? "ENABLE + EXPANDED" : dictionary.toUpperCase());
       }
     } catch (error) {
       if (request !== searchRequest) return;
@@ -1713,9 +1862,31 @@
     dictionaryReturnFocus = null;
   });
   form.addEventListener("submit", handleSubmit);
+  dictionaryChoiceTrigger.addEventListener("click", () => dictionaryChoiceModal.showModal());
+  dictionaryChoiceClose.addEventListener("click", () => dictionaryChoiceModal.close());
+  dictionaryChoiceModal.addEventListener("click", (event) => {
+    if (event.target === dictionaryChoiceModal) dictionaryChoiceModal.close();
+  });
+  dictionaryChoiceModal.addEventListener("close", () => dictionaryChoiceTrigger.focus());
+  dictionaryInputs.forEach((input) => input.addEventListener("change", () => {
+    renderDictionaryChoice();
+    dictionaryChoiceModal.close();
+  }));
   offlineToggle?.addEventListener("click", toggleOfflineMode);
+  offlineModalConfirm?.addEventListener("click", confirmOfflineMode);
+  offlineModalCancel?.addEventListener("click", () => offlineModal.close());
+  offlineForceDownload?.addEventListener("change", renderOfflineRequirement);
+  offlineSimulateDownload?.addEventListener("change", () => {
+    offlineSpeedOptions.disabled = !offlineSimulateDownload.checked;
+    offlineSimulateSpeeds.forEach((input) => { input.disabled = !offlineSimulateDownload.checked; });
+    renderOfflineRequirement();
+  });
+  offlineModal?.addEventListener("cancel", (event) => {
+    if (offlineDialogBusy) event.preventDefault();
+  });
   updateActiveFilterCount();
   const sharedSearchPending = importSharedPickFromUrl();
+  renderDictionaryChoice();
   renderPickList();
   renderOfflineState();
   if (offlineModeEnabled && "caches" in window) {

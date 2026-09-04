@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wordiply Solver: Find the Longest Words | MonkeyTactics</title>
-  <meta name="description" content="Enter a Wordiply starter to find the longest matching words. Compare ENABLE and SOWPODS results, filter by position, and copy answers privately.">
+  <meta name="description" content="Enter a Wordiply starter to find the longest matching words. Search the Standard (ENABLE) dictionary, filter by position, and copy answers privately.">
   <meta name="author" content="MonkeyTactics">
   <meta name="robots" content="index, follow">
   <meta name="date" content="2026-08-31">
@@ -26,14 +26,14 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@graph":[
     {"@type":"BreadcrumbList","@id":"https://monkeytactics.com/tools/wordiply-solver#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://monkeytactics.com/tools/"},{"@type":"ListItem","position":3,"name":"Wordiply Solver","item":"https://monkeytactics.com/tools/wordiply-solver"}]},
-    {"@type":"SoftwareApplication","@id":"https://monkeytactics.com/tools/wordiply-solver#app","name":"Wordiply Solver","url":"https://monkeytactics.com/tools/wordiply-solver","applicationCategory":"GameApplication","operatingSystem":"Any","isAccessibleForFree":true,"description":"A private browser-based solver that finds long dictionary words containing a Wordiply starter as an uninterrupted sequence.","dateModified":"2026-08-31","publisher":{"@type":"Organization","name":"MonkeyTactics","url":"https://monkeytactics.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Longest words first","Anywhere, prefix, and suffix matching","ENABLE and SOWPODS dictionaries","One-click answer copying","Private in-browser search"]},
-    {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does the starter have to stay together?","acceptedAnswer":{"@type":"Answer","text":"Yes. It must appear as one uninterrupted sequence in the same order."}},{"@type":"Question","name":"Which dictionary should I choose?","acceptedAnswer":{"@type":"Answer","text":"SOWPODS is the best starting point for British vocabulary. ENABLE is a broad North American list, while Both provides the widest combined set of suggestions."}},{"@type":"Question","name":"Will every result be accepted by Wordiply?","acceptedAnswer":{"@type":"Answer","text":"No. This helper uses independent public word lists rather than Wordiply's private answer list, so results should be confirmed in the game."}}]}
+    {"@type":"SoftwareApplication","@id":"https://monkeytactics.com/tools/wordiply-solver#app","name":"Wordiply Solver","url":"https://monkeytactics.com/tools/wordiply-solver","applicationCategory":"GameApplication","operatingSystem":"Any","isAccessibleForFree":true,"description":"A private browser-based solver that finds long dictionary words containing a Wordiply starter as an uninterrupted sequence.","dateModified":"2026-08-31","publisher":{"@type":"Organization","name":"MonkeyTactics","url":"https://monkeytactics.com/"},"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Longest words first","Anywhere, prefix, and suffix matching","the Standard (ENABLE) dictionary","One-click answer copying","Private in-browser search"]},
+    {"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does the starter have to stay together?","acceptedAnswer":{"@type":"Answer","text":"Yes. It must appear as one uninterrupted sequence in the same order."}},{"@type":"Question","name":"Which dictionary should I choose?","acceptedAnswer":{"@type":"Answer","text":"EXPANDED is the best starting point for British vocabulary. ENABLE is a broad North American list, while Both provides the widest combined set of suggestions."}},{"@type":"Question","name":"Will every result be accepted by Wordiply?","acceptedAnswer":{"@type":"Answer","text":"No. This helper uses independent public word lists rather than Wordiply's private answer list, so results should be confirmed in the game."}}]}
   ]}
   </script>
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260807-2">
   <link rel="stylesheet" href="../assets/css/tools/wordiply-solver.css?v=20260831-hero-fit-4">
-  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260831-stable-mobile-7">
+  <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260904-reference-10">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
 </head>
 <body class="premium-tool-page wordiply-page">
@@ -52,8 +52,8 @@
       <form id="wordiply-form" novalidate>
         <div class="solver-heading"><div><div class="premium-section-kicker">01 / Stretch the starter</div><h2 id="solver-heading">Find Your Longest Word</h2><p>Type the exact starter shown in Wordiply. We’ll search for it as one continuous block.</p></div>
           <fieldset class="dictionary-selector"><legend class="visually-hidden">Dictionary</legend><div class="segmented-control">
-            <label><input type="radio" name="dictionary" value="sowpods" checked><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--sowpods" aria-hidden="true"></span><span>SOWPODS</span></span></label>
-            <label><input type="radio" name="dictionary" value="enable"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span><span>ENABLE</span></span></label>
+            <label><input type="radio" name="dictionary" value="expanded"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--expanded" aria-hidden="true"></span><span>EXPANDED</span></span></label>
+            <label><input type="radio" name="dictionary" value="enable" checked><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--enable" aria-hidden="true"></span><span>ENABLE</span></span></label>
             <label><input type="radio" name="dictionary" value="both"><span class="dictionary-option"><span class="dictionary-icon dictionary-icon--both" aria-hidden="true"></span><span>Both</span></span></label>
           </div></fieldset>
         </div>
@@ -76,7 +76,7 @@
     </section>
 
     <section class="content-grid" aria-label="Wordiply solver guide">
-      <article class="content-card"><p class="premium-section-kicker">02 / How to use it</p><h2>From Starter to Longest Word</h2><ol><li><strong>Choose a dictionary:</strong> use ENABLE for a broad North American list, SOWPODS for British and North American vocabulary, or Both for the widest combined results. Hover over or focus an option for details. SOWPODS is the recommended starting point for Wordiply.</li><li>Copy the starter letters from today’s Wordiply.</li><li>Keep “Anywhere” selected for normal play, then press <strong>Find long words</strong>.</li><li>Start with the top results: ties are grouped by length and sorted alphabetically.</li><li>Try a word in the game itself to confirm it uses Wordiply’s accepted-word list.</li></ol></article>
+      <article class="content-card"><p class="premium-section-kicker">02 / How to use it</p><h2>From Starter to Longest Word</h2><ol><li><strong>Choose a dictionary:</strong> use ENABLE for a broad North American list, EXPANDED for British and North American vocabulary, or Both for the widest combined results. Hover over or focus an option for details. EXPANDED is the recommended starting point for Wordiply.</li><li>Copy the starter letters from today’s Wordiply.</li><li>Keep “Anywhere” selected for normal play, then press <strong>Find long words</strong>.</li><li>Start with the top results: ties are grouped by length and sorted alphabetically.</li><li>Try a word in the game itself to confirm it uses Wordiply’s accepted-word list.</li></ol></article>
       <aside class="content-card"><p class="premium-section-kicker">Example</p><h2>How Matching Works</h2><div class="match-example"><span>Starter</span><strong>ACT</strong><span>Matches</span><strong>counter<strong>act</strong>ing</strong><span>Doesn’t match</span><s>acrobatic</s></div><p>The letters must be consecutive. A word merely containing A, C, and T in separate places does not qualify.</p></aside>
     </section>
     <section class="content-grid" aria-label="Wordiply rules and strategy">
@@ -101,8 +101,8 @@
     <section class="content-grid" aria-label="Wordiply solver data and privacy">
       <article class="content-card">
         <p class="premium-section-kicker">04 / Word coverage</p>
-        <h2>ENABLE, SOWPODS, and Wordiply Answers</h2>
-        <p><strong>ENABLE</strong> is a broad public-domain English word list commonly used for North American word games. <strong>SOWPODS</strong> combines British and North American word-game vocabulary, making it the more useful starting point for a British game such as Wordiply. Choose <strong>Both</strong> for maximum coverage with duplicate words removed.</p>
+        <h2>Standard Dictionary and Wordiply Answers</h2>
+        <p><strong>ENABLE</strong> is a broad public-domain English word list commonly used for North American word games. <strong>EXPANDED</strong> combines British and North American word-game vocabulary, making it the more useful starting point for a British game such as Wordiply. Choose <strong>Both</strong> for maximum coverage with duplicate words removed.</p>
         <p>These lists are independent of Wordiply. They can contain obscure words that the live game rejects and may omit newer or specially selected answers that Wordiply accepts. Always confirm a suggestion in the game. See the <a href="/third-party-notices">dictionary sources and licenses</a>.</p>
       </article>
       <aside class="content-card">
@@ -117,7 +117,7 @@
       <h2 id="faq-heading">Wordiply Solver FAQ</h2>
       <div class="faq-grid">
         <article><h3>Does the starter have to stay together?</h3><p>Yes. It must appear as one uninterrupted sequence in the same order.</p></article>
-        <article><h3>Which dictionary should I choose?</h3><p>SOWPODS is the best starting point for British vocabulary. ENABLE is a broad North American list; Both gives the widest set of ideas.</p></article>
+        <article><h3>Which dictionary should I choose?</h3><p>EXPANDED is the best starting point for British vocabulary. ENABLE is a broad North American list; Both gives the widest set of ideas.</p></article>
         <article><h3>Will every result be accepted by Wordiply?</h3><p>No. This helper uses independent public word lists, not Wordiply’s private answer list. Treat results as suggestions and confirm them in the game.</p></article>
       </div>
       <p class="wordiply-disclaimer">MonkeyTactics is an independent helper and is not affiliated with or endorsed by Wordiply or Guardian News &amp; Media.</p>
@@ -128,5 +128,6 @@
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-wordiply-1" defer></script>
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
   <script src="../assets/js/tools/wordiply-solver.js?v=20260831-gold-copy-2" defer></script>
+<script src="../assets/js/shared/dictionary-offline-controls.js?v=20260904-reference-2" defer></script>
 </body>
 </html>

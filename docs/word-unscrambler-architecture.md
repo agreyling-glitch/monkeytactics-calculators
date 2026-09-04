@@ -27,8 +27,8 @@ tools/word-unscrambler.html
   +-- assets/js/tools/word-unscrambler/word-unscrambler.js
         UI state, dictionary fetching, DOM rendering, and bridge calls
           |
-          +-- assets/data/words/manifest.enable-sowpods-v2.json
-          +-- assets/data/words/[a-z].enable-sowpods-v2.txt.gz
+          +-- assets/data/words/manifest.enable-v1.json
+          +-- assets/data/words/[a-z].enable-v1.txt.gz
 
 Rust source:
 wasm/word-unscrambler-engine/src/lib.rs
@@ -79,12 +79,12 @@ This check prevents the application from enabling its engine on an unapproved ho
 
 ## Dictionary Storage
 
-The combined dictionary contains 272,405 unique words sourced from ENABLE and SOWPODS. It is split into 26 gzip-compressed shards based on the first letter of each word.
+The Standard dictionary contains 172,820 unique words sourced from ENABLE. It is split into 26 gzip-compressed shards based on the first letter of each word. An Expanded Wiktionary-based dictionary is planned but is not currently bundled.
 
 The manifest describes:
 
 - Format version and encoding.
-- Total and per-source word counts.
+- Total word count.
 - Dictionary source metadata.
 - Filename, word count, compressed size, and SHA-256 digest for each shard.
 
@@ -99,8 +99,6 @@ Membership is a bit mask:
 | Value | Meaning |
 | ---: | --- |
 | `1` | ENABLE |
-| `2` | SOWPODS |
-| `3` | Present in both dictionaries |
 
 Search selection uses the same bit values. A word belongs to the selected dictionary when:
 
@@ -108,7 +106,7 @@ Search selection uses the same bit values. A word belongs to the selected dictio
 word_membership & selected_dictionary_bit != 0
 ```
 
-Selecting Both uses bit `3`, producing the deduplicated union.
+The current data uses bit `1` exclusively. Additional membership values are reserved for the future Expanded dictionary.
 
 ## Lazy Dictionary Loading
 
@@ -142,7 +140,7 @@ The engine is stored in a thread-local `RefCell<Engine>`. Browser WebAssembly cu
 | `HashMap<usize, Vec<String>> signatures_by_length` | Limits candidate signatures to the requested word length. |
 | `HashMap<String, WordInfo> metadata` | Stores dictionary membership, score, vowel count, and 26 letter counts for every word. |
 | `Vec<String> enable_words` | Tracks words belonging to ENABLE. |
-| `Vec<String> sowpods_words` | Tracks words belonging to SOWPODS. |
+| `Vec<String> expanded_words` | Reserved for the future Expanded dictionary. |
 | `HashMap<(String, u8), HookInfo> hook_maps` | Caches hook results by word and dictionary selection. |
 
 ### Canonical signatures

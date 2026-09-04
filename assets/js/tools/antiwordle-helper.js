@@ -9,7 +9,7 @@
   function hideMessage(){message.hidden=true}
   function showMessage(text){message.textContent=text;message.hidden=false}
   async function decode(response){const bytes=new Uint8Array(await response.arrayBuffer());if(bytes[0]!==31||bytes[1]!==139)return new TextDecoder().decode(bytes);const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));return new Response(stream).text()}
-  async function loadDictionary(){await Engine.ready;const manifest=await fetch("/assets/data/words/manifest.enable-sowpods-v2.json").then(r=>{if(!r.ok)throw new Error("manifest");return r.json()});await Promise.all(Object.values(manifest.chunks).map(async chunk=>{const response=await fetch(`/assets/data/words/${chunk.file}`);if(!response.ok)throw new Error("chunk");Engine.initEngine((await decode(response)).split(/\r?\n/).filter(Boolean))}));dictionaryReady=true;add.disabled=false;add.textContent="Add feedback & find safe guesses";search()}
+  async function loadDictionary(){await Engine.ready;const manifest=await fetch("/assets/data/words/manifest.enable-v1.json").then(r=>{if(!r.ok)throw new Error("manifest");return r.json()});await Promise.all(Object.values(manifest.chunks).map(async chunk=>{const response=await fetch(`/assets/data/words/${chunk.file}`);if(!response.ok)throw new Error("chunk");Engine.initEngine((await decode(response)).split(/\r?\n/).filter(Boolean))}));dictionaryReady=true;add.disabled=false;add.textContent="Add feedback & find safe guesses";search()}
   function constraints(){
     const locked=Array(5).fill(""),blocked=Array.from({length:5},()=>new Set()),minimum={},maximum={};
     guesses.forEach(row=>{
