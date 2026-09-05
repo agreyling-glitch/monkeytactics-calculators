@@ -10,7 +10,7 @@
 .solver-panel, .results-panel { padding: clamp(1rem, 2.5vw, 1.5rem); border: 1px solid var(--premium-line); border-radius: 1rem; background: #0b1510; }
 .pattern-label-row { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; margin-top: .9rem; }
 .clue-field { margin-bottom: .8rem; }
-.pattern-label-row label { color: var(--premium-muted); font-weight: 700; }
+.crossword-page .clue-field > label,.pattern-label-row label { color: var(--crossword-gold); font-weight: 700; }
 .field label { color: var(--premium-ink); font-weight: 800; }
 #pattern-length-preview { color: var(--premium-muted); font-size: .78rem; white-space: nowrap; }
 .clue-field input,.pattern-input { width: 100%; box-sizing: border-box; margin-top: .45rem; padding: .8rem .85rem; border: 1px solid var(--premium-line); border-radius: .65rem; outline: 0; background: #111e17; color: var(--premium-ink); font-size: 1rem; }

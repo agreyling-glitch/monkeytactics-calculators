@@ -12,7 +12,7 @@ const offlineWorker = fs.readFileSync(new URL("../crossword-offline-sw.js", impo
 test("crossword solver cache-busts the WordNet graph release", () => {
   assert.match(html, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
   assert.match(html, /crossword-solver\.js\?v=20260904-both-default-39/);
-  assert.match(html, /crossword-solver\.css\?v=20260904-active-dictionary-icon-34/);
+  assert.match(html, /crossword-solver\.css\?v=20260905-gold-input-labels-36/);
   assert.match(html, /crossword-pick-list-store\.js\?v=20260901-grid-positions-1/);
 });
 
@@ -303,7 +303,7 @@ test("clue and pattern fields share a restrained input treatment", () => {
   assert.match(css, /\.clue-field input,\.pattern-input \{[^}]*border: 1px solid var\(--premium-line\);[^}]*background: #111e17;/);
   assert.match(css, /\.pattern-input \{[^}]*font-size: 1rem|\.clue-field input,\.pattern-input \{[^}]*font-size: 1rem/);
   assert.doesNotMatch(css, /\.pattern-input \{[^}]*border: 2px solid/);
-  assert.match(css, /\.pattern-label-row label \{[^}]*color: var\(--premium-muted\)/);
+  assert.match(css, /\.crossword-page \.clue-field > label,\.pattern-label-row label \{[^}]*color: var\(--crossword-gold\)/);
 });
 
 test("shared definitions use local WordNet before a cached Datamuse fallback", () => {
