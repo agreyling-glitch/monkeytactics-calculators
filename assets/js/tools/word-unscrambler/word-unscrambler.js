@@ -76,6 +76,9 @@ const offlineStatus = document.querySelector("#word-tool-offline-status");
 const offlineProgress = document.querySelector("#word-tool-offline-progress");
 const rackSortTrigger = document.querySelector("#rack-sort-trigger");
 const rackSortMenu = document.querySelector("#rack-sort-menu");
+const rackHelpTrigger = document.querySelector("#rack-help-trigger");
+const rackSyntaxDialog = document.querySelector("#rack-syntax-dialog");
+const rackSyntaxClose = document.querySelector("#rack-syntax-close");
 const IS_WWF = document.body.dataset.wordGame === "wwf";
 const GAME_NAME = IS_WWF ? "Words With Friends Solver" : "Word Unscrambler";
 const analyzeWord = (word) => IS_WWF ? Engine.analyzeWwfWord(word) : Engine.analyzeWord(word);
@@ -100,6 +103,7 @@ const WWF_TILE_VALUES = Object.freeze({
   n: 2, o: 1, p: 4, q: 10, r: 1, s: 1, t: 1, u: 2, v: 5, w: 4, x: 8, y: 3, z: 10
 });
 const LENGTH_GROUP_SORTS = new Set(["length-desc", "length-asc", "uses-most"]);
+const RESULT_PAGE_SIZE = 250;
 const DICTIONARY_LINKS = Object.freeze([
   {
     abbreviation: "MW",
@@ -226,12 +230,14 @@ function closeRackSortMenu({ restoreFocus = false } = {}) {
 }
 
 function applyRackSort(method) {
-  const slashIndex = input.value.indexOf("/");
-  const rackSource = slashIndex < 0 ? input.value : input.value.slice(0, slashIndex);
-  const pattern = slashIndex < 0 ? "" : input.value.slice(slashIndex + 1).trim();
+  const syntaxIndex = input.value.search(/[:/+\-]/);
+  let suffixStart = syntaxIndex < 0 ? input.value.length : syntaxIndex;
+  while (suffixStart > 0 && /\s/.test(input.value[suffixStart - 1])) suffixStart -= 1;
+  const rackSource = input.value.slice(0, suffixStart);
+  const suffix = input.value.slice(suffixStart);
   const rack = rackSource.toLowerCase().replace(/[^a-z?]/g, "");
   if (!rack) return;
-  input.value = `${sortRack(rack, method).toUpperCase()}${slashIndex < 0 ? "" : ` / ${pattern}`}`;
+  input.value = `${sortRack(rack, method).toUpperCase()}${suffix}`;
   renderRackTiles();
   closeHistoryDropdown();
   closeRackSortMenu({ restoreFocus: true });
@@ -457,7 +463,7 @@ input.style.background = "transparent";
 input.style.color = "transparent";
 input.style.webkitTextFillColor = "transparent";
 input.style.textShadow = "0 0 0 transparent";
-input.style.caretColor = "#22c55e";
+input.style.caretColor = "transparent";
 
 const getScrabbleScore = (word) => IS_WWF ? Engine.scoreWwfWord(word) : Engine.scoreWord(word);
 
@@ -966,19 +972,23 @@ function renderAllHistory() {
   renderHistoryModal();
 }
 
-function createRackTile(letter, index) {
+function createRackTile(letter, index, isDraggableRackTile = false) {
   const tile = document.createElement("span");
   const face = document.createElement("span");
   const score = document.createElement("span");
   const isWildcard = letter === "?";
-  const isPatternCharacter = letter === "/" || letter === "*";
+  const isPatternCharacter = ["/", "*", ":", "+", "-"].includes(letter) || /^\d$/.test(letter);
 
   tile.className = "rack-tile";
+  if (isDraggableRackTile) {
+    tile.classList.add("rack-tile--draggable");
+    tile.dataset.rackIndex = String(index);
+  }
   tile.classList.toggle("rack-tile--wildcard", isWildcard);
   tile.classList.toggle("rack-tile--pattern", isPatternCharacter);
   tile.style.display = "inline-flex";
-  tile.style.width = "2rem";
-  tile.style.height = "2rem";
+  tile.style.width = "2.5rem";
+  tile.style.height = "2.5rem";
   tile.style.flexDirection = "column";
   tile.style.alignItems = "flex-start";
   tile.style.justifyContent = "space-between";
@@ -1000,7 +1010,7 @@ function createRackTile(letter, index) {
   face.style.display = "block";
   face.style.marginLeft = "0.02rem";
   face.style.marginTop = "0.01rem";
-  face.style.fontSize = "1.08rem";
+  face.style.fontSize = "1.3rem";
   face.style.fontWeight = "900";
   face.style.letterSpacing = "-0.02em";
   face.style.textTransform = "uppercase";
@@ -1011,7 +1021,7 @@ function createRackTile(letter, index) {
   score.style.alignSelf = "flex-end";
   score.style.marginRight = "0.01rem";
   score.style.marginBottom = "0.01rem";
-  score.style.fontSize = "0.56rem";
+  score.style.fontSize = "0.65rem";
   score.style.fontWeight = "900";
   score.style.lineHeight = "1";
   score.style.color = "#111827";
@@ -1034,13 +1044,29 @@ function createRackCaret() {
   caret.className = "rack-caret";
   caret.style.display = "inline-block";
   caret.style.width = "2px";
-  caret.style.height = "1.65rem";
+  caret.style.height = "2.05rem";
   caret.style.margin = "0 0.06rem";
   caret.style.borderRadius = "999px";
   caret.style.background = "#22c55e";
   caret.style.boxShadow = "0 0 6px rgba(34,197,94,0.8)";
   caret.style.animation = "rackCaretBlink 1s steps(2, start) infinite";
   return caret;
+}
+
+function fitRackTilesToOneLine() {
+  if (!rackTiles) return;
+  const tiles = rackTiles.querySelectorAll(".rack-tile");
+  if (!tiles.length) {
+    rackTiles.style.removeProperty("--rack-tile-size");
+    return;
+  }
+  const styles = getComputedStyle(rackTiles);
+  const horizontalPadding = Number.parseFloat(styles.paddingLeft) + Number.parseFloat(styles.paddingRight);
+  const gap = Number.parseFloat(styles.columnGap) || 0;
+  const caretWidth = rackTiles.querySelector(".rack-caret") ? 6 : 0;
+  const availableWidth = Math.max(0, rackTiles.clientWidth - horizontalPadding - caretWidth);
+  const fittedSize = (availableWidth - (gap * Math.max(0, tiles.length - 1))) / tiles.length;
+  rackTiles.style.setProperty("--rack-tile-size", `${Math.max(18, Math.min(40, fittedSize))}px`);
 }
 
 function renderRackTiles() {
@@ -1050,13 +1076,103 @@ function renderRackTiles() {
 
   const raw = input.value;
   const letters = [...raw.replace(/\s+/g, "")];
+  const compactDelimiterIndex = letters.findIndex((letter) => [":", "/", "+", "-"].includes(letter));
+  const rackTileCount = compactDelimiterIndex < 0 ? letters.length : compactDelimiterIndex;
   const selectionStart = input.selectionStart ?? raw.length;
   const caretIndex = [...raw.slice(0, selectionStart).replace(/\s+/g, "")].length;
-  const tiles = letters.map((letter, index) => createRackTile(letter, index));
-  tiles.splice(caretIndex, 0, createRackCaret());
+  const tiles = letters.map((letter, index) => createRackTile(letter, index, index < rackTileCount));
+  if (document.activeElement === input) {
+    tiles.splice(caretIndex, 0, createRackCaret());
+  }
 
   rackTiles.replaceChildren(...tiles);
+  fitRackTilesToOneLine();
 }
+
+function getRackInputParts() {
+  const raw = input.value;
+  const delimiterIndex = raw.search(/[:/+\-]/);
+  const rackEnd = delimiterIndex < 0 ? raw.length : delimiterIndex;
+  let suffixStart = rackEnd;
+  while (suffixStart > 0 && /\s/.test(raw[suffixStart - 1])) suffixStart -= 1;
+  return {
+    rack: [...raw.slice(0, suffixStart).replace(/\s+/g, "")],
+    suffix: raw.slice(suffixStart)
+  };
+}
+
+function setReorderedRack(rack, suffix, caretTileIndex) {
+  input.value = `${rack.join("")}${suffix}`;
+  const caretPosition = clamp(caretTileIndex + 1, 0, rack.length);
+  input.focus({ preventScroll: true });
+  input.setSelectionRange(caretPosition, caretPosition);
+  closeHistoryDropdown();
+  renderRackTiles();
+}
+
+function moveRackTile(sourceIndex, insertionIndex) {
+  const { rack, suffix } = getRackInputParts();
+  if (sourceIndex < 0 || sourceIndex >= rack.length) return;
+  const [letter] = rack.splice(sourceIndex, 1);
+  const adjustedIndex = clamp(insertionIndex - (sourceIndex < insertionIndex ? 1 : 0), 0, rack.length);
+  rack.splice(adjustedIndex, 0, letter);
+  setReorderedRack(rack, suffix, adjustedIndex);
+}
+
+let rackDragState = null;
+
+rackTiles.addEventListener("pointerdown", (event) => {
+  const tile = event.target.closest(".rack-tile--draggable");
+  if (!tile || event.button !== 0) return;
+  event.preventDefault();
+  tile.setPointerCapture(event.pointerId);
+  rackDragState = {
+    pointerId: event.pointerId,
+    sourceIndex: Number(tile.dataset.rackIndex),
+    startX: event.clientX,
+    startY: event.clientY,
+    insertionIndex: Number(tile.dataset.rackIndex),
+    moved: false,
+    tile
+  };
+});
+
+rackTiles.addEventListener("pointermove", (event) => {
+  if (!rackDragState || rackDragState.pointerId !== event.pointerId) return;
+  const distance = Math.hypot(event.clientX - rackDragState.startX, event.clientY - rackDragState.startY);
+  if (!rackDragState.moved && distance < 6) return;
+  rackDragState.moved = true;
+  rackDragState.tile.classList.add("is-dragging");
+  rackTiles.querySelectorAll(".is-drop-before, .is-drop-after").forEach((tile) => {
+    tile.classList.remove("is-drop-before", "is-drop-after");
+  });
+  const target = document.elementFromPoint(event.clientX, event.clientY)?.closest(".rack-tile--draggable");
+  if (!target) return;
+  const targetIndex = Number(target.dataset.rackIndex);
+  const after = event.clientX > target.getBoundingClientRect().left + target.offsetWidth / 2;
+  rackDragState.insertionIndex = targetIndex + (after ? 1 : 0);
+  target.classList.add(after ? "is-drop-after" : "is-drop-before");
+});
+
+function finishRackDrag(event) {
+  if (!rackDragState || rackDragState.pointerId !== event.pointerId) return;
+  const state = rackDragState;
+  rackDragState = null;
+  state.tile.releasePointerCapture?.(event.pointerId);
+  if (state.moved) {
+    moveRackTile(state.sourceIndex, state.insertionIndex);
+  } else {
+    input.focus({ preventScroll: true });
+    input.setSelectionRange(state.sourceIndex + 1, state.sourceIndex + 1);
+    renderRackTiles();
+  }
+}
+
+rackTiles.addEventListener("pointerup", finishRackDrag);
+rackTiles.addEventListener("pointercancel", () => {
+  rackDragState = null;
+  renderRackTiles();
+});
 
 function sanitizeRackInput() {
   const currentValue = input.value;
@@ -1184,6 +1300,8 @@ function runPendingHistorySearch() {
 }
 
 function saveHistoryEntry(letters, pattern, matches, filters, sortMode) {
+  const parsedHistoryInput = parseSmartInput(letters);
+  const analysisLetters = parsedHistoryInput.rack;
   historyEntries = HistoryStore.add({
     id: "",
     timestamp: Date.now(),
@@ -1192,8 +1310,10 @@ function saveHistoryEntry(letters, pattern, matches, filters, sortMode) {
     filters,
     sortMode,
     resultCount: matches.length,
-    entropy: getHistoryEntropy(letters),
-    leaveValue: getHistoryLeaveValue(letters, matches),
+    entropy: getHistoryEntropy(analysisLetters),
+    leaveValue: parsedHistoryInput.unrestricted
+      ? null
+      : getHistoryLeaveValue(analysisLetters, matches),
     pinned: false
   });
   renderAllHistory();
@@ -1898,12 +2018,12 @@ function createWordItem(word, letters, options) {
   return item;
 }
 
-function appendWordGroup(fragment, headingText, words, ariaLabel, letters, options) {
+function appendWordGroup(fragment, headingText, words, ariaLabel, letters, options, totalCount = words.length) {
   const group = document.createElement("section");
   group.className = "word-group";
 
   const heading = document.createElement("h4");
-  heading.textContent = headingText;
+  heading.textContent = `${headingText} [${totalCount.toLocaleString()}]`;
 
   const grid = document.createElement("ul");
   grid.className = "word-grid";
@@ -1914,7 +2034,57 @@ function appendWordGroup(fragment, headingText, words, ariaLabel, letters, optio
   fragment.append(group);
 }
 
-function renderMatches(letters, matches, options) {
+function createResultPagination(currentPage, pageCount, navigate, position) {
+  const pagination = document.createElement("nav");
+  const pageStatus = document.createElement("span");
+  const pageLabel = document.createElement("label");
+  const pageInput = document.createElement("input");
+  const goButton = document.createElement("button");
+  const addButton = (label, page, disabled, ariaLabel) => {
+    const control = document.createElement("button");
+    control.type = "button";
+    control.textContent = label;
+    control.disabled = disabled;
+    control.setAttribute("aria-label", ariaLabel);
+    control.addEventListener("click", () => navigate(page));
+    pagination.append(control);
+  };
+
+  pagination.className = `result-pagination result-pagination--${position}`;
+  pagination.setAttribute("aria-label", `${position === "top" ? "Top" : "Bottom"} word result pages`);
+  addButton("First", 1, currentPage === 1, "First results page");
+  addButton("Previous", currentPage - 1, currentPage === 1, "Previous results page");
+  pageStatus.className = "result-page-status";
+  pageStatus.textContent = `Page ${currentPage.toLocaleString()} of ${pageCount.toLocaleString()}`;
+  pageStatus.setAttribute("aria-live", "polite");
+  pagination.append(pageStatus);
+
+  pageLabel.className = "result-page-picker";
+  pageLabel.append(document.createTextNode("Page "));
+  pageInput.type = "number";
+  pageInput.min = "1";
+  pageInput.max = String(pageCount);
+  pageInput.step = "1";
+  pageInput.value = String(currentPage);
+  pageInput.setAttribute("aria-label", `Page number, 1 through ${pageCount}`);
+  goButton.type = "button";
+  goButton.textContent = "Go";
+  const goToEnteredPage = () => navigate(Number.parseInt(pageInput.value, 10));
+  goButton.addEventListener("click", goToEnteredPage);
+  pageInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      goToEnteredPage();
+    }
+  });
+  pageLabel.append(pageInput, goButton);
+  pagination.append(pageLabel);
+  addButton("Next", currentPage + 1, currentPage === pageCount, "Next results page");
+  addButton("Last", pageCount, currentPage === pageCount, "Last results page");
+  return pagination;
+}
+
+function renderMatches(letters, matches, options, requestedPage = 1, focusResults = false) {
   clearResults();
 
   if (matches.length === 0) {
@@ -1926,18 +2096,37 @@ function renderMatches(letters, matches, options) {
     return;
   }
 
-  resultsHeading.textContent =
-    matches.length === 1 ? "1 word found" : `${matches.length} words found`;
-  matchCount.textContent = `${matches.length} ${matches.length === 1 ? "match" : "matches"}`;
+  const pageCount = Math.ceil(matches.length / RESULT_PAGE_SIZE);
+  const currentPage = clamp(Math.trunc(requestedPage) || 1, 1, pageCount);
+  const pageStart = (currentPage - 1) * RESULT_PAGE_SIZE;
+  const pageEnd = Math.min(pageStart + RESULT_PAGE_SIZE, matches.length);
+  const visibleMatches = matches.slice(pageStart, pageEnd);
+  const foundLabel = matches.length === 1 ? "1 word found" : `${matches.length.toLocaleString()} words found`;
+  resultsHeading.textContent = options.unrestricted
+    ? `${foundLabel} in the selected dictionary`
+    : `${foundLabel} made by unscrambling the letters ${letters.toUpperCase()}`;
+  matchCount.textContent = pageCount > 1
+    ? `Showing ${(pageStart + 1).toLocaleString()}–${pageEnd.toLocaleString()} of ${matches.length.toLocaleString()} matches`
+    : `${matches.length.toLocaleString()} ${matches.length === 1 ? "match" : "matches"}`;
   matchCount.hidden = false;
   emptyState.hidden = true;
 
   const fragment = document.createDocumentFragment();
+  const navigate = (page) => renderMatches(letters, matches, options, page, true);
+
+  if (pageCount > 1) {
+    fragment.append(createResultPagination(currentPage, pageCount, navigate, "top"));
+  }
 
   if (LENGTH_GROUP_SORTS.has(options.sortBy)) {
     const wordsByLength = new Map();
+    const totalWordsByLength = new Map();
 
     matches.forEach((word) => {
+      totalWordsByLength.set(word.length, (totalWordsByLength.get(word.length) || 0) + 1);
+    });
+
+    visibleMatches.forEach((word) => {
       const group = wordsByLength.get(word.length);
       if (group) {
         group.push(word);
@@ -1949,25 +2138,36 @@ function renderMatches(letters, matches, options) {
     wordsByLength.forEach((words, length) => {
       appendWordGroup(
         fragment,
-        `${length}-letter words made by unscrambling the letters ${letters.toUpperCase()}`,
+        `${length}-letter words`,
         words,
         `${length}-letter words`,
         letters,
-        options
+        options,
+        totalWordsByLength.get(length)
       );
     });
   } else {
     const heading = SORT_LABELS[options.sortBy] ?? "Matching words";
-    appendWordGroup(fragment, heading, matches, heading, letters, options);
+    appendWordGroup(fragment, heading, visibleMatches, heading, letters, options, matches.length);
+  }
+
+  if (pageCount > 1) {
+    fragment.append(createResultPagination(currentPage, pageCount, navigate, "bottom"));
   }
 
   wordList.append(fragment);
-  breakdownState = { letters, matches: [...matches], options };
+  breakdownState = { letters, matches, options };
   wordBreakdown.hidden = false;
   renderResultsPickButtons();
 
   if (wordBreakdown.open) {
     renderWordBreakdown();
+  }
+
+  if (focusResults) {
+    resultsHeading.setAttribute("tabindex", "-1");
+    resultsHeading.focus({ preventScroll: true });
+    resultsHeading.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
 
@@ -2617,8 +2817,10 @@ function getHookInfo(word, dictionaryBit) {
   return Engine.findHooks(word, dictionaryBit);
 }
 
-function findMatches(letters, options) {
-  return Engine.unscramble(letters, options.pattern, options);
+function findMatches(letters, options, unrestricted) {
+  return unrestricted
+    ? Engine.crosswordSearch(options.pattern || "*", "", options)
+    : Engine.unscramble(letters, options.pattern, options);
 }
 
 async function handleSubmit(event) {
@@ -2626,13 +2828,14 @@ async function handleSubmit(event) {
   clearMessage();
   clearResults();
 
-  const { rack: letters, pattern } = parseSmartInput(input.value);
+  const parsedInput = parseSmartInput(input.value);
+  const { rack: letters, pattern, unrestricted, unrestrictedCount, inlineLength, hasLengthSeparator, hasValidLength, inlineMustInclude, inlineExcludeLetters, includeClauseCount, excludeClauseCount, hasInvalidClauses } = parsedInput;
   const startsWith = startsWithInput.value.trim().toLowerCase();
   const endsWith = endsWithInput.value.trim().toLowerCase();
-  const mustInclude = mustIncludeInput.value.trim().toLowerCase();
-  const excludeLetters = excludeLettersInput.value.trim().toLowerCase();
+  const mustInclude = inlineMustInclude || mustIncludeInput.value.trim().toLowerCase();
+  const excludeLetters = inlineExcludeLetters || excludeLettersInput.value.trim().toLowerCase();
   const dictionary = [...dictionaryInputs].find((option) => option.checked)?.value ?? "enable";
-  const wordLength = Number(wordLengthInput.value);
+  const wordLength = hasValidLength ? inlineLength : Number(wordLengthInput.value);
   const minimumVowels = Number(minimumVowelsInput.value);
   const minimumConsonants = Number(minimumConsonantsInput.value);
   const minimumScore = minimumScoreInput.value === ""
@@ -2645,13 +2848,51 @@ async function handleSubmit(event) {
   const sortBy = sortResultsInput.value;
   startsWithInput.value = startsWith;
   endsWithInput.value = endsWith;
-  mustIncludeInput.value = mustInclude;
-  excludeLettersInput.value = excludeLetters;
 
-  if (!letters) {
+  if (includeClauseCount > 1 || excludeClauseCount > 1 || hasInvalidClauses) {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState("Check inline filters", "Use at most one +letters clause and one -letters clause at the end of the query.");
+    showMessage("Use the format rack:length / pattern +required -excluded.");
+    input.focus();
+    return;
+  }
+
+  if ([...mustInclude].some((letter) => excludeLetters.includes(letter))) {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState("Conflicting inline filters", "A letter cannot be both required and excluded.");
+    showMessage("Remove letters that appear in both +required and -excluded.");
+    input.focus();
+    return;
+  }
+
+  if (!letters && !unrestricted) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Enter some letters", "Add scrambled letters to search the dictionary.");
     showMessage("Please enter at least one letter.");
+    input.focus();
+    return;
+  }
+
+  if (unrestrictedCount > 1) {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState("Too many unrestricted wildcards", "Use one asterisk before the colon.");
+    showMessage("Use a single * before : for an unrestricted dictionary search.");
+    input.focus();
+    return;
+  }
+
+  if (hasLengthSeparator && !hasValidLength) {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState("Add a valid length", "Enter a whole number after the colon, such as *:2 / q*.");
+    showMessage("Enter a word length from 2 through 30 after :.");
+    input.focus();
+    return;
+  }
+
+  if (unrestricted && !hasValidLength) {
+    resultsHeading.textContent = "Ready when you are";
+    setEmptyState("Add an exact length", "Unrestricted * searches require : followed by a word length.");
+    showMessage("Add an exact length after *, for example *:2 / q*.");
     input.focus();
     return;
   }
@@ -2723,11 +2964,11 @@ async function handleSubmit(event) {
     return;
   }
 
-  if (!Number.isInteger(wordLength) || wordLength < 0 || wordLength > 30) {
+  if (!Number.isInteger(wordLength) || wordLength < 0 || wordLength > 30 || (hasLengthSeparator && wordLength < 2)) {
     resultsHeading.textContent = "Ready when you are";
-    setEmptyState("Check word length", "Use a whole number from 0 through 30.");
-    showMessage("Word Length must be a whole number from 0 through 30.");
-    focusFilterInput(wordLengthInput);
+    setEmptyState("Check word length", hasLengthSeparator ? "Use a whole number from 2 through 30 after :." : "Use a whole number from 0 through 30.");
+    showMessage(hasLengthSeparator ? "Inline word length must be from 2 through 30." : "Word Length must be a whole number from 0 through 30.");
+    if (hasLengthSeparator) input.focus(); else focusFilterInput(wordLengthInput);
     return;
   }
 
@@ -2785,7 +3026,7 @@ async function handleSubmit(event) {
     startsWith,
     endsWith,
     pattern,
-    mustInclude,
+    mustInclude: unrestricted ? `${letters}${mustInclude}` : mustInclude,
     excludeLetters,
     highValueOnly: highValueOnlyInput.checked,
     minimumVowels,
@@ -2795,7 +3036,8 @@ async function handleSubmit(event) {
     hookFilter,
     sortBy,
     scoring: IS_WWF ? "wwf" : "scrabble",
-    showHooks: Boolean(hookFilter || sortBy.startsWith("hooks-"))
+    showHooks: Boolean(hookFilter || sortBy.startsWith("hooks-")),
+    unrestricted
   };
   const historyFilters = getCurrentFilters();
 
@@ -2804,7 +3046,7 @@ async function handleSubmit(event) {
   buttonLabel.textContent = "Loading words…";
 
   try {
-    if (letters.includes("?")) {
+    if (unrestricted || letters.includes("?")) {
       buttonLabel.textContent = "Loading wildcards…";
       await loadAllChunks();
     } else {
@@ -2816,9 +3058,12 @@ async function handleSubmit(event) {
       await loadAllChunks();
     }
 
-    const matches = findMatches(letters, options);
+    const matches = findMatches(letters, options, unrestricted);
     renderMatches(letters, matches, options);
-    saveHistoryEntry(letters, pattern, matches, historyFilters, sortBy);
+    const slashIndex = input.value.indexOf("/");
+    const historyRack = (slashIndex < 0 ? input.value : input.value.slice(0, slashIndex)).trim();
+    const historyPattern = slashIndex < 0 ? pattern : input.value.slice(slashIndex + 1).trim();
+    saveHistoryEntry(historyRack, historyPattern, matches, historyFilters, sortBy);
   } catch (error) {
     console.error("Unable to load dictionary chunks:", error);
     resultsHeading.textContent = "Dictionary unavailable";
@@ -2875,18 +3120,38 @@ input.addEventListener("input", () => {
   renderRackTiles();
 });
 input.addEventListener("beforeinput", (event) => {
-  if (
-    event.inputType === "insertText"
-    && event.data
-    && InputRules.sanitizeSmartInput(event.data) !== event.data
-  ) {
-    event.preventDefault();
-  }
+  if (event.inputType !== "insertText" || !event.data) return;
+  const start = input.selectionStart ?? input.value.length;
+  const end = input.selectionEnd ?? start;
+  const proposedValue = `${input.value.slice(0, start)}${event.data}${input.value.slice(end)}`;
+  if (InputRules.sanitizeSmartInput(proposedValue) !== proposedValue) event.preventDefault();
 });
 input.addEventListener("keyup", renderRackTiles);
 input.addEventListener("click", renderRackTiles);
 input.addEventListener("focus", renderRackTiles);
+input.addEventListener("blur", renderRackTiles);
+new ResizeObserver(fitRackTilesToOneLine).observe(rackTiles);
 input.addEventListener("keydown", (event) => {
+  if (event.altKey && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+    const { rack } = getRackInputParts();
+    const selectionStart = input.selectionStart ?? 0;
+    const rawDelimiterIndex = input.value.search(/[:/+\-]/);
+    if (rawDelimiterIndex >= 0 && selectionStart > rawDelimiterIndex) return;
+    const rackCharactersBeforeCaret = [...input.value.slice(0, selectionStart).replace(/\s+/g, "")]
+      .findIndex((character) => [":", "/", "+", "-"].includes(character));
+    const compactBeforeCaret = [...input.value.slice(0, selectionStart).replace(/\s+/g, "")];
+    const beforeDelimiter = rackCharactersBeforeCaret < 0
+      ? compactBeforeCaret.length
+      : rackCharactersBeforeCaret;
+    const sourceIndex = clamp(beforeDelimiter - 1, 0, Math.max(0, rack.length - 1));
+    const movingLeft = event.key === "ArrowLeft";
+    if ((movingLeft && sourceIndex > 0) || (!movingLeft && sourceIndex < rack.length - 1)) {
+      event.preventDefault();
+      moveRackTile(sourceIndex, movingLeft ? sourceIndex - 1 : sourceIndex + 2);
+    }
+    return;
+  }
+
   if (!historyModalBackdrop.hidden) {
     return;
   }
@@ -2932,6 +3197,33 @@ input.addEventListener("keydown", (event) => {
   );
   renderHistoryDropdown();
   historyDropdown.querySelector(".is-active")?.scrollIntoView({ block: "nearest" });
+});
+rackHelpTrigger.addEventListener("click", () => rackSyntaxDialog.showModal());
+rackSyntaxClose.addEventListener("click", () => rackSyntaxDialog.close());
+rackSyntaxDialog.addEventListener("click", (event) => {
+  if (event.target === rackSyntaxDialog) rackSyntaxDialog.close();
+});
+rackSyntaxDialog.addEventListener("close", () => rackHelpTrigger.focus());
+rackSyntaxDialog.querySelectorAll("[data-rack-example]").forEach((example) => {
+  example.addEventListener("click", () => {
+    input.value = example.dataset.rackExample;
+    restoreFilters();
+    if (example.dataset.mustInclude !== undefined) mustIncludeInput.value = example.dataset.mustInclude;
+    if (example.dataset.excludeLetters !== undefined) excludeLettersInput.value = example.dataset.excludeLetters;
+    if (example.dataset.dictionary !== undefined) {
+      const exampleDictionary = [...dictionaryInputs]
+        .find((option) => option.value === example.dataset.dictionary);
+      if (exampleDictionary) {
+        exampleDictionary.checked = true;
+        exampleDictionary.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    }
+    rackSyntaxDialog.close();
+    sanitizeRackInput();
+    renderRackTiles();
+    syncSectionFilterResetButtons();
+    form.requestSubmit(button);
+  });
 });
 document.addEventListener("pointerdown", (event) => {
   if (!historyDropdown.hidden && !event.target.closest(".primary-search-input")) {

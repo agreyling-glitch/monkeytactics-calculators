@@ -10,16 +10,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Free Words With Friends Solver &amp; Word Finder | MonkeyTactics</title>
-  <meta name="description" content="Free Words With Friends solver with WWF scores, rack sorting, wildcards, local definitions, offline mode, and Standard, Expanded, or combined dictionaries.">
+  <meta name="description" content="Free Words With Friends solver with rack sorting, exact-length patterns, 867,000+ words, WWF scores, hooks, local definitions, and offline use.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
-  <meta name="date" content="2026-09-04">
+  <meta name="date" content="2026-09-05">
   <meta name="theme-color" content="#0f172a">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/words-with-friends-solver">
 
   <meta property="og:title" content="Free Words With Friends Solver &amp; Word Finder">
-  <meta property="og:description" content="Find WWF words, organize rack letters strategically, check local definitions and hooks, or install the solver for offline use.">
+  <meta property="og:description" content="Find WWF plays with compact rack patterns, exact-length lists, wildcards, required or excluded letters, scores, hooks, and offline dictionaries.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://monkeytactics.com/tools/words-with-friends-solver">
   <meta property="og:site_name" content="MonkeyTactics">
@@ -27,7 +27,7 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Free Words With Friends Solver &amp; Word Finder">
-  <meta name="twitter:description" content="Find Words With Friends plays, sort rack letters strategically, check local definitions and hooks, and use the solver offline.">
+  <meta name="twitter:description" content="Search 867,000+ words with rack patterns, exact lengths, wildcards, WWF scores, hooks, and offline support.">
 
   <script type="application/ld+json">
   {
@@ -57,7 +57,9 @@
         "featureList": [
           "Find words made from some or all supplied letters",
           "Search Standard ENABLE, Expanded Wiktionary-derived, or 867,000+ unique combined dictionary entries",
-          "Combine rack letters, wildcard tiles, and a positional pattern in one smart input",
+          "Combine rack letters, wildcard tiles, exact length, positional patterns, required letters, and excluded letters in one smart input",
+          "Use compact :length, / pattern, +required, and -excluded rack syntax",
+          "Open runnable Words With Friends rack examples that configure and start a search",
           "Filter by exact word length, starting letters, or ending letters",
           "Match visible letter patterns with question-mark and variable-length asterisk wildcards",
           "Require or exclude specific letters",
@@ -74,9 +76,10 @@
           "Use a confirmed Reset All action to clear the rack, filters, History, Pick List, and current results",
           "Use Ctrl+I to focus the rack, Ctrl+Enter to search, Ctrl+R to open Reset All, Ctrl+B to open Word Breakdown, Ctrl+H to open History, and Alt+L to toggle Pick List",
           "Respect repeated-letter frequency",
-          "Group results by word length",
+          "Group results by word length and page large result sets in groups of 250",
           "Calculate English Words With Friends tile scores",
-          "Rearrange rack tiles with vowel, alphabetical, blank, S, duplicate, digraph, frequency, and stem-based sorting",
+          "Drag rack tiles into a custom order or rearrange them with vowel, alphabetical, blank, S, duplicate, digraph, frequency, and stem-based sorting",
+          "Keep responsive rack tiles on one line as the available width changes",
           "Load local WordNet definitions from each result without an API call",
           "Open Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge from a separate lookup menu",
           "Download the complete WWF solver, dictionaries, hooks, and definitions for offline use",
@@ -91,7 +94,7 @@
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-09-04"
+        "dateModified": "2026-09-05"
       },
       {
         "@type": "WebPage",
@@ -104,7 +107,7 @@
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/words-with-friends-solver#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/words-with-friends-solver#app" },
         "datePublished": "2026-07-31",
-        "dateModified": "2026-09-04"
+        "dateModified": "2026-09-05"
       },
       {
         "@type": "ItemList",
@@ -158,7 +161,12 @@
       {
         "@type": "Question",
         "name": "How does the smart letter and pattern input work?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Enter rack letters before a slash and an optional pattern after it. In the pattern, ? matches exactly one letter and * matches any number of letters, including zero. Question marks before the slash remain wildcard rack tiles. The input accepts only English letters, spaces, ?, /, and *; other characters are removed." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter rack letters before a slash and an optional pattern after it. Add : and a number for an exact length. Use * before the colon for an unrestricted word-list search, such as *:2 / q* for every two-letter word beginning with Q. Add +letters to require letters or -letters to exclude them. In the pattern, ? matches one letter and * matches any number of letters. Question marks before the slash remain wildcard rack tiles. The Rack syntax guide includes runnable examples that start the search automatically." }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I generate a complete Words With Friends word list?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Enter *: followed by the word length to remove the rack restriction, then optionally add a pattern, required letters, or excluded letters. For example, *:7 / *ING finds seven-letter words ending in ING. Large lists show the exact total and 250 results per page with paging controls above and below the words." }
       },
       {
         "@type": "Question",
@@ -235,7 +243,7 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
-  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260904-offline-green-5">
+  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260905-list-search-21">
   <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260904-wiktionary-check-14">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260903-word-heading-align-3">
@@ -339,18 +347,18 @@
                   <input
                     id="letters"
                     name="letters"
-                    type="text"
+                    type="search"
                     inputmode="text"
                     autocomplete="off"
                     autocapitalize="none"
                     spellcheck="false"
-                    placeholder="e.g. ABCDE?? / a*e"
-                    title="Use up to 2 rack ? wildcards. After /, use ? for one letter or up to 3 * wildcards for any number of letters: ABCDE?? / a*e. Press Down Arrow for recent searches."
+                    placeholder="e.g. ABCDE?? / a*e or *:2 / q*"
+                    title="Open the rack syntax guide for examples."
                     aria-keyshortcuts="Control+I Meta+I"
                     aria-describedby="input-hint form-message"
                     aria-controls="history-dropdown history-modal"
                     aria-expanded="false"
-                    pattern="[A-Za-z?/* ]*"
+                    pattern="[A-Za-z0-9?:/*+ -]*"
                     maxlength="65"
                     required
                   >
@@ -371,14 +379,36 @@
                     aria-label="Recent searches"
                     hidden
                   ></div>
-                  <span class="visually-hidden" id="input-hint">Use English letters, spaces, question marks, one slash, and asterisks only. Use up to 2 rack question-mark wildcards. After the slash, use question mark for one letter or up to 3 stars for any number of letters: ABCDE?? / a*e. Press Down Arrow to browse recent searches.</span>
+                  <span class="visually-hidden" id="input-hint">Add colon and a number for an exact word length. Asterisk before the colon searches any letters and requires a length, for example *:2 / q*. Use up to 2 rack question-mark wildcards. After the slash, question mark matches one letter and up to 3 stars match any number of letters.</span>
                 </div>
+                <dialog class="rack-syntax-dialog" id="rack-syntax-dialog" aria-labelledby="rack-syntax-title">
+                  <div class="rack-syntax-header"><h3 id="rack-syntax-title">Rack syntax guide</h3><button class="rack-syntax-close" id="rack-syntax-close" type="button" aria-label="Close rack syntax guide">&times;</button></div>
+                  <div class="rack-syntax-content">
+                    <p>Combine a rack query with Basic and Advanced Filters to build a precise word list.</p>
+                    <dl class="rack-symbol-list"><dt><code>?</code></dt><dd>Matches one letter. In your rack, it represents a blank tile: <code>CAT?</code> means C, A, T, plus one blank. In a pattern after <code>/</code>, it represents one unknown letter: <code>/ C?T</code> matches CAT, COT, CUT, and similar words.</dd><dt><code>:</code></dt><dd>Sets an exact word length.</dd><dt><code>*</code></dt><dd>Removes the rack restriction before <code>:</code>; matches any number of letters after <code>/</code>.</dd><dt><code>/</code></dt><dd>Begins the positional pattern.</dd><dt><code>+</code></dt><dd>Requires the following letters.</dd><dt><code>-</code></dt><dd>Excludes the following letters.</dd></dl>
+                    <div class="rack-example-list">
+                      <div class="rack-example"><code>EXAMPLE?</code><span>Unscramble a rack with one blank.</span><button type="button" data-rack-example="EXAMPLE?">Try</button></div>
+                      <div class="rack-example"><code>AEINRST:7</code><span>Find seven-letter bingos using exactly these rack tiles.</span><button type="button" data-rack-example="AEINRST:7">Try</button></div>
+                      <div class="rack-example"><code>AEINR??:7</code><span>Find seven-letter words using a rack with two blank tiles.</span><button type="button" data-rack-example="AEINR??:7">Try</button></div>
+                      <div class="rack-example"><code>AELPST? / ?A?E</code><span>Use the rack to find four-letter words with A second and E last, such as SALE or TALE.</span><button type="button" data-rack-example="AELPST? / ?A?E">Try</button></div>
+                      <div class="rack-example"><code>AEINRST / *S</code><span>Find words from the rack that end with S.</span><button type="button" data-rack-example="AEINRST / *S">Try</button></div>
+                      <div class="rack-example"><code>*:2 / q*</code><span>All two-letter words beginning with Q. <strong>Expanded or Both required.</strong></span><button type="button" data-rack-example="*:2 / q*" data-dictionary="expanded">Try</button></div>
+                      <div class="rack-example"><code>*:2 +A</code><span>Find every two-letter word containing A.</span><button type="button" data-rack-example="*:2 +A">Try</button></div>
+                      <div class="rack-example"><code>*:7 / *z*</code><span>All seven-letter words containing Z.</span><button type="button" data-rack-example="*:7 / *z*">Try</button></div>
+                      <div class="rack-example"><code>*:7 / *ING</code><span>Find every seven-letter word ending with ING.</span><button type="button" data-rack-example="*:7 / *ING">Try</button></div>
+                      <div class="rack-example"><code>*:8 +ING</code><span>Eight-letter words containing I, N, and G.</span><button type="button" data-rack-example="*:8 +ING">Try</button></div>
+                      <div class="rack-example"><code>*:8 / W* +ING</code><span>Find every eight-letter word beginning with W and containing I, N, and G.</span><button type="button" data-rack-example="*:8 / W* +ING">Try</button></div>
+                      <div class="rack-example"><code>*:6 -QXZ</code><span>Six-letter words without Q, X, or Z.</span><button type="button" data-rack-example="*:6 -QXZ">Try</button></div>
+                    </div>
+                  </div>
+                </dialog>
                 <div class="rack-sort-picker" id="rack-sort-picker">
                   <button class="rack-sort-trigger" id="rack-sort-trigger" type="button" aria-label="Sort rack letters" aria-haspopup="menu" aria-expanded="false" aria-controls="rack-sort-menu" title="Sort rack letters">
                     <span class="rack-sort-icon" aria-hidden="true"></span>
                   </button>
                   <div class="rack-sort-menu" id="rack-sort-menu" role="menu" aria-label="Rack sorting options" hidden></div>
                 </div>
+                <button class="rack-help-trigger" id="rack-help-trigger" type="button" tabindex="-1" aria-label="Open rack syntax guide" aria-haspopup="dialog" aria-controls="rack-syntax-dialog" title="Rack syntax guide">?</button>
                 <div class="primary-search-actions">
                   <button
                     class="btn-calculate"
@@ -849,7 +879,16 @@
         <li><strong>Enter rack letters and a pattern:</strong> type repeated tiles exactly as they
             appear. Use <code>?</code> for a wildcard rack tile and add an optional pattern after
             <code>/</code>. In the pattern, <code>?</code> matches one letter and <code>*</code>
-            matches any number of letters, including zero.</li>
+            matches any number of letters, including zero. To generate a complete word list, use
+            <code>*:length</code>; for example, <code>*:2 / q*</code> finds every two-letter word
+            beginning with Q in the selected dictionary. Add <code>+letters</code> to require
+            letters or <code>-letters</code> to exclude them, such as
+            <code>*:7 +ING-QXZ</code>. Open the <span class="rack-help-inline-icon" aria-hidden="true">?</span>
+            <strong>Rack syntax guide</strong> question-mark button for runnable
+            examples that fill the query and start the search automatically.</li>
+        <li><strong>Arrange the rack:</strong> drag rack tiles into your preferred order, use
+            <kbd>Alt</kbd> with the Left or Right Arrow key, or select the rack-sort menu. Tiles
+            resize with the available space so compact queries remain on one line.</li>
         <li><strong>Set the main word filters:</strong> open <strong>Basic Filters</strong>, then use
             Word Length, Starts With, Ends With, Must Include Letters, and Exclude Letters to
             describe the match.</li>
@@ -875,9 +914,12 @@
             pattern, filters, and sorting method. On desktop, press Down Arrow in the rack input
             for a compact recent-search list.</li>
       </ol>
-      <p>Letter frequency still matters: a result cannot use any letter more often than it appears
-         in your input. The rack accepts English letters, spaces, <code>?</code>, <code>/</code>,
-         and <code>*</code>; other characters are removed as you type or paste. The selected
+      <p>Letter frequency still matters in normal rack searches: a result cannot use any letter
+         more often than it appears in your input. Add <code>:length</code> for an exact length;
+         digits are accepted only after the colon. A single <code>*</code> before the colon removes
+         the rack restriction and requires an exact length. Broad searches show the exact match
+         total while displaying 250 results per page to keep the page responsive. Paging controls
+         appear above and below the word groups. The selected
          <strong>ENABLE and/or EXPANDED</strong> word data is
          compressed and loaded in small chunks only when a search needs them.</p>
       <p>Press <kbd>Ctrl</kbd>+<kbd>I</kbd>, or <kbd>Command</kbd>+<kbd>I</kbd> on a Mac, to jump
@@ -1101,9 +1143,20 @@
                  it. Question marks before the slash are wildcard rack tiles. After the slash,
                  <code>?</code> matches exactly one letter and <code>*</code> matches any number of
                  letters, including zero. For example, <code>ABCDE?? / A*E</code> finds rack-buildable
-                 words beginning with A and ending with E. The input accepts only English letters,
-                 spaces, <code>?</code>, <code>/</code>, and <code>*</code>; other characters are
-                 removed.</p>
+                 words beginning with A and ending with E. Add <code>:length</code> before the slash
+                 to set an exact length. Use a single unrestricted rack star, such as
+                 <code>*:2 / Q*</code>, to list every two-letter word beginning with Q. Append
+                 <code>+letters</code> to require letters or <code>-letters</code> to exclude them;
+                 for example, <code>*:7 +ING-QXZ</code>. The Rack syntax guide provides runnable
+                 examples that apply the query and start the search automatically.</p>
+            </li>
+            <li class="faq-item">
+              <h3>How do I generate a complete Words With Friends word list?</h3>
+              <p>Enter <code>*:length</code> to remove the rack restriction, then optionally add a
+                 pattern, required letters, or excluded letters. For example,
+                 <code>*:7 / *ING</code> finds seven-letter words ending in ING. Large searches show
+                 the exact match total and 250 results per page, with paging controls above and
+                 below the word groups.</p>
             </li>
             <li class="faq-item">
               <h3>How do I find the highest-scoring Words With Friends word?</h3>
@@ -1323,14 +1376,14 @@
     </section>
   </div>
 
-  <script src="../assets/js/tools/word-unscrambler/input-rules.js?v=20260803-2" defer></script>
+  <script src="../assets/js/tools/word-unscrambler/input-rules.js?v=20260905-list-search-16" defer></script>
   <script src="../assets/js/tools/word-unscrambler/history-store.js?v=20260827-wwf-1" defer></script>
   <script src="../assets/js/tools/word-unscrambler/pick-list-store.js?v=20260827-wwf-1" defer></script>
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-wwf-1" defer></script>
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
   <script src="../assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10" defer></script>
   <script src="../assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
-  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260904-wiktionary-11" defer></script>
+  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260905-list-search-19" defer></script>
 <script src="../assets/js/shared/dictionary-offline-controls.js?v=20260904-active-dictionary-icon-10" defer></script>
 </body>
 </html>
