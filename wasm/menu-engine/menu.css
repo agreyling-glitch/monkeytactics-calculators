@@ -224,14 +224,24 @@
   pointer-events: auto;
 }
 
+html:has(.mt-mobile-drawer.open),
+body:has(.mt-mobile-drawer.open) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .mt-mobile-drawer {
+  box-sizing: border-box;
   position: fixed;
   top: 0;
+  bottom: 0;
   right: 0;
   z-index: 150;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   width: min(24rem, 88vw);
-  height: 100dvh;
+  height: auto;
   padding: 1.1rem;
   border-left: 1px solid rgba(74, 222, 128, 0.2);
   background: #09111f;

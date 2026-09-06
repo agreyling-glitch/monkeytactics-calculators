@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Precious Metals Retirement Withdrawal Calculator</title>
+  <meta name="description" content="Stress-test retirement withdrawals across gold, silver, platinum, palladium, mining stocks, royalty companies, and cash with private browser-based Monte Carlo simulations." />
+  <link rel="canonical" href="https://monkeytactics.com/tools/precious-metals-retirement-calculator" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260903-branded-scrollbars" />
+  <link rel="stylesheet" href="/assets/css/tools/precious-metals-retirement-calculator.css?v=20260905-labs-note-v3" />
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebApplication",
+    "name":"Precious Metals Retirement Withdrawal Calculator",
+    "url":"https://monkeytactics.com/tools/precious-metals-retirement-calculator",
+    "applicationCategory":"FinanceApplication",
+    "operatingSystem":"Any",
+    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
+  }
+  </script>
+</head>
+<body>
+  <main>
+    <div id="mt-header"></div>
+    <script type="module" src="/assets/wasm/menu/menu.js?v=20260828-menu-manifest-v1"></script>
+
+    <section class="pm-shell" aria-labelledby="page-title">
+      <nav class="pm-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep" aria-hidden="true">/</span><a href="/tools/labs">Labs</a><span class="sep" aria-hidden="true">/</span><span aria-current="page">Precious Metals Retirement</span></nav>
+      <header class="pm-intro">
+        <div>
+          <p class="pm-eyebrow">MonkeyTactics Labs</p>
+          <h1 id="page-title">Will your metals portfolio fund retirement?</h1>
+          <p>Model inflation-adjusted retirement spending across gold, silver, platinum, palladium, miners, streamers, and cash.</p>
+        </div>
+        <div class="pm-engine-badge" id="engine-status"><span></span> Loading private simulation engine…</div>
+      </header>
+
+      <div class="pm-workspace">
+        <form class="pm-controls" id="calculator-form">
+          <section class="pm-panel">
+            <div class="pm-panel-heading"><h2>Plan</h2><button type="button" class="pm-reset" id="reset-button">Reset plan</button></div>
+            <div class="pm-field-grid">
+              <label class="pm-field"><span>Portfolio at retirement</span><span class="pm-money-input"><b>$</b><input id="portfolio" type="number" min="10000" max="1000000000" step="10000" value="1000000" /></span></label>
+              <label class="pm-field"><span>Retirement length</span><span class="pm-suffix-input"><input id="years" type="number" min="5" max="70" step="1" value="30" /><b>years</b></span></label>
+              <label class="pm-field"><span>Minimum annual budget</span><span class="pm-money-input"><b>$</b><input id="minimum-budget" type="number" min="0" max="1000000000" step="1000" value="40000" /></span></label>
+              <label class="pm-field"><span>Simulations</span><select id="simulations"><option value="1000">1,000 · fast</option><option value="10000" selected>10,000 · standard</option><option value="50000">50,000 · detailed</option></select></label>
+            </div>
+            <p class="pm-live-withdrawal"><strong id="budget-summary">$40,000 minimum</strong> in year one, increased annually with inflation. The model solves for additional spending at your survival target.</p>
+            <details class="pm-global-advanced"><summary>Advanced simulation settings</summary><div class="pm-field-grid">
+              <label class="pm-field"><span>Simulation seed</span><input id="simulation-seed" type="number" min="1" max="9007199254740991" step="1" value="20260905" /></label>
+              <label class="pm-field"><span>Rebalancing</span><select id="rebalancing"><option value="annual" selected>Annual</option><option value="none">None</option></select></label>
+              <label class="pm-field"><span>Withdrawal timing</span><select id="withdrawal-timing"><option value="beginning" selected>Beginning of year</option><option value="end">End of year</option></select></label>
+            </div></details>
+            <button class="pm-run" id="run-button" type="submit">Run retirement stress test <span>→</span></button>
+            <p class="pm-error" id="form-error" role="alert"></p>
+          </section>
+
+          <section class="pm-panel">
+            <div class="pm-panel-heading"><div><p class="pm-kicker">Allocation</p><h2 id="active-portfolio-name">My Portfolio</h2></div><div class="pm-allocation-actions"><button type="button" class="pm-reset" id="reset-portfolio">Restore this portfolio</button><strong class="pm-total" id="allocation-total">100%</strong></div></div>
+            <div class="pm-presets" role="group" aria-label="Portfolio presets">
+              <button type="button" data-preset="my" class="active">My Portfolio</button>
+              <button type="button" data-preset="balanced">Balanced metals</button>
+              <button type="button" data-preset="preservation">Bullion preservation</button>
+              <button type="button" data-preset="miners">Miner dominant</button>
+              <button type="button" data-preset="streamers">Streamer dominant</button>
+              <button type="button" data-preset="barbell">Metals barbell</button>
+            </div>
+            <div class="pm-portfolio-backup">
+              <span>Backup all six portfolio mixes</span>
+              <div><button type="button" id="export-portfolios">Export</button><label>Import<input id="import-portfolios" type="file" accept="application/json,.json" /></label></div>
+            </div>
+            <p class="pm-portfolio-message" id="portfolio-message" role="status"></p>
+            <div class="pm-allocation-list" id="allocation-list">
+              <label><span><i class="gold"></i>Gold bullion</span><input data-allocation-slider type="range" min="0" max="100" step="1" value="30" aria-label="Gold bullion allocation slider" /><span><input data-allocation type="number" min="0" max="100" step="1" value="30" aria-label="Gold bullion allocation percentage" /><b>%</b></span></label>
+              <label><span><i class="silver"></i>Silver bullion</span><input data-allocation-slider type="range" min="0" max="100" step="1" value="10" aria-label="Silver bullion allocation slider" /><span><input data-allocation type="number" min="0" max="100" step="1" value="10" aria-label="Silver bullion allocation percentage" /><b>%</b></span></label>
+              <label><span><i class="platinum"></i>Platinum bullion</span><input data-allocation-slider type="range" min="0" max="100" step="1" value="3" aria-label="Platinum bullion allocation slider" /><span><input data-allocation type="number" min="0" max="100" step="1" value="3" aria-label="Platinum bullion allocation percentage" /><b>%</b></span></label>
+              <label><span><i class="palladium"></i>Palladium bullion</span><input data-allocation-slider type="range" min="0" max="100" step="1" value="2" aria-label="Palladium bullion allocation slider" /><span><input data-allocation type="number" min="0" max="100" step="1" value="2" aria-label="Palladium bullion allocation percentage" /><b>%</b></span></label>
+              <label><span><i class="senior"></i>Senior miners</span><input data-allocation-slider type="range" min="0" max="100" step="1" value="20" aria-label="Senior miners allocation slider" /><span><input data-allocation type="number" min="0" max="100" step="1" value="20" aria-label="Senior miners allocation percentage" /><b>%</b></span></label>
+              <label><span><i class="junior"></i>Junior miners</span><input data-allocation-slider type="range" min="0" max="100" step="1" value="5" aria-label="Junior miners allocation slider" /><span><input data-allocation type="number" min="0" max="100" step="1" value="5" aria-label="Junior miners allocation percentage" /><b>%</b></span></label>
+              <label><span><i class="royalty"></i>Royalty &amp; streaming</span><input data-allocation-slider type="range" min="0" max="100" step="1" value="20" aria-label="Royalty and streaming allocation slider" /><span><input data-allocation type="number" min="0" max="100" step="1" value="20" aria-label="Royalty and streaming allocation percentage" /><b>%</b></span></label>
+              <label><span><i class="cash"></i>Cash / T-bills</span><input data-allocation-slider type="range" min="0" max="100" step="1" value="10" aria-label="Cash and T-bills allocation slider" /><span><input data-allocation type="number" min="0" max="100" step="1" value="10" aria-label="Cash and T-bills allocation percentage" /><b>%</b></span></label>
+            </div>
+            <div class="pm-allocation-bar" id="allocation-bar" aria-hidden="true"></div>
+          </section>
+
+          <section class="pm-panel pm-stress-panel">
+            <div><p class="pm-kicker">Plan assumptions</p><h2>Inflation &amp; survival target</h2></div>
+            <label class="pm-range-field"><span><b>Official CPI assumption</b><output id="inflation-output">3.0%</output></span><input id="inflation" type="range" min="0" max="10" step="0.25" value="3" /></label>
+            <label class="pm-range-field"><span><b>Legacy-style CPI premium</b><output id="legacy-output">+0.0%</output></span><input id="legacy-premium" type="range" min="0" max="8" step="0.25" value="0" /></label>
+            <p class="pm-help">An open stress premium—not a reproduction of ShadowStats or an official historical CPI.</p>
+            <label class="pm-range-field"><span><b>Survival target</b><output id="target-output">90%</output></span><input id="survival-target" type="range" min="75" max="99" step="1" value="90" /></label>
+            <p class="pm-help">The solver finds the highest inflation-linked budget that meets this modeled success rate.</p>
+          </section>
+        </form>
+
+        <aside class="pm-results" aria-live="polite">
+          <section class="pm-scorecard">
+            <div class="pm-score-top"><div><p>Additional annual spending</p><strong id="additional-spending">—</strong></div><div class="pm-rating" id="rating">Target</div></div>
+            <div class="pm-meter"><span id="success-meter"></span></div>
+            <p id="success-detail">The amount above your minimum budget that the portfolio can support in year one.</p>
+          </section>
+
+          <section class="pm-result-grid">
+            <article><p>Maximum total budget</p><strong id="maximum-budget">—</strong><span>minimum plus additional spending</span></article>
+            <article><p>Implied initial rate</p><strong id="implied-rate">—</strong><span>of the starting portfolio</span></article>
+            <article><p>Minimum alone survives</p><strong id="minimum-success">—</strong><span>before adding discretionary spending</span></article>
+          </section>
+
+          <section class="pm-chart-panel">
+            <div class="pm-panel-heading"><div><p class="pm-kicker">Real portfolio value</p><h2>Sequence-of-returns range</h2></div><span class="pm-chart-legend"><i></i> Median</span></div>
+            <canvas id="path-chart" width="760" height="330" aria-label="Chart of projected real portfolio balances"></canvas>
+          </section>
+
+          <section class="pm-compare-panel">
+            <div><p class="pm-kicker">Same plan, different mix</p><h2>Metals portfolio comparison</h2></div>
+            <div class="pm-comparison" id="comparison-list"><p class="pm-placeholder">Results will appear after the first run.</p></div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="pm-methodology" aria-labelledby="method-heading">
+        <div><p class="pm-eyebrow">Read the model before trusting the number</p><h2 id="method-heading">What this first version calculates</h2></div>
+        <div class="pm-method-grid">
+          <article><span>01</span><h3>Parameterized Monte Carlo</h3><p>Returns are sampled from disclosed long-run nominal assumptions with shared metals, equity, and defensive shocks. The model rebalances annually before applying returns.</p></article>
+          <article><span>02</span><h3>Sector-aware model</h3><p>Four bullion metals, seniors, juniors, royalty companies, and cash have separate return, volatility, and cost assumptions. These are planning inputs, not forecasts.</p></article>
+          <article><span>03</span><h3>Budget solver</h3><p>The minimum and additional spending rise together with inflation. A deterministic search finds the highest year-one total that retains your selected modeled survival rate.</p></article>
+        </div>
+        <details class="pm-history-tool" open><summary>Estimate assumptions from monthly history</summary>
+          <div class="pm-history-intro">
+            <div><p class="pm-kicker">Local data workshop</p><h3>Build an estimate you can update over time</h3><p>Import one row per month. Later imports append new months and replace matching months, so corrections are not counted twice. The history and estimates stay in this browser.</p></div>
+            <span class="pm-local-badge">No upload to MonkeyTactics</span>
+          </div>
+          <div class="pm-history-controls">
+            <label class="pm-field"><span>Assumption row to update</span><select id="history-asset"><option value="0">Gold bullion</option><option value="1">Silver bullion</option><option value="2">Platinum bullion</option><option value="3">Palladium bullion</option><option value="4">Senior miners</option><option value="5">Junior miners</option><option value="6">Royalty &amp; streaming</option><option value="7">Cash / T-bills</option></select></label>
+            <label class="pm-field"><span>Values in the CSV</span><select id="history-format"><option value="prices">Monthly prices / index levels</option><option value="percent">Monthly returns in percent</option><option value="decimal">Monthly returns as decimals</option></select></label>
+            <label class="pm-field"><span>Estimation window</span><select id="history-lookback"><option value="0">All imported history</option><option value="5">Trailing 5 years</option><option value="10" selected>Trailing 10 years</option><option value="20">Trailing 20 years</option></select></label>
+            <label class="pm-field"><span>Annual holding cost</span><span class="pm-suffix-input"><input id="history-cost" type="number" min="0" max="10" step="0.1" value="0.4" /><b>%</b></span></label>
+          </div>
+          <div class="pm-history-import">
+            <label class="pm-file-button">Choose CSV<input id="history-file" type="file" accept=".csv,text/csv" /></label>
+            <span>or paste CSV below</span>
+          </div>
+          <textarea id="history-paste" rows="6" spellcheck="false" aria-label="Paste monthly history CSV" placeholder="date,asset,metals,equity,defensive&#10;2024-01,100,100,100,100&#10;2024-02,102,101,103,100.4"></textarea>
+          <div class="pm-history-actions"><button type="button" id="history-import">Append pasted rows</button><button type="button" id="history-estimate" class="primary">Estimate &amp; apply</button><button type="button" id="history-export">Export saved CSV</button><button type="button" id="history-clear" class="danger">Clear this history</button></div>
+          <div class="pm-history-status" id="history-status" role="status">No saved history for Gold bullion.</div>
+          <details class="pm-howto"><summary>How to prepare the data and where to find it</summary>
+            <div class="pm-howto-grid">
+              <section><h4>1. Collect monthly observations</h4><p>Use month-end adjusted prices or total-return index levels. For miners and streamers, adjusted prices matter because they account for dividends and stock splits. Keep every series in the same currency and use the same month-end dates.</p><p>Useful starting points include <a href="https://www.lbma.org.uk/prices-and-data/lbma-precious-metal-prices" target="_blank" rel="noopener">LBMA precious-metal benchmarks</a>, the <a href="https://fred.stlouisfed.org/" target="_blank" rel="noopener">Federal Reserve’s FRED database</a> for CPI and short-rate research, documented mining indexes from <a href="https://www.msci.com/indexes/index/701928/msci-acwi-select-gold-miners-imi-index" target="_blank" rel="noopener">MSCI</a> or <a href="https://www.spglobal.com/spdji/en/indices/equity/dow-jones-precious-metals-index/" target="_blank" rel="noopener">S&amp;P Dow Jones Indices</a>, and adjusted-price exports from your broker or fund provider. Access and reuse terms vary; do not redistribute data you are not licensed to share.</p><p>A quoted Treasury yield is an annualized interest rate, not a bond price or monthly return. Do not paste a yield into a price column. For the defensive reference, prefer a Treasury total-return index; a knowledgeable user may instead convert a short-rate series into monthly holding-period returns before import.</p></section>
+              <section><h4>2. Choose simple or advanced CSV</h4><p><strong>Simple:</strong> provide <code>date,asset</code>. The tool estimates annualized compound return and volatility, while leaving the three existing factor values unchanged.</p><p><strong>Advanced:</strong> also provide <code>metals,equity,defensive</code>. Use a broad precious-metals index, a broad total-return equity index, and a short-Treasury or high-quality bond index. With at least 24 matched returns, the tool estimates the positive shared-shock exposures too.</p></section>
+              <section><h4>3. Interpret the estimate</h4><p>At least 12 returns are required. Fewer than 60 months is a weak retirement-planning sample; 120–239 months is more stable. More months reduce sampling noise, but very old months may describe a different market regime, which is why the lookback is selectable.</p><p>Review the calculated values before relying on them. Historical compound return is not a forecast, correlation can change during crises, and this estimator deliberately ignores negative factor correlations because the current simulation uses positive shared-shock exposures.</p></section>
+            </div>
+          </details>
+        </details>
+        <details><summary>Edit annual model assumptions</summary>
+          <div class="pm-assumption-toolbar"><p>Percentages are annualized. Factor exposures create the correlation structure; squared exposures for each asset must total no more than 1.00.</p><button type="button" id="reset-assumptions">Restore defaults</button></div>
+          <div class="pm-assumption-table-wrap"><table><thead><tr><th>Asset</th><th>Nominal return</th><th>Volatility</th><th>Annual cost</th><th>Metals factor</th><th>Equity factor</th><th>Defensive factor</th></tr></thead><tbody>
+            <tr data-assumption><td>Gold bullion</td><td><input data-model="return" type="number" min="-20" max="30" step="0.1" value="6.5" aria-label="Gold nominal return" />%</td><td><input data-model="volatility" type="number" min="0" max="100" step="0.1" value="15.5" aria-label="Gold volatility" />%</td><td><input data-model="cost" type="number" min="0" max="10" step="0.1" value="0.4" aria-label="Gold annual cost" />%</td><td><input data-model="metals" type="number" min="0" max="1" step="0.01" value="0.82" aria-label="Gold metals factor" /></td><td><input data-model="equity" type="number" min="0" max="1" step="0.01" value="0.05" aria-label="Gold equity factor" /></td><td><input data-model="defensive" type="number" min="0" max="1" step="0.01" value="0.20" aria-label="Gold defensive factor" /></td></tr>
+            <tr data-assumption><td>Silver bullion</td><td><input data-model="return" type="number" min="-20" max="30" step="0.1" value="7.0" aria-label="Silver nominal return" />%</td><td><input data-model="volatility" type="number" min="0" max="100" step="0.1" value="28.0" aria-label="Silver volatility" />%</td><td><input data-model="cost" type="number" min="0" max="10" step="0.1" value="0.6" aria-label="Silver annual cost" />%</td><td><input data-model="metals" type="number" min="0" max="1" step="0.01" value="0.78" aria-label="Silver metals factor" /></td><td><input data-model="equity" type="number" min="0" max="1" step="0.01" value="0.14" aria-label="Silver equity factor" /></td><td><input data-model="defensive" type="number" min="0" max="1" step="0.01" value="0.05" aria-label="Silver defensive factor" /></td></tr>
+            <tr data-assumption><td>Platinum bullion</td><td><input data-model="return" type="number" min="-20" max="30" step="0.1" value="6.0" aria-label="Platinum nominal return" />%</td><td><input data-model="volatility" type="number" min="0" max="100" step="0.1" value="24.5" aria-label="Platinum volatility" />%</td><td><input data-model="cost" type="number" min="0" max="10" step="0.1" value="0.6" aria-label="Platinum annual cost" />%</td><td><input data-model="metals" type="number" min="0" max="1" step="0.01" value="0.62" aria-label="Platinum metals factor" /></td><td><input data-model="equity" type="number" min="0" max="1" step="0.01" value="0.28" aria-label="Platinum equity factor" /></td><td><input data-model="defensive" type="number" min="0" max="1" step="0.01" value="0.00" aria-label="Platinum defensive factor" /></td></tr>
+            <tr data-assumption><td>Palladium bullion</td><td><input data-model="return" type="number" min="-20" max="30" step="0.1" value="5.5" aria-label="Palladium nominal return" />%</td><td><input data-model="volatility" type="number" min="0" max="100" step="0.1" value="31.0" aria-label="Palladium volatility" />%</td><td><input data-model="cost" type="number" min="0" max="10" step="0.1" value="0.7" aria-label="Palladium annual cost" />%</td><td><input data-model="metals" type="number" min="0" max="1" step="0.01" value="0.58" aria-label="Palladium metals factor" /></td><td><input data-model="equity" type="number" min="0" max="1" step="0.01" value="0.35" aria-label="Palladium equity factor" /></td><td><input data-model="defensive" type="number" min="0" max="1" step="0.01" value="0.00" aria-label="Palladium defensive factor" /></td></tr>
+            <tr data-assumption><td>Senior miners</td><td><input data-model="return" type="number" min="-20" max="30" step="0.1" value="8.5" aria-label="Senior miners nominal return" />%</td><td><input data-model="volatility" type="number" min="0" max="100" step="0.1" value="34.0" aria-label="Senior miners volatility" />%</td><td><input data-model="cost" type="number" min="0" max="10" step="0.1" value="0.6" aria-label="Senior miners annual cost" />%</td><td><input data-model="metals" type="number" min="0" max="1" step="0.01" value="0.58" aria-label="Senior miners metals factor" /></td><td><input data-model="equity" type="number" min="0" max="1" step="0.01" value="0.50" aria-label="Senior miners equity factor" /></td><td><input data-model="defensive" type="number" min="0" max="1" step="0.01" value="0.00" aria-label="Senior miners defensive factor" /></td></tr>
+            <tr data-assumption><td>Junior miners</td><td><input data-model="return" type="number" min="-20" max="30" step="0.1" value="9.5" aria-label="Junior miners nominal return" />%</td><td><input data-model="volatility" type="number" min="0" max="100" step="0.1" value="48.0" aria-label="Junior miners volatility" />%</td><td><input data-model="cost" type="number" min="0" max="10" step="0.1" value="0.9" aria-label="Junior miners annual cost" />%</td><td><input data-model="metals" type="number" min="0" max="1" step="0.01" value="0.55" aria-label="Junior miners metals factor" /></td><td><input data-model="equity" type="number" min="0" max="1" step="0.01" value="0.58" aria-label="Junior miners equity factor" /></td><td><input data-model="defensive" type="number" min="0" max="1" step="0.01" value="0.00" aria-label="Junior miners defensive factor" /></td></tr>
+            <tr data-assumption><td>Royalty &amp; streaming</td><td><input data-model="return" type="number" min="-20" max="30" step="0.1" value="9.0" aria-label="Streamers nominal return" />%</td><td><input data-model="volatility" type="number" min="0" max="100" step="0.1" value="29.0" aria-label="Streamers volatility" />%</td><td><input data-model="cost" type="number" min="0" max="10" step="0.1" value="0.6" aria-label="Streamers annual cost" />%</td><td><input data-model="metals" type="number" min="0" max="1" step="0.01" value="0.48" aria-label="Streamers metals factor" /></td><td><input data-model="equity" type="number" min="0" max="1" step="0.01" value="0.48" aria-label="Streamers equity factor" /></td><td><input data-model="defensive" type="number" min="0" max="1" step="0.01" value="0.08" aria-label="Streamers defensive factor" /></td></tr>
+            <tr data-assumption><td>Cash / T-bills</td><td><input data-model="return" type="number" min="-20" max="30" step="0.1" value="4.0" aria-label="Cash nominal return" />%</td><td><input data-model="volatility" type="number" min="0" max="100" step="0.1" value="2.5" aria-label="Cash volatility" />%</td><td><input data-model="cost" type="number" min="0" max="10" step="0.1" value="0.1" aria-label="Cash annual cost" />%</td><td><input data-model="metals" type="number" min="0" max="1" step="0.01" value="0.00" aria-label="Cash metals factor" /></td><td><input data-model="equity" type="number" min="0" max="1" step="0.01" value="0.00" aria-label="Cash equity factor" /></td><td><input data-model="defensive" type="number" min="0" max="1" step="0.01" value="0.65" aria-label="Cash defensive factor" /></td></tr>
+          </tbody></table></div>
+        </details>
+        <p class="pm-disclaimer"><strong>Educational model only.</strong> Normal-like simulations can understate extreme market events, historical estimates can contain survivorship and selection bias, and no success percentage guarantees future results. User-supplied history calibrates assumptions; it does not turn the simulation into a forecast or historical bootstrap.</p>
+      </section>
+
+      <section class="pm-labs-note" aria-labelledby="labs-note-heading">
+        <div class="pm-labs-note__label">Why this is in Labs</div>
+        <div class="pm-labs-note__content">
+          <h2 id="labs-note-heading">A working calculator that asks more of you</h2>
+          <p>This calculator works, but retirement planning for a precious-metals portfolio does not have one dependable set of numbers that fits everyone. Gold, silver, miners, and streaming companies can behave very differently depending on the period you study. Small changes to their expected returns, volatility, costs, and relationships can materially change the result.</p>
+          <p>In plain terms, the calculator can do the math, but it cannot know what the future will look like. The built-in assumptions are a starting point—not a promise. To get serious use from the model, you need to review the assumptions, enter values that match your holdings and outlook, and test more than one plausible scenario. That takes extra effort compared with a conventional calculator.</p>
+          <p>This began as an idea I wanted to explore: could a retirement withdrawal tool be built specifically for people whose portfolios are dominated by precious metals and the companies that produce them? I felt the concept was worth building and sharing, even though it asks motivated users to participate in the modeling rather than accept a single preset answer.</p>
+          <div class="pm-labs-note__cta">
+            <p>If you are genuinely interested in using this calculator, have relevant experience, or want to help shape where it goes next, I would like to hear from you.</p>
+            <a href="/contact">Contact MonkeyTactics <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+  <footer>
+    <div>© 2026 MonkeyTactics</div>
+    <nav aria-label="Footer navigation">
+      <a href="https://blog.monkeytactics.com/">Blog</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms-of-service">Terms</a>
+      <a href="/third-party-notices">Third-Party Notices</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/sitemap">Sitemap</a>
+    </nav>
+  </footer>
+  <script type="module" src="/assets/js/tools/precious-metals-retirement-calculator/precious-metals-retirement-calculator.js?v=20260905-monkeytactics-v1"></script>
+</body>
+</html>

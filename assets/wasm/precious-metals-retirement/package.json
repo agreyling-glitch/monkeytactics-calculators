@@ -1,0 +1,17 @@
+{
+  "name": "precious-metals-retirement-engine",
+  "type": "module",
+  "description": "Client-side precious-metals retirement withdrawal simulator for MonkeyTactics",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "precious_metals_retirement_engine_bg.wasm",
+    "precious_metals_retirement_engine.js",
+    "precious_metals_retirement_engine.d.ts"
+  ],
+  "main": "precious_metals_retirement_engine.js",
+  "types": "precious_metals_retirement_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

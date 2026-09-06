@@ -94,12 +94,12 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   });
   collectLeaves(groups);
 
-  assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "text-data", "batch-automation"]);
+  assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "labs", "text-data", "batch-automation"]);
   assert.deepEqual(
     groups.find(({ id }) => id === "word-games").children.map(({ id }) => id),
     ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-solver", "absurdle-solver", "quordle-solver", "octordle-solver", "sedecordle-solver"],
   );
-  assert.equal(leaves.length, 37);
+  assert.equal(leaves.length, 38);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
 });
 
@@ -149,6 +149,14 @@ test("the menu glass treatment respects reduced-motion and blur fallbacks", () =
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.mt-mobile-drawer \*/);
 });
 
+test("the open mobile menu owns the only vertical scroll container", () => {
+  const css = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "menu.css"), "utf8");
+  assert.match(css, /html:has\(\.mt-mobile-drawer\.open\),[\s\S]*?overflow: hidden/);
+  assert.match(css, /\.mt-mobile-drawer \{[\s\S]*?box-sizing: border-box/);
+  assert.match(css, /\.mt-mobile-drawer \{[\s\S]*?bottom: 0/);
+  assert.match(css, /\.mt-mobile-drawer \{[\s\S]*?overscroll-behavior: contain/);
+});
+
 test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
@@ -156,6 +164,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     ["word-games", "Word Games", 10],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
+    ["labs", "Labs", 1],
     ["text-data", "Text &amp; Data", 5],
     ["batch-automation", "Batch &amp; Automation", 5],
   ]) {
@@ -166,7 +175,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 37);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 38);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -241,6 +250,7 @@ test("the homepage collection links every menu category with matching counts", (
     ["word-games", "Word Games", 10],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
+    ["labs", "Labs", 1],
     ["text-data", "Text &amp; Data", 5],
     ["batch-automation", "Batch &amp; Automation", 5],
   ];

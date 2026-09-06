@@ -39,6 +39,7 @@ This project is especially useful for students, professionals, developers, small
 The site currently features 37 tools organized around the hierarchy used by the universal menu and All Tools directory:
 
 - Finance: [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator), [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator), [Percentage Calculator](https://monkeytactics.com/tools/percentage-calculator)
+- Labs: [Precious Metals Retirement Calculator](https://monkeytactics.com/tools/precious-metals-retirement-calculator)
 - Health & Body: [BMI Calculator](https://monkeytactics.com/tools/bmi-calculator), [Daily Energy Needs Calculator](https://monkeytactics.com/tools/calorie-calculator), [Age Calculator](https://monkeytactics.com/tools/age-calculator)
 - Word Games: [Word Unscrambler](https://monkeytactics.com/tools/word-unscrambler), [Words With Friends Solver](https://monkeytactics.com/tools/words-with-friends-solver), [Crossword Clue & Pattern Solver](https://monkeytactics.com/tools/crossword-solver), [Wordiply Solver](https://monkeytactics.com/tools/wordiply-solver), [Wordle Solver & Helper](https://monkeytactics.com/tools/wordle-helper), [Antiwordle Solver](https://monkeytactics.com/tools/antiwordle-solver), [Absurdle Solver](https://monkeytactics.com/tools/absurdle-solver), [Quordle Solver](https://monkeytactics.com/tools/quordle-solver), [Octordle Solver](https://monkeytactics.com/tools/octordle-solver), [Sedecordle Solver](https://monkeytactics.com/tools/sedecordle-solver)
 - Utilities: [Date Difference & Business Days Calculator](https://monkeytactics.com/tools/date-difference-calculator), [Unit Converter](https://monkeytactics.com/tools/unit-converter), [Tip Calculator](https://monkeytactics.com/tools/tip-calculator), [Time Zone Converter](https://monkeytactics.com/tools/time-zone-converter), [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator), [QR Code Decoder](https://monkeytactics.com/tools/qr-code-decoder)
@@ -57,6 +58,7 @@ The site currently features 37 tools organized around the hierarchy used by the 
 | **Calculators** | Health | BMI, Daily Energy Needs, Age |
 | **Calculators** | Time & Date | Date & Business Days, Time Zone Converter |
 | **Calculators** | Construction | Concrete, Drywall, Paint, Tile, Roofing Shingles, Lumber Board Feet, Insulation |
+| **Labs** | Experimental models | Precious Metals Retirement Calculator |
 | **Text & Data** | — | Unit Converter, Tip Calculator, QR Code Decoder, Word & Character Counter, OCR Utility |
 | **Batch & Automation** | — | Batch QR Generator, Batch Password Generator, Mortgage Scenario Comparison, Business Day Planner, Image Text Extraction |
 
@@ -82,6 +84,7 @@ The Word Unscrambler, Words With Friends Solver, Crossword Solver, Wordiply Solv
 |---|---|---|---|
 | [Loan & Mortgage Calculator](https://monkeytactics.com/tools/loan-mortgage-calculator) | `wasm/mortgage-engine` | `assets/wasm/mortgage` | Fixed-rate amortization, monthly and bi-weekly payments, extra payments, and multi-scenario calculations |
 | [Compound Interest Calculator](https://monkeytactics.com/tools/compound-interest-calculator) | `wasm/mortgage-engine` | `assets/wasm/mortgage` | Compound growth, regular contributions, tax drag, inflation, and multi-scenario projections |
+| [Precious Metals Retirement Calculator](https://monkeytactics.com/tools/precious-metals-retirement-calculator) | `wasm/precious-metals-retirement-engine` | `assets/wasm/precious-metals-retirement` | Seeded retirement simulations across bullion, miners, royalties, cash, inflation, and editable assumptions |
 | [QR Code Generator](https://monkeytactics.com/tools/qr-code-generator) | `wasm/qr-code-generator-engine` | `assets/wasm/qr-code-generator` | QR encoding, styling, image export, and batch generation |
 | [Password Generator](https://monkeytactics.com/tools/password-generator) | `wasm/qr-code-generator-engine` | `assets/wasm/qr-code-generator` | Local password QR previews and export through the shared QR engine |
 | [QR & Barcode Decoder](https://monkeytactics.com/tools/qr-code-decoder) | `wasm/qr-code-decoder-engine` | `assets/wasm/qr-code-decoder` | Local QR and barcode decoding, controlled image preprocessing, and stylized-module normalization |
