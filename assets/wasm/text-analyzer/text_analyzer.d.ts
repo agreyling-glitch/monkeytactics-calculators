@@ -25,6 +25,12 @@ export class AnalysisResult {
 export function analyze_text(input: string): AnalysisResult;
 
 /**
+ * Analyze using the browser's locale-aware `Intl.Segmenter` word boundaries.
+ * Browser indices are UTF-16 offsets, matching textarea selection APIs.
+ */
+export function analyze_text_with_segments(input: string, segments: any): AnalysisResult;
+
+/**
  * Verifies that the WASM engine is running on an approved MonkeyTactics host.
  */
 export function verify_domain(host: string): boolean;
@@ -46,9 +52,12 @@ export interface InitOutput {
     readonly analysisresult_visualization_data: (a: number) => number;
     readonly analysisresult_word_count: (a: number) => number;
     readonly analyze_text: (a: number, b: number) => number;
+    readonly analyze_text_with_segments: (a: number, b: number, c: number, d: number) => void;
     readonly verify_domain: (a: number, b: number) => number;
     readonly __wbindgen_export: (a: number, b: number) => number;
     readonly __wbindgen_export2: (a: number, b: number, c: number, d: number) => number;
+    readonly __wbindgen_export3: (a: number) => void;
+    readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

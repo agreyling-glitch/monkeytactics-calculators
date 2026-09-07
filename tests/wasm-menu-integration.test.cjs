@@ -540,7 +540,8 @@ test("the Word and Character Counter uses the premium text analysis presentation
 test("the Word and Character Counter keeps analysis controls inside mobile viewports", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "word-character-counter.html"), "utf8");
   assert.match(html, /\.calc-layout > \*,[\s\S]*?\.results-col \{ min-width: 0; \}/);
-  assert.match(html, /\.textarea-actions \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\); \}/);
+  assert.match(html, /\.textarea-actions \{[\s\S]*?display: flex;[\s\S]*?flex-wrap: wrap;/);
+  assert.match(html, /\.textarea-actions \.btn-ghost \{[\s\S]*?width: auto;[\s\S]*?flex: 0 0 auto;/);
   assert.match(html, /#resultsCards \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow-x: visible;/);
   assert.match(html, /\.analysis-card-grid \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow-x: visible;/);
   assert.match(html, /\.keywords-heading-row \{ align-items: flex-start; flex-direction: column; \}/);

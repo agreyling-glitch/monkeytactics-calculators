@@ -85,7 +85,7 @@
   </style>
   <script src="/assets/js/shared/ads.js" defer></script>
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-08-28" />
+  <meta name="date" content="2026-09-07" />
 
   <script type="application/ld+json">
 {
@@ -93,8 +93,8 @@
   "@graph": [
     {
       "@type": "CollectionPage",
-      "@id": "https://monkeytactics.com/tools/productivity.html#collection",
-      "url": "https://monkeytactics.com/tools/productivity.html",
+      "@id": "https://monkeytactics.com/tools/productivity#collection",
+      "url": "https://monkeytactics.com/tools/productivity",
       "name": "Free Productivity Tools",
       "isPartOf": {
         "@id": "https://monkeytactics.com/#website"
@@ -113,7 +113,7 @@
           {
             "@type": "ListItem",
             "position": 2,
-            "url": "https://monkeytactics.com/tools/word-character-counter.html"
+            "url": "https://monkeytactics.com/tools/word-character-counter"
           },
           {
             "@type": "ListItem",
@@ -166,7 +166,7 @@
         <a href="/tools/word-character-counter" class="tool-card">
           <span class="card-icon" aria-hidden="true">📝</span>
           <strong>Word &amp; Character Counter</strong>
-          <div>Paste or type any text to instantly count words, characters (with and without spaces), sentences, and paragraphs.</div>
+          <div>Count multilingual text, estimate reading and speaking time, inspect readability, keywords, phrases, and document structure, and recover drafts with optional browser autosave.</div>
           <div class="card-tags">
             <span class="card-tag">Writing</span>
             <span class="card-tag">Words</span>
@@ -243,9 +243,11 @@
          select <strong>Check for breach</strong>, only the first five characters of a locally created
          SHA-1 fingerprint are sent to the Pwned Passwords range API. Anonymous range replies are cached
          on your device for up to 24 hours, with a maximum of 100 entries.</p>
-      <p>Similarly, text you paste into the Word &amp; Character Counter never leaves your device.
-         It is processed locally by JavaScript with zero server involvement, making it safe to use
-         with sensitive documents, drafts, or confidential writing.</p>
+      <p>Similarly, the Word &amp; Character Counter analyzes text locally with Rust/WebAssembly in a
+         Web Worker and uses a complete JavaScript fallback if WebAssembly is unavailable. Draft text
+         is not sent to a MonkeyTactics analysis server. Optional autosave uses browser-managed
+         IndexedDB storage, so users should still consider the security of their device, browser
+         profile, extensions, and applicable document-handling policies.</p>
       <p>The OCR Utility also processes selected images and document pages locally. HEIC and HEIF
          images are converted in the browser, PDF.js renders PDF pages locally, and Tesseract.js
          recognizes the prepared text regions. Uploaded files, screenshots, camera captures, scans,
@@ -270,14 +272,16 @@
         </li>
         <li class="faq-item">
           <h3>Does the word counter count hyphenated words as one or two?</h3>
-          <p>Hyphenated words (e.g. "well-known") are counted as a single word, consistent with
-             standard word-processing software like Microsoft Word.</p>
+          <p>The counter follows the browser's locale-aware Unicode word boundaries. In English,
+             a form such as "well-known" is typically counted as two word-like segments. Different
+             editors and publishing systems may apply their own counting conventions.</p>
         </li>
         <li class="faq-item">
           <h3>Can I use the word counter for text in other languages?</h3>
-          <p>Yes — the counter works with any Unicode text, including accented characters, non-Latin
-             scripts, and emoji. Word counting accuracy may vary for languages that don't use spaces
-             to separate words (e.g. Chinese, Japanese).</p>
+          <p>Yes — the counter supports Unicode text, including accented characters, non-Latin scripts,
+             and emoji. Modern browsers use locale-aware segmentation for languages such as Chinese,
+             Japanese, and Thai, with a Unicode-aware compatibility method when that API is unavailable.
+             Ambiguous language-specific boundaries can still differ from another editor's rules.</p>
         </li>
       </ul>
     </section>

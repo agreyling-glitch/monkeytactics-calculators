@@ -2,7 +2,7 @@ import {
   initializeTextAnalyzer,
   runAnalysis,
   verify_domain,
-} from "./text-analyzer-wrapper.js";
+} from "./text-analyzer-wrapper.js?v=20260907-js-fallback-1";
 
 let initializationPromise;
 let wasmReady = false;
@@ -20,7 +20,7 @@ export function initWasmEngine() {
         return true;
       })
       .catch(function (error) {
-        console.warn("WASM engine unavailable; using JavaScript fallback", error);
+        console.warn("WASM engine unavailable", error);
         return false;
       });
   }
