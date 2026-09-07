@@ -1,6 +1,7 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::sync::OnceLock;
+use unicode_segmentation::UnicodeSegmentation;
 use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "parallel")]
@@ -13,6 +14,12 @@ pub use wasm_bindgen_rayon::init_thread_pool;
 struct Token {
     word: String,
     char_index: usize,
+}
+
+#[derive(Debug, Deserialize)]
+struct BrowserToken {
+    word: String,
+    index: usize,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
@@ -321,48 +328,81 @@ fn stopwords() -> &'static HashSet<&'static str> {
 }
 
 fn tokenize(input: &str) -> Vec<Token> {
-    let mut tokens = Vec::new();
-    let mut start_byte = None;
-    let mut start_char = 0usize;
+    input
+        .unicode_word_indices()
+        .map(|(byte_index, word)| Token {
+            word: word.to_lowercase(),
+            char_index: input[..byte_index].chars().count(),
+        })
+        .collect()
+}
 
-    for (char_position, (byte_index, ch)) in input.char_indices().enumerate() {
-        if ch.is_alphanumeric() || (ch == '\'' && start_byte.is_some()) {
-            if start_byte.is_none() {
-                start_byte = Some(byte_index);
-                start_char = char_position;
-            }
-        } else if let Some(start) = start_byte.take() {
-            let raw = input[start..byte_index].trim_end_matches('\'');
-            if !raw.is_empty() {
-                tokens.push(Token {
-                    word: raw.to_lowercase(),
-                    char_index: start_char,
-                });
-            }
-        }
+fn is_sentence_terminator(chars: &[char], index: usize) -> bool {
+    let ch = chars[index];
+    if ch != '.' {
+        return matches!(ch, '!' | '?' | '。' | '！' | '？' | '．' | '｡' | '؟' | '।' | '॥');
     }
+    if index > 0
+        && index + 1 < chars.len()
+        && chars[index - 1].is_ascii_digit()
+        && chars[index + 1].is_ascii_digit()
+    {
+        return false;
+    }
+    if index > 0
+        && index + 2 < chars.len()
+        && chars[index - 1].is_alphabetic()
+        && chars[index + 1].is_alphabetic()
+        && chars[index + 2] == '.'
+    {
+        return false;
+    }
+    let mut start = index;
+    while start > 0 && (chars[start - 1].is_alphabetic() || chars[start - 1] == '.') {
+        start -= 1;
+    }
+    let preceding: String = chars[start..index].iter().collect::<String>().to_lowercase();
+    const DOTTED_ABBREVIATIONS: &[&str] = &["a.m", "p.m", "e.g", "i.e", "u.s", "u.k"];
+    if DOTTED_ABBREVIATIONS.contains(&preceding.as_str()) {
+        if preceding != "a.m" && preceding != "p.m" {
+            return false;
+        }
+        return chars[index + 1..]
+            .iter()
+            .find(|ch| !ch.is_whitespace())
+            .is_some_and(|ch| ch.is_ascii_uppercase());
+    }
+    let final_word = preceding.rsplit('.').next().unwrap_or("");
+    const ABBREVIATIONS: &[&str] = &[
+        "mr", "mrs", "ms", "dr", "prof", "sr", "jr", "st", "mt", "rev", "hon",
+        "capt", "cmdr", "col", "gen", "lt", "sgt", "sen", "rep", "gov", "pres",
+        "vs", "etc", "fig", "no", "dept", "est", "inc", "ltd", "co",
+    ];
+    if ABBREVIATIONS.contains(&final_word) {
+        return false;
+    }
+    if final_word.chars().count() == 1
+        && input_final_word_is_uppercase(chars, index)
+    {
+        return false;
+    }
+    true
+}
 
-    if let Some(start) = start_byte {
-        let raw = input[start..].trim_end_matches('\'');
-        if !raw.is_empty() {
-            tokens.push(Token {
-                word: raw.to_lowercase(),
-                char_index: start_char,
-            });
-        }
-    }
-    tokens
+fn input_final_word_is_uppercase(chars: &[char], index: usize) -> bool {
+    index > 0 && chars[index - 1].is_ascii_uppercase()
 }
 
 fn sentence_lengths(input: &str) -> Vec<u32> {
     let mut result = Vec::new();
     let mut current = 0u32;
     let mut has_content = false;
-    for ch in input.chars() {
+    let chars: Vec<char> = input.chars().collect();
+    for (index, &ch) in chars.iter().enumerate() {
         if !has_content && ch.is_whitespace() {
             continue;
         }
-        if matches!(ch, '.' | '!' | '?') {
+        if is_sentence_terminator(&chars, index) {
             if has_content {
                 result.push(current + 1);
                 current = 0;
@@ -497,8 +537,7 @@ fn ngrams(tokens: &[Token]) -> NgramResult {
     }
 }
 
-fn analyze(input: &str) -> AnalysisData {
-    let tokens = tokenize(input);
+fn analyze_tokens(input: &str, tokens: Vec<Token>) -> AnalysisData {
     let word_count = tokens.len() as u32;
     let sentence_lengths = sentence_lengths(input);
     let paragraph_lengths = paragraph_lengths(input);
@@ -552,11 +591,34 @@ fn analyze(input: &str) -> AnalysisData {
     }
 }
 
+fn analyze(input: &str) -> AnalysisData {
+    analyze_tokens(input, tokenize(input))
+}
+
 #[wasm_bindgen]
 pub fn analyze_text(input: &str) -> AnalysisResult {
     AnalysisResult {
         data: analyze(input),
     }
+}
+
+/// Analyze using the browser's locale-aware `Intl.Segmenter` word boundaries.
+/// Browser indices are UTF-16 offsets, matching textarea selection APIs.
+#[wasm_bindgen]
+pub fn analyze_text_with_segments(input: &str, segments: JsValue) -> Result<AnalysisResult, JsValue> {
+    let browser_tokens: Vec<BrowserToken> = serde_wasm_bindgen::from_value(segments)
+        .map_err(|error| JsValue::from_str(&error.to_string()))?;
+    let tokens = browser_tokens
+        .into_iter()
+        .filter(|token| !token.word.is_empty())
+        .map(|token| Token {
+            word: token.word.to_lowercase(),
+            char_index: token.index,
+        })
+        .collect();
+    Ok(AnalysisResult {
+        data: analyze_tokens(input, tokens),
+    })
 }
 
 /// Verifies that the WASM engine is running on an approved MonkeyTactics host.
@@ -567,6 +629,8 @@ pub fn verify_domain(host: String) -> bool {
         || host == "monkeytactics-calculators.pages.dev"
         || host.ends_with(".monkeytactics-calculators.pages.dev")
         || host == "127.0.0.1"
+        || host == "localhost"
+        || host == "::1"
 }
 
 #[cfg(test)]
@@ -583,6 +647,24 @@ mod tests {
         assert_eq!(
             tokens.iter().map(|t| t.char_index).collect::<Vec<_>>(),
             [0, 7, 12]
+        );
+    }
+
+    #[test]
+    fn tokenization_handles_mixed_scripts_and_punctuation() {
+        let tokens = tokenize("Hello—世界! café");
+        assert_eq!(
+            tokens.iter().map(|t| t.word.as_str()).collect::<Vec<_>>(),
+            ["hello", "世", "界", "café"]
+        );
+    }
+
+    #[test]
+    fn tokenization_keeps_unicode_apostrophe_words_together() {
+        let tokens = tokenize("don't l’amour");
+        assert_eq!(
+            tokens.iter().map(|t| t.word.as_str()).collect::<Vec<_>>(),
+            ["don't", "l’amour"]
         );
     }
 
@@ -636,6 +718,23 @@ mod tests {
     }
 
     #[test]
+    fn sentence_detection_supports_common_unicode_terminators() {
+        let result = analyze("床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。");
+        assert_eq!(result.sentence_count, 2);
+        assert_eq!(result.visualization_data.sentence_lengths, [13, 13]);
+
+        let mixed = analyze("Really？ نعم؟ ठीक। Done!");
+        assert_eq!(mixed.sentence_count, 4);
+    }
+
+    #[test]
+    fn sentence_detection_does_not_split_titles_initials_or_decimals() {
+        let result = analyze("Mr. Darcy met Dr. Jones at 3.14 p.m. They spoke to J. Smith.");
+        assert_eq!(result.sentence_count, 2);
+        assert_eq!(result.visualization_data.sentence_lengths.len(), 2);
+    }
+
+    #[test]
     fn empty_text_has_zero_counts_and_finite_scores() {
         let result = analyze("");
         assert_eq!(result.word_count, 0);
@@ -653,7 +752,8 @@ mod tests {
             "preview.monkeytactics-calculators.pages.dev".into()
         ));
         assert!(verify_domain("127.0.0.1".into()));
-        assert!(!verify_domain("localhost".into()));
+        assert!(verify_domain("localhost".into()));
+        assert!(verify_domain("::1".into()));
         assert!(!verify_domain("evilmonkeytactics.com".into()));
     }
 }

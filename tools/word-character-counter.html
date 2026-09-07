@@ -8,19 +8,19 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <meta charset="UTF-8" />
-  <title>Free Word Counter &amp; Character Counter | Text Analyzer</title>
+  <title>Free Word &amp; Character Counter | Text Analyzer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Count words, characters, sentences, and paragraphs. Check reading time, readability, keyword density, n-grams, and text structure privately in your browser." />
+        content="Count words, characters, sentences, and paragraphs online. Check reading time, readability, keyword density, and text structure privately for free." />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta name="author" content="MonkeyTactics" />
   <meta name="date" content="2026-07-22" />
-  <meta name="dateModified" content="2026-08-11" />
+  <meta name="dateModified" content="2026-09-07" />
   <meta name="theme-color" content="#0f172a" />
 
   <!-- Open Graph -->
   <meta property="og:title"       content="Free Word Counter &amp; Character Counter" />
-  <meta property="og:description" content="Analyze word and character counts, readability, keyword density, n-grams, and text structure privately in your browser." />
+  <meta property="og:description" content="Count words and characters, check readability, and analyze keywords and text structure privately in your browser." />
   <meta property="og:type"        content="website" />
   <meta property="og:url"         content="https://monkeytactics.com/tools/word-character-counter" />
   <meta property="og:site_name"   content="MonkeyTactics" />
@@ -28,7 +28,7 @@
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Free Word Counter &amp; Character Counter" />
-  <meta name="twitter:description" content="Analyze counts, readability, keywords, n-grams, and writing structure locally in your browser." />
+  <meta name="twitter:description" content="Count words and characters, check readability, and analyze keywords and writing structure locally in your browser." />
 
   <!-- Canonical -->
   <link rel="canonical" href="https://monkeytactics.com/tools/word-character-counter" />
@@ -53,7 +53,7 @@
         "name": "Free Word Counter and Character Counter",
         "alternateName": "MonkeyTactics Text Analyzer",
         "url": "https://monkeytactics.com/tools/word-character-counter",
-        "description": "A free, private browser-based text analyzer for live word and character counts, reading time, readability scores, keyword density, n-grams, text-structure charts, report exports, and selected-word unscrambling.",
+        "description": "A free, private browser-based word and character counter with reading and speaking time, readability scores, keyword density, phrase analysis, writing targets, and text-structure charts.",
         "applicationCategory": "UtilitiesApplication",
         "applicationSubCategory": "Writing and Text Analysis Tool",
         "operatingSystem": "Any",
@@ -68,28 +68,38 @@
           "Keyword counts, density, and stopword filtering",
           "Unigram, bigram, and trigram analysis",
           "Sentence rhythm, paragraph structure, and keyword distribution charts",
-          "Plain-text and Markdown analysis exports",
-          "Local selected-word unscrambling with Scrabble scores",
+          "Word and character writing targets",
+          "Text and PDF document import and PDF printing",
+          "Optional local browser autosave",
           "Private in-browser analysis"
         ],
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "publisher": { "@id": "https://monkeytactics.com/#organization" },
         "author": { "@id": "https://monkeytactics.com/#organization" },
         "datePublished": "2026-07-22",
-        "dateModified": "2026-08-11"
+        "dateModified": "2026-09-07"
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://monkeytactics.com/tools/word-character-counter#related-guides",
+        "name": "Related Word Counter Guides",
+        "numberOfItems": 1,
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Does Your Word Counter Upload Your Text? A Guide to Private Text Analysis", "url": "https://blog.monkeytactics.com/posts/does-your-word-counter-upload-your-text/" }
+        ]
       },
       {
         "@type": "WebPage",
         "@id": "https://monkeytactics.com/tools/word-character-counter#webpage",
         "url": "https://monkeytactics.com/tools/word-character-counter",
         "name": "Free Word Counter and Character Counter",
-        "description": "Count words and characters, estimate reading time, measure readability and keyword density, explore n-grams and writing structure, and export a text analysis report.",
+        "description": "Count words and characters, estimate reading and speaking time, measure readability and keyword density, and explore phrases and writing structure.",
         "inLanguage": "en-US",
         "isPartOf": { "@id": "https://monkeytactics.com/#website" },
         "breadcrumb": { "@id": "https://monkeytactics.com/tools/word-character-counter#breadcrumb" },
         "mainEntity": { "@id": "https://monkeytactics.com/tools/word-character-counter#app" },
         "datePublished": "2026-07-22",
-        "dateModified": "2026-08-11"
+        "dateModified": "2026-09-07"
       }
     ]
   }
@@ -104,7 +114,7 @@
       {
         "@type": "Question",
         "name": "How are words counted in this tool?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Words are counted by splitting text on whitespace and stripping leading and trailing punctuation. Hyphenated terms like \"well-known\" count as a single word, which matches the behaviour of common word processors like Microsoft Word and Google Docs." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Words are counted with locale-aware Unicode word boundaries in modern browsers, with a Unicode-aware compatibility method for older browsers. This recognizes punctuation, accented text, mixed scripts, and many languages that do not separate every word with spaces." }
       },
       {
         "@type": "Question",
@@ -114,27 +124,27 @@
       {
         "@type": "Question",
         "name": "How is reading time calculated?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Reading time is estimated by dividing the word count by a reading speed measured in words per minute (WPM). The default is 200 WPM. You can change it to roughly 250–300 WPM for skimmable web content or 150–180 WPM for dense technical material." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Reading time uses words per minute for English-compatible text and characters per minute for Chinese and Japanese. The language selector controls the units and presets, and every speed remains adjustable." }
       },
       {
         "@type": "Question",
         "name": "What do the readability scores mean?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Each score estimates the U.S. school grade level a reader may need. A score near 8 suggests eighth-grade reading difficulty; lower scores are generally easier. Treat the four scores as a range, not a precise rating, and use several paragraphs for a more useful estimate." }
+        "acceptedAnswer": { "@type": "Answer", "text": "The selected language determines the formula. English grade scores and the German Wiener score estimate a school or difficulty level, where lower is generally easier. Spanish and French scores measure reading ease, where higher is easier. Use several paragraphs and treat every result as an estimate rather than a precise rating." }
       },
       {
         "@type": "Question",
         "name": "What does keyword density mean?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Keyword density is the percentage of total words that a given word represents. The list shows the most frequent words in your text, with common stopwords (the, and, of, to, etc.) excluded by default so meaningful terms are easier to spot." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Keyword density is the percentage of total words that a given word represents. The language selector applies a local stopword list for supported languages so meaningful terms are easier to spot." }
       },
       {
         "@type": "Question",
-        "name": "Can I export the text analysis?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. After you add text, use Export Analysis to download the counts, readability scores, and top keywords as a plain-text or Markdown report." }
+        "name": "Can I open a PDF or save my text as a PDF?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. You can extract selectable text from a PDF for analysis. Images and scanned pages are ignored. Use Save as PDF to open your browser's print dialog and create a PDF from the editor text." }
       },
       {
         "@type": "Question",
         "name": "Is my text private?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Analysis runs in your browser, and text entered in the tool is not transmitted to a server or stored by the tool. See our Privacy Policy for details." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Analysis runs in your browser and text is never uploaded. Optional autosave stores the current draft only in this browser and can be disabled or cleared." }
       }
     ]
   }
@@ -175,6 +185,243 @@
     .tool-widget h2 {
       margin: 0 0 1.25rem;
       font-size: 1.05rem;
+    }
+
+    [data-focus-mode] .counter-app-title { padding-right: 2.75rem; }
+
+    .tool-widget.is-focus-mode {
+      display: flex;
+      flex-direction: column;
+    }
+    .tool-widget.is-focus-mode .counter-app-title { flex: 0 0 auto; }
+    .analysis-tabs {
+      display: flex;
+      width: 100%;
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+    .analysis-tab {
+      flex: 0 0 auto;
+      min-width: 0;
+      margin-bottom: -1px;
+      padding: 0.65rem 0.8rem;
+      border: 1px solid rgba(245,196,81,0.28);
+      border-radius: 0.35rem 0.35rem 0 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .analysis-tab:hover { color: var(--text); }
+    .analysis-tab:disabled,
+    .text-insight-tab:disabled {
+      border-color: rgba(148,163,184,0.16);
+      background: rgba(148,163,184,0.035);
+      color: rgba(148,163,184,0.42);
+      cursor: not-allowed;
+      opacity: 0.72;
+    }
+    .analysis-tab:disabled:hover,
+    .text-insight-tab:disabled:hover { color: rgba(148,163,184,0.42); }
+    .analysis-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .analysis-tab[aria-selected="true"] {
+      position: relative;
+      z-index: 2;
+      border-color: rgba(245,196,81,0.62);
+      border-bottom-color: #0b1711;
+      background: #0b1711;
+      color: #f5c451;
+    }
+    .analysis-tab-panels { position: relative; }
+    .analysis-tab-panel { width: 100%; }
+    .analysis-tab-panel[hidden] { display: none; }
+    .analysis-tab-panel--text.is-retained-inactive {
+      position: absolute !important;
+      inset: 0;
+      z-index: -1;
+      visibility: hidden;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .counter-tool-page .analysis-tab-panel:not([hidden]) {
+      border: 1px solid rgba(245,196,81,0.34);
+      border-radius: 0 0.7rem 0.7rem 0.7rem;
+      background: rgba(255,255,255,0.02);
+    }
+    .counter-tool-page .analysis-tab-panel--text .calc-layout {
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+    .counter-tool-page .analysis-tab-panel > .keywords-section,
+    .counter-tool-page .analysis-tab-panel > #ngram-section {
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+    .analysis-tab-panel > .keywords-section { margin-top: 0; }
+    .analysis-tab-panel--results { min-width: 0; }
+    .analysis-tab-panel--results > .keywords-section + .keywords-section { margin-top: 1rem; }
+    .tool-widget.is-focus-mode .analysis-tabs { flex: 0 0 auto; }
+    .tool-widget.is-focus-mode .analysis-tab-panels {
+      display: flex;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .tool-widget.is-focus-mode .analysis-tab-panel:not([hidden]) {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+    }
+    .tool-widget.is-focus-mode .analysis-tab-panel--text:not([hidden]) {
+      display: flex;
+      overflow: visible;
+    }
+    .tool-widget.is-focus-mode .analysis-tab-panel--results:not([hidden]) {
+      display: flex;
+      flex-direction: column;
+    }
+    .tool-widget.is-focus-mode #analysis-panel-density,
+    .tool-widget.is-focus-mode #analysis-panel-phrases { overflow: hidden; }
+    .tool-widget.is-focus-mode #keywordsSection,
+    .tool-widget.is-focus-mode #ngram-section {
+      display: flex;
+      flex: 1 1 auto;
+      min-height: 0;
+      flex-direction: column;
+    }
+    .tool-widget.is-focus-mode #keywordsSection .keywords-wrap,
+    .tool-widget.is-focus-mode #ngram-section .ngram-top {
+      flex: 1 1 auto;
+      min-height: 120px;
+      overflow: auto;
+    }
+    .tool-widget.is-focus-mode #ngram-section .ngram-group:not([hidden]) {
+      display: flex;
+      flex: 1 1 auto;
+      min-height: 0;
+      flex-direction: column;
+    }
+    .tool-widget.is-focus-mode .calc-layout {
+      display: flex;
+      flex: 1 1 auto;
+      min-height: 0;
+      align-items: stretch;
+    }
+    .tool-widget.is-focus-mode .inputs-col {
+      display: flex;
+      width: 100%;
+      min-height: 0;
+    }
+    .tool-widget.is-focus-mode .input-group {
+      display: flex;
+      flex: 1 1 auto;
+      min-height: 0;
+      flex-direction: column;
+    }
+    .tool-widget.is-focus-mode #text-input {
+      flex: 1 1 auto;
+      min-height: 120px;
+    }
+    .editor-selection-status {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.85rem;
+      min-height: 1.25rem;
+      margin-top: 0.3rem;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+    .editor-selection-status:has(#analysis-language-hint[hidden]):has(#autosave-status[hidden]):has(#selection-statistics[hidden]):has(#structure-navigation-status[hidden]) { display: none; }
+    .editor-selection-status strong { color: var(--accent); font-weight: 700; }
+    #structure-navigation-status { color: var(--gold, #f5c451); }
+    .autosave-control-label { display: inline-block; min-width: 3.9rem; }
+    .tool-widget.is-focus-mode .textarea-actions,
+    .tool-widget.is-focus-mode .results-col { flex: 0 0 auto; }
+    .text-insights { margin-top: 0.4rem; }
+    .analysis-language-notice {
+      margin: 0;
+      padding: 0.55rem 0.8rem;
+      border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+      border-top: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .text-insight-tabs {
+      display: flex;
+      width: 100%;
+      max-width: 100%;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-bottom: 0;
+      border-bottom: 0;
+    }
+    .text-insight-tab {
+      margin-bottom: -1px;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid rgba(245,196,81,0.28);
+      border-radius: 0.35rem 0.35rem 0 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .text-insight-tab[aria-selected="true"] {
+      position: relative;
+      z-index: 2;
+      border-color: rgba(245,196,81,0.62);
+      border-bottom-color: #0b1711;
+      background: #0b1711;
+      color: #f5c451;
+    }
+    .text-insight-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .text-insight-panel[hidden] { display: none; }
+    .text-insight-panel > .keywords-section { margin-top: 0; }
+    .counter-tool-page .text-insight-panel:not([hidden]) {
+      padding: 0.6rem;
+      border: 1px solid rgba(245,196,81,0.34);
+      border-radius: 0 0.7rem 0.7rem 0.7rem;
+      background: rgba(255,255,255,0.02);
+    }
+    .counter-tool-page .text-insight-panel > .text-insight-surface {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+    .text-insight-panel .readability-section { margin-top: 0; }
+    .counter-tool-page .text-insight-panel .results-col {
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+    .counter-tool-page .text-insight-surface .result-card,
+    .counter-tool-page .text-insight-surface .result-card.primary {
+      border-color: transparent;
+      background: transparent;
+    }
+    .counter-tool-page .text-insight-surface > .structure-card {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+    .tool-widget.is-focus-mode .text-insights {
+      flex: 0 1 auto;
+      max-height: 50%;
+      min-height: 140px;
+      overflow: auto;
     }
 
     /* ── Single-column workspace ── */
@@ -229,6 +476,16 @@
       min-height: 240px;
       resize: vertical;
       line-height: 1.55;
+    }
+    #text-input[data-text-size="small"] { font-size: 0.85rem; }
+    #text-input[data-text-size="medium"] { font-size: 0.95rem; }
+    #text-input[data-text-size="large"] { font-size: 1.1rem; }
+    .input-group textarea::-webkit-resizer {
+      border-radius: 0 0 0.4rem 0;
+      background-color: #0b1711;
+      background-image:
+        linear-gradient(135deg, transparent 0 52%, rgba(245,196,81,0.32) 52% 58%, transparent 58%),
+        linear-gradient(135deg, transparent 0 68%, rgba(245,196,81,0.62) 68% 74%, transparent 74%);
     }
 
     .input-group input[type="range"] {
@@ -308,13 +565,56 @@
     .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
     .textarea-actions {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 0.5rem;
       margin-bottom: 0.45rem;
     }
+    .editor-preferences {
+      margin-bottom: 0.45rem;
+      border: 1px solid var(--border);
+      border-radius: 0.45rem;
+      background: rgba(11,23,17,0.48);
+    }
+    .editor-preferences summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.48rem 0.65rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .editor-preferences summary::-webkit-details-marker { display: none; }
+    .editor-preferences summary::after {
+      content: '›';
+      color: var(--gold, #f5c451);
+      font-size: 1rem;
+      line-height: 1;
+      transform: rotate(90deg);
+      transition: transform 0.15s;
+    }
+    .editor-preferences[open] summary {
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+    .editor-preferences[open] summary::after { transform: rotate(-90deg); }
+    .editor-preferences summary:focus-visible {
+      outline: 2px solid rgba(245,196,81,0.72);
+      outline-offset: 2px;
+    }
+    .editor-preferences .textarea-actions {
+      margin: 0;
+      padding: 0.65rem;
+    }
     .textarea-actions .btn-ghost {
-      width: 100%;
+      width: auto;
+      flex: 0 0 auto;
       padding: 0.55rem 0.75rem;
       font-size: 0.8rem;
     }
@@ -369,12 +669,13 @@
       gap: 0.6rem;
     }
     #resultsCards {
-      grid-template-columns: minmax(240px, 1.8fr) minmax(145px, 1.35fr) repeat(3, minmax(100px, 1fr));
+      grid-template-columns: minmax(145px,1.35fr) repeat(3,minmax(100px,1fr));
       gap: 0.5rem;
       overflow-x: auto;
       padding-bottom: 0.1rem;
     }
     #resultsCards > .stat-trio { display: contents; }
+    .speed-controls-grid { display: grid; grid-template-columns: repeat(2,minmax(280px,1fr)); gap: 0.75rem; }
     #resultsCards .result-card {
       min-width: 0;
       padding: 0.6rem 0.7rem;
@@ -390,27 +691,282 @@
       font-size: 0.68rem;
       white-space: nowrap;
     }
-    .reading-speed-card {
+    .reading-speed-card,
+    .speaking-speed-card {
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
-    .reading-speed-card .result-label {
+    .language-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .editor-toolbar {
       display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.4rem;
+    }
+    .editor-toolbar .btn-ghost {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width: 2rem;
+      height: 2rem;
+      flex: 0 0 auto;
+      padding: 0;
+      border-radius: 0.35rem;
+    }
+    .editor-toolbar .btn-ghost svg {
+      width: 1rem;
+      height: 1rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+    .editor-toolbar .text-size-icon text {
+      fill: currentColor;
+      stroke: none;
+      font-family: Georgia, serif;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .editor-toolbar .text-size-icon text:last-child { font-size: 17px; }
+    .editor-toolbar .btn-ghost::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 0.4rem);
+      left: 50%;
+      width: max-content;
+      max-width: 11rem;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid rgba(245,196,81,0.3);
+      border-radius: 0.35rem;
+      background: #08130e;
+      color: var(--text);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      font-size: 0.68rem;
+      line-height: 1.2;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -0.2rem);
+      transition: opacity 0.12s, transform 0.12s;
+    }
+    .editor-toolbar .btn-ghost:hover::after,
+    .editor-toolbar .btn-ghost:focus-visible::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    .editor-toolbar .btn-ghost:first-child::after { left: 0; transform: translate(0, -0.2rem); }
+    .editor-toolbar .btn-ghost:first-child:hover::after,
+    .editor-toolbar .btn-ghost:first-child:focus-visible::after { transform: translate(0, 0); }
+    .editor-find-dialog {
+      position: fixed;
+      z-index: 10000;
+      inset: 50% auto auto 50%;
+      width: min(92vw, 24rem);
+      max-height: calc(100vh - 2rem);
+      margin: 0;
+      padding: 0;
+      border: 1px solid rgba(245,196,81,0.4);
+      border-radius: 0.75rem;
+      background: #08130e !important;
+      color: var(--text);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.72);
+      overflow: auto;
+      transform: translate(-50%, -50%);
+    }
+    .editor-find-dialog::backdrop { background: rgba(0,0,0,0.72); }
+    .editor-find-dialog-inner { padding: 1rem; }
+    .editor-find-dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.8rem;
+    }
+    .editor-find-dialog-header h3 { margin: 0; font-size: 1rem; }
+    .editor-find-dialog-header .btn-ghost { padding: 0.25rem 0.55rem; }
+    .editor-find-grid { display: grid; gap: 0.65rem; }
+    .editor-find-grid label { display: grid; justify-content: stretch; align-items: stretch; gap: 0.3rem; margin: 0; color: var(--muted); font-size: 0.75rem; }
+    .editor-find-grid input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 0.45rem;
+      background: var(--card-bg);
+      color: var(--text);
+      font: inherit;
+    }
+    .editor-find-options { display: flex; align-items: center; flex-wrap: wrap; gap: 0.85rem; }
+    .editor-find-options label {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.2rem 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .editor-find-options input {
+      flex: 0 0 auto;
+      width: 0.95rem;
+      height: 0.95rem;
+      margin: 0;
+      accent-color: var(--accent);
+      outline: none;
+      box-shadow: none;
+    }
+    .editor-find-options label:focus-within { color: var(--text); }
+    .editor-find-options input:focus-visible {
+      outline: 2px solid rgba(245,196,81,0.72);
+      outline-offset: 2px;
+      border-radius: 0.15rem;
+    }
+    .editor-find-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+    .editor-find-actions .btn-ghost { padding: 0.45rem 0.7rem; font-size: 0.75rem; }
+    #editor-find-status { min-height: 1.1rem; margin: 0.65rem 0 0; color: var(--muted); font-size: 0.75rem; }
+    .language-control select {
+      width: auto;
+      min-width: 7.5rem;
+      padding: 0.5rem 1.8rem 0.5rem 0.65rem;
+    }
+    .language-status { color: var(--muted); font-size: 0.75rem; }
+    .writing-assistance-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .writing-assistance-control input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .writing-assistance-switch {
+      position: relative;
+      width: 2.1rem;
+      height: 1.15rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--card-bg);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .writing-assistance-switch::after {
+      content: '';
+      position: absolute;
+      top: 0.14rem;
+      left: 0.16rem;
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.15s, background 0.15s;
+    }
+    .writing-assistance-control input:checked + .writing-assistance-switch {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 22%, var(--card-bg));
+    }
+    .writing-assistance-control input:checked + .writing-assistance-switch::after {
+      transform: translateX(0.95rem);
+      background: var(--accent);
+    }
+    .writing-assistance-control input:focus-visible + .writing-assistance-switch {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .reading-speed-card .result-label,
+    .speaking-speed-card .result-label {
+      display: flex;
+      align-items: center;
       justify-content: space-between;
       gap: 0.5rem;
+      font-size: 0.58rem;
+      letter-spacing: 0.035em;
+      white-space: nowrap;
     }
-    .reading-speed-inline {
+    .reading-speed-summary,
+    .speaking-speed-summary {
+      white-space: nowrap;
+      font-size: 0.56rem;
+    }
+    #wpmVal,
+    #speakingWpmVal { color: var(--accent); font-weight: 700; }
+    .reading-time-number { color: var(--accent); font-weight: 700; }
+    .summary-count-number { color: var(--accent); font-weight: 700; }
+    .reading-speed-inline,
+    .speaking-speed-inline {
       display: grid;
-      grid-template-columns: 72px minmax(120px, 1fr);
+      grid-template-columns: 76px minmax(120px, 1fr) 150px;
       align-items: center;
       gap: 0.65rem;
     }
-    .reading-speed-inline .wpm-number {
+    .reading-speed-inline .wpm-number,
+    .speaking-speed-inline .wpm-number {
       width: 100%;
       min-width: 0;
     }
-    .reading-speed-inline input[type="range"] { width: 100%; }
+    .reading-speed-inline input[type="range"],
+    .speaking-speed-inline input[type="range"] { width: 100%; }
+    .speed-preset { width: 100%; min-width: 0; min-height: 2.7rem; padding: 0.4rem 1.75rem 0.4rem 0.7rem; border: 1px solid var(--border); border-radius: 0.5rem; background: #0b1711; color: var(--text); font: inherit; font-size: 0.78rem; }
+    .speed-preset:focus { border-color: var(--accent); outline: none; }
+    .target-progress-list { display: flex; min-width: 0; flex: 1 1 auto; flex-wrap: wrap; gap: 0.35rem; }
+    .target-progress-list[hidden] { display: none; }
+    .target-progress-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.5rem; border: 1px solid var(--border); border-radius: 999px; color: var(--muted); font-size: 0.68rem; white-space: nowrap; }
+    .target-progress-chip progress { width: 3.5rem; height: 0.35rem; accent-color: var(--accent); }
+    .target-progress-chip.is-over { border-color: rgba(248,113,113,0.65); color: #f87171; }
+    .target-progress-chip.is-over progress { accent-color: #f87171; }
+    .target-progress-chip.word-range.is-below { border-color: rgba(245,196,81,0.55); color: #f5c451; }
+    .target-progress-chip.word-range.is-within { border-color: rgba(34,197,94,0.55); color: var(--accent); }
+    .target-progress-chip.word-range.is-over { border-color: rgba(248,113,113,0.65); color: #f87171; }
+    .target-range-track { position: relative; width: 4.5rem; height: 0.38rem; overflow: hidden; border-radius: 999px; background: rgba(148,163,184,0.25); }
+    .target-range-fill { display: block; height: 100%; border-radius: inherit; background: currentColor; }
+    .target-range-min-marker { position: absolute; top: -0.12rem; bottom: -0.12rem; width: 2px; background: var(--text); opacity: 0.8; transform: translateX(-1px); }
+    .writing-targets-surface { position: relative; display: grid; gap: 0.75rem; padding-top: 0.1rem; }
+    .writing-targets-grid {
+      display: grid;
+      grid-template-columns: minmax(20rem,26rem) repeat(3,minmax(12rem,15rem));
+      justify-content: start;
+      gap: 0.75rem;
+      padding-right: 2rem;
+    }
+    .writing-targets-grid label {
+      display: grid;
+      justify-content: stretch;
+      align-items: stretch;
+      gap: 0.3rem;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .writing-targets-grid input,
+    .writing-targets-grid select { width: 100%; box-sizing: border-box; padding: 0.55rem; border: 1px solid var(--border); border-radius: 0.45rem; background: #0b1711; color: var(--text); font: inherit; }
+    .writing-targets-grid input[type="number"] { color-scheme: dark; accent-color: var(--accent); }
+    .writing-targets-grid input[type="number"]::-webkit-inner-spin-button {
+      opacity: 0.72;
+      filter: sepia(1) saturate(4) hue-rotate(78deg) brightness(1.08);
+    }
+    .word-target-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0.4rem; }
+    .writing-targets-status { display: flex; align-items: center; gap: 0.5rem; }
+    #writing-targets-clear { position: absolute; z-index: 1; top: 0.1rem; right: 0.1rem; display: grid; width: 1.35rem; height: 1.35rem; min-height: 0; padding: 0; place-items: center; border-color: rgba(248,113,113,0.55); border-radius: 50%; background: rgba(239,68,68,0.1); color: #f87171; font-size: 0.9rem; line-height: 1; }
+    #writing-targets-clear:hover { border-color: #f87171; background: rgba(239,68,68,0.18); color: #fca5a5; }
+    #writing-targets-clear[hidden] { display: none; }
     .stat-trio .result-card { padding: 0.85rem 0.9rem; }
     .stat-trio .result-value { font-size: 1.3rem; }
     .stat-trio .result-label { font-size: 0.7rem; margin-bottom: 0.2rem; }
@@ -459,11 +1015,29 @@
       font-size: 0.85rem;
       color: var(--muted);
     }
+    .keywords-controls #clear-keyword-selection {
+      margin-left: auto;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.75rem;
+    }
 
     .keywords-wrap {
-      overflow-x: auto;
+      overflow: auto;
       border-radius: var(--radius);
       border: 1px solid var(--border);
+    }
+
+    .keywords-table tbody tr[data-keyword] { cursor: pointer; }
+    .keywords-table tbody tr[data-keyword]:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+    .keywords-table tbody tr[data-keyword].is-keyword-filtered td {
+      background: rgba(245,196,81,0.12);
+      color: var(--keyword-color, #f5c451);
+    }
+    .keywords-table tbody tr[data-keyword].is-keyword-filtered td:first-child {
+      box-shadow: inset 4px 0 var(--keyword-color, #f5c451);
     }
 
     .keywords-table {
@@ -496,6 +1070,14 @@
       font-weight: 500;
     }
     .keywords-table td:last-child { color: var(--accent); font-weight: 600; }
+    #keyword-density-table th:nth-child(2),
+    #keyword-density-table td:nth-child(2) {
+      width: 7rem;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    #keyword-density-table th:nth-child(3),
+    #keyword-density-table td:nth-child(3) { width: 7rem; }
 
     .keywords-table tr:last-child td { border-bottom: none; }
     .keywords-table tr:hover td      { background: rgba(255,255,255,0.02); }
@@ -589,6 +1171,101 @@
     .structure-card + .structure-card { margin-top: 0.75rem; }
 
     .structure-card canvas { margin-top: 0.65rem; }
+    #sentenceRhythmCanvas,
+    #paragraphStructureCanvas { cursor: pointer; }
+    .structure-card:has(> .chart-help-button) {
+      position: relative;
+      padding-top: 0.45rem;
+    }
+    .structure-card:has(> .chart-help-button) canvas { margin-top: 0; }
+    .chart-zoom-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.25rem;
+      min-height: 1.55rem;
+      margin: 0 2.45rem 0.35rem 0;
+    }
+    .chart-zoom-button,
+    .chart-zoom-fit {
+      min-width: 1.65rem;
+      height: 1.55rem;
+      padding: 0 0.42rem;
+      border: 1px solid rgba(245,196,81,0.42);
+      border-radius: 0.3rem;
+      background: rgba(245,196,81,0.07);
+      color: #f5c451;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .chart-zoom-button:hover,
+    .chart-zoom-fit:hover { background: rgba(245,196,81,0.16); }
+    .chart-zoom-button:disabled { opacity: 0.35; cursor: default; }
+    .chart-zoom-fit[aria-pressed="true"] { background: rgba(245,196,81,0.18); }
+    .chart-zoom-button:focus-visible,
+    .chart-zoom-fit:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    .chart-scroll-viewport {
+      position: relative;
+      width: 100%;
+      height: 166px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-color: rgba(245,196,81,0.55) rgba(148,163,184,0.12);
+      scrollbar-width: thin;
+    }
+    .chart-scroll-spacer { height: 150px; pointer-events: none; }
+    .chart-scroll-viewport canvas {
+      position: absolute;
+      top: 0;
+      max-width: none;
+    }
+    .chart-help-button {
+      position: absolute;
+      z-index: 1;
+      top: 0.45rem;
+      right: 0.5rem;
+      display: grid;
+      width: 1.35rem;
+      height: 1.35rem;
+      padding: 0;
+      place-items: center;
+      border: 1px solid rgba(245,196,81,0.62);
+      border-radius: 50%;
+      background: rgba(245,196,81,0.1);
+      color: #f5c451;
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 800;
+      line-height: 1;
+      cursor: help;
+    }
+    .chart-help-button:hover { background: rgba(245,196,81,0.18); }
+    .chart-help-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .counter-tool-page .text-insight-surface .chart-help-dialog {
+      width: min(92vw, 32rem);
+      padding: 1rem;
+      border: 1px solid rgba(245,196,81,0.4);
+      border-radius: 0.7rem;
+      background: #08130e;
+      color: var(--text);
+      box-shadow: 0 1.25rem 4rem rgba(0,0,0,0.72);
+      isolation: isolate;
+    }
+    .counter-tool-page .text-insight-surface .chart-help-dialog::backdrop {
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(2px);
+    }
+    .chart-help-dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .chart-help-dialog-header h3 { margin: 0; font-size: 1rem; }
+    .chart-help-dialog .metric-explanation { margin-top: 0.75rem; }
+    .chart-help-close { padding: 0.25rem 0.55rem; }
     #keyword-distribution-container {
       padding: 0.35rem 0.5rem;
     }
@@ -697,26 +1374,50 @@
     .related-card:hover  { border-color: rgba(34,197,94,0.4); transform: translateY(-2px); }
     .related-card strong { font-size: 0.9rem; }
     .related-card span   { color: var(--muted); font-size: 0.8rem; }
+    .word-counter-related-guides {
+      margin-top: 2rem;
+      padding: clamp(1rem, 3vw, 2rem);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      background: #0d1812;
+    }
+    .word-counter-related-guides-heading h2 { margin: 0.2rem 0 0.45rem; color: var(--text); font: 500 clamp(1.45rem, 2.6vw, 2rem)/1.15 Georgia, serif; }
+    .word-counter-related-guides-heading > p:last-child { max-width: 52rem; margin: 0; color: var(--muted); }
+    .word-game-guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 0.9rem; margin-top: 1.15rem; }
+    .word-game-guide-card { display: flex; min-width: 0; flex-direction: column; padding: 1rem; border: 1px solid rgba(183,247,207,0.12); border-radius: 0.85rem; background: rgba(255,255,255,0.018); }
+    .word-game-guide-card > span { color: var(--accent); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+    .word-game-guide-card h3 { margin: 0.45rem 0; font-size: 1.05rem; line-height: 1.3; }
+    .word-game-guide-card h3 a { color: var(--text); text-decoration: none; }
+    .word-game-guide-card h3 a:hover { color: var(--accent); }
+    .word-game-guide-card p { flex: 1; margin: 0 0 0.8rem; color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
+    .word-game-guide-link { align-self: flex-start; color: var(--accent); font-size: 0.8rem; font-weight: 800; text-decoration: none; }
+    .word-game-guide-link:hover { text-decoration: underline; }
 
     /* ── Responsive ── */
     @media (max-width: 800px) {
       .calc-layout { grid-template-columns: 1fr; }
     }
+    @media (max-width: 900px) {
+      .speed-controls-grid { grid-template-columns: 1fr; }
+      .writing-targets-grid { grid-template-columns: repeat(2,minmax(0,1fr)); padding-right: 2rem; }
+    }
+
     @media (max-width: 600px) {
       .hero--inner  { padding: 1.25rem; }
       .hero--inner h1 { font-size: 1.5rem; }
       .tool-widget  { padding: 1.25rem; }
       .result-card.primary .result-value { font-size: 1.75rem; }
-      .textarea-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .textarea-actions .unscramble-btn { grid-column: 1 / -1; }
       #resultsCards {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         overflow-x: visible;
       }
       #resultsCards > .reading-speed-card,
-      #resultsCards > .result-card.primary,
-      #resultsCards > .stat-trio > .result-card:last-child { grid-column: 1 / -1; }
-      .reading-speed-inline { grid-template-columns: 64px minmax(0, 1fr); }
+      #resultsCards > .speaking-speed-card,
+      #resultsCards > .result-card.primary { grid-column: 1 / -1; }
+      .reading-speed-inline,
+      .speaking-speed-inline { grid-template-columns: 70px minmax(90px,1fr); }
+      .speed-preset { grid-column: 1 / -1; }
+      .writing-targets-grid { grid-template-columns: 1fr; }
       .stat-trio { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .analysis-card-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -726,9 +1427,12 @@
       .keywords-heading-row { align-items: flex-start; flex-direction: column; }
       .keywords-heading-row .check { margin-left: 0; white-space: normal; }
       .keywords-wrap { max-width: 100%; }
+      .analysis-tabs { gap: 0.25rem; padding: 0; }
+      .analysis-tab { padding: 0.55rem 0.3rem; font-size: 0.75rem; }
     }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-14" />
+  <link rel="stylesheet" href="/assets/css/shared/focus-mode.css?v=20260829-2" />
   <script src="/assets/js/shared/ads.js" defer></script>
   <link rel="stylesheet" href="/assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
 </head>
@@ -762,32 +1466,161 @@
 
     <!-- COUNTER WIDGET -->
     <section class="counter-workspace-section" aria-labelledby="calc-heading">
-      <div class="tool-widget">
+      <div class="tool-widget" data-focus-mode data-focus-mode-label="Word &amp; Character Counter">
         <div class="premium-app-title counter-app-title"><div class="premium-section-kicker">01 / Analyze</div><h2 id="calc-heading">Paste or type your text</h2><p>Your counts and writing analysis update instantly as you type.</p></div>
 
-        <div class="calc-layout">
+        <div class="analysis-tabs" role="tablist" aria-label="Text analysis views">
+          <button class="analysis-tab" id="analysis-tab-text" type="button" role="tab" aria-selected="true" aria-controls="analysis-panel-text" tabindex="0">Text</button>
+          <button class="analysis-tab" id="analysis-tab-density" type="button" role="tab" aria-selected="false" aria-controls="analysis-panel-density" tabindex="-1" disabled>Density</button>
+          <button class="analysis-tab" id="analysis-tab-phrases" type="button" role="tab" aria-selected="false" aria-controls="analysis-panel-phrases" tabindex="-1" disabled>Phrases</button>
+        </div>
+
+        <div class="analysis-tab-panels">
+          <section class="analysis-tab-panel analysis-tab-panel--text" id="analysis-panel-text" role="tabpanel" aria-labelledby="analysis-tab-text">
+
+            <div class="calc-layout">
 
           <!-- ── LEFT: INPUTS ── -->
           <div class="inputs-col">
 
             <!-- Textarea -->
             <div class="input-group">
-              <div class="textarea-actions">
-                <button class="btn-ghost" id="clear-btn" type="button">Clear</button>
-                <button class="btn-ghost" id="copy-btn" type="button">Copy</button>
-                <button class="btn-ghost unscramble-btn" id="unscramble-selected-word" type="button">Unscramble</button>
+              <details class="editor-preferences">
+                <summary>Editor settings</summary>
+                <div class="textarea-actions">
+                <label class="language-control" for="analysis-language">
+                  Language
+                  <select id="analysis-language" aria-label="Analysis language">
+                    <option value="auto" selected>Auto</option>
+                    <option value="english">English</option>
+                    <option value="chinese">Chinese</option>
+                    <option value="japanese">Japanese</option>
+                    <option value="thai">Thai</option>
+                    <option value="french">French</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="german">German</option>
+                    <option value="other">Other</option>
+                  </select>
+                </label>
+                <label class="writing-assistance-control" title="Request your browser's available spelling and grammar assistance">
+                  <span>Browser Assistance</span>
+                  <input id="writing-assistance" type="checkbox" role="switch" aria-label="Browser writing assistance" checked>
+                  <span class="writing-assistance-switch" aria-hidden="true"></span>
+                </label>
+                <label class="writing-assistance-control" title="Save this draft and its settings in this browser">
+                  <span class="autosave-control-label" id="autosave-control-label" aria-live="polite">Autosave</span>
+                  <input id="draft-autosave" type="checkbox" role="switch" aria-label="Save draft locally" checked>
+                  <span class="writing-assistance-switch" aria-hidden="true"></span>
+                </label>
+                </div>
+              </details>
+              <div class="editor-toolbar" role="toolbar" aria-label="Document actions">
+                <button class="btn-ghost" id="editor-new" type="button" aria-label="New draft" title="New draft" data-tooltip="New draft">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 12v6M9 15h6"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-open" type="button" aria-label="Open text file" title="Open text file" data-tooltip="Open text file">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19V5a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v2"/><path d="M3 19l3-8h16l-3 8z"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-download" type="button" aria-label="Download text file" title="Download text file" data-tooltip="Download text file">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-save-pdf" type="button" aria-label="Save draft as PDF" title="Save draft as PDF" data-tooltip="Save as PDF">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M7.5 17v-5h2a1.5 1.5 0 0 1 0 3h-2m5 2v-5h1.2a2.2 2.2 0 0 1 0 5h-1.2M17 17v-5h3"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-print" type="button" aria-label="Print draft" title="Print draft" data-tooltip="Print draft">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-cut" type="button" aria-label="Cut selected text" title="Cut selected text" data-tooltip="Cut">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="M8.5 8.5L20 20M8.5 15.5L20 4"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-copy" type="button" aria-label="Copy selected text" title="Copy selected text" data-tooltip="Copy">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-paste" type="button" aria-label="Paste text" title="Paste text" data-tooltip="Paste">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h6M9 3h6a2 2 0 0 1 2 2v2H7V5a2 2 0 0 1 2-2z"/><path d="M7 6H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-2"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-find" type="button" aria-label="Find and replace" title="Find and replace" data-tooltip="Find &amp; Replace">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="M14.5 14.5L21 21M4 21h10M11 18l3 3-3 3"/></svg>
+                </button>
+                <button class="btn-ghost" id="editor-text-size" type="button" aria-label="Text size: Medium" title="Text size: Medium" data-tooltip="Text size: Medium">
+                  <svg class="text-size-icon" viewBox="0 0 28 24" aria-hidden="true"><text x="1" y="18">A</text><text x="13" y="18">A</text></svg>
+                </button>
+                <input id="editor-file-input" type="file" accept=".txt,.md,.csv,.pdf,text/plain,text/markdown,text/csv,application/pdf" hidden>
               </div>
               <textarea id="text-input"
                         placeholder="Paste or type your text here..."
-                        aria-label="Text to analyse"></textarea>
+                        aria-label="Text to analyse"
+                        spellcheck="true"
+                        autocorrect="on"
+                        autocapitalize="sentences"
+                        data-text-size="medium"></textarea>
+              <dialog class="editor-find-dialog" id="editor-find-dialog" aria-labelledby="editor-find-title">
+                <div class="editor-find-dialog-inner">
+                  <div class="editor-find-dialog-header">
+                    <h3 id="editor-find-title">Find &amp; Replace</h3>
+                    <button class="btn-ghost" id="editor-find-close" type="button" aria-label="Close Find and Replace">&times;</button>
+                  </div>
+                  <div class="editor-find-grid">
+                    <label>Find <input id="editor-find-text" type="text" autocomplete="off"></label>
+                    <label>Replace with <input id="editor-replace-text" type="text" autocomplete="off"></label>
+                    <div class="editor-find-options">
+                      <label><input id="editor-match-case" type="checkbox"> Match case</label>
+                      <label><input id="editor-whole-words" type="checkbox"> Whole words</label>
+                      <label><input id="editor-in-selection" type="checkbox"> In selection</label>
+                    </div>
+                  </div>
+                  <div class="editor-find-actions">
+                    <button class="btn-ghost" id="editor-find-next" type="button">Find next</button>
+                    <button class="btn-ghost" id="editor-replace" type="button">Replace</button>
+                    <button class="btn-ghost" id="editor-replace-all" type="button">Replace all</button>
+                  </div>
+                  <p id="editor-find-status" aria-live="polite"></p>
+                </div>
+              </dialog>
+              <div class="editor-selection-status" aria-live="polite" aria-atomic="true">
+                <span class="language-status" id="analysis-language-hint" hidden>English assumed—choose a language for matching analysis.</span>
+                <span id="autosave-status" hidden></span>
+                <span id="selection-statistics" hidden></span>
+                <span id="structure-navigation-status" hidden></span>
+              </div>
 
-              <!-- Compact metrics strip -->
+              <div class="text-insights">
+                <div class="text-insight-tabs" role="tablist" aria-label="Text details">
+                  <button class="text-insight-tab" id="text-insight-tab-summary" type="button" role="tab" aria-selected="true" aria-controls="text-insight-panel-summary" tabindex="0">Summary</button>
+                  <button class="text-insight-tab" id="text-insight-tab-speed" type="button" role="tab" aria-selected="false" aria-controls="text-insight-panel-speed" tabindex="-1">Speed</button>
+                  <button class="text-insight-tab" id="text-insight-tab-targets" type="button" role="tab" aria-selected="false" aria-controls="text-insight-panel-targets" tabindex="-1">Targets</button>
+                  <button class="text-insight-tab" id="text-insight-tab-readability" type="button" role="tab" aria-selected="false" aria-controls="text-insight-panel-readability" tabindex="-1" disabled>Readability</button>
+                  <button class="text-insight-tab" id="text-insight-tab-sentence-rhythm" type="button" role="tab" aria-selected="false" aria-controls="text-insight-panel-sentence-rhythm" tabindex="-1" disabled>Sentence Rhythm</button>
+                  <button class="text-insight-tab" id="text-insight-tab-paragraph-structure" type="button" role="tab" aria-selected="false" aria-controls="text-insight-panel-paragraph-structure" tabindex="-1" disabled>Paragraph Structure</button>
+                </div>
+                <p class="analysis-language-notice" id="readability-language-notice" hidden>
+                  Readability scores are available for English, Spanish, French, and German text. Counts, density, phrases, rhythm, and structure remain available.
+                </p>
+
+                <!-- Compact metrics strip -->
+                <section class="text-insight-panel text-insight-surface" id="text-insight-panel-summary" role="tabpanel" aria-labelledby="text-insight-tab-summary">
               <div class="results-col" id="resultsCol" aria-live="polite">
                 <div id="resultsCards" style="display:grid;">
+                  <div class="result-card primary">
+                    <div class="result-label">Words</div>
+                    <div class="result-value" id="resWords">0</div>
+                    <div class="result-sub" id="resWordsSub">— sentences · — paragraphs</div>
+                  </div>
+                  <div class="stat-trio">
+                    <div class="result-card"><div class="result-label">Characters</div><div class="result-value" id="resChars">0</div></div>
+                    <div class="result-card"><div class="result-label">No Spaces</div><div class="result-value" id="resCharsNoSpaces">0</div></div>
+                    <div class="result-card"><div class="result-label">Lines</div><div class="result-value" id="resLines">0</div></div>
+                  </div>
+                </div>
+              </div>
+                </section>
+
+                <section class="text-insight-panel" id="text-insight-panel-speed" role="tabpanel" aria-labelledby="text-insight-tab-speed" hidden>
+                <div class="speed-controls-grid">
                   <div class="result-card reading-speed-card">
                     <label class="result-label" for="wpm">
                       Reading Speed
-                      <span id="wpmVal">200 wpm</span>
+                      <span class="reading-speed-summary"><span id="wpmVal">200</span> <span id="readingSpeedUnit">wpm</span> &middot; <span id="resReading">less than a minute</span></span>
                     </label>
                     <div class="reading-speed-inline">
                       <input type="number" id="wpm" class="wpm-number"
@@ -796,52 +1629,72 @@
                       <input type="range" id="wpmSlider"
                              min="50" max="1000" step="10" value="200"
                              aria-label="Reading speed slider" />
+                      <select class="speed-preset" id="readingSpeedPreset" aria-label="Reading speed preset">
+                        <option value="130">Technical</option><option value="240">Standard</option><option value="300">Skimming</option><option value="custom" selected>Custom</option>
+                      </select>
                     </div>
                   </div>
-
-                  <div class="result-card primary">
-                    <div class="result-label">Words</div>
-                    <div class="result-value" id="resWords">0</div>
-                    <div class="result-sub" id="resWordsSub">— sentences · — paragraphs</div>
-                  </div>
-
-                  <div class="stat-trio">
-                    <div class="result-card">
-                      <div class="result-label">Characters</div>
-                      <div class="result-value" id="resChars">0</div>
-                    </div>
-                    <div class="result-card">
-                      <div class="result-label">No Spaces</div>
-                      <div class="result-value" id="resCharsNoSpaces">0</div>
-                    </div>
-                    <div class="result-card">
-                      <div class="result-label">Read Time</div>
-                      <div class="result-value" id="resReading">—</div>
+                  <div class="result-card speaking-speed-card">
+                    <label class="result-label" for="speakingWpm">
+                      Speaking Speed
+                      <span class="speaking-speed-summary"><span id="speakingWpmVal">130</span> <span id="speakingSpeedUnit">wpm</span> &middot; <span id="resSpeaking">less than a minute</span></span>
+                    </label>
+                    <div class="speaking-speed-inline">
+                      <input type="number" id="speakingWpm" class="wpm-number"
+                             min="80" max="200" step="5" value="130"
+                             aria-label="Speaking speed in words per minute" />
+                      <input type="range" id="speakingWpmSlider"
+                             min="80" max="200" step="5" value="130"
+                             aria-label="Speaking speed slider" />
+                      <select class="speed-preset" id="speakingSpeedPreset" aria-label="Speaking speed preset">
+                        <option value="100">Slow</option><option value="130" selected>Presentation</option><option value="150">Conversational</option><option value="180">Fast</option><option value="custom">Custom</option>
+                      </select>
                     </div>
                   </div>
                 </div>
+                <p class="metric-explanation" id="speed-language-note" hidden></p>
+                </section>
+
+                <section class="text-insight-panel" id="text-insight-panel-targets" role="tabpanel" aria-labelledby="text-insight-tab-targets" hidden>
+                <form id="writing-targets-form" class="writing-targets-surface">
+                  <button class="btn-ghost" id="writing-targets-clear" type="button" aria-label="Clear all writing targets" title="Clear targets" hidden>&times;</button>
+                  <div class="writing-targets-grid">
+                    <label>Word range<span class="word-target-fields"><input id="target-words-min" type="number" min="1" step="1" placeholder="Minimum" aria-label="Minimum word count" /><input id="target-words-max" type="number" min="1" step="1" placeholder="Maximum" aria-label="Maximum word count" /></span></label>
+                    <label>Character limit<input id="target-characters" type="number" min="1" step="1" placeholder="Optional maximum" /></label>
+                    <label>Desired reading time<input id="target-reading-minutes" type="number" min="0.1" step="0.1" placeholder="Minutes" /></label>
+                    <label>Desired speaking time<input id="target-speaking-minutes" type="number" min="0.1" step="0.1" placeholder="Minutes" /></label>
+                  </div>
+                  <div class="writing-targets-status">
+                    <div class="target-progress-list" id="target-progress-list" aria-live="polite" hidden></div>
+                  </div>
+                </form>
+                </section>
+                <section class="text-insight-panel" id="text-insight-panel-readability" role="tabpanel" aria-labelledby="text-insight-tab-readability" hidden></section>
+                <section class="text-insight-panel" id="text-insight-panel-sentence-rhythm" role="tabpanel" aria-labelledby="text-insight-tab-sentence-rhythm" hidden></section>
+                <section class="text-insight-panel" id="text-insight-panel-paragraph-structure" role="tabpanel" aria-labelledby="text-insight-tab-paragraph-structure" hidden></section>
               </div>
 
             </div>
 
           </div><!-- /inputs-col -->
 
-        </div><!-- /calc-layout -->
-      </div><!-- /tool-widget -->
-    </section>
+            </div><!-- /calc-layout -->
+          </section>
 
+          <section class="analysis-tab-panel analysis-tab-panel--results" id="analysis-panel-density" role="tabpanel" aria-labelledby="analysis-tab-density" hidden>
     <!-- KEYWORD DENSITY TABLE -->
-    <section class="keywords-section" id="keywordsSection" style="display:none;" aria-labelledby="kw-heading">
+    <section class="keywords-section" id="keywordsSection" hidden aria-labelledby="kw-heading">
       <div class="keywords-heading-row">
         <h2 id="kw-heading">Keyword Density</h2>
         <label class="check">
           <input type="checkbox" id="exclude-stopwords" checked />
-          Exclude common stopwords from keywords
+          <span id="exclude-stopwords-label">Exclude common stopwords from keywords</span>
         </label>
       </div>
 
       <div class="keywords-controls">
         <span id="kwInfo">Top keywords in your text</span>
+        <button class="btn-ghost" id="clear-keyword-selection" type="button" hidden>Clear selection</button>
       </div>
 
       <div class="keywords-wrap">
@@ -857,48 +1710,55 @@
         </table>
       </div>
     </section>
+          </section>
+
+          <section class="analysis-tab-panel analysis-tab-panel--results" id="analysis-panel-phrases" role="tabpanel" aria-labelledby="analysis-tab-phrases" hidden></section>
+        </div><!-- /analysis-tab-panels -->
+      </div><!-- /tool-widget -->
+    </section>
 
     <!-- HOW TO USE -->
     <div class="seo-section">
-      <h2>How to use this free text analyzer</h2>
-      <p>Paste or type text into the editor. The word counter updates words, characters with and
-         without spaces, sentences, paragraphs, and estimated reading time immediately. Adjust
-         <strong>Reading Speed</strong> to match your audience; no calculate button is required.</p>
-      <p>Use the <strong>Keyword Density</strong> table to find repeated terms and their share of the
-         total word count. You can include or exclude common stopwords, select a keyword to isolate
-         it on the distribution chart, or unscramble a selected word with the local word finder.</p>
-      <p>Review the four readability grade estimates, unigram, bigram, and trigram tables, sentence
-         rhythm, paragraph structure, and keyword distribution to understand how the writing is
-         organized. Download the finished analysis as a plain-text or Markdown report when you need
-         to save or share the results.</p>
+      <h2>How to use the word and character counter</h2>
+      <p>Paste, type, or open a text-based PDF in the editor. The counter updates the number of words,
+         characters, characters without spaces, sentences, paragraphs, and lines as you write. Use it
+         to check an essay word limit, prepare a social media post, edit web copy, or measure a long document.</p>
+      <p>Open <strong>Speed</strong> to estimate reading and speaking time at a pace you choose. Add minimum
+         and maximum goals under <strong>Targets</strong>, then use the combined progress indicators to see
+         whether the draft is below, within, or above its intended length.</p>
+      <p>The <strong>Density</strong> tab lists frequent terms and their percentage of the text. Select one or
+         more rows to compare where those words occur. The <strong>Phrases</strong> tab shows common unigrams,
+         bigrams, and trigrams, while Sentence Rhythm and Paragraph Structure visualize the shape of the draft.</p>
     </div>
 
     <!-- FORMULA -->
     <div class="seo-section">
       <h2>How are the counts calculated?</h2>
-      <p>Words are counted by splitting the text on whitespace and trimming punctuation from
-         each token. Hyphenated words like "well-known" count as one word, matching the behaviour
-         of common word processors.</p>
+      <p>Words are counted with locale-aware Unicode boundaries when your browser supports them,
+         so text without spaces—such as Chinese, Japanese, and Thai—is handled more accurately.
+         A Unicode-aware compatibility method is used in older browsers.</p>
       <div class="formula-block" role="img" aria-label="Word counting formula">
-        words = text.trim().split(/\s+/).length
+        words = locale-aware word segments
         density = ( word count ÷ total words ) × 100
       </div>
-      <p>Reading time uses the formula <strong>reading time = word count ÷ WPM</strong>, where WPM
-         (words per minute) defaults to 200. <strong>Characters</strong> includes every character
-         and space; <strong>No Spaces</strong> excludes all whitespace — useful when checking text
-         against platform limits that ignore whitespace.</p>
+      <p><strong>Characters</strong> includes letters, numbers, punctuation, spaces, and line breaks.
+         <strong>No Spaces</strong> excludes whitespace. Reading and speaking time divide the relevant
+         word or character count by the selected speed; Chinese and Japanese use character-based presets.</p>
     </div>
 
     <div class="seo-section">
       <h2>Readability, keyword, and phrase analysis</h2>
-      <p>Readability is reported with Flesch-Kincaid Grade, Gunning Fog, SMOG, and Coleman-Liau.
-         Each formula uses a different combination of sentence length, word length, letter count,
-         or estimated syllables, so the scores are best treated as a range rather than a single
-         definitive grade level.</p>
+      <p>Readability uses Flesch-Kincaid, Gunning Fog, SMOG, and Coleman-Liau for English;
+         Fernández-Huerta and Szigriszt-Pazos for Spanish; Kandel–Moles for French; and the Wiener
+         Sachtextformel for German. Each formula uses sentence length, word length, letter count,
+         or estimated syllables and should be treated as guidance rather than a definitive rating.</p>
       <p>Keyword density shows individual word frequency, while the n-gram tables reveal common
          one-, two-, and three-word phrases. These measurements can help editors notice repetition
          and topic gaps, but they are diagnostic signals rather than keyword targets. Clear,
          useful writing should take priority over reaching a particular density percentage.</p>
+      <p>Sentence Rhythm compares sentence lengths, and Paragraph Structure compares paragraph sizes.
+         Click a bar to select the corresponding passage in the editor. For long documents, zoom and pan
+         the chart to inspect a smaller section without losing its place in the full text.</p>
     </div>
 
     <!-- FAQ -->
@@ -913,9 +1773,9 @@
 
         <li class="faq-item">
           <h3>How are words counted?</h3>
-          <p>Words are counted by splitting the text on whitespace and removing leading and trailing
-             punctuation. Hyphenated terms like "well-known" count as a single word, matching the
-             behaviour of Microsoft Word and Google Docs.</p>
+          <p>Words are counted with your browser's locale-aware Unicode word boundaries, with a
+             Unicode-aware compatibility method for older browsers. This recognizes punctuation,
+             accented text, mixed scripts, and many languages that do not separate every word with spaces.</p>
         </li>
 
         <li class="faq-item">
@@ -927,45 +1787,46 @@
 
         <li class="faq-item">
           <h3>How is reading time calculated?</h3>
-          <p>Reading time is estimated by dividing the word count by a reading speed in words per
-             minute (WPM). The default is 200 WPM. Adjust it to roughly 250–300 WPM for skimmable
-             web content or 150–180 WPM for dense technical material.</p>
+          <p>Reading time uses words per minute for English-compatible text and characters per minute
+             for Chinese and Japanese. The language selector controls the units and presets, and every
+             speed remains adjustable for the audience and material.</p>
         </li>
 
         <li class="faq-item">
           <h3>What do the readability scores mean?</h3>
-          <p>Each score estimates the U.S. school grade level a reader may need. A score near 8
-             suggests eighth-grade reading difficulty; lower scores are generally easier. Treat the
-             four scores as a range, not a precise rating, and use several paragraphs for a more
-             useful estimate.</p>
+          <p>The selected language determines the formula. English grade scores and the German Wiener
+             score estimate a school or difficulty level, where lower is generally easier. Spanish
+             and French scores measure reading ease, where higher is easier. Use several paragraphs
+             and treat every result as an estimate rather than a precise rating.</p>
         </li>
 
         <li class="faq-item">
           <h3>What does keyword density mean?</h3>
           <p>Keyword density is the percentage of total words that a given word represents. The
-             list shows the most frequent words in your text, with common stopwords (the, and, of,
-             to, etc.) excluded by default so meaningful terms are easier to spot. It is a
+             list shows the most frequent words in your text, using a local stopword list for the
+             selected language when available. It is a
              lightweight indicator — for full SEO work, also consider context, synonyms, and
              natural language variations.</p>
         </li>
 
         <li class="faq-item">
           <h3>Can I use this counter for text in other languages?</h3>
-          <p>Yes — the counter works with any Unicode text, including accented characters, non-Latin
-             scripts, and emoji. Word counting accuracy may vary for languages that do not use
-             spaces to separate words (for example Chinese or Japanese).</p>
+          <p>Yes — the counter works with Unicode text, including accented characters, non-Latin scripts,
+             and emoji. Modern browsers use locale-aware word segmentation for languages such as Chinese,
+             Japanese, and Thai; results can still vary for ambiguous language-specific boundaries.</p>
         </li>
 
         <li class="faq-item">
-          <h3>Can I export the text analysis?</h3>
-          <p>Yes. After you add text, use Export Analysis to download the counts, readability
-             scores, and top keywords as a plain-text or Markdown report.</p>
+          <h3>Can I open a PDF or save my text as a PDF?</h3>
+          <p>Yes. You can extract selectable text from a PDF for analysis. Images and scanned pages are
+             ignored. Use Save as PDF to open your browser's print dialog and create a PDF from the editor text.</p>
         </li>
 
         <li class="faq-item">
           <h3>Is my data private?</h3>
-          <p>Yes — analysis runs entirely in your browser. No text you enter
-             is transmitted to a server or stored by this tool. See our
+          <p>Yes — analysis runs entirely in your browser and no text is transmitted to a server.
+             When Autosave is enabled, the current draft and settings are stored only in this browser.
+             Disable Autosave or choose New to remove the saved draft. See our
              <a href="/privacy" style="color:var(--accent)">Privacy Policy</a> for details.</p>
         </li>
 
@@ -974,9 +1835,25 @@
       </details>
     </section>
 
+    <section class="word-counter-related-guides" id="word-counter-related-guides" aria-labelledby="word-counter-guides-heading" data-related-guides-tool="word-character-counter" data-related-guides-limit="2">
+      <div class="word-counter-related-guides-heading">
+        <p class="premium-section-kicker">Learn more</p>
+        <h2 id="word-counter-guides-heading">Related Word Counter Guides</h2>
+        <p>Learn how local text analysis protects drafts and how browser-based engineering keeps large documents responsive.</p>
+      </div>
+      <div class="word-game-guide-grid">
+        <article class="word-game-guide-card">
+          <span>Privacy and performance</span>
+          <h3><a href="https://blog.monkeytactics.com/posts/does-your-word-counter-upload-your-text/">Does Your Word Counter Upload Your Text?</a></h3>
+          <p>See how Rust, WebAssembly, Web Workers, IndexedDB autosave, and large-document optimizations keep text analysis local.</p>
+          <a class="word-game-guide-link" href="https://blog.monkeytactics.com/posts/does-your-word-counter-upload-your-text/">Read guide <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+    </section>
+
     <!-- RELATED TOOLS -->
     <section aria-labelledby="related-heading" style="margin-top:2rem;">
-      <h2 id="related-heading">Related Tools</h2>
+      <h2 id="related-heading">Related writing and text tools</h2>
       <div class="related-grid">
 
         <a href="/tools/word-unscrambler" class="related-card">
@@ -1046,18 +1923,154 @@
   </footer>
 
   <!-- COUNTER SCRIPT -->
+  <script src="/assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
+  <script src="/assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
+  <script>
+    (function initializeAnalysisTabs() {
+      const tabs = [...document.querySelectorAll('.analysis-tab')];
+      const panels = [...document.querySelectorAll('.analysis-tab-panel')];
+
+      function activateTab(tab, moveFocus) {
+        if (tab.disabled) return;
+        tabs.forEach(function (candidate) {
+          const selected = candidate === tab;
+          candidate.setAttribute('aria-selected', String(selected));
+          candidate.tabIndex = selected ? 0 : -1;
+          const panel = document.getElementById(candidate.getAttribute('aria-controls'));
+          if (panel.id === 'analysis-panel-text') {
+            panel.hidden = false;
+            panel.classList.toggle('is-retained-inactive', !selected);
+            panel.toggleAttribute('inert', !selected);
+            panel.setAttribute('aria-hidden', String(!selected));
+          } else {
+            panel.hidden = !selected;
+          }
+        });
+        if (moveFocus) tab.focus();
+        window.dispatchEvent(new Event('resize'));
+      }
+
+      tabs.forEach(function (tab, index) {
+        tab.addEventListener('click', function () { activateTab(tab, false); });
+        tab.addEventListener('keydown', function (event) {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const enabledTabs = tabs.filter(function (candidate) { return !candidate.disabled; });
+          const enabledIndex = enabledTabs.indexOf(tab);
+          let nextIndex = enabledIndex;
+          if (event.key === 'ArrowLeft') nextIndex = (enabledIndex - 1 + enabledTabs.length) % enabledTabs.length;
+          if (event.key === 'ArrowRight') nextIndex = (enabledIndex + 1) % enabledTabs.length;
+          if (event.key === 'Home') nextIndex = 0;
+          if (event.key === 'End') nextIndex = enabledTabs.length - 1;
+          activateTab(enabledTabs[nextIndex], true);
+        });
+      });
+
+      window.addEventListener('analysis-content-state', function (event) {
+        const hasText = event.detail.hasText;
+        tabs.forEach(function (tab) {
+          if (tab.id !== 'analysis-tab-text') tab.disabled = !hasText;
+        });
+        if (!hasText) activateTab(document.getElementById('analysis-tab-text'), false);
+      });
+    })();
+
+    (function initializeTextInsightTabs() {
+      const tabs = [...document.querySelectorAll('.text-insight-tab')];
+
+      function activateTab(tab, moveFocus) {
+        if (tab.disabled) return;
+        tabs.forEach(function (candidate) {
+          const selected = candidate === tab;
+          candidate.setAttribute('aria-selected', String(selected));
+          candidate.tabIndex = selected ? 0 : -1;
+          document.getElementById(candidate.getAttribute('aria-controls')).hidden = !selected;
+        });
+        if (moveFocus) tab.focus();
+        window.dispatchEvent(new Event('resize'));
+      }
+
+      tabs.forEach(function (tab, index) {
+        tab.addEventListener('click', function () { activateTab(tab, false); });
+        tab.addEventListener('keydown', function (event) {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const enabledTabs = tabs.filter(function (candidate) { return !candidate.disabled; });
+          const enabledIndex = enabledTabs.indexOf(tab);
+          let nextIndex = enabledIndex;
+          if (event.key === 'ArrowLeft') nextIndex = (enabledIndex - 1 + enabledTabs.length) % enabledTabs.length;
+          if (event.key === 'ArrowRight') nextIndex = (enabledIndex + 1) % enabledTabs.length;
+          if (event.key === 'Home') nextIndex = 0;
+          if (event.key === 'End') nextIndex = enabledTabs.length - 1;
+          activateTab(enabledTabs[nextIndex], true);
+        });
+      });
+
+      window.addEventListener('analysis-content-state', function (event) {
+        const hasText = event.detail.hasText;
+        const supportsReadability = event.detail.supportsReadability !== false;
+        const availableWithoutText = new Set([
+          'text-insight-tab-summary', 'text-insight-tab-speed', 'text-insight-tab-targets'
+        ]);
+        tabs.forEach(function (tab) {
+          tab.disabled = (!hasText && !availableWithoutText.has(tab.id))
+            || (tab.id === 'text-insight-tab-readability' && !supportsReadability);
+        });
+        const selectedTab = tabs.find(function (tab) { return tab.getAttribute('aria-selected') === 'true'; });
+        if (selectedTab?.disabled) activateTab(document.getElementById('text-insight-tab-summary'), false);
+      });
+    })();
+  </script>
   <script type="module">
-    import { analyzeText, humanizeReadingTime } from "/assets/js/tools/word-character-counter/word-counter.js";
-    import { initializeWordCounter } from "/assets/js/tools/word-character-counter/integration.js?v=20260811-20";
+    import { analyzeText, detectAnalysisSupport, getSpeedProfile, humanizeReadingTime } from "/assets/js/tools/word-character-counter/word-counter.js?v=20260907-long-duration-1";
+    import { initializeWordCounter } from "/assets/js/tools/word-character-counter/integration.js?v=20260907-tab-cache-1";
+    import { deleteDraftFromBrowser, loadDraftFromBrowser, saveDraftToBrowser } from "/assets/js/tools/word-character-counter/draft-storage.js?v=20260907-indexeddb-autosave-1";
 
     /* ── Element refs ── */
     const textInput      = document.getElementById('text-input');
+    const languageSelect = document.getElementById('analysis-language');
+    const languageHint = document.getElementById('analysis-language-hint');
+    const writingAssistance = document.getElementById('writing-assistance');
+    const draftAutosave = document.getElementById('draft-autosave');
+    const autosaveControlLabel = document.getElementById('autosave-control-label');
+    const autosaveStatus = document.getElementById('autosave-status');
+    const selectionStatistics = document.getElementById('selection-statistics');
+    const structureNavigationStatus = document.getElementById('structure-navigation-status');
     const wpmInput       = document.getElementById('wpm');
     const wpmSlider      = document.getElementById('wpmSlider');
     const wpmVal         = document.getElementById('wpmVal');
+    const speakingWpmInput  = document.getElementById('speakingWpm');
+    const speakingWpmSlider = document.getElementById('speakingWpmSlider');
+    const speakingWpmVal    = document.getElementById('speakingWpmVal');
+    const readingSpeedUnit  = document.getElementById('readingSpeedUnit');
+    const speakingSpeedUnit = document.getElementById('speakingSpeedUnit');
+    const speedLanguageNote = document.getElementById('speed-language-note');
+    const readingSpeedPreset  = document.getElementById('readingSpeedPreset');
+    const speakingSpeedPreset = document.getElementById('speakingSpeedPreset');
     const excludeStop    = document.getElementById('exclude-stopwords');
-    const clearBtn       = document.getElementById('clear-btn');
-    const copyBtn        = document.getElementById('copy-btn');
+    const excludeStopLabel = document.getElementById('exclude-stopwords-label');
+    const editorNew = document.getElementById('editor-new');
+    const editorOpen = document.getElementById('editor-open');
+    const editorDownload = document.getElementById('editor-download');
+    const editorSavePdf = document.getElementById('editor-save-pdf');
+    const editorFind = document.getElementById('editor-find');
+    const editorPrint = document.getElementById('editor-print');
+    const editorCut = document.getElementById('editor-cut');
+    const editorCopy = document.getElementById('editor-copy');
+    const editorPaste = document.getElementById('editor-paste');
+    const editorTextSize = document.getElementById('editor-text-size');
+    const editorFileInput = document.getElementById('editor-file-input');
+    const editorFindDialog = document.getElementById('editor-find-dialog');
+    const editorFindClose = document.getElementById('editor-find-close');
+    const editorFindText = document.getElementById('editor-find-text');
+    const editorReplaceText = document.getElementById('editor-replace-text');
+    const editorMatchCase = document.getElementById('editor-match-case');
+    const editorWholeWords = document.getElementById('editor-whole-words');
+    const editorInSelection = document.getElementById('editor-in-selection');
+    const editorFindNext = document.getElementById('editor-find-next');
+    const editorReplace = document.getElementById('editor-replace');
+    const editorReplaceAll = document.getElementById('editor-replace-all');
+    const editorFindStatus = document.getElementById('editor-find-status');
 
     const resultsCards   = document.getElementById('resultsCards');
     const resWords       = document.getElementById('resWords');
@@ -1065,6 +2078,41 @@
     const resChars       = document.getElementById('resChars');
     const resCharsNoSpaces = document.getElementById('resCharsNoSpaces');
     const resReading     = document.getElementById('resReading');
+    const resSpeaking    = document.getElementById('resSpeaking');
+    const resLines       = document.getElementById('resLines');
+    const targetsForm    = document.getElementById('writing-targets-form');
+    const targetsClear   = document.getElementById('writing-targets-clear');
+    const targetProgress = document.getElementById('target-progress-list');
+    const targetWordsMin = document.getElementById('target-words-min');
+    const targetWordsMax = document.getElementById('target-words-max');
+    const targetCharacters = document.getElementById('target-characters');
+    const targetReadingMinutes = document.getElementById('target-reading-minutes');
+    const targetSpeakingMinutes = document.getElementById('target-speaking-minutes');
+    let preferredExcludeStopwords = excludeStop.checked;
+    let stopwordLanguageGuardActive = false;
+    let activeSpeedMode = 'words';
+    const savedSpeedSettings = new Map();
+    const writingAssistanceStorageKey = 'word-character-counter-writing-assistance-v2';
+    const autosavePreferenceKey = 'word-character-counter-autosave-enabled';
+    const legacyAutosaveDraftKey = 'word-character-counter-draft-v1';
+    const autosaveIdleDelay = 3_000;
+    const editorFileByteLimit = 5_000_000;
+    const editorPdfByteLimit = 25_000_000;
+    let autoLatinActive = false;
+    let languageHintTimer = 0;
+    let autosaveTimer = 0;
+    let autosaveGeneration = 0;
+    let autosaveWriteQueue = Promise.resolve();
+    let autosaveStatusTimer = 0;
+    let autosaveReady = false;
+    let restoredTabs = null;
+    let findSelectionScope = null;
+    let activeFindMatch = null;
+    let immediateRenderFrame = 0;
+    let summaryAnalysisTimer = 0;
+    const largeDocumentCharacterThreshold = 250_000;
+    const veryLargeDocumentCharacterThreshold = 1_000_000;
+    const wordSegmenters = new Map();
 
     const keywordsSection = document.getElementById('keywordsSection');
     const kwBody          = document.getElementById('kwBody');
@@ -1072,68 +2120,666 @@
 
     /* ── Local sentence + paragraph counts (lightweight, not in module) ── */
     function countSentences(text) {
-      const matches = text.match(/[^.!?\n]+[.!?]+(?=\s|$)|[^.!?\n]+$/g);
-      return matches ? matches.length : 0;
+      const terminator = /[.!?。！？．｡؟।॥]/;
+      let count = 0;
+      let hasContent = false;
+      for (const character of text) {
+        if (terminator.test(character)) {
+          if (hasContent) count += 1;
+          hasContent = false;
+        } else if (!/\s/.test(character)) {
+          hasContent = true;
+        }
+      }
+      return count + (hasContent ? 1 : 0);
     }
     function countParagraphs(text) {
       const paras = text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
       return paras.length;
     }
+    function countLines(text) {
+      return text.length ? text.split(/\r\n|\r|\n/).length : 0;
+    }
+    function countWordsLightweight(text, language) {
+      if (!text.trim()) return 0;
+      if (typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function') {
+        const locales = { english: 'en', chinese: 'zh', japanese: 'ja', thai: 'th', french: 'fr', spanish: 'es', german: 'de' };
+        const locale = locales[language] || 'en';
+        if (!wordSegmenters.has(locale)) wordSegmenters.set(locale, new Intl.Segmenter(locale, { granularity: 'word' }));
+        let count = 0;
+        for (const segment of wordSegmenters.get(locale).segment(text)) if (segment.isWordLike) count += 1;
+        return count;
+      }
+      return (text.match(/[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu) || []).length;
+    }
+    function scheduleImmediateAnalysis() {
+      cancelAnimationFrame(immediateRenderFrame);
+      clearTimeout(summaryAnalysisTimer);
+      const length = textInput.value.length;
+      if (length >= largeDocumentCharacterThreshold) {
+        const delay = length >= veryLargeDocumentCharacterThreshold ? 850 : 500;
+        summaryAnalysisTimer = setTimeout(renderAnalysis, delay);
+        return;
+      }
+      immediateRenderFrame = requestAnimationFrame(renderAnalysis);
+    }
+
+    function applyWritingAssistance(language) {
+      const languageTags = {
+        english: 'en', chinese: 'zh', japanese: 'ja', thai: 'th',
+        french: 'fr', spanish: 'es', german: 'de'
+      };
+      textInput.lang = languageTags[language] || '';
+      const enabled = writingAssistance.checked;
+      textInput.spellcheck = enabled;
+      textInput.setAttribute('spellcheck', String(enabled));
+      textInput.setAttribute('autocorrect', enabled ? 'on' : 'off');
+      textInput.setAttribute('autocapitalize', enabled ? 'sentences' : 'off');
+    }
+
+    const editorTextSizes = ['small', 'medium', 'large'];
+    function applyEditorTextSize(size) {
+      const normalizedSize = editorTextSizes.includes(size) ? size : 'medium';
+      const label = normalizedSize.charAt(0).toUpperCase() + normalizedSize.slice(1);
+      textInput.dataset.textSize = normalizedSize;
+      editorTextSize.setAttribute('aria-label', 'Text size: ' + label);
+      editorTextSize.title = 'Text size: ' + label;
+      editorTextSize.dataset.tooltip = 'Text size: ' + label;
+    }
+
+    function updateLanguageHint(showAutoLatinHint) {
+      if (!showAutoLatinHint) {
+        autoLatinActive = false;
+        clearTimeout(languageHintTimer);
+        languageHint.hidden = true;
+        return;
+      }
+      if (autoLatinActive) return;
+      autoLatinActive = true;
+      languageHint.hidden = false;
+      clearTimeout(languageHintTimer);
+      languageHintTimer = setTimeout(function () { languageHint.hidden = true; }, 4500);
+    }
+
+    function showAutosaveStatus(message, isWarning = false) {
+      autosaveStatus.textContent = message;
+      autosaveStatus.style.color = isWarning ? '#f87171' : 'var(--accent)';
+      autosaveStatus.hidden = false;
+      clearTimeout(autosaveStatusTimer);
+      autosaveStatusTimer = setTimeout(function () { autosaveStatus.hidden = true; }, isWarning ? 4500 : 1800);
+    }
+
+    function setAutosaveSaving(saving) {
+      autosaveControlLabel.textContent = saving ? 'Saving…' : 'Autosave';
+      draftAutosave.setAttribute('aria-label', saving ? 'Saving draft locally' : 'Save draft locally');
+    }
+
+    function draftState() {
+      return {
+        text: textInput.value,
+        language: languageSelect.value,
+        readingSpeed: wpmInput.value,
+        speakingSpeed: speakingWpmInput.value,
+        textSize: textInput.dataset.textSize || 'medium',
+        targets: {
+          wordMinimum: targetWordsMin.value,
+          wordMaximum: targetWordsMax.value,
+          characters: targetCharacters.value,
+          readingMinutes: targetReadingMinutes.value,
+          speakingMinutes: targetSpeakingMinutes.value
+        },
+        primaryTab: document.querySelector('.analysis-tab[aria-selected="true"]')?.id || 'analysis-tab-text',
+        detailTab: document.querySelector('.text-insight-tab[aria-selected="true"]')?.id || 'text-insight-tab-summary',
+        updatedAt: Date.now()
+      };
+    }
+
+    async function saveDraft() {
+      autosaveTimer = 0;
+      if (!autosaveReady || !draftAutosave.checked) {
+        setAutosaveSaving(false);
+        return;
+      }
+      const generation = autosaveGeneration;
+      const state = draftState();
+      try {
+        const write = autosaveWriteQueue.then(function () { return saveDraftToBrowser(state); });
+        autosaveWriteQueue = write.catch(function () {});
+        await write;
+        try { localStorage.removeItem(legacyAutosaveDraftKey); } catch (_) {}
+        if (generation === autosaveGeneration) setAutosaveSaving(false);
+      } catch (indexedDbError) {
+        try {
+          localStorage.setItem(legacyAutosaveDraftKey, JSON.stringify(state));
+          if (generation === autosaveGeneration) setAutosaveSaving(false);
+        } catch (_) {
+          if (generation === autosaveGeneration) {
+            setAutosaveSaving(false);
+            showAutosaveStatus('Could not save this draft in the browser.', true);
+          }
+        }
+      }
+    }
+
+    function scheduleAutosave() {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = 0;
+      autosaveGeneration += 1;
+      if (!autosaveReady || !draftAutosave.checked) {
+        setAutosaveSaving(false);
+        return;
+      }
+      setAutosaveSaving(true);
+      autosaveTimer = setTimeout(saveDraft, autosaveIdleDelay);
+    }
+
+    async function restoreDraft() {
+      try {
+        draftAutosave.checked = localStorage.getItem(autosavePreferenceKey) !== 'false';
+        if (!draftAutosave.checked) return;
+        let saved = null;
+        try { saved = await loadDraftFromBrowser(); } catch (_) {}
+        if (!saved) {
+          const legacySaved = JSON.parse(localStorage.getItem(legacyAutosaveDraftKey) || 'null');
+          if (legacySaved && typeof legacySaved === 'object') {
+            saved = legacySaved;
+            try {
+              await saveDraftToBrowser(legacySaved);
+              localStorage.removeItem(legacyAutosaveDraftKey);
+            } catch (_) {}
+          }
+        }
+        if (!saved || typeof saved !== 'object') return;
+        textInput.value = typeof saved.text === 'string' ? saved.text : '';
+        applyEditorTextSize(saved.textSize);
+        if ([...languageSelect.options].some(option => option.value === saved.language)) languageSelect.value = saved.language;
+        if (saved.readingSpeed) {
+          wpmInput.value = wpmSlider.value = saved.readingSpeed;
+          wpmVal.textContent = saved.readingSpeed;
+          readingSpeedPreset.value = [...readingSpeedPreset.options].some(option => option.value === String(saved.readingSpeed)) ? String(saved.readingSpeed) : 'custom';
+        }
+        if (saved.speakingSpeed) {
+          speakingWpmInput.value = speakingWpmSlider.value = saved.speakingSpeed;
+          speakingWpmVal.textContent = saved.speakingSpeed;
+          speakingSpeedPreset.value = [...speakingSpeedPreset.options].some(option => option.value === String(saved.speakingSpeed)) ? String(saved.speakingSpeed) : 'custom';
+        }
+        const targets = saved.targets || {};
+        targetWordsMin.value = targets.wordMinimum || (targets.wordMode === 'min' ? targets.words || '' : '');
+        targetWordsMax.value = targets.wordMaximum || (targets.wordMode === 'max' ? targets.words || '' : '');
+        targetCharacters.value = targets.characters || '';
+        targetReadingMinutes.value = targets.readingMinutes || '';
+        targetSpeakingMinutes.value = targets.speakingMinutes || '';
+        restoredTabs = { primary: saved.primaryTab, detail: saved.detailTab };
+      } catch (_) {
+        try { localStorage.removeItem(legacyAutosaveDraftKey); } catch (_) {}
+        try { await deleteDraftFromBrowser(); } catch (_) {}
+      }
+    }
+
+    function updateSelectionStatistics() {
+      const start = textInput.selectionStart;
+      const end = textInput.selectionEnd;
+      const selectedText = start === end ? '' : textInput.value.slice(start, end);
+      if (!selectedText) {
+        selectionStatistics.hidden = true;
+        selectionStatistics.textContent = '';
+        return;
+      }
+      const selected = analyzeText(selectedText, { language: languageSelect.value });
+      const profile = getSpeedProfile(selectedText, selected.words, languageSelect.value);
+      const readingSpeed = parseInt(wpmInput.value, 10) || profile.reading.defaultValue;
+      const speakingSpeed = parseInt(speakingWpmInput.value, 10) || profile.speaking.defaultValue;
+      const readingSeconds = Math.ceil(profile.amount / readingSpeed * 60);
+      const speakingSeconds = Math.ceil(profile.amount / speakingSpeed * 60);
+      selectionStatistics.innerHTML = '<strong>Selection</strong> · ' +
+        selected.words.toLocaleString() + (selected.words === 1 ? ' word · ' : ' words · ') +
+        Array.from(selectedText).length.toLocaleString() + (Array.from(selectedText).length === 1 ? ' character · Read ' : ' characters · Read ') +
+        humanizeReadingTime(readingSeconds) + ' · Speak ' + humanizeReadingTime(speakingSeconds);
+      selectionStatistics.hidden = false;
+    }
+
+    function notifyTextChanged() {
+      textInput.dispatchEvent(new Event('input', { bubbles: true }));
+      textInput.focus();
+    }
+
+    async function clearCurrentDraft() {
+      clearTimeout(autosaveTimer);
+      autosaveGeneration += 1;
+      setAutosaveSaving(false);
+      textInput.value = '';
+      autosaveReady = false;
+      notifyTextChanged();
+      autosaveReady = true;
+      try { localStorage.removeItem(legacyAutosaveDraftKey); } catch (_) {}
+      try {
+        await autosaveWriteQueue;
+        await deleteDraftFromBrowser();
+      } catch (_) {}
+      showAutosaveStatus('Saved draft cleared');
+    }
+
+    async function copyToClipboard(text, successMessage) {
+      if (!text) {
+        showAutosaveStatus('Select text to copy.', true);
+        return false;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        showAutosaveStatus(successMessage);
+        return true;
+      } catch (_) {
+        showAutosaveStatus('Clipboard access was blocked by the browser.', true);
+        return false;
+      }
+    }
+
+    function downloadText() {
+      const blob = new Blob([textInput.value], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'draft.txt';
+      link.click();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+
+    function shouldSeparatePdfItems(left, right) {
+      if (!left || !right || /\s$/u.test(left) || /^\s/u.test(right)) return false;
+      const unspacedScript = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}]/u;
+      return !unspacedScript.test(left.slice(-1)) && !unspacedScript.test(right.charAt(0));
+    }
+
+    function pdfTextItemGeometry(item) {
+      const transform = Array.isArray(item?.transform) ? item.transform : [];
+      const x = Number(transform[4]);
+      const y = Number(transform[5]);
+      const transformedHeight = Math.abs(Number(transform[3]));
+      const itemHeight = Math.abs(Number(item?.height));
+      return {
+        x: Number.isFinite(x) ? x : null,
+        y: Number.isFinite(y) ? y : null,
+        height: transformedHeight || itemHeight || null
+      };
+    }
+
+    function pdfTextItemsToString(items) {
+      let text = '';
+      let pendingLineBreak = null;
+
+      (items || []).forEach(function (item) {
+        const value = typeof item?.str === 'string' ? item.str : '';
+        const geometry = pdfTextItemGeometry(item);
+
+        if (!value) {
+          if (item?.hasEOL && text) {
+            if (pendingLineBreak) pendingLineBreak.forceParagraph = true;
+            else pendingLineBreak = { geometry: geometry, forceParagraph: false };
+          }
+          return;
+        }
+
+        if (pendingLineBreak) {
+          const previous = pendingLineBreak.geometry;
+          const verticalGap = previous?.y !== null && geometry.y !== null
+            ? Math.abs(previous.y - geometry.y)
+            : 0;
+          const lineHeight = Math.max(previous?.height || 0, geometry.height || 0, 1);
+          const startsParagraph = pendingLineBreak.forceParagraph || verticalGap > lineHeight * 1.6;
+          text += startsParagraph ? '\n\n' : '\n';
+          pendingLineBreak = null;
+        } else if (shouldSeparatePdfItems(text, value)) {
+          text += ' ';
+        }
+
+        text += value;
+        if (item.hasEOL) pendingLineBreak = { geometry: geometry, forceParagraph: false };
+      });
+
+      return text.trim();
+    }
+
+    async function extractPdfText(file) {
+      const pdfjs = await import('/assets/js/vendor/pdfjs/pdf.min.mjs');
+      pdfjs.GlobalWorkerOptions.workerSrc = '/assets/js/vendor/pdfjs/pdf.worker.min.mjs';
+      const documentTask = pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) });
+      const pdfDocument = await documentTask.promise;
+      const pages = [];
+      try {
+        for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
+          showAutosaveStatus('Extracting PDF page ' + pageNumber + ' of ' + pdfDocument.numPages + '…');
+          const page = await pdfDocument.getPage(pageNumber);
+          const content = await page.getTextContent();
+          pages.push(pdfTextItemsToString(content.items));
+          page.cleanup();
+        }
+      } finally {
+        await pdfDocument.destroy();
+      }
+      return pages.filter(Boolean).join('\n\n');
+    }
+
+    function centerFindMatchInEditor(index) {
+      const styles = getComputedStyle(textInput);
+      const mirror = document.createElement('div');
+      mirror.setAttribute('aria-hidden', 'true');
+      Object.assign(mirror.style, {
+        position: 'fixed',
+        left: '-10000px',
+        top: '0',
+        visibility: 'hidden',
+        boxSizing: styles.boxSizing,
+        width: textInput.getBoundingClientRect().width + 'px',
+        padding: styles.padding,
+        border: styles.border,
+        font: styles.font,
+        letterSpacing: styles.letterSpacing,
+        lineHeight: styles.lineHeight,
+        whiteSpace: 'pre-wrap',
+        overflowWrap: 'break-word',
+        wordBreak: styles.wordBreak
+      });
+      mirror.textContent = textInput.value.slice(0, index);
+      const marker = document.createElement('span');
+      marker.textContent = textInput.value.slice(index, index + 1) || '\u200b';
+      mirror.append(marker);
+      document.body.append(mirror);
+      const lineHeight = parseFloat(styles.lineHeight) || parseFloat(styles.fontSize) * 1.2;
+      textInput.scrollTo({
+        top: Math.max(0, marker.offsetTop - textInput.clientHeight / 2 + lineHeight / 2),
+        behavior: 'smooth'
+      });
+      mirror.remove();
+    }
+
+    function findNext() {
+      const query = editorFindText.value;
+      if (!query) {
+        editorFindStatus.textContent = 'Enter text to find.';
+        return false;
+      }
+      const source = editorMatchCase.checked ? textInput.value : textInput.value.toLocaleLowerCase();
+      const needle = editorMatchCase.checked ? query : query.toLocaleLowerCase();
+      const scope = activeFindScope();
+      const searchStart = textInput.selectionEnd >= scope.start && textInput.selectionEnd < scope.end
+        ? textInput.selectionEnd : scope.start;
+      let index = findMatchingIndex(source, needle, searchStart, scope.end);
+      let wrapped = false;
+      if (index < 0) {
+        index = findMatchingIndex(source, needle, scope.start, scope.end);
+        wrapped = index >= 0;
+      }
+      if (index < 0) {
+        activeFindMatch = null;
+        editorFindStatus.textContent = 'No matches found.';
+        return false;
+      }
+      textInput.focus({ preventScroll: true });
+      textInput.setSelectionRange(index, index + query.length);
+      activeFindMatch = { start: index, end: index + query.length };
+      requestAnimationFrame(function () { centerFindMatchInEditor(index); });
+      updateFindCount(wrapped ? 'Wrapped · ' : 'Selected · ');
+      updateSelectionStatistics();
+      return true;
+    }
+
+    function activeFindScope() {
+      return editorInSelection.checked && findSelectionScope
+        ? { ...findSelectionScope }
+        : { start: 0, end: textInput.value.length };
+    }
+
+    function findMatchingIndex(source, needle, start, end = source.length) {
+      let index = source.indexOf(needle, start);
+      while (index >= 0 && index + needle.length <= end && editorWholeWords.checked && !isWholeWordMatch(source, needle, index)) {
+        index = source.indexOf(needle, index + Math.max(1, needle.length));
+      }
+      return index >= 0 && index + needle.length <= end ? index : -1;
+    }
+
+    function isWholeWordMatch(source, needle, index) {
+      const wordCharacter = /[\p{L}\p{N}_]/u;
+      const startsWithWord = wordCharacter.test(needle[0] || '');
+      const endsWithWord = wordCharacter.test(needle[needle.length - 1] || '');
+      const beforeIsWord = index > 0 && wordCharacter.test(source[index - 1]);
+      const afterIndex = index + needle.length;
+      const afterIsWord = afterIndex < source.length && wordCharacter.test(source[afterIndex]);
+      return (!startsWithWord || !beforeIsWord) && (!endsWithWord || !afterIsWord);
+    }
+
+    function updateFindCount(prefix = '') {
+      const query = editorFindText.value;
+      if (!query) {
+        editorFindStatus.textContent = '';
+        return;
+      }
+      const source = editorMatchCase.checked ? textInput.value : textInput.value.toLocaleLowerCase();
+      const needle = editorMatchCase.checked ? query : query.toLocaleLowerCase();
+      const scope = activeFindScope();
+      let count = 0;
+      let cursor = scope.start;
+      let index = findMatchingIndex(source, needle, cursor, scope.end);
+      while (index >= 0) {
+        count += 1;
+        cursor = index + Math.max(1, query.length);
+        index = findMatchingIndex(source, needle, cursor, scope.end);
+      }
+      editorFindStatus.textContent = prefix + count + (count === 1 ? ' match' : ' matches');
+    }
+
+    try {
+      const savedWritingAssistance = localStorage.getItem(writingAssistanceStorageKey);
+      if (savedWritingAssistance === 'on' || savedWritingAssistance === 'off') writingAssistance.checked = savedWritingAssistance === 'on';
+    } catch (_) {}
+
+    function numericTarget(input) {
+      return input.value && Number.isFinite(input.valueAsNumber) ? input.valueAsNumber : 0;
+    }
+
+    function renderTargetProgress(stats) {
+      const definitions = [];
+      const wordMinimum = numericTarget(targetWordsMin);
+      const wordMaximum = numericTarget(targetWordsMax);
+      const characters = numericTarget(targetCharacters);
+      const readingSeconds = numericTarget(targetReadingMinutes) * 60;
+      const speakingSeconds = numericTarget(targetSpeakingMinutes) * 60;
+      const invalidWordRange = wordMinimum && wordMaximum && wordMaximum < wordMinimum;
+      targetWordsMax.setCustomValidity(invalidWordRange ? 'Maximum words must be greater than or equal to minimum words.' : '');
+      if (wordMinimum || wordMaximum) {
+        let state = 'is-within';
+        let status = '';
+        if (invalidWordRange) {
+          state = 'is-over';
+          status = 'Maximum must be at least ' + wordMinimum.toLocaleString();
+        } else if (wordMinimum && stats.words < wordMinimum) {
+          state = 'is-below';
+          status = stats.words.toLocaleString() + ' / ' + wordMinimum.toLocaleString() + ' minimum';
+        } else if (wordMaximum && stats.words > wordMaximum) {
+          state = 'is-over';
+          status = stats.words.toLocaleString() + ' words · ' + (stats.words - wordMaximum).toLocaleString() + ' over maximum';
+        } else if (wordMinimum && wordMaximum) {
+          status = stats.words.toLocaleString() + ' words · within ' + wordMinimum.toLocaleString() + '–' + wordMaximum.toLocaleString();
+        } else if (wordMinimum) {
+          status = stats.words.toLocaleString() + ' words · minimum reached';
+        } else {
+          status = stats.words.toLocaleString() + ' / ' + wordMaximum.toLocaleString() + ' maximum';
+        }
+        definitions.push({
+          label: / words · /.test(status) ? status : 'Words ' + status,
+          value: stats.words,
+          target: wordMaximum || wordMinimum,
+          minimum: wordMinimum,
+          maximum: wordMaximum,
+          state: state,
+          wordRange: true
+        });
+      }
+      if (characters) definitions.push({ label: 'Characters ' + stats.characters.toLocaleString() + ' / ' + characters.toLocaleString(), value: stats.characters, target: characters, alert: stats.characters > characters });
+      if (readingSeconds) definitions.push({ label: 'Read ' + humanizeReadingTime(stats.readingSeconds) + ' / ' + humanizeReadingTime(readingSeconds), value: stats.readingSeconds, target: readingSeconds, alert: stats.readingSeconds > readingSeconds });
+      if (speakingSeconds) definitions.push({ label: 'Speak ' + humanizeReadingTime(stats.speakingSeconds) + ' / ' + humanizeReadingTime(speakingSeconds), value: stats.speakingSeconds, target: speakingSeconds, alert: stats.speakingSeconds > speakingSeconds });
+      targetProgress.replaceChildren(...definitions.map(function (definition) {
+        const chip = document.createElement('span');
+        chip.className = 'target-progress-chip' + (definition.wordRange ? ' word-range ' + definition.state : (definition.alert ? ' is-over' : ''));
+        const label = document.createElement('span');
+        label.textContent = definition.label;
+        if (definition.wordRange) {
+          const track = document.createElement('span');
+          track.className = 'target-range-track';
+          const fill = document.createElement('span');
+          fill.className = 'target-range-fill';
+          fill.style.width = Math.min(100, definition.value / definition.target * 100) + '%';
+          track.append(fill);
+          if (definition.minimum && definition.maximum) {
+            const marker = document.createElement('span');
+            marker.className = 'target-range-min-marker';
+            marker.style.left = Math.min(100, definition.minimum / definition.maximum * 100) + '%';
+            track.append(marker);
+          }
+          chip.append(label, track);
+          return chip;
+        }
+        const progress = document.createElement('progress');
+        progress.max = definition.target;
+        progress.value = Math.min(definition.value, definition.target);
+        chip.append(label, progress);
+        return chip;
+      }));
+      targetProgress.hidden = definitions.length === 0;
+      targetsClear.hidden = definitions.length === 0;
+    }
 
     /* ── Slider <-> number input sync ── */
-    function syncWPM(source, target) {
+    function syncWPM(source, target, output, preset) {
       source.addEventListener('input', function () {
         const v = parseInt(source.value, 10);
         if (!isNaN(v)) {
           target.value = v;
-          wpmVal.textContent = v + ' wpm';
+          output.textContent = v;
+          preset.value = [...preset.options].some(option => option.value === String(v)) ? String(v) : 'custom';
           renderAnalysis();
         }
       });
     }
-    syncWPM(wpmSlider, wpmInput);
-    syncWPM(wpmInput, wpmSlider);
+    syncWPM(wpmSlider, wpmInput, wpmVal, readingSpeedPreset);
+    syncWPM(wpmInput, wpmSlider, wpmVal, readingSpeedPreset);
+    syncWPM(speakingWpmSlider, speakingWpmInput, speakingWpmVal, speakingSpeedPreset);
+    syncWPM(speakingWpmInput, speakingWpmSlider, speakingWpmVal, speakingSpeedPreset);
+
+    function bindSpeedPreset(preset, input, slider, output) {
+      preset.addEventListener('change', function () {
+        if (preset.value === 'custom') return;
+        input.value = preset.value;
+        slider.value = preset.value;
+        output.textContent = preset.value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    }
+    bindSpeedPreset(readingSpeedPreset, wpmInput, wpmSlider, wpmVal);
+    bindSpeedPreset(speakingSpeedPreset, speakingWpmInput, speakingWpmSlider, speakingWpmVal);
+
+    function configureSpeedControl(config, input, slider, output, preset, savedValue) {
+      const value = savedValue ?? config.defaultValue;
+      [input, slider].forEach(function (control) {
+        control.min = config.min;
+        control.max = config.max;
+        control.step = config.step;
+        control.value = value;
+      });
+      output.textContent = value;
+      preset.replaceChildren(...config.presets.map(function ([label, presetValue]) {
+        const option = document.createElement('option');
+        option.value = presetValue;
+        option.textContent = label;
+        return option;
+      }), new Option('Custom', 'custom'));
+      preset.value = config.presets.some(([, presetValue]) => presetValue === value) ? String(value) : 'custom';
+    }
+
+    function applySpeedProfile(profile) {
+      if (profile.mode !== activeSpeedMode) {
+        savedSpeedSettings.set(activeSpeedMode, {
+          reading: parseInt(wpmInput.value, 10),
+          speaking: parseInt(speakingWpmInput.value, 10)
+        });
+        const saved = savedSpeedSettings.get(profile.mode);
+        configureSpeedControl(profile.reading, wpmInput, wpmSlider, wpmVal, readingSpeedPreset, saved?.reading);
+        configureSpeedControl(profile.speaking, speakingWpmInput, speakingWpmSlider, speakingWpmVal, speakingSpeedPreset, saved?.speaking);
+        activeSpeedMode = profile.mode;
+      }
+      readingSpeedUnit.textContent = profile.unit;
+      speakingSpeedUnit.textContent = profile.unit;
+      const unitName = profile.unit === 'cpm' ? 'characters per minute' : 'words per minute';
+      wpmInput.setAttribute('aria-label', 'Reading speed in ' + unitName);
+      wpmSlider.setAttribute('aria-label', 'Reading speed slider in ' + unitName);
+      speakingWpmInput.setAttribute('aria-label', 'Speaking speed in ' + unitName);
+      speakingWpmSlider.setAttribute('aria-label', 'Speaking speed slider in ' + unitName);
+      const scriptName = profile.mode === 'han-characters' ? 'Chinese' : profile.mode === 'japanese-characters' ? 'Japanese' : '';
+      speedLanguageNote.hidden = !profile.approximate;
+      speedLanguageNote.textContent = scriptName
+        ? scriptName + ' estimate using characters per minute; adjust the presets for your audience.'
+        : 'Approximate estimate using words per minute for the detected script; adjust the custom speed for your audience.';
+    }
 
     /* ── Render results ── */
     function renderAnalysis() {
       const text = textInput.value;
+      const support = detectAnalysisSupport(text, languageSelect.value);
+      applyWritingAssistance(support.language);
+      const autoLanguageOption = languageSelect.querySelector('option[value="auto"]');
+      const detectedLanguage = support.language[0].toUpperCase() + support.language.slice(1);
+      const confidentlyDetected = ['chinese', 'japanese', 'thai'].includes(support.language);
+      autoLanguageOption.textContent = text.trim() && confidentlyDetected ? 'Auto (' + detectedLanguage + ')' : 'Auto';
+      updateLanguageHint(Boolean(text.trim() && languageSelect.value === 'auto' && support.dominantScript === 'Latin'));
+      const initialSpeedProfile = getSpeedProfile(text, 0, languageSelect.value);
+      applySpeedProfile(initialSpeedProfile);
+      const disableStopwords = Boolean(text.trim()) && !support.stopwordsSupported;
+      if (disableStopwords && !stopwordLanguageGuardActive) {
+        preferredExcludeStopwords = excludeStop.checked;
+        stopwordLanguageGuardActive = true;
+      } else if (!disableStopwords && stopwordLanguageGuardActive) {
+        excludeStop.checked = preferredExcludeStopwords;
+        stopwordLanguageGuardActive = false;
+      }
+      if (disableStopwords) excludeStop.checked = false;
+      excludeStop.disabled = disableStopwords;
+      const languageLabel = support.language[0].toUpperCase() + support.language.slice(1);
+      excludeStopLabel.textContent = disableStopwords
+        ? 'Stopword filtering unavailable for this language'
+        : 'Exclude common ' + languageLabel + ' stopwords';
+      excludeStop.closest('.check').title = excludeStop.disabled
+        ? 'Stopword filtering is unavailable for the selected language.'
+        : '';
+      window.dispatchEvent(new CustomEvent('analysis-content-state', {
+        detail: { hasText: Boolean(text.trim()), supportsReadability: support.readabilitySupported }
+      }));
       const wpm  = parseInt(wpmInput.value, 10) || 200;
-      const res  = analyzeText(text, { wpm, excludeStopwords: excludeStop.checked });
+      const speakingWpm = parseInt(speakingWpmInput.value, 10) || 130;
+      const words = countWordsLightweight(text, support.language);
+      const characters = Array.from(text).length;
+      const charactersNoSpaces = Array.from(text.replace(/\s/g, '')).length;
+      const speedProfile = getSpeedProfile(text, words, languageSelect.value);
 
       resultsCards.style.display = 'grid';
 
       const sentences  = countSentences(text);
       const paragraphs = countParagraphs(text);
+      const lines       = countLines(text);
 
-      resWords.textContent         = res.words.toLocaleString();
-      resWordsSub.textContent      =
+      resWords.textContent         = words.toLocaleString();
+      resWordsSub.innerHTML        = (
         sentences + (sentences === 1 ? ' sentence' : ' sentences') + ' · ' +
-        paragraphs + (paragraphs === 1 ? ' paragraph' : ' paragraphs');
-      resChars.textContent         = res.characters.toLocaleString();
-      resCharsNoSpaces.textContent = res.charactersNoSpaces.toLocaleString();
-      resReading.textContent       = humanizeReadingTime(res.readingTimeSeconds);
-
-      if (!text.trim()) {
-        keywordsSection.style.display = 'none';
-        return;
-      }
-
-      /* ── Keyword density table ── */
-      const list = res.topWords.slice(0, 10);
-
-      if (list.length === 0) {
-        keywordsSection.style.display = 'none';
-      } else {
-        keywordsSection.style.display = 'block';
-        kwInfo.textContent = excludeStop.checked
-          ? 'Top ' + list.length + ' keywords (excluding stopwords)'
-          : 'Top ' + list.length + ' keywords (including stopwords)';
-        kwBody.innerHTML = list.map(function (w) {
-          return '<tr><td>' + escapeHTML(w.word) + '</td>' +
-                 '<td>' + w.count + '</td>' +
-                 '<td>' + w.density.toFixed(1) + '%</td></tr>';
-        }).join('');
-      }
+        paragraphs + (paragraphs === 1 ? ' paragraph' : ' paragraphs')
+      ).replace(/\d+/g, '<span class="summary-count-number">$&</span>');
+      resChars.textContent         = characters.toLocaleString();
+      resCharsNoSpaces.textContent = charactersNoSpaces.toLocaleString();
+      resLines.textContent         = lines.toLocaleString();
+      const readingSeconds = Math.ceil(speedProfile.amount / wpm * 60);
+      resReading.innerHTML         = humanizeReadingTime(readingSeconds)
+        .replace(/\d+/g, '<span class="reading-time-number">$&</span>');
+      const speakingSeconds = Math.ceil(speedProfile.amount / speakingWpm * 60);
+      resSpeaking.innerHTML        = humanizeReadingTime(speakingSeconds)
+        .replace(/\d+/g, '<span class="reading-time-number">$&</span>');
+      renderTargetProgress({ words, characters, readingSeconds, speakingSeconds });
     }
 
     function escapeHTML(s) {
@@ -1143,27 +2789,271 @@
     }
 
     /* ── Listeners ── */
-    textInput.addEventListener('input', renderAnalysis);
-    excludeStop.addEventListener('change', renderAnalysis);
-
-    clearBtn.addEventListener('click', function () {
-      textInput.value = '';
-      renderAnalysis();
+    textInput.addEventListener('input', function () {
+      scheduleImmediateAnalysis();
+      scheduleAutosave();
+      if (editorFindDialog.open) updateFindCount();
+    });
+    ['select', 'keyup', 'pointerup'].forEach(function (eventName) {
+      textInput.addEventListener(eventName, updateSelectionStatistics);
+    });
+    window.addEventListener('text-editor-selection-change', updateSelectionStatistics);
+    window.addEventListener('structure-selection-change', function (event) {
+      const detail = event.detail;
+      if (!detail) {
+        structureNavigationStatus.hidden = true;
+        structureNavigationStatus.textContent = '';
+        return;
+      }
+      structureNavigationStatus.textContent = detail.label;
+      structureNavigationStatus.hidden = false;
+      updateSelectionStatistics();
+    });
+    languageSelect.addEventListener('change', renderAnalysis);
+    writingAssistance.addEventListener('change', function () {
+      applyWritingAssistance(detectAnalysisSupport(textInput.value, languageSelect.value).language);
+      try { localStorage.setItem(writingAssistanceStorageKey, writingAssistance.checked ? 'on' : 'off'); } catch (_) {}
       textInput.focus();
     });
-
-    copyBtn.addEventListener('click', function () {
-      if (!textInput.value) return;
-      navigator.clipboard.writeText(textInput.value).then(function () {
-        const original = copyBtn.textContent;
-        copyBtn.textContent = '✅ Copied!';
-        setTimeout(function () { copyBtn.textContent = original; }, 2000);
-      });
+    draftAutosave.addEventListener('change', async function () {
+      clearTimeout(autosaveTimer);
+      autosaveGeneration += 1;
+      setAutosaveSaving(draftAutosave.checked);
+      try {
+        localStorage.setItem(autosavePreferenceKey, String(draftAutosave.checked));
+        if (draftAutosave.checked) saveDraft();
+        else {
+          localStorage.removeItem(legacyAutosaveDraftKey);
+          await autosaveWriteQueue;
+          await deleteDraftFromBrowser();
+          setAutosaveSaving(false);
+          showAutosaveStatus('Saved draft removed');
+        }
+      } catch (_) {
+        setAutosaveSaving(false);
+        showAutosaveStatus('Could not update browser storage.', true);
+      }
+    });
+    excludeStop.addEventListener('change', function () {
+      if (!excludeStop.disabled) preferredExcludeStopwords = excludeStop.checked;
+      renderAnalysis();
+    });
+    targetsForm.addEventListener('input', renderAnalysis);
+    targetsForm.addEventListener('change', renderAnalysis);
+    targetsForm.addEventListener('submit', function (event) { event.preventDefault(); });
+    targetsClear.addEventListener('click', function () {
+      [targetWordsMin, targetWordsMax, targetCharacters, targetReadingMinutes, targetSpeakingMinutes].forEach(function (input) { input.value = ''; });
+      targetWordsMax.setCustomValidity('');
+      renderAnalysis();
+      scheduleAutosave();
     });
 
     /* ── Init ── */
-    renderAnalysis();
-    initializeWordCounter();
+    restoreDraft().finally(function () {
+      autosaveReady = true;
+      renderAnalysis();
+      initializeWordCounter().then(function () {
+        if (!restoredTabs) return;
+        const detailTab = document.getElementById(restoredTabs.detail);
+        const primaryTab = document.getElementById(restoredTabs.primary);
+        if (detailTab && !detailTab.disabled) detailTab.click();
+        if (primaryTab && !primaryTab.disabled) primaryTab.click();
+      });
+    });
+    editorNew.addEventListener('click', function () {
+      if (textInput.value && !confirm('Start a new draft? The current saved draft will be cleared.')) return;
+      clearCurrentDraft();
+    });
+    editorOpen.addEventListener('click', function () { editorFileInput.click(); });
+    editorFileInput.addEventListener('change', async function () {
+      const file = editorFileInput.files?.[0];
+      editorFileInput.value = '';
+      if (!file) return;
+      const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name || '');
+      const sizeLimit = isPdf ? editorPdfByteLimit : editorFileByteLimit;
+      if (file.size > sizeLimit) {
+        showAutosaveStatus(isPdf ? 'Choose a PDF smaller than 25 MB.' : 'Choose a text file smaller than 5 MB.', true);
+        return;
+      }
+      try {
+        if (isPdf) {
+          showAutosaveStatus('Extracting text from PDF…');
+          const extractedText = await extractPdfText(file);
+          if (!extractedText) {
+            showAutosaveStatus('No selectable text was found. Scanned images are ignored.', true);
+            return;
+          }
+          textInput.value = extractedText;
+          showAutosaveStatus('PDF text extracted');
+        } else {
+          textInput.value = await file.text();
+        }
+        notifyTextChanged();
+      } catch (_) {
+        showAutosaveStatus(isPdf ? 'Could not extract text from that PDF. It may be encrypted or damaged.' : 'Could not open that text file.', true);
+      }
+    });
+    editorDownload.addEventListener('click', downloadText);
+    editorTextSize.addEventListener('click', function () {
+      const currentIndex = editorTextSizes.indexOf(textInput.dataset.textSize || 'medium');
+      applyEditorTextSize(editorTextSizes[(currentIndex + 1) % editorTextSizes.length]);
+      scheduleAutosave();
+    });
+    editorCut.addEventListener('click', async function () {
+      const start = textInput.selectionStart;
+      const end = textInput.selectionEnd;
+      if (start === end) {
+        showAutosaveStatus('Select text to cut.', true);
+        return;
+      }
+      if (!await copyToClipboard(textInput.value.slice(start, end), 'Cut to clipboard')) return;
+      textInput.setRangeText('', start, end, 'end');
+      notifyTextChanged();
+    });
+    editorCopy.addEventListener('click', function () {
+      const start = textInput.selectionStart;
+      const end = textInput.selectionEnd;
+      copyToClipboard(start === end ? textInput.value : textInput.value.slice(start, end), start === end ? 'Draft copied' : 'Selection copied');
+    });
+    editorPaste.addEventListener('click', async function () {
+      try {
+        const clipboardText = await navigator.clipboard.readText();
+        if (!clipboardText) return;
+        textInput.setRangeText(clipboardText, textInput.selectionStart, textInput.selectionEnd, 'end');
+        notifyTextChanged();
+        showAutosaveStatus('Pasted from clipboard');
+      } catch (_) {
+        showAutosaveStatus('Clipboard access was blocked by the browser.', true);
+      }
+    });
+    editorFind.addEventListener('click', function () {
+      findSelectionScope = textInput.selectionStart !== textInput.selectionEnd
+        ? { start: textInput.selectionStart, end: textInput.selectionEnd }
+        : null;
+      editorInSelection.disabled = !findSelectionScope;
+      if (!findSelectionScope) editorInSelection.checked = false;
+      if (!editorFindDialog.open) editorFindDialog.show();
+      editorFindText.focus();
+      updateFindCount();
+    });
+    editorFindClose.addEventListener('click', function () { editorFindDialog.close(); });
+    editorFindDialog.addEventListener('click', function (event) {
+      if (event.target === editorFindDialog) editorFindDialog.close();
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape' || !editorFindDialog.open) return;
+      event.preventDefault();
+      editorFindDialog.close();
+      textInput.focus({ preventScroll: true });
+    });
+    editorFindNext.addEventListener('click', findNext);
+    editorFindText.addEventListener('input', function () { updateFindCount(); });
+    [editorMatchCase, editorWholeWords, editorInSelection].forEach(function (control) {
+      control.addEventListener('change', function () { updateFindCount(); });
+    });
+    editorFindText.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') { event.preventDefault(); findNext(); }
+    });
+    textInput.addEventListener('keydown', function (event) {
+      if (
+        event.key === 'Enter' &&
+        editorFindDialog.open &&
+        activeFindMatch &&
+        textInput.selectionStart === activeFindMatch.start &&
+        textInput.selectionEnd === activeFindMatch.end
+      ) {
+        event.preventDefault();
+        findNext();
+      }
+    });
+    editorReplace.addEventListener('click', function () {
+      const query = editorFindText.value;
+      const selected = textInput.value.slice(textInput.selectionStart, textInput.selectionEnd);
+      const scope = activeFindScope();
+      const matches = editorMatchCase.checked ? selected === query : selected.toLocaleLowerCase() === query.toLocaleLowerCase();
+      const wholeWordMatches = !editorWholeWords.checked || isWholeWordMatch(
+        editorMatchCase.checked ? textInput.value : textInput.value.toLocaleLowerCase(),
+        editorMatchCase.checked ? query : query.toLocaleLowerCase(),
+        textInput.selectionStart
+      );
+      const selectionIsInScope = textInput.selectionStart >= scope.start && textInput.selectionEnd <= scope.end;
+      if (!query || !matches || !wholeWordMatches || !selectionIsInScope) {
+        findNext();
+        return;
+      }
+      textInput.setRangeText(editorReplaceText.value, textInput.selectionStart, textInput.selectionEnd, 'end');
+      if (editorInSelection.checked && findSelectionScope) {
+        findSelectionScope.end += editorReplaceText.value.length - query.length;
+      }
+      notifyTextChanged();
+      editorFindStatus.textContent = 'Replaced one match.';
+      findNext();
+    });
+    editorReplaceAll.addEventListener('click', function () {
+      const query = editorFindText.value;
+      if (!query) {
+        editorFindStatus.textContent = 'Enter text to find.';
+        return;
+      }
+      const source = editorMatchCase.checked ? textInput.value : textInput.value.toLocaleLowerCase();
+      const needle = editorMatchCase.checked ? query : query.toLocaleLowerCase();
+      const scope = activeFindScope();
+      let count = 0;
+      let cursor = scope.start;
+      let output = '';
+      let index = findMatchingIndex(source, needle, cursor, scope.end);
+      while (index >= 0) {
+        output += textInput.value.slice(cursor, index) + editorReplaceText.value;
+        cursor = index + query.length;
+        count += 1;
+        index = findMatchingIndex(source, needle, cursor, scope.end);
+      }
+      if (count) {
+        output += textInput.value.slice(cursor, scope.end);
+        textInput.value = textInput.value.slice(0, scope.start) + output + textInput.value.slice(scope.end);
+        if (editorInSelection.checked && findSelectionScope) findSelectionScope.end = scope.start + output.length;
+        notifyTextChanged();
+      }
+      editorFindStatus.textContent = count ? 'Replaced ' + count + (count === 1 ? ' match.' : ' matches.') : 'No matches found.';
+    });
+    function openDraftPrintDialog() {
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        showAutosaveStatus('Allow pop-ups to print or save this draft as PDF.', true);
+        return;
+      }
+      printWindow.opener = null;
+      printWindow.document.title = 'Text draft';
+      const style = printWindow.document.createElement('style');
+      style.textContent = 'body{margin:0.75in;color:#111;font:12pt/1.55 Georgia,serif}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}';
+      const content = printWindow.document.createElement('pre');
+      content.textContent = textInput.value;
+      printWindow.document.head.append(style);
+      printWindow.document.body.append(content);
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }
+    editorPrint.addEventListener('click', openDraftPrintDialog);
+    editorSavePdf.addEventListener('click', function () {
+      showAutosaveStatus('Choose “Save as PDF” in the print dialog.');
+      openDraftPrintDialog();
+    });
+    textInput.addEventListener('keydown', function (event) {
+      if (!(event.ctrlKey || event.metaKey)) return;
+      const key = event.key.toLocaleLowerCase();
+      if (key === 'f') { event.preventDefault(); editorFind.click(); }
+      if (key === 's') { event.preventDefault(); downloadText(); }
+      if (key === 'o') { event.preventDefault(); editorOpen.click(); }
+    });
+    document.querySelectorAll('.analysis-tab, .text-insight-tab').forEach(function (tab) {
+      tab.addEventListener('click', scheduleAutosave);
+    });
+    [textInput, languageSelect, wpmInput, wpmSlider, speakingWpmInput, speakingWpmSlider, targetsForm]
+      .forEach(function (control) {
+        control.addEventListener('input', scheduleAutosave);
+        control.addEventListener('change', scheduleAutosave);
+      });
   </script>
 
 </body>

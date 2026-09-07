@@ -1,12 +1,37 @@
-import { analyzeText, humanizeReadingTime } from "/assets/js/tools/word-character-counter/word-counter.js";
-import { initWasmEngine, runWasmAnalysis } from "./wasm-engine.js";
-import { createVisualizationRenderer } from "./visualizations.js?v=20260809-1";
+import { analyzeText, calculateReadability, detectAnalysisSupport, getSpeedProfile, getStopwords, humanizeReadingTime } from "/assets/js/tools/word-character-counter/word-counter.js?v=20260907-long-duration-1";
+import { initWasmEngine, runWasmAnalysis } from "./wasm-engine.js?v=20260907-js-fallback-1";
+import { analyzeTextWithJavaScript } from "./js-analyzer.js?v=20260907-js-fallback-1";
+import { createVisualizationRenderer } from "./visualizations.js?v=20260906-density-width-1";
 import {
   normalizeUnscrambleTerm, unscrambleLocal
 } from "../word-unscrambler/embed-client.js?v=20260809-1";
 
 let initialized = false;
 let latestAnalysis = null;
+const analyzerParityDebug = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]).has(window.location.hostname)
+  && new URLSearchParams(window.location.search).get("analyzerDebug") === "parity";
+
+function formatTiming(value) {
+  return Number.isFinite(value) ? value.toFixed(2) + " ms" : "n/a";
+}
+
+function logAnalyzerDiagnostics(diagnostics) {
+  if (!diagnostics) return;
+  const timing = diagnostics.timings || {};
+  const differenceCount = diagnostics.differences?.length || 0;
+  console.groupCollapsed("[Analyzer parity] " + (diagnostics.match ? "Match" : "Mismatch — " + differenceCount + (diagnostics.truncated ? "+" : "") + " differences"));
+  console.table({
+    "WASM initialization": formatTiming(timing.wasmInitializationMs),
+    "WASM analysis": formatTiming(timing.wasmMs),
+    "JavaScript analysis": formatTiming(timing.javascriptMs),
+    "JS − WASM": formatTiming(timing.deltaMs),
+    "JS / WASM": Number.isFinite(timing.ratio) ? timing.ratio.toFixed(2) + "×" : "n/a"
+  });
+  console.log("Rolling median (" + timing.runs + " run" + (timing.runs === 1 ? "" : "s") + "): WASM "
+    + formatTiming(timing.wasmMedianMs) + ", JavaScript " + formatTiming(timing.javascriptMedianMs));
+  if (!diagnostics.match) console.table(diagnostics.differences);
+  console.groupEnd();
+}
 
 function element(tag, attributes, text) {
   const node = document.createElement(tag);
@@ -30,9 +55,9 @@ function resultCard(label, id, explanation) {
   return card;
 }
 
-function createReadabilitySection(after) {
+function createReadabilitySection(container) {
   const section = element("section", {
-    className: "readability-section", id: "readabilitySection",
+    className: "readability-section text-insight-surface", id: "readabilitySection",
     "aria-label": "Readability scores"
   });
   const cards = element("div", { className: "stat-trio analysis-card-grid" });
@@ -44,18 +69,51 @@ function createReadabilitySection(after) {
     resultCard("Coleman-Liau Index", "readabilityColeman", "Uses letters per word and sentence length instead of estimating syllables.")
   );
   section.append(cards);
-  after.insertAdjacentElement("afterend", section);
+  container.append(section);
   return section;
 }
 
-function chartCard(title, id, label, explanation, hoverOnly) {
+function chartCard(title, id, label, explanation, hoverOnly, helpModal) {
   const descriptionId = id + "Description";
   const card = element("div", { className: "result-card structure-card" });
-  if (!hoverOnly) card.append(element("div", { className: "result-label" }, title));
-  card.append(element("p", {
-    className: hoverOnly ? "chart-hover-description" : "metric-explanation",
-    id: descriptionId
-  }, hoverOnly ? title + ". " + explanation : explanation));
+  if (helpModal) {
+    const dialogId = id + "HelpDialog";
+    const titleId = id + "HelpTitle";
+    const helpButton = element("button", {
+      className: "chart-help-button", type: "button", "aria-label": "About " + title,
+      "aria-haspopup": "dialog", "aria-controls": dialogId
+    }, "?");
+    const dialog = element("dialog", {
+      className: "chart-help-dialog result-card", id: dialogId, "aria-labelledby": titleId,
+      "aria-describedby": descriptionId
+    });
+    const header = element("div", { className: "chart-help-dialog-header" });
+    const close = element("button", {
+      className: "btn-ghost chart-help-close", type: "button", "aria-label": "Close " + title + " help"
+    }, "×");
+    header.append(element("h3", { id: titleId }, title), close);
+    dialog.append(header, element("p", { className: "metric-explanation", id: descriptionId }, explanation));
+    helpButton.addEventListener("click", function () {
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "");
+      close.focus({ preventScroll: true });
+    });
+    close.addEventListener("click", function () {
+      if (typeof dialog.close === "function") dialog.close();
+      else dialog.removeAttribute("open");
+      helpButton.focus({ preventScroll: true });
+    });
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog) close.click();
+    });
+    card.append(helpButton, dialog);
+  } else {
+    if (!hoverOnly) card.append(element("div", { className: "result-label" }, title));
+    card.append(element("p", {
+      className: hoverOnly ? "chart-hover-description" : "metric-explanation",
+      id: descriptionId
+    }, hoverOnly ? title + ". " + explanation : explanation));
+  }
   const canvas = element("canvas", {
     id, role: "img", "aria-label": label, "aria-describedby": descriptionId
   });
@@ -64,12 +122,25 @@ function chartCard(title, id, label, explanation, hoverOnly) {
     canvas.title = title + ": " + explanation;
   }
   canvas.dataset.height = hoverOnly ? "44" : "150";
-  card.append(canvas);
+  if (helpModal) {
+    const zoomControls = element("div", { className: "chart-zoom-controls", role: "group", "aria-label": title + " zoom controls" });
+    zoomControls.append(
+      element("button", { className: "chart-zoom-button", type: "button", "data-chart-zoom": "out", "aria-label": "Zoom out " + title }, "−"),
+      element("button", { className: "chart-zoom-fit", type: "button", "data-chart-zoom": "fit", "aria-label": "Fit all " + title }, "Fit"),
+      element("button", { className: "chart-zoom-button", type: "button", "data-chart-zoom": "in", "aria-label": "Zoom in " + title }, "+")
+    );
+    const viewport = element("div", { className: "chart-scroll-viewport", tabindex: "0", "aria-label": title + " scroll area" });
+    const spacer = element("div", { className: "chart-scroll-spacer", "aria-hidden": "true" });
+    viewport.append(spacer, canvas);
+    card.append(zoomControls, viewport);
+  } else {
+    card.append(canvas);
+  }
   return { card, canvas };
 }
 
-function createNgramSection(after) {
-  after.insertAdjacentHTML("afterend", `
+function createNgramSection(container) {
+  container.insertAdjacentHTML("beforeend", `
     <div id="ngram-section" class="result-card structure-card">
       <div class="btn-row" role="tablist" aria-label="N-gram categories">
         <button class="btn-ghost ngram-tab" id="ngram-unigrams-tab" type="button" role="tab" aria-selected="true" aria-controls="ngram-unigrams" tabindex="0" data-ngram-type="unigrams">Unigrams</button>
@@ -98,7 +169,7 @@ function createNgramSection(after) {
     </div>
   `);
 
-  const section = after.nextElementSibling;
+  const section = container.lastElementChild;
   const tabs = [...section.querySelectorAll("[role=tab]")];
 
   function activateTab(type, moveFocus) {
@@ -182,33 +253,35 @@ function renderNgramTable(container, title, ngrams) {
   container.replaceChildren(table);
 }
 
-function renderNgramTables(containers, data) {
-  const topN = 10;
+function renderNgramTables(containers, data, rowLimit = 10) {
   ["unigrams", "bigrams", "trigrams"].forEach(function (type) {
     const title = type[0].toUpperCase() + type.slice(1);
     const sorted = sortNgrams(data?.[type]);
     containers[type].fullData = sorted;
-    renderNgramTable(containers[type].top, "Top " + title, sorted.slice(0, topN));
+    renderNgramTable(containers[type].top, "Top " + title, sorted.slice(0, rowLimit));
   });
 }
 
-function createVisualizationsSection(after, keywordTable) {
-  const section = element("section", {
-    className: "keywords-section", id: "visualizationsSection",
-    "aria-labelledby": "visualizations-heading"
+function createVisualizationSections(sentenceContainer, paragraphContainer, phrasesContainer, keywordTable) {
+  const sentenceSection = element("section", {
+    className: "keywords-section text-insight-surface", id: "sentenceRhythmSection",
+    "aria-label": "Sentence rhythm analysis"
   });
-  section.style.display = "none";
-  section.append(element("h2", { id: "visualizations-heading" }, "Text Structure"));
-  section.append(element("p", { className: "analysis-intro" },
-    "Read these charts from left to right, matching the order of your text. They help you find dense or repetitive areas to review; variation is a signal, not automatically a problem."
-  ));
+  const paragraphSection = element("section", {
+    className: "keywords-section text-insight-surface", id: "paragraphStructureSection",
+    "aria-label": "Paragraph structure analysis"
+  });
+  sentenceSection.style.display = "none";
+  paragraphSection.style.display = "none";
   const sentence = chartCard(
     "Sentence Rhythm", "sentenceRhythmCanvas", "Bar chart of sentence lengths in reading order",
-    "Each bar is one sentence, and its height represents the character count. Look for isolated tall bars that may be hard to follow, or a run of similarly short bars that may sound choppy."
+    "Each bar is one sentence, and its height represents the character count. Look for isolated tall bars that may be hard to follow, or a run of similarly short bars that may sound choppy.",
+    false, true
   );
   const paragraph = chartCard(
     "Paragraph Structure", "paragraphStructureCanvas", "Bar chart of paragraph lengths in reading order",
-    "Each bar is one paragraph separated by a blank line, and its height represents the character count. Use it to spot long blocks that may need a break or very short paragraphs that could be combined."
+    "Each bar is one paragraph separated by a blank line, and its height represents the character count. Use it to spot long blocks that may need a break or very short paragraphs that could be combined.",
+    false, true
   );
   const keywords = chartCard(
     "Keyword Distribution", "keywordDistributionCanvas", "Timeline of non-common keyword occurrences from the start to the end of the text",
@@ -216,49 +289,172 @@ function createVisualizationsSection(after, keywordTable) {
     true
   );
   keywords.card.id = "keyword-distribution-container";
-  section.append(sentence.card, paragraph.card);
-  keywordTable.insertAdjacentElement("afterend", keywords.card);
-  const ngrams = createNgramSection(keywords.card);
-  after.insertAdjacentElement("afterend", section);
+  sentenceSection.append(sentence.card);
+  paragraphSection.append(paragraph.card);
+  keywordTable.closest(".keywords-wrap").insertAdjacentElement("afterend", keywords.card);
+  const ngrams = createNgramSection(phrasesContainer);
+  sentenceContainer.append(sentenceSection);
+  paragraphContainer.append(paragraphSection);
   return {
-    section, sentenceCanvas: sentence.canvas,
+    sections: [sentenceSection, paragraphSection], sentenceCanvas: sentence.canvas,
     paragraphCanvas: paragraph.canvas, keywordCanvas: keywords.canvas, ngrams
   };
 }
 
-function createExportSection(after) {
-  const section = element("section", {
-    className: "keywords-section", id: "exportSection",
-    "aria-labelledby": "export-heading"
+function renderReadability(section, data, text, support, languageSelection) {
+  const cards = section.querySelector('.analysis-card-grid');
+  const englishMetrics = support.language === 'english' ? [
+    ['Flesch-Kincaid Grade', data.readability_scores.flesch_kincaid, 'Uses sentence length and estimated syllables per word.'],
+    ['Gunning Fog Index', data.readability_scores.gunning_fog, 'Weights long sentences and complex words with three or more syllables.'],
+    ['SMOG Grade', data.readability_scores.smog, 'Focuses on words with three or more syllables; it is most stable with 30 or more sentences.'],
+    ['Coleman-Liau Index', data.readability_scores.coleman_liau, 'Uses letters per word and sentence length instead of estimating syllables.']
+  ] : [];
+  const metrics = englishMetrics.length ? englishMetrics : calculateReadability(text, data.sentence_count, languageSelection)
+    .map(metric => [metric.label, metric.value, metric.explanation]);
+  cards.replaceChildren(...metrics.map(function ([label, value, explanation], index) {
+    return resultCard(label, 'readabilityMetric' + index, explanation);
+  }));
+  metrics.forEach(function (metric, index) {
+    document.getElementById('readabilityMetric' + index).textContent = formatScore(metric[1]);
   });
-  section.style.display = "none";
-  section.append(element("h2", { id: "export-heading" }, "Export Analysis"));
-  const buttons = element("div", { className: "btn-row" });
-  [["Export JSON", "json"], ["Export Markdown", "markdown"], ["Export Plain Text", "text"]]
-    .forEach(function ([label, format]) {
-      buttons.append(element("button", {
-        className: "btn-ghost", type: "button", "data-export-format": format
-      }, label));
-    });
-  section.append(buttons);
-  after.insertAdjacentElement("afterend", section);
-  return section;
+  cards.style.display = metrics.length ? 'grid' : 'none';
 }
 
-function topKeywords(data, excludeStopwords) {
-  if (excludeStopwords) return data.top_keywords;
-  return Object.entries(data.ngram_data.unigrams)
+function allKeywords(data, excludeStopwords, language) {
+  const stopwords = getStopwords(language);
+  const entries = Object.entries(data.ngram_data.unigrams)
     .map(function ([word, count]) {
       return { word, count, density: count / Math.max(1, data.word_count) * 100 };
     })
-    .sort(function (left, right) {
-      return right.count - left.count || left.word.localeCompare(right.word);
-    })
-    .slice(0, 10);
+    .filter(function (entry) { return !excludeStopwords || !stopwords.has(entry.word); });
+  return [...entries].sort(function (left, right) {
+    return right.count - left.count || left.word.localeCompare(right.word);
+  });
 }
 
 function formatScore(value) {
   return Number.isFinite(value) ? value.toFixed(1) : "0.0";
+}
+
+const sentenceAbbreviations = new Set([
+  "mr", "mrs", "ms", "dr", "prof", "sr", "jr", "st", "mt", "rev", "hon",
+  "capt", "cmdr", "col", "gen", "lt", "sgt", "sen", "rep", "gov", "pres",
+  "vs", "etc", "fig", "no", "dept", "est", "inc", "ltd", "co"
+]);
+const dottedSentenceAbbreviations = new Set(["a.m", "p.m", "e.g", "i.e", "u.s", "u.k"]);
+
+function isSentenceTerminator(text, index) {
+  const character = text[index];
+  if (character !== ".") return /[!?。！？．｡؟।॥]/.test(character);
+  if (/\d/.test(text[index - 1] || "") && /\d/.test(text[index + 1] || "")) return false;
+  if (/\p{L}/u.test(text[index - 1] || "") && /\p{L}/u.test(text[index + 1] || "") && text[index + 2] === ".") return false;
+  let precedingStart = index;
+  while (precedingStart > 0 && /[\p{L}.]/u.test(text[precedingStart - 1])) precedingStart -= 1;
+  const preceding = text.slice(precedingStart, index);
+  const dottedAbbreviation = preceding.toLocaleLowerCase("en");
+  if (dottedSentenceAbbreviations.has(dottedAbbreviation)) {
+    if (dottedAbbreviation !== "a.m" && dottedAbbreviation !== "p.m") return false;
+    let nextIndex = index + 1;
+    while (nextIndex < text.length && /\s/u.test(text[nextIndex])) nextIndex += 1;
+    const nextNonSpace = text[nextIndex] || "";
+    return /[A-Z]/.test(nextNonSpace);
+  }
+  const finalWord = preceding.split(".").at(-1) || "";
+  if (sentenceAbbreviations.has(finalWord.toLocaleLowerCase("en"))) return false;
+  if (finalWord.length === 1 && /[A-Z]/.test(finalWord)) return false;
+  return true;
+}
+
+function sentenceRanges(text) {
+  const ranges = [];
+  let start = -1;
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (start < 0 && !/\s/.test(character)) start = index;
+    if (start >= 0 && isSentenceTerminator(text, index)) {
+      ranges.push({ start, end: index + 1 });
+      start = -1;
+    }
+  }
+  if (start >= 0) {
+    let end = text.length;
+    while (end > start && /\s/.test(text[end - 1])) end -= 1;
+    if (end > start) ranges.push({ start, end });
+  }
+  return ranges;
+}
+
+function paragraphRanges(text) {
+  const ranges = [];
+  const linePattern = /[^\r\n]*(?:\r\n|\r|\n|$)/g;
+  let paragraphStart = -1;
+  let paragraphEnd = -1;
+  for (const match of text.matchAll(linePattern)) {
+    if (!match[0]) continue;
+    const content = match[0].replace(/[\r\n]+$/, "");
+    if (content.trim()) {
+      if (paragraphStart < 0) paragraphStart = match.index + content.search(/\S/);
+      paragraphEnd = match.index + content.trimEnd().length;
+    } else if (paragraphStart >= 0) {
+      ranges.push({ start: paragraphStart, end: paragraphEnd });
+      paragraphStart = -1;
+      paragraphEnd = -1;
+    }
+  }
+  if (paragraphStart >= 0) ranges.push({ start: paragraphStart, end: paragraphEnd });
+  return ranges;
+}
+
+function centerTextareaRange(textarea, index) {
+  if (textarea.value.length > 100000) {
+    const styles = getComputedStyle(textarea);
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    context.font = styles.font;
+    const sample = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const averageCharacterWidth = context.measureText(sample).width / sample.length || parseFloat(styles.fontSize) * 0.55;
+    const contentWidth = textarea.clientWidth
+      - (parseFloat(styles.paddingLeft) || 0)
+      - (parseFloat(styles.paddingRight) || 0);
+    const columns = Math.max(1, Math.floor(contentWidth / averageCharacterWidth));
+    let completedRows = 0;
+    let targetRows = 0;
+    let lineLength = 0;
+    const text = textarea.value;
+    for (let offset = 0; offset <= text.length; offset += 1) {
+      if (offset === index) {
+        targetRows = completedRows + Math.floor(lineLength / columns);
+      }
+      const character = text[offset];
+      if (offset === text.length || character === "\n") {
+        completedRows += Math.max(1, Math.ceil(lineLength / columns));
+        lineLength = 0;
+      } else if (character !== "\r") {
+        lineLength += character === "\t" ? 4 : 1;
+      }
+    }
+    const progress = targetRows / Math.max(1, completedRows);
+    textarea.scrollTop = Math.max(0, progress * textarea.scrollHeight - textarea.clientHeight / 2);
+    return;
+  }
+  const styles = getComputedStyle(textarea);
+  const mirror = document.createElement("div");
+  mirror.setAttribute("aria-hidden", "true");
+  Object.assign(mirror.style, {
+    position: "fixed", left: "-10000px", top: "0", visibility: "hidden",
+    boxSizing: styles.boxSizing, width: textarea.getBoundingClientRect().width + "px",
+    padding: styles.padding, border: styles.border, font: styles.font,
+    letterSpacing: styles.letterSpacing, lineHeight: styles.lineHeight,
+    whiteSpace: "pre-wrap", overflowWrap: "break-word", wordBreak: styles.wordBreak
+  });
+  mirror.textContent = textarea.value.slice(0, index);
+  const marker = document.createElement("span");
+  marker.textContent = textarea.value.slice(index, index + 1) || "\u200b";
+  mirror.append(marker);
+  document.body.append(mirror);
+  const lineHeight = parseFloat(styles.lineHeight) || parseFloat(styles.fontSize) * 1.2;
+  textarea.scrollTop = Math.max(0, marker.offsetTop - textarea.clientHeight / 2 + lineHeight / 2);
+  mirror.remove();
 }
 
 function markdownReport(data) {
@@ -320,7 +516,13 @@ export async function initializeWordCounter() {
   const textInput = document.getElementById("text-input");
   const resultsPanel = document.getElementById("resultsCol");
   const keywordSection = document.getElementById("keywordsSection");
+  const densityPanel = document.getElementById("analysis-panel-density");
   const keywordTable = document.getElementById("keyword-density-table");
+  const clearKeywordSelection = document.getElementById("clear-keyword-selection");
+  const phrasesPanel = document.getElementById("analysis-panel-phrases");
+  const readabilityPanel = document.getElementById("text-insight-panel-readability");
+  const sentencePanel = document.getElementById("text-insight-panel-sentence-rhythm");
+  const paragraphPanel = document.getElementById("text-insight-panel-paragraph-structure");
   const selectedWordButton = document.getElementById("unscramble-selected-word");
   const unscramblePopup = document.getElementById("unscramble-popup");
   const popupClose = document.getElementById("unscramble-popup-close");
@@ -333,23 +535,108 @@ export async function initializeWordCounter() {
   const popupNext = document.getElementById("unscramble-popup-next");
   const popupPageStatus = document.getElementById("unscramble-popup-page-status");
   if (
-    !textInput || !resultsPanel || !keywordSection || !keywordTable || !selectedWordButton
+    !textInput || !resultsPanel || !keywordSection || !keywordTable || !clearKeywordSelection || !phrasesPanel
+    || !readabilityPanel || !sentencePanel || !paragraphPanel
     || !unscramblePopup || !popupClose || !popupWord
     || !popupStatus || !popupResults || !popupBody || !popupPagination
     || !popupPrevious || !popupNext || !popupPageStatus
   ) return;
 
-  const readabilitySection = createReadabilitySection(resultsPanel);
-  const visualizationElements = createVisualizationsSection(keywordSection, keywordTable);
-  const exportSection = createExportSection(visualizationElements.section);
+  const readabilitySection = createReadabilitySection(readabilityPanel);
+  const visualizationElements = createVisualizationSections(sentencePanel, paragraphPanel, phrasesPanel, keywordTable);
+  let structureRepositionTimer = 0;
+  visualizationElements.onSegmentSelect = function (type, index) {
+    clearTimeout(structureRepositionTimer);
+    const ranges = getStructureRanges(type);
+    const range = ranges[index];
+    if (!range) return;
+    const selectedText = textInput.value.slice(range.start, range.end);
+    const amount = type === "sentence"
+      ? Array.from(selectedText).length
+      : analyzeText(selectedText, { language: document.getElementById("analysis-language").value }).words;
+    const unit = type === "sentence" ? (amount === 1 ? "character" : "characters") : (amount === 1 ? "word" : "words");
+    const name = type === "sentence" ? "Sentence" : "Paragraph";
+    textInput.focus({ preventScroll: true });
+    textInput.setSelectionRange(range.start, range.end, "forward");
+    window.dispatchEvent(new CustomEvent("structure-selection-change", {
+      detail: { label: name + " " + (index + 1) + " of " + ranges.length + " · " + amount + " " + unit }
+    }));
+    window.dispatchEvent(new Event("text-editor-selection-change"));
+    structureRepositionTimer = setTimeout(function () {
+      structureRepositionTimer = 0;
+      const bounds = textInput.getBoundingClientRect();
+      if (bounds.bottom < 0 || bounds.top > window.innerHeight) {
+        textInput.scrollIntoView({
+          behavior: textInput.value.length > 100000 ? "auto" : "smooth",
+          block: "center"
+        });
+      }
+      centerTextareaRange(textInput, range.start);
+    }, 300);
+  };
+  visualizationElements.onSegmentDeselect = function () {
+    clearTimeout(structureRepositionTimer);
+    structureRepositionTimer = 0;
+    const caret = textInput.selectionEnd;
+    textInput.setSelectionRange(caret, caret);
+    window.dispatchEvent(new CustomEvent("structure-selection-change"));
+    window.dispatchEvent(new Event("text-editor-selection-change"));
+  };
   const renderer = createVisualizationRenderer(visualizationElements);
-  let lockedKeyword = null;
+  const selectedKeywords = new Set();
+  let analysisRevision = 0;
+  const renderedRevision = { density: -1, phrases: -1, readability: -1, sentence: -1, paragraph: -1 };
+  let supportCache = { text: null, languageSelection: null, value: null };
+
+  function currentAnalysisSupport() {
+    const text = textInput.value;
+    const languageSelection = document.getElementById("analysis-language").value;
+    if (supportCache.text !== text || supportCache.languageSelection !== languageSelection) {
+      supportCache = { text, languageSelection, value: detectAnalysisSupport(text, languageSelection) };
+    }
+    return supportCache.value;
+  }
+
+  function invalidateRenderedViews(...views) {
+    (views.length ? views : Object.keys(renderedRevision)).forEach(function (view) {
+      renderedRevision[view] = -1;
+    });
+  }
+  const structureRangeCache = { text: null, sentence: null, paragraph: null };
+  let structureRangeWarmup = 0;
+  function getStructureRanges(type) {
+    const text = textInput.value;
+    if (structureRangeCache.text !== text) {
+      structureRangeCache.text = text;
+      structureRangeCache.sentence = null;
+      structureRangeCache.paragraph = null;
+    }
+    if (!structureRangeCache[type]) {
+      structureRangeCache[type] = type === "sentence" ? sentenceRanges(text) : paragraphRanges(text);
+    }
+    return structureRangeCache[type];
+  }
+  function scheduleStructureRangeWarmup(text) {
+    if (structureRangeWarmup) {
+      if (typeof cancelIdleCallback === "function") cancelIdleCallback(structureRangeWarmup);
+      else clearTimeout(structureRangeWarmup);
+    }
+    const warmRanges = function () {
+      structureRangeWarmup = 0;
+      if (text !== textInput.value) return;
+      getStructureRanges("sentence");
+      getStructureRanges("paragraph");
+    };
+    structureRangeWarmup = typeof requestIdleCallback === "function"
+      ? requestIdleCallback(warmRanges, { timeout: 750 })
+      : setTimeout(warmRanges, 0);
+  }
+  let keywordResizeTimer = null;
   let popupRequestId = 0;
   let popupReturnFocus = null;
   const popupPageSize = 15;
   let popupMatches = [];
   let popupPage = 0;
-  if (!await initWasmEngine()) return;
 
   function closeUnscramblePopup() {
     popupRequestId += 1;
@@ -420,19 +707,6 @@ export async function initializeWordCounter() {
     }
   }
 
-  function createUnscrambleButton(word) {
-    const button = element("button", {
-      className: "btn-ghost unscramble-btn", type: "button",
-      style: "padding:0.25rem 0.55rem;font-size:0.7rem;margin-left:0.5rem;",
-      "aria-label": "Unscramble " + word
-    }, "Unscramble");
-    button.addEventListener("click", function (event) {
-      event.stopPropagation();
-      openUnscramblePopup(word, button);
-    });
-    return button;
-  }
-
   popupClose.addEventListener("click", closeUnscramblePopup);
   popupPrevious.addEventListener("click", function () {
     if (popupPage === 0) return;
@@ -448,10 +722,12 @@ export async function initializeWordCounter() {
   unscramblePopup.addEventListener("keydown", function (event) {
     if (event.key === "Escape") closeUnscramblePopup();
   });
-  selectedWordButton.addEventListener("click", function () {
-    const selected = textInput.value.slice(textInput.selectionStart, textInput.selectionEnd);
-    openUnscramblePopup(selected, selectedWordButton);
-  });
+  if (selectedWordButton) {
+    selectedWordButton.addEventListener("click", function () {
+      const selected = textInput.value.slice(textInput.selectionStart, textInput.selectionEnd);
+      openUnscramblePopup(selected, selectedWordButton);
+    });
+  }
 
   function getPositionsFor(word) {
     if (!latestAnalysis) return [];
@@ -478,111 +754,312 @@ export async function initializeWordCounter() {
     );
   }
 
-  function drawFilteredDistribution(word) {
-    if (!latestAnalysis) return;
-    renderer.drawKeywordDistribution(getPositionsFor(word), latestAnalysis.char_count);
+  function selectedKeywordPositions() {
+    return [...selectedKeywords].flatMap(getPositionsFor);
   }
 
   function restoreFullGraph() {
-    if (lockedKeyword) drawFilteredDistribution(lockedKeyword);
-    else drawFullDistribution();
+    if (!latestAnalysis) return;
+    if (selectedKeywords.size) {
+      renderer.drawKeywordDistribution(selectedKeywordPositions(), latestAnalysis.char_count);
+    } else {
+      drawFullDistribution();
+    }
   }
 
-  function lockKeyword(word) {
-    lockedKeyword = word;
-    drawFilteredDistribution(word);
+  function keywordMarkerColor(word) {
+    let hash = 0;
+    for (let index = 0; index < word.length; index += 1) {
+      hash = (hash * 31 + word.charCodeAt(index)) >>> 0;
+    }
+    return "hsl(" + (hash % 360) + " 70% 55%)";
+  }
+
+  function updateKeywordSelection() {
+    document.querySelectorAll("#kwBody tr[data-keyword]").forEach(function (row) {
+      const selected = selectedKeywords.has(row.dataset.keyword);
+      row.classList.toggle("is-keyword-filtered", selected);
+      row.setAttribute("aria-selected", String(selected));
+      row.style.setProperty("--keyword-color", keywordMarkerColor(row.dataset.keyword));
+    });
+    clearKeywordSelection.hidden = selectedKeywords.size === 0;
   }
 
   function bindKeywordRow(row, word) {
     row.dataset.keyword = word;
+    row.tabIndex = 0;
+    row.setAttribute("aria-selected", "false");
     row.addEventListener("mouseenter", function () {
-      if (!lockedKeyword) drawFilteredDistribution(word);
+      if (!selectedKeywords.size) {
+        renderer.drawKeywordDistribution(getPositionsFor(word), latestAnalysis.char_count);
+      }
     });
     row.addEventListener("mouseleave", restoreFullGraph);
     row.addEventListener("click", function () {
-      if (lockedKeyword === word) {
-        lockedKeyword = null;
-        drawFullDistribution();
-      } else {
-        lockKeyword(word);
-      }
+      if (selectedKeywords.has(word)) selectedKeywords.delete(word);
+      else if (selectedKeywords.size < 8) selectedKeywords.add(word);
+      restoreFullGraph();
+      updateKeywordSelection();
+    });
+    row.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      row.click();
     });
   }
 
-  visualizationElements.keywordCanvas.addEventListener("click", function () {
-    if (!lockedKeyword) return;
-    lockedKeyword = null;
+  clearKeywordSelection.addEventListener("click", function () {
+    selectedKeywords.clear();
     drawFullDistribution();
+    updateKeywordSelection();
   });
 
-  function updateMetrics() {
-    const text = textInput.value;
-    if (!text.trim()) {
-      latestAnalysis = null;
-      readabilitySection.style.display = "block";
-      readabilitySection.querySelector(".analysis-card-grid").style.display = "none";
-      visualizationElements.section.style.display = "none";
-      exportSection.style.display = "none";
-      lockedKeyword = null;
-      renderNgramTables(visualizationElements.ngrams, {});
-      renderer.render({
-        sentence_lengths: [], paragraph_lengths: [], keyword_positions: []
-      }, 0);
-      return;
-    }
-    const result = runWasmAnalysis(text);
-    if (!result) return;
-    const data = result.toJSON();
-    result.free();
-    latestAnalysis = data;
+  function keywordRowLimit() {
+    const widget = keywordSection.closest(".tool-widget");
+    if (!widget.classList.contains("is-focus-mode")) return 10;
+    return Number.POSITIVE_INFINITY;
+  }
 
-    const wpm = parseInt(document.getElementById("wpm").value, 10) || 200;
-    const seconds = Math.ceil(data.word_count / wpm * 60);
-    document.getElementById("resWords").textContent = data.word_count.toLocaleString();
-    document.getElementById("resWordsSub").textContent = data.sentence_count + (data.sentence_count === 1 ? " sentence" : " sentences") + " · " + data.paragraph_count + (data.paragraph_count === 1 ? " paragraph" : " paragraphs");
-    document.getElementById("resChars").textContent = data.char_count.toLocaleString();
-    document.getElementById("resCharsNoSpaces").textContent = data.char_no_spaces.toLocaleString();
-    document.getElementById("resReading").textContent = humanizeReadingTime(seconds);
+  function phraseRowLimit() {
+    const panel = document.getElementById("analysis-panel-phrases");
+    if (!panel.closest(".tool-widget").classList.contains("is-focus-mode") || panel.hidden) return 10;
+    const top = panel.querySelector(".ngram-group:not([hidden]) .ngram-top");
+    if (!top || top.clientHeight < 1) return 10;
+    const table = top.querySelector("table");
+    const headerHeight = table?.tHead?.getBoundingClientRect().height || 36;
+    const rowHeight = table?.tBodies[0]?.rows[0]?.getBoundingClientRect().height || 38;
+    return Math.max(10, Math.floor((top.clientHeight - headerHeight) / rowHeight));
+  }
 
-    const excludeStopwords = document.getElementById("exclude-stopwords").checked;
-    const keywords = topKeywords(data, excludeStopwords);
-    renderNgramTables(visualizationElements.ngrams, data.ngram_data);
+  function renderPhraseRows() {
+    if (!latestAnalysis) return;
+    renderNgramTables(visualizationElements.ngrams, latestAnalysis.ngram_data, phraseRowLimit());
+  }
+
+  function renderKeywordRows() {
+    if (!latestAnalysis) return;
+    const stopwordControl = document.getElementById("exclude-stopwords");
+    const excludeStopwords = stopwordControl.checked && !stopwordControl.disabled;
+    const language = currentAnalysisSupport().language;
+    const available = allKeywords(latestAnalysis, excludeStopwords, language);
+    const keywords = available.slice(0, keywordRowLimit());
     document.getElementById("kwInfo").textContent = "Top " + keywords.length + " keywords (" + (excludeStopwords ? "excluding" : "including") + " stopwords)";
     const keywordRows = keywords.map(function (entry) {
       const row = document.createElement("tr");
       const wordCell = element("td", null, entry.word);
-      wordCell.append(createUnscrambleButton(entry.word));
       row.append(wordCell, element("td", null, String(entry.count)), element("td", null, entry.density.toFixed(1) + "%"));
       bindKeywordRow(row, entry.word);
       return row;
     });
     document.getElementById("kwBody").replaceChildren(...keywordRows);
-    if (lockedKeyword && !keywords.some(function (entry) { return entry.word === lockedKeyword; })) {
-      lockedKeyword = null;
-    }
-
-    document.getElementById("readabilityFlesch").textContent = formatScore(data.readability_scores.flesch_kincaid);
-    document.getElementById("readabilityFog").textContent = formatScore(data.readability_scores.gunning_fog);
-    document.getElementById("readabilitySmog").textContent = formatScore(data.readability_scores.smog);
-    document.getElementById("readabilityColeman").textContent = formatScore(data.readability_scores.coleman_liau);
-    readabilitySection.style.display = "block";
-    readabilitySection.querySelector(".analysis-card-grid").style.display = "grid";
-    visualizationElements.section.style.display = data.word_count > 0 ? "block" : "none";
-    exportSection.style.display = "block";
-    renderer.render(data.visualization_data, data.char_count);
-    if (lockedKeyword) drawFilteredDistribution(lockedKeyword);
+    const availableWords = new Set(available.map(function (entry) { return entry.word; }));
+    selectedKeywords.forEach(function (word) {
+      if (!availableWords.has(word)) selectedKeywords.delete(word);
+    });
+    updateKeywordSelection();
   }
 
-  textInput.addEventListener("input", updateMetrics);
-  document.getElementById("wpm").addEventListener("input", updateMetrics);
-  document.getElementById("wpmSlider").addEventListener("input", updateMetrics);
-  document.getElementById("exclude-stopwords").addEventListener("change", updateMetrics);
-  document.getElementById("clear-btn").addEventListener("click", updateMetrics);
-  exportSection.addEventListener("click", function (event) {
-    const button = event.target.closest("[data-export-format]");
-    if (button && latestAnalysis) downloadReport(button.dataset.exportFormat, latestAnalysis);
+  window.addEventListener("resize", function () {
+    if (!latestAnalysis) return;
+    clearTimeout(keywordResizeTimer);
+    keywordResizeTimer = setTimeout(function () {
+      if (!document.getElementById("analysis-panel-density").hidden) renderKeywordRows();
+      if (!document.getElementById("analysis-panel-phrases").hidden) renderPhraseRows();
+    }, 120);
   });
-  updateMetrics();
+
+  visualizationElements.keywordCanvas.addEventListener("click", function () {
+    if (!selectedKeywords.size) return;
+    selectedKeywords.clear();
+    drawFullDistribution();
+    updateKeywordSelection();
+  });
+
+  let analysisWorker = null;
+  let workerUnavailable = false;
+  let analysisTimer = 0;
+  let latestRequestId = 0;
+  let pendingText = "";
+  const baseAnalysisDelay = 220;
+  const largeDocumentCharacterThreshold = 250_000;
+  const veryLargeDocumentCharacterThreshold = 1_000_000;
+
+  function analysisDelayFor(text) {
+    if (text.length >= veryLargeDocumentCharacterThreshold) return 700;
+    if (text.length >= largeDocumentCharacterThreshold) return 450;
+    return baseAnalysisDelay;
+  }
+
+  function renderActiveViews() {
+    if (!latestAnalysis) return;
+    const readabilityNotice = document.getElementById("readability-language-notice");
+    let renderVisualization = false;
+    if (!phrasesPanel.hidden && renderedRevision.phrases !== analysisRevision) {
+      renderPhraseRows();
+      renderedRevision.phrases = analysisRevision;
+    }
+    if (!densityPanel.hidden && renderedRevision.density !== analysisRevision) {
+      keywordSection.hidden = false;
+      renderKeywordRows();
+      renderedRevision.density = analysisRevision;
+      renderVisualization = true;
+    }
+    if (!readabilityPanel.hidden && renderedRevision.readability !== analysisRevision) {
+      const text = textInput.value;
+      const languageSelection = document.getElementById("analysis-language").value;
+      const support = currentAnalysisSupport();
+      renderReadability(readabilitySection, latestAnalysis, text, support, languageSelection);
+      if (readabilityNotice) readabilityNotice.hidden = !text.trim() || support.readabilitySupported;
+      readabilitySection.style.display = "block";
+      readabilitySection.querySelector(".analysis-card-grid").style.display = "grid";
+      renderedRevision.readability = analysisRevision;
+    }
+    visualizationElements.sections.forEach(function (section) {
+      section.style.display = latestAnalysis.word_count > 0 ? "block" : "none";
+    });
+    if (!sentencePanel.hidden && renderedRevision.sentence !== analysisRevision) {
+      renderedRevision.sentence = analysisRevision;
+      renderVisualization = true;
+    }
+    if (!paragraphPanel.hidden && renderedRevision.paragraph !== analysisRevision) {
+      renderedRevision.paragraph = analysisRevision;
+      renderVisualization = true;
+    }
+    if (renderVisualization) {
+      renderer.render(latestAnalysis.visualization_data, latestAnalysis.char_count);
+      if (!densityPanel.hidden && selectedKeywords.size) restoreFullGraph();
+    }
+  }
+
+  function applyAnalysisResult(id, text, data) {
+    if (id !== latestRequestId || text !== pendingText || text !== textInput.value) return;
+    latestAnalysis = data;
+    analysisRevision += 1;
+    invalidateRenderedViews();
+    supportCache.text = null;
+    renderActiveViews();
+    scheduleStructureRangeWarmup(text);
+  }
+
+  async function runFallbackAnalysis(id, text) {
+    const wasmReady = await initWasmEngine();
+    if (id !== latestRequestId || text !== textInput.value) return;
+    let data;
+    if (wasmReady) {
+      const result = runWasmAnalysis(text);
+      if (result) {
+        data = result.toJSON();
+        result.free();
+      }
+    }
+    if (!data) {
+      data = analyzeTextWithJavaScript(text);
+      console.warn("WASM analyzer unavailable; using the JavaScript analyzer on the main thread.");
+    }
+    applyAnalysisResult(id, text, data);
+  }
+
+  function useFallback(id, text) {
+    if (analysisWorker) analysisWorker.terminate();
+    analysisWorker = null;
+    workerUnavailable = true;
+    runFallbackAnalysis(id, text);
+  }
+
+  function ensureAnalysisWorker() {
+    if (analysisWorker || workerUnavailable) return analysisWorker;
+    try {
+      const workerUrl = new URL("./analysis-worker.js?v=20260907-debug-flag-1", import.meta.url);
+      if (analyzerParityDebug) workerUrl.searchParams.set("parity", "1");
+      analysisWorker = new Worker(
+        workerUrl,
+        { type: "module" },
+      );
+      analysisWorker.addEventListener("message", function (event) {
+        const { id, data, error, diagnostics, engine, fallbackReason, timings } = event.data || {};
+        if (id !== latestRequestId) return;
+        if (error) {
+          useFallback(id, pendingText);
+          return;
+        }
+        logAnalyzerDiagnostics(diagnostics);
+        if (engine === "javascript" && fallbackReason) {
+          console.warn("WASM analyzer unavailable; Worker used the JavaScript fallback.", {
+            reason: fallbackReason,
+            wasmInitialization: formatTiming(timings?.wasmInitializationMs),
+            javascriptAnalysis: formatTiming(timings?.javascriptMs)
+          });
+        }
+        applyAnalysisResult(id, pendingText, data);
+      });
+      analysisWorker.addEventListener("error", function () {
+        useFallback(latestRequestId, pendingText);
+      }, { once: true });
+    } catch (_) {
+      workerUnavailable = true;
+    }
+    return analysisWorker;
+  }
+
+  function clearHeavyAnalysis() {
+    latestAnalysis = null;
+    invalidateRenderedViews();
+    supportCache.text = null;
+    keywordSection.hidden = true;
+    structureRangeCache.text = null;
+    structureRangeCache.sentence = null;
+    structureRangeCache.paragraph = null;
+    const readabilityNotice = document.getElementById("readability-language-notice");
+    if (readabilityNotice) readabilityNotice.hidden = true;
+    readabilitySection.querySelector(".analysis-card-grid").style.display = "none";
+    visualizationElements.sections.forEach(function (section) { section.style.display = "none"; });
+    selectedKeywords.clear();
+    updateKeywordSelection();
+  }
+
+  function scheduleHeavyAnalysis() {
+    clearTimeout(analysisTimer);
+    const text = textInput.value;
+    pendingText = text;
+    const id = ++latestRequestId;
+    if (!text.trim()) {
+      clearHeavyAnalysis();
+      return;
+    }
+    analysisTimer = setTimeout(function () {
+      const worker = ensureAnalysisWorker();
+      if (worker) worker.postMessage({ id, text });
+      else runFallbackAnalysis(id, text);
+    }, analysisDelayFor(text));
+  }
+
+  textInput.addEventListener("input", function () {
+    clearTimeout(structureRepositionTimer);
+    structureRepositionTimer = 0;
+    renderer.clearBarSelection?.();
+    window.dispatchEvent(new CustomEvent("structure-selection-change"));
+    scheduleHeavyAnalysis();
+  });
+  textInput.addEventListener("pointerdown", function () {
+    clearTimeout(structureRepositionTimer);
+    structureRepositionTimer = 0;
+    renderer.clearBarSelection?.();
+    window.dispatchEvent(new CustomEvent("structure-selection-change"));
+  });
+  document.getElementById("exclude-stopwords").addEventListener("change", function () {
+    invalidateRenderedViews("density");
+    renderActiveViews();
+  });
+  document.getElementById("analysis-language").addEventListener("change", function () {
+    supportCache.text = null;
+    invalidateRenderedViews("density", "readability");
+    scheduleHeavyAnalysis();
+    renderActiveViews();
+  });
+  document.querySelectorAll(".analysis-tab, .text-insight-tab").forEach(function (tab) {
+    tab.addEventListener("click", function () { requestAnimationFrame(renderActiveViews); });
+  });
+  scheduleHeavyAnalysis();
 }
 
 export function runJavaScriptFallback(text, wpm, excludeStopwords) {
