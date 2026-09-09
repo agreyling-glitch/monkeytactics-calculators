@@ -41,3 +41,21 @@ test("validates required and duplicate CSV columns", () => {
   assert.throws(() => parseBatchCsv("name,data,data\nHome,a,b"), /duplicate column headers: data/);
   assert.throws(() => parseBatchCsv('name,data\nHome,"unfinished'), /unclosed quoted value/);
 });
+
+test("preserves quoted multiline data and rejects malformed CSV", () => {
+  assert.deepEqual(parseBatchCsv('\uFEFFname,data\r\n"Café","  first, \"\"quoted\"\"\r\nsecond  "'), [{name:'Café',data:'  first, "quoted"\r\nsecond  '}]);
+  for (const csv of ['name,data\na,b,c', 'name,data\na,"b"junk', 'name,data\na,b"c"']) assert.throws(() => parseBatchCsv(csv), /CSV/);
+});
+
+test("handles 250 entries without losing distinct payloads", () => {
+  const rows = Array.from({length:250}, (_,i) => `item-${i},https://example.com/${i}`);
+  assert.equal(parseBatchCsv('name,data\n'+rows.join('\n')).length,250);
+});
+
+
+test("rejects 251 usable rows but applies the limit after duplicate cleanup", () => {
+ const rows=Array.from({length:251},(_,i)=>`item-${i},https://example.com/${i}`);
+ assert.throws(()=>parseBatchCsv('name,data\n'+rows.join('\n')),/250 QR codes/);
+ rows[250]=rows[0];
+ assert.equal(parseBatchCsv('name,data\n'+rows.join('\n')).length,250);
+});

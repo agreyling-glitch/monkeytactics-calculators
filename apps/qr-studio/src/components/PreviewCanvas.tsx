@@ -17,6 +17,7 @@ interface Props {
   onZoomChange: (zoom: number) => void;
   onGridChange: (show: boolean) => void;
   onSimulationChange: (simulation: "light" | "dark") => void;
+  onDownload: () => void;
 }
 
 export function PreviewCanvas(props: Props) {
@@ -163,18 +164,8 @@ export function PreviewCanvas(props: Props) {
       </div>
     </header>
 
-    <div className="qr-preview-analysis-controls" aria-label="Preview inspection controls">
-      <div className="qr-preview-mode" role="group" aria-label="QR rendering mode">
-        <button type="button" className={previewMode === "raw" ? "active" : ""} aria-pressed={previewMode === "raw"} disabled={!props.result} onClick={() => setPreviewMode("raw")}>Raw</button>
-        <button type="button" className={previewMode === "styled" ? "active" : ""} aria-pressed={previewMode === "styled"} disabled={!props.result} onClick={() => setPreviewMode("styled")}>Styled</button>
-      </div>
-      <label className="qr-perspective-control"><span>Camera perspective <output>{perspective}°</output></span><input type="range" min="0" max="55" step="1" value={perspective} aria-label="Camera perspective distortion" disabled={!props.result} onInput={(event) => setPerspective(Number(event.currentTarget.value))} /></label>
-      <button type="button" className={`${showQuietZone ? "active" : ""} ${showQuietZone && quietZone.violated ? "violation" : ""}`} aria-pressed={showQuietZone} disabled={!props.result} onClick={() => setShowQuietZone(!showQuietZone)}>Quiet zone</button>
-      <button type="button" className={showErrorCorrection ? "active correction-active" : ""} aria-pressed={showErrorCorrection} disabled={!props.result} onClick={() => { setShowErrorCorrection(!showErrorCorrection); if (!showErrorCorrection) setShowHeatmap(false); }}>Error correction</button>
-      <button type="button" className={showHeatmap ? "active heatmap-active" : ""} aria-pressed={showHeatmap} disabled={!props.result} title="Show scan-sensitive and risky QR areas" onClick={() => { setShowHeatmap(!showHeatmap); if (!showHeatmap) setShowErrorCorrection(false); }}>Heatmap</button>
-    </div>
 
-    <div ref={stageRef} className={`qr-preview-stage ${props.showGrid ? "show-grid" : ""} ${canPan ? "pannable" : ""} ${isDragging ? "dragging" : ""}`} title={canPan ? "Use the mouse wheel to zoom. Click and drag to pan. Double-click to zoom all the way out." : "Use the mouse wheel to zoom. Double-click to zoom all the way in."} onPointerDown={startPan} onPointerMove={movePan} onPointerUp={stopPan} onPointerCancel={cancelPan}>
+    <div ref={stageRef} className={`qr-preview-stage ${props.style.transparent ? "is-transparent" : ""} ${props.showGrid ? "show-grid" : ""} ${canPan ? "pannable" : ""} ${isDragging ? "dragging" : ""}`} title={canPan ? "Use the mouse wheel to zoom. Click and drag to pan. Double-click to zoom all the way out." : "Use the mouse wheel to zoom. Double-click to zoom all the way in."} onPointerDown={startPan} onPointerMove={movePan} onPointerUp={stopPan} onPointerCancel={cancelPan}>
       {props.result?.svg ? <div ref={frameRef} className="qr-svg-frame" style={{ transform: buildPreviewTransform(pan, props.zoom, perspective, frameWidth), "--qr-grid-count": gridCount, "--qr-module-count": props.result.moduleCount, "--qr-grid-inset": `${frameExtent * 100 / outputCount}%`, "--qr-quiet-inset": `${(frameExtent + 4) * 100 / outputCount}%`, "--qr-quiet-size": `${4 * 100 / gridCount}%` } as CSSProperties}>
         <div className="qr-svg-content" dangerouslySetInnerHTML={{ __html: displayedSvg }} />
         {props.showGrid && <div className="qr-module-grid" aria-hidden="true" />}
@@ -198,5 +189,19 @@ export function PreviewCanvas(props: Props) {
       {perspectiveAssessment && perspective > 0 && <p className="qr-perspective-result">{perspectiveAssessment.penalty} point camera-perspective penalty · weakest modules retain {Math.round(perspectiveAssessment.minimumScale * 100)}% of their flat edge size.</p>}
       {[...(props.result?.suggestions ?? []), ...(perspectiveAssessment?.suggestions ?? [])].length ? <ul>{[...(props.result?.suggestions ?? []), ...(perspectiveAssessment?.suggestions ?? [])].map((suggestion) => <li key={suggestion}>{suggestion}</li>)}</ul> : null}
     </div>
+    <div className="qr-preview-download"><div><strong>Make it yours. Take it anywhere.</strong><span>PNG, SVG or PDF · Export settings on the left</span></div><button type="button" disabled={!props.result} onClick={props.onDownload}>Download QR code <span aria-hidden="true">↗</span></button></div>
+    <details className="qr-inspection"><summary>Inspect scan reliability <span>Overlays & camera checks</span></summary>
+    <div className="qr-preview-analysis-controls" aria-label="Preview inspection controls">
+      <div className="qr-preview-mode" role="group" aria-label="QR rendering mode">
+        <button type="button" className={previewMode === "raw" ? "active" : ""} aria-pressed={previewMode === "raw"} disabled={!props.result} onClick={() => setPreviewMode("raw")}>Raw</button>
+        <button type="button" className={previewMode === "styled" ? "active" : ""} aria-pressed={previewMode === "styled"} disabled={!props.result} onClick={() => setPreviewMode("styled")}>Styled</button>
+      </div>
+      <label className="qr-perspective-control"><span>Camera perspective <output>{perspective}°</output></span><input type="range" min="0" max="55" step="1" value={perspective} aria-label="Camera perspective distortion" disabled={!props.result} onInput={(event) => setPerspective(Number(event.currentTarget.value))} /></label>
+      <button type="button" className={`${showQuietZone ? "active" : ""} ${showQuietZone && quietZone.violated ? "violation" : ""}`} aria-pressed={showQuietZone} disabled={!props.result} onClick={() => setShowQuietZone(!showQuietZone)}>Quiet zone</button>
+      <button type="button" className={showErrorCorrection ? "active correction-active" : ""} aria-pressed={showErrorCorrection} disabled={!props.result} onClick={() => { setShowErrorCorrection(!showErrorCorrection); if (!showErrorCorrection) setShowHeatmap(false); }}>Error correction</button>
+      <button type="button" className={showHeatmap ? "active heatmap-active" : ""} aria-pressed={showHeatmap} disabled={!props.result} title="Show scan-sensitive and risky QR areas" onClick={() => { setShowHeatmap(!showHeatmap); if (!showHeatmap) setShowErrorCorrection(false); }}>Heatmap</button>
+    </div>
+
+    </details>
   </section>;
 }

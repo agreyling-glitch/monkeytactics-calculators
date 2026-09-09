@@ -1,4 +1,4 @@
-import type { ChangeEvent, ReactNode } from "react";
+import { useState, type ChangeEvent, type ReactNode } from "react";
 import type { FormValues, QrType } from "../types";
 
 interface Props {
@@ -16,17 +16,25 @@ const TYPES: Array<[QrType, string]> = [
 ];
 
 export function SidebarContent({ qrType, values, error, onTypeChange, onValueChange }: Props) {
-  const set = (key: string) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    onValueChange(key, event.target.type === "checkbox" ? (event.target as HTMLInputElement).checked : event.target.value);
+  const [photoError, setPhotoError] = useState("");
+  const set = (key: string) => (event: { currentTarget: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement }) => {
+    onValueChange(key, event.currentTarget.type === "checkbox" ? (event.currentTarget as HTMLInputElement).checked : event.currentTarget.value);
   };
   const value = (key: string) => String(values[key] ?? "");
 
   const contactPhoto = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    setPhotoError("");
     if (!file) return onValueChange("contactPhoto", "");
-    if (file.size > 250_000) return onValueChange("contactPhoto", "");
+    if (file.size > 1_000 || !["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      setPhotoError("Choose a PNG, JPEG, or WebP under 1 KB. QR codes have very limited photo capacity.");
+      event.target.value = "";
+      return onValueChange("contactPhoto", "");
+    }
+    onValueChange("contactPhoto", "");
     const reader = new FileReader();
     reader.onload = () => onValueChange("contactPhoto", String(reader.result));
+    reader.onerror = () => setPhotoError("Unable to read this photo. Try another file.");
     reader.readAsDataURL(file);
   };
 
@@ -39,11 +47,12 @@ export function SidebarContent({ qrType, values, error, onTypeChange, onValueCha
     </label>
 
     <div className="qr-dynamic-form">{renderFields(qrType, values, value, set, contactPhoto)}</div>
+    {qrType === "vcard" && photoError && <div className="qr-inline-error" role="alert">{photoError}</div>}
     {error && <div className="qr-inline-error" role="alert">{error}</div>}
   </div>;
 }
 
-type Setter = (key: string) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+type Setter = (key: string) => (event: { currentTarget: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement }) => void;
 
 function renderFields(type: QrType, values: FormValues, value: (key: string) => string, set: Setter, contactPhoto: (event: ChangeEvent<HTMLInputElement>) => void) {
   switch (type) {
@@ -51,8 +60,8 @@ function renderFields(type: QrType, values: FormValues, value: (key: string) => 
     case "text": return <Field label="Plain text"><textarea rows={7} value={value("text")} onChange={set("text")} placeholder="Enter text to encode" /></Field>;
     case "wifi": return <>
       <Field label="Network name (SSID)"><input value={value("wifiSsid")} onChange={set("wifiSsid")} placeholder="Guest Wi-Fi" /></Field>
-      <Field label="Password"><input type="password" value={value("wifiPassword")} onChange={set("wifiPassword")} /></Field>
-      <div className="qr-field-row"><Field label="Encryption"><select value={value("wifiEncryption")} onChange={set("wifiEncryption")}><option>WPA</option><option>WEP</option><option value="NONE">Open</option></select></Field>
+      {value("wifiEncryption") !== "NONE" && <Field label="Password"><input type="password" value={value("wifiPassword")} onChange={set("wifiPassword")} /></Field>}
+      <div className="qr-field-row"><Field label="Encryption"><select value={value("wifiEncryption")} onChange={set("wifiEncryption")}><option value="WPA">WPA / WPA2 Personal</option><option>WEP</option><option value="NONE">Open</option></select></Field>
       <label className="qr-check"><input type="checkbox" checked={Boolean(values.wifiHidden)} onChange={set("wifiHidden")} /> Hidden network</label></div>
     </>;
     case "vcard": return <>
@@ -60,7 +69,7 @@ function renderFields(type: QrType, values: FormValues, value: (key: string) => 
       <div className="qr-field-row"><Field label="Phone"><input type="tel" value={value("contactPhone")} onChange={set("contactPhone")} /></Field><Field label="Email"><input type="email" value={value("contactEmail")} onChange={set("contactEmail")} /></Field></div>
       <Field label="Address"><input value={value("contactAddress")} onChange={set("contactAddress")} /></Field>
       <Field label="Website"><input type="url" value={value("contactWebsite")} onChange={set("contactWebsite")} /></Field>
-      <Field label="Embedded photo"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={contactPhoto} /><small>Optional; keep below 250 KB. Large cards may exceed QR capacity.</small></Field>
+      <Field label="Embedded photo"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={contactPhoto} /><small>Optional; under 1 KB. Even a small photo may exceed QR capacity with other contact details.</small></Field>
     </>;
     case "email": return <>
       <Field label="Recipient"><input type="email" value={value("emailAddress")} onChange={set("emailAddress")} /></Field>
@@ -68,10 +77,11 @@ function renderFields(type: QrType, values: FormValues, value: (key: string) => 
       <Field label="Message"><textarea rows={5} value={value("emailBody")} onChange={set("emailBody")} /></Field>
     </>;
     case "sms": return <><Field label="Phone number"><input type="tel" value={value("smsPhone")} onChange={set("smsPhone")} /></Field><Field label="Message"><textarea rows={5} value={value("smsMessage")} onChange={set("smsMessage")} /></Field></>;
-    case "geo": return <div className="qr-field-row"><Field label="Latitude"><input type="number" step="any" value={value("latitude")} onChange={set("latitude")} placeholder="44.9537" /></Field><Field label="Longitude"><input type="number" step="any" value={value("longitude")} onChange={set("longitude")} placeholder="-93.0900" /></Field></div>;
+    case "geo": return <div className="qr-field-row"><Field label="Latitude"><input type="number" min="-90" max="90" step="any" value={value("latitude")} onChange={set("latitude")} placeholder="44.9537" /></Field><Field label="Longitude"><input type="number" min="-180" max="180" step="any" value={value("longitude")} onChange={set("longitude")} placeholder="-93.0900" /></Field></div>;
     case "calendar": return <>
+      <p className="qr-content-help">Times are saved without a time zone and use the local time of the calendar importing the code.</p>
       <Field label="Event title"><input value={value("eventTitle")} onChange={set("eventTitle")} /></Field>
-      <div className="qr-field-row"><Field label="Starts"><input type="datetime-local" value={value("eventStart")} onChange={set("eventStart")} /></Field><Field label="Ends"><input type="datetime-local" value={value("eventEnd")} onChange={set("eventEnd")} /></Field></div>
+      <div className="qr-field-row"><Field label="Starts"><input type="datetime-local" value={value("eventStart")} onChange={set("eventStart")} onInput={set("eventStart")} /></Field><Field label="Ends"><input type="datetime-local" value={value("eventEnd")} onChange={set("eventEnd")} onInput={set("eventEnd")} /></Field></div>
       <Field label="Location"><input value={value("eventLocation")} onChange={set("eventLocation")} /></Field>
       <Field label="Description"><textarea rows={4} value={value("eventDescription")} onChange={set("eventDescription")} /></Field>
     </>;
@@ -83,8 +93,9 @@ function renderFields(type: QrType, values: FormValues, value: (key: string) => 
     </>;
     case "crypto": return <>
       <Field label="Network"><select value={value("cryptoNetwork")} onChange={set("cryptoNetwork")}><option value="bitcoin">Bitcoin</option><option value="ethereum">Ethereum</option><option value="solana">Solana</option><option value="litecoin">Litecoin</option></select></Field>
+      <p className="qr-content-help">Use a native-coin address for the selected network. Address ownership and checksums are not verified.</p>
       <Field label="Wallet address"><input value={value("cryptoAddress")} onChange={set("cryptoAddress")} /></Field>
-      <div className="qr-field-row"><Field label="Amount"><input inputMode="decimal" value={value("cryptoAmount")} onChange={set("cryptoAmount")} /></Field><Field label="Label"><input value={value("cryptoLabel")} onChange={set("cryptoLabel")} /></Field></div>
+      <div className="qr-field-row"><Field label={`Amount (${({ bitcoin: "BTC", ethereum: "ETH", solana: "SOL", litecoin: "LTC" } as Record<string, string>)[value("cryptoNetwork")] ?? "BTC"}, optional)`}><input inputMode="decimal" value={value("cryptoAmount")} onChange={set("cryptoAmount")} /></Field>{value("cryptoNetwork") !== "ethereum" && <Field label="Label (optional)"><input value={value("cryptoLabel")} onChange={set("cryptoLabel")} /></Field>}</div>
     </>;
     case "social": return <>
       <Field label="Platform"><select value={value("socialPlatform")} onChange={set("socialPlatform")}><option value="whatsapp">WhatsApp</option><option value="telegram">Telegram</option><option value="messenger">Messenger</option><option value="instagram">Instagram</option><option value="x">X</option><option value="linkedin">LinkedIn</option></select></Field>

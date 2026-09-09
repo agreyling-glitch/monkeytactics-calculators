@@ -130,7 +130,7 @@ function makeMultiPagePdf(pageContents: string[], logo: string | null) {
   });
   if (logo) objects.push(logo);
   objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
-  objects.push("<< /Producer (MonkeyTactics QR Studio) >>");
+  objects.push("<< /Producer (MonkeyTactics QR Code Generator) >>");
 
   const encoder = new TextEncoder();
   const parts: Uint8Array[] = [encoder.encode("%PDF-1.4\n%MTQR\n")];
