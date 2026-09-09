@@ -1,0 +1,85 @@
+/* Supporting content for the free QR Code Generator. */
+.qr-tool-page { background: radial-gradient(ellipse at 80% 0, #192e21 0, transparent 38%), #0b1510; }
+.qr-page-details { color: #eff3e9; }
+.qr-page-details p, .qr-page-details dd { color: #a8b8aa; line-height: 1.75; font-size: .92rem; }
+.qr-page-details h2 { margin: 0 0 1rem; font: 500 clamp(1.7rem,3vw,2.5rem)/1.14 Georgia,serif; color: #eff3e9; letter-spacing: -.025em; }
+.qr-page-details h3 { color: #eff3e9; font-size: 1.05rem; line-height: 1.4; }
+.qr-page-details .qr-eyebrow { margin: 0 0 .8rem; color: #abdcb7; font: 700 .68rem/1.4 Arial,sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.qr-benefit-strip { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; border-bottom: 1px solid #293c2e; padding: .5rem 0 2rem; color: #bdcbbf; font-size: .8rem; }
+.qr-benefit-strip span::before { content: '✓'; color: #a3e6b1; margin-right: .65rem; }
+.qr-editorial-section { padding: 3.5rem 0; }
+.qr-section-heading { display: grid; grid-template-columns: 1.25fr 1fr; align-items: end; gap: 3rem; margin-bottom: 2rem; }
+.qr-section-heading p { margin-bottom: 0; }
+.qr-section-heading h2 { margin-bottom: 0; max-width: 30rem; }
+.qr-process { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 1.75rem; list-style: none; margin: 0; padding: 0; }
+.qr-process li { border-top: 1px solid #36523e; padding-top: 1.4rem; }
+.qr-process li > span { font: 400 2rem/1 Georgia,serif; color: #a3cbaa; }
+.qr-process h3 { margin: 1.1rem 0 .5rem; }
+.qr-process p { margin: 0; font-size: .85rem; }
+.qr-use-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.qr-use-card { display: flex; flex-direction: column; padding: 1.7rem; border: 1px solid #304233; border-radius: 1rem; background: linear-gradient(145deg,#1a2d20,#111e17); }
+.qr-use-card:nth-child(2) { background: linear-gradient(145deg,#202d27,#111e17); }
+.qr-use-card:nth-child(3) { background: linear-gradient(145deg,#2b2e20,#171e15); }
+.qr-use-symbol { display: grid; place-items: center; width: 3rem; height: 3rem; border: 1px solid #52634b; border-radius: .9rem; color: #c9e9b7; font: 400 1.7rem Georgia,serif; }
+.qr-use-card h3 { margin: 1.6rem 0 .5rem; }
+.qr-use-card p { margin: 0 0 1.5rem; flex: 1; }
+.qr-card-tag { padding-top: 1rem; border-top: 1px solid #304233; color: #baceb8; font-size: .72rem; }
+.qr-page-details .qr-extra-types { font-size: .78rem; margin: 1rem 0 0; }
+.qr-export-guide { display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; background: #e7ecdf; border-radius: 1.2rem; padding: clamp(1.5rem,4vw,3rem); margin: 1rem 0; }
+.qr-export-guide h2 { color: #1b3323; }
+.qr-export-guide p, .qr-export-guide dd { color: #4c6050; }
+.qr-export-guide .qr-eyebrow { color: #3c6848; }
+.qr-text-link { display: inline-block; margin-top: 1rem; color: #224b2f; font-size: .85rem; font-weight: 700; text-underline-offset: 4px; }
+.qr-format-list { margin: 0; }
+.qr-format-list > div { border-top: 1px solid #b8c8b6; padding: 1.1rem 0; }
+.qr-format-list dt { display: flex; align-items: center; gap: 1.25rem; font-size: 1.3rem; font-weight: 800; color: #224b2f; }
+.qr-format-list dt span { font-size: .8rem; font-weight: 600; }
+.qr-format-list dd { margin: .5rem 0 0; font-size: .84rem; }
+.qr-workflow-section { display: grid; grid-template-columns: 1fr 1.2fr; gap: 4rem; }
+.qr-workflow-items article { padding: 1.5rem 0; border-bottom: 1px solid #304233; }
+.qr-workflow-items article:first-child { padding-top: 0; }
+.qr-workflow-items article > span { font-size: .65rem; color: #abdcb7; letter-spacing: .12em; }
+.qr-workflow-items h3 { margin: .65rem 0; }
+.qr-workflow-items p { margin: 0; }
+.qr-tool-page .qr-faq { display: grid; grid-template-columns: 1fr 1.2fr; gap: 4rem; padding: 3rem 0; border-top: 1px solid #304233; }
+.qr-faq-intro p { max-width: 22rem; }
+.qr-faq-items { min-width: 0; }
+.qr-faq-items details { padding: 1.2rem 0; border-color: #304233; }
+.qr-faq-items details:first-child { padding-top: 0; }
+.qr-faq-items summary { display: flex; justify-content: space-between; gap: 1.5rem; font-size: .9rem; list-style: none; line-height: 1.5; }
+.qr-faq-items summary::-webkit-details-marker { display: none; }
+.qr-faq-items summary::after { content: '+'; color: #abdcb7; font-size: 1.1rem; }
+.qr-faq-items details[open] summary::after { content: '−'; }
+.qr-faq-items details p { margin-top: .85rem; font-size: .85rem; }
+.qr-tool-page .qr-learn-more { max-width: none; margin: 1rem 0 3rem; padding: 2rem; border-color: #304233; background: #122119; }
+.qr-guide-grid { gap: 1.5rem; }
+.qr-guide-card { padding: 1.2rem 0 0; border: 0; border-top: 1px solid #3b5140; border-radius: 0; background: transparent; }
+.qr-guide-card h3 { margin: .75rem 0; font-size: 1.05rem; line-height: 1.5; }
+.qr-guide-card > span, .qr-guide-link { color: #b5ddbc; }
+.qr-tool-page .qr-related-tools { max-width: none; padding: 0 0 3rem; }
+.qr-related-tools .related-grid { margin-top: 1.4rem; }
+.qr-related-tools .related-card { padding: 1.4rem; border-color: #304233; background: transparent; transition: background .15s; }
+.qr-related-tools .related-card:hover { background: #1c3022; }
+.qr-page-details a:focus-visible, .qr-page-details summary:focus-visible { outline: 2px solid #a3e6b1; outline-offset: 5px; }
+.qr-export-guide a:focus-visible { outline-color: #224b2f; }
+.qr-tool-page .review-collector { background: #15251a; border-color: #304233; }
+@media(max-width:800px) {
+ .qr-section-heading, .qr-export-guide, .qr-workflow-section, .qr-tool-page .qr-faq { grid-template-columns: 1fr; gap: 1.5rem; }
+ .qr-process { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .qr-use-grid { grid-template-columns: 1fr; }
+ .qr-use-card { padding: 1.4rem; }
+ .qr-use-card h3 { margin-top: 1rem; }
+ .qr-editorial-section { padding: 2.5rem 0; }
+ .qr-benefit-strip { justify-content: flex-start; gap: .8rem 1.5rem; }
+}
+@media(max-width:480px) {
+ .qr-process { gap: 1.25rem; }
+ .qr-process p { font-size: .8rem; }
+ .qr-tool-page .qr-learn-more { padding: 1.3rem; }
+ .qr-format-list dt { align-items: flex-start; flex-direction: column; gap: .3rem; }
+ .qr-workspace-toolbar { flex-wrap: wrap; }
+}
+
+.qr-section-links { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; padding-top: 1.5rem; }
+.qr-section-links a { color: #b5ddbc; font-size: .8rem; text-underline-offset: 4px; }
+.qr-page-details h2, #studio-heading { scroll-margin-top: 2rem; }

@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>QR Code Generator – Batch &amp; PDF | MonkeyTactics</title>
-  <meta name="description" content="Create custom QR codes with safe frames, text labels, logos, gradients and reliability checks. Export URL, Wi-Fi, vCard and batch QR codes as PNG, SVG, PDF or ZIP.">
+  <title>Free QR Code Generator with Logo &amp; Batch | MonkeyTactics</title>
+  <meta name="description" content="Create free QR codes for URLs, Wi-Fi and contacts. Add a logo, download PNG, SVG or PDF, or generate up to 250 codes from CSV. No account needed.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
   <meta name="date" content="2026-08-05">
   <link rel="canonical" href="https://monkeytactics.com/tools/qr-code-generator">
-  <meta property="og:title" content="Free Custom QR Code Generator | MonkeyTactics">
-  <meta property="og:description" content="Design reliable QR codes with custom frames, labels, dots, eyes, gradients and logos. Export PNG, SVG, PDF, printable layouts or batch ZIP files.">
+  <meta property="og:title" content="Free QR Code Generator with Logo &amp; Batch | MonkeyTactics">
+  <meta property="og:description" content="Create free QR codes for URLs, Wi-Fi and contacts. Add a logo, download PNG, SVG or PDF, or generate up to 250 codes from CSV. No account needed.">
   <meta property="og:url" content="https://monkeytactics.com/tools/qr-code-generator">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MonkeyTactics">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Free Custom QR Code Generator | MonkeyTactics">
-  <meta name="twitter:description" content="Create, style, test and export single or batch QR codes directly in your browser.">
+  <meta name="twitter:title" content="Free QR Code Generator with Logo &amp; Batch | MonkeyTactics">
+  <meta name="twitter:description" content="Create free QR codes for URLs, Wi-Fi and contacts. Add a logo, download PNG, SVG or PDF, or generate up to 250 codes from CSV. No account needed.">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -24,7 +24,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260903-branded-scrollbars">
-  <link rel="stylesheet" href="/assets/generated/qr-studio/qr-studio.css?v=20260806-60">
+  <link rel="stylesheet" href="/assets/generated/qr-studio/qr-studio.css?v=20260909-batch-validation-6">
   <style>
     .hero--inner { padding: 1.75rem 2rem; }
     .hero--inner h1 { font-size: 1.9rem; }
@@ -73,19 +73,33 @@
   <link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-2">
   <link rel="stylesheet" href="/assets/css/shared/focus-mode.css?v=20260829-2">
   <style>
-    .qr-tool-page .qr-app-intro { margin-bottom: 0; }
+    .qr-tool-page .premium-tool-hero { padding-top: 1.5rem; padding-bottom: 1rem; }
+    .qr-tool-page .premium-hero-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); }
+    .qr-tool-page .premium-hero-stat { display: flex; }
+    @media (max-width: 850px) {
+      .qr-tool-page .premium-hero-grid { grid-template-columns: 1fr; }
+      .qr-tool-page .premium-hero-stat { display: none; }
+    }
+    .qr-tool-page .premium-tool-hero h1 { font-size: clamp(2rem,4vw,3.2rem); }
+    .qr-tool-page .premium-hero-copy { max-width: 42rem; }
+    .qr-tool-page .qr-app-wrap { padding-top: 1rem; }
+    .qr-tool-page .qr-app-intro { margin-bottom: 0; background: #101d16; padding: 1rem 4.25rem 1rem 1.5rem; }
+    .qr-tool-page .qr-app-intro .premium-section-kicker { display: none; }
+    .qr-tool-page .qr-app-intro h2 { font-family: inherit; font-weight: 600; font-size: 1.15rem; line-height: 1.3; }
+    .qr-tool-page .qr-app-intro p { font-size: .8rem; }
     .qr-tool-page [data-focus-mode]:not(.is-focus-mode) > .focus-mode-toggle { top: 3.25rem; right: 1.25rem; }
   </style>
   <link rel="stylesheet" href="/assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebApplication","@id":"https://monkeytactics.com/tools/qr-code-generator#app","name":"MonkeyTactics QR Code Generator","alternateName":"MonkeyTactics QR Studio","url":"https://monkeytactics.com/tools/qr-code-generator","description":"A free browser-based QR code generator for custom single and batch QR codes with safe frames, advanced styling, reliability analysis, project saving, and PNG, SVG, PDF and ZIP exports.","applicationCategory":"UtilitiesApplication","applicationSubCategory":"QR Code Generator","operatingSystem":"Any","browserRequirements":"Requires JavaScript and a modern web browser","isAccessibleForFree":true,"dateModified":"2026-08-06","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["URL, text and Wi-Fi QR codes","vCard, email, SMS, phone, geo and calendar QR codes","TOTP, cryptocurrency and social profile QR codes","Custom module and finder-eye shapes","Safe frames with labels, presets, gradients, patterns and icons","Gradients, colors, effects, image logos and text logos","Live scan reliability analysis and heatmap","PNG, SVG and PDF export","CSV batch ZIP export with frame overrides and printable layouts","Offline project save and JSON import or export"]}
+  {"@context":"https://schema.org","@type":"WebApplication","@id":"https://monkeytactics.com/tools/qr-code-generator#app","name":"MonkeyTactics QR Code Generator","url":"https://monkeytactics.com/tools/qr-code-generator","description":"Create free QR codes for URLs, Wi-Fi and contacts. Add a logo, download PNG, SVG or PDF, or generate up to 250 codes from CSV. No account needed.","applicationCategory":"UtilitiesApplication","applicationSubCategory":"QR Code Generator","operatingSystem":"Any","browserRequirements":"Requires JavaScript and a modern web browser","isAccessibleForFree":true,"dateModified":"2026-09-09","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["URL, text and Wi-Fi QR codes","vCard, email, SMS, location and calendar QR codes","TOTP, cryptocurrency and social profile QR codes","Custom module and finder-eye shapes","Safe frames with labels, presets, gradients, patterns and icons","Gradients, colors, effects, image logos and text logos","Live scan reliability analysis and heatmap","PNG, SVG and PDF export","CSV batch ZIP export with frame overrides and printable layouts","Browser project saving and JSON import or export"],"inLanguage":"en","publisher":{"@type":"Organization","name":"MonkeyTactics","url":"https://monkeytactics.com/"}}
   </script>
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Utilities","item":"https://monkeytactics.com/tools/utilities"},{"@type":"ListItem","position":3,"name":"QR Code Generator","item":"https://monkeytactics.com/tools/qr-code-generator"}]}
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Generators","item":"https://monkeytactics.com/tools/#generators"},{"@type":"ListItem","position":3,"name":"QR Code Generator","item":"https://monkeytactics.com/tools/qr-code-generator"}]}
   </script>
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"ItemList","@id":"https://monkeytactics.com/tools/qr-code-generator#related-guides","name":"Related QR Code Guides","numberOfItems":3,"itemListElement":[{"@type":"ListItem","position":1,"name":"How to Design a Beautiful QR Code Without Breaking Scanability","url":"https://blog.monkeytactics.com/posts/design-beautiful-qr-code-without-breaking-scanability/"},{"@type":"ListItem","position":2,"name":"QR Code Reliability: Quiet Zones, ECC Levels, and Why Most Styled QRs Fail","url":"https://blog.monkeytactics.com/posts/qr-code-reliability-quiet-zones-ecc-levels/"},{"@type":"ListItem","position":3,"name":"Batch QR Code Workflows: CSV Validation, Reliable Styling, and Production-Ready Exports","url":"https://blog.monkeytactics.com/posts/batch-qr-code-workflows-csv-validation-production-export/"}]}
   </script>
+  <link rel="stylesheet" href="/assets/css/qr-generator-page.css?v=20260909-seo-2">
 </head>
 <body class="premium-tool-page qr-tool-page">
   <main>
@@ -97,65 +111,68 @@
       <div class="premium-hero-grid">
         <div>
           <p class="premium-eyebrow">Private, local QR design</p>
-          <h1 id="tool-heading">Advanced QR Code Generator</h1>
-          <p class="premium-hero-copy">Create single or batch QR codes with structured content, safe frames, custom styling, logos, and live scan-reliability checks. Export a production-ready PNG, SVG, PDF, or ZIP.</p>
-          <div class="premium-hero-pills" aria-label="QR generator features"><span>No uploads required</span><span>Single &amp; batch workflows</span></div>
+          <h1 id="tool-heading">Free QR Code Generator</h1>
+          <p class="premium-hero-copy">Create a custom QR code for a website, Wi-Fi network, or contact. Add your logo and colors, then download PNG, SVG, or PDF. Free, with no account required.</p>
+          <div class="premium-hero-pills" aria-label="QR generator features"><span>Created in your browser</span><span>Single &amp; batch workflows</span></div>
         </div>
-        <div class="premium-hero-stat" aria-hidden="true"><span>Design with confidence</span><strong>Style <i>vs.</i> reliability</strong><small>Make it distinctive. Keep it easy to scan.</small></div>
+        <div class="premium-hero-stat"><span>Design with confidence</span><strong>Style <i>meets</i> reliability</strong><small>Make it distinctive. Keep it easy to scan.</small></div>
       </div>
     </section>
 
     <section class="qr-app-wrap" aria-labelledby="studio-heading" data-focus-mode data-focus-mode-label="QR Code Generator">
       <div class="qr-app-intro">
-        <div><div class="premium-section-kicker">01 / Create</div><h2 id="studio-heading">Custom QR Code Studio</h2><p>Choose the content, shape the design, test its reliability, and export in the format you need.</p></div>
+        <div><div class="premium-section-kicker">01 / Create</div><h2 id="studio-heading">QR Code Generator</h2><p>Choose the content, shape the design, test its reliability, and export in the format you need.</p></div>
       </div>
-      <div id="qr-studio-root"><p>Loading QR Studio…</p></div>
+      <div id="qr-studio-root"><p>Loading QR Code Generator…</p></div>
       <noscript>This QR generator needs JavaScript enabled because all QR creation runs locally in your browser.</noscript>
     </section>
 
-    <section class="qr-info" aria-labelledby="features-heading">
-      <h2 id="features-heading">Create a QR code for almost any purpose</h2>
-      <p>MonkeyTactics combines a flexible QR code maker with practical safeguards for print and digital use. Everything is created locally in your browser, with no account required.</p>
-      <div class="qr-info-grid">
-        <article><h3>Dedicated QR content types</h3><p>Create structured QR codes without manually formatting the underlying data.</p><ul class="qr-types"><li>Website URL</li><li>Plain text</li><li>Wi-Fi network</li><li>vCard contact</li><li>Email</li><li>SMS or phone call</li><li>Geo location</li><li>Calendar event</li><li>TOTP authenticator</li><li>Cryptocurrency</li><li>Social profiles</li></ul></article>
-        <article><h3>Advanced QR styling and frames</h3><p>Choose colors, multi-stop gradients, module patterns, custom dot shapes and finder-eye designs. Add a safe outer frame with a short call-to-action, preset, icon, gradient or pattern without covering the QR quiet zone. You can also add an uploaded logo, built-in purpose icon, or safety-limited text logo with automatic contrast.</p><p>Optional shadows, glow, texture and artistic effects are reflected in the live preview and exports.</p></article>
-        <article><h3>Scan reliability tools</h3><p>The live reliability score evaluates contrast, module size, the quiet zone, effects and logo coverage. Turn on the risk heatmap to see which parts of a heavily styled QR code may be difficult for scanners.</p><p>Safe logo settings and automatic error-correction adjustments help protect readability.</p></article>
-        <article><h3>Professional export options</h3><p>Download web or print-resolution PNG files, scalable SVG artwork, or PDFs for individual codes, Avery label sheets, posters and business cards.</p><p>CSV batches can produce ZIP archives, SVG sets, mixed formats, PDF booklets, manifests, final CSV records and thumbnail contact sheets.</p></article>
-      </div>
-    </section>
-
-    <section class="qr-info" aria-labelledby="how-heading">
-      <h2 id="how-heading">How to make a custom QR code</h2>
-      <p>The live preview updates as you work, so you can compare design choices before downloading the finished file.</p>
-      <ol class="qr-steps">
-        <li><strong>1. Choose content</strong>Select a QR type and complete its dedicated fields.</li>
-        <li><strong>2. Customize styling</strong>Adjust colors, dots, corner eyes, gradients, logos, frames and effects.</li>
-        <li><strong>3. Check reliability</strong>Review the scan score and heatmap, then simplify risky styling if needed.</li>
-        <li><strong>4. Export</strong>Choose PNG, SVG or PDF, or upload a CSV to create a batch ZIP.</li>
-      </ol>
-    </section>
-
-    <section class="qr-info" aria-labelledby="projects-heading">
-      <h2 id="projects-heading">Reusable projects and cleaner batch workflows</h2>
-      <div class="qr-info-grid">
-        <article><h3>Save your complete QR project</h3><p>Store content, styling, an image or text logo, batch CSV data and export preferences together in your browser. Projects can be duplicated for variations or exported as JSON for backup and transfer.</p></article>
-        <article><h3>Prepare up to 250 QR codes</h3><p>Upload a CSV with <code>name,data</code> columns. The batch preview validates columns, removes empty rows and detects duplicates before generation. A progress dialog reports each QR code during export.</p></article>
-      </div>
-    </section>
-
+    <div class="qr-page-details">
+      <div class="qr-benefit-strip" aria-label="Generator benefits"><span>Free to create &amp; download</span><span>Created in your browser</span><span>No account needed</span></div>
+      <nav class="qr-section-links" aria-label="QR generator page sections"><a href="#how-heading">How to create a QR code</a><a href="#formats-heading">Download formats</a><a href="#projects-heading">Batch generation</a><a href="#faq-heading">FAQs</a></nav>
+      <section class="qr-editorial-section" aria-labelledby="how-heading">
+        <div class="qr-section-heading"><div><p class="qr-eyebrow">From idea to scan</p><h2 id="how-heading">How to create a QR code</h2></div><p>Your preview updates as you go. Start simple, add your style, and check the finished result.</p></div>
+        <ol class="qr-process">
+          <li><span aria-hidden="true">01</span><h3>Add your content</h3><p>Share a website, Wi-Fi network, contact, or any of the supported content types.</p></li>
+          <li><span aria-hidden="true">02</span><h3>Make it yours</h3><p>Choose a preset, adjust the colors, and add an image or text logo. A frame can include a short label such as “Scan menu.”</p></li>
+          <li><span aria-hidden="true">03</span><h3>Check the details</h3><p>Review scan reliability, then test with your phone at the size you intend to use.</p></li>
+          <li><span aria-hidden="true">04</span><h3>Download &amp; share</h3><p>Choose PNG, SVG, or PDF for your website, packaging, print, or presentation.</p></li>
+        </ol>
+      </section>
+      <section class="qr-editorial-section" aria-labelledby="features-heading">
+        <div class="qr-section-heading"><div><p class="qr-eyebrow">One code, many uses</p><h2 id="features-heading">QR codes for links, contacts, and Wi-Fi</h2></div><p>Make the next step easy for the person holding the camera.</p></div>
+        <div class="qr-use-grid">
+          <article class="qr-use-card"><span class="qr-use-symbol" aria-hidden="true">↗</span><h3>A place to explore</h3><p>Link to a menu, portfolio, product page, or social profile.</p><span class="qr-card-tag">Website · Social profiles</span></article>
+          <article class="qr-use-card"><span class="qr-use-symbol" aria-hidden="true">@</span><h3>A way to connect</h3><p>Share contact details or start an email or text message.</p><span class="qr-card-tag">vCard · Email · SMS</span></article>
+          <article class="qr-use-card"><span class="qr-use-symbol" aria-hidden="true">⌁</span><h3>A warmer welcome</h3><p>Help guests join your Wi-Fi, find a location, or save an event.</p><span class="qr-card-tag">Wi-Fi · Location · Calendar</span></article>
+        </div>
+        <p class="qr-extra-types">Also supports plain text, TOTP authenticator setup, and cryptocurrency payment details.</p>
+      </section>
+      <section class="qr-export-guide" aria-labelledby="formats-heading">
+        <div><p class="qr-eyebrow">Ready for the real world</p><h2 id="formats-heading">Download your QR code<br>as PNG, SVG, or PDF</h2><p>Use the same design on a screen or in print. Pick a format that fits your next step.</p><a href="#studio-heading" class="qr-text-link">Back to the generator ↑</a></div>
+        <dl class="qr-format-list"><div><dt>PNG <span>Everyday sharing</span></dt><dd>An image for websites, presentations, and everyday print projects. Choose your export resolution.</dd></div><div><dt>SVG <span>Any size, sharp edges</span></dt><dd>A scalable vector for design software, packaging, and artwork that needs to grow.</dd></div><div><dt>PDF <span>Made for print</span></dt><dd>Single codes, label sheets, posters, business cards, or a booklet of batch codes.</dd></div></dl>
+      </section>
+      <section class="qr-editorial-section qr-workflow-section" aria-labelledby="projects-heading">
+        <div><p class="qr-eyebrow">Keep your good ideas</p><h2 id="projects-heading">Save a design.<br>Create QR codes in bulk.</h2><p>Save a favorite setup or prepare a whole collection with the same look.</p></div>
+        <div class="qr-workflow-items"><article><span>01 / SAVE</span><h3>Pick up where you left off</h3><p>Save content, styling, logos, and export preferences in your browser. Duplicate a project for variations, or export a JSON backup to take it with you.</p></article><article><span>02 / REPEAT</span><h3>Make up to 250 at once</h3><p>Upload a CSV with <code>name</code> and <code>data</code> columns to generate up to 250 QR codes in bulk. Each data cell holds the exact text or complete URL to encode. Review the cleaned rows, apply your design, and download a ZIP or printable PDF collection.</p></article></div>
+      </section>
     <section class="qr-info qr-faq" aria-labelledby="faq-heading">
-      <h2 id="faq-heading">QR Code Generator FAQ</h2>
+      <div class="qr-faq-intro"><p class="qr-eyebrow">A little clarity</p><h2 id="faq-heading">QR code questions,<br>answered.</h2><p>Practical details about files, privacy, and getting a dependable scan.</p></div>
+      <div class="qr-faq-items">
+      <details><summary>Is this QR code generator free?</summary><p>Yes. Creating and downloading QR codes is free, including custom logos, PNG, SVG and PDF exports, and batches of up to 250 codes. No account is required.</p></details>
+      <details><summary>Can I change a QR code after downloading it?</summary><p>These are static QR codes: the encoded content stays fixed in the downloaded image. To change a URL or other content, edit it here and download a new code. If you control the linked webpage, you can update that page without changing its URL or QR code.</p></details>
       <details><summary>Which export format should I choose?</summary><p>PNG is convenient for websites, presentations and common print workflows. SVG stays sharp at any size and is best for vector design software. PDF is useful for print-ready single codes, label sheets, posters, business cards and batch booklets.</p></details>
       <details><summary>Can I create QR codes in bulk?</summary><p>Yes. Upload a CSV containing up to 250 cleaned QR rows. You can export the selected format, an SVG set, a PDF booklet or mixed PNG and SVG files in one ZIP package.</p></details>
       <details><summary>Can I add a logo without making the QR code unreadable?</summary><p>Yes, but the logo covers encoded modules. Use safe mode, automatic error-correction adjustment, a contrasting logo background and the live reliability score. Always scan-test the final artwork at its intended printed size.</p></details>
       <details><summary>Where are saved projects and uploaded files stored?</summary><p>Project data, imported CSV text and embedded logo data are stored locally in your browser. Export a project JSON file if you need a portable backup or want to move it to another browser.</p></details>
       <details><summary>Does a QR code expire?</summary><p>The QR image itself does not expire. A QR code that contains a direct URL continues to work while that destination remains available. MonkeyTactics does not add a redirect or subscription between the QR code and your destination.</p></details>
+      </div>
     </section>
 
     <section class="qr-learn-more" aria-labelledby="qr-guides-heading">
       <div class="qr-learn-more-heading">
         <p class="premium-section-kicker">Learn more</p>
-        <h2 id="qr-guides-heading">Related QR Code Guides</h2>
+        <h2 id="qr-guides-heading">QR code design and printing guides</h2>
         <p>Explore practical guidance for designing dependable QR codes, protecting scanability, and preparing larger production runs.</p>
       </div>
       <div class="qr-guide-grid">
@@ -181,7 +198,7 @@
     </section>
 
     <section class="related-tools qr-related-tools" aria-labelledby="related-heading">
-      <h2 id="related-heading">Related free tools</h2>
+      <p class="qr-eyebrow">Keep creating</p><h2 id="related-heading">A few more useful tools</h2>
       <div class="related-grid">
         <a href="/tools/qr-code-decoder" class="related-card"><strong>QR Code Decoder</strong><span>Decode QR codes and barcodes privately from images, screenshots, URLs, or your camera.</span></a>
         <a href="/tools/ocr-utility" class="related-card"><strong>OCR Utility</strong><span>Extract editable text from images, screenshots, scans, and PDFs directly in your browser.</span></a>
@@ -189,6 +206,7 @@
       </div>
     </section>
 
+    </div>
   </main>
 
   <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot">
@@ -200,7 +218,7 @@
     <div>© 2026 MonkeyTactics</div>
     <nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav>
   </footer>
-  <script type="module" src="/assets/generated/qr-studio/qr-studio.js?v=20260806-60"></script>
+  <script type="module" src="/assets/generated/qr-studio/qr-studio.js?v=20260909-batch-validation-6"></script>
   <script src="/assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
 </body>
 </html>

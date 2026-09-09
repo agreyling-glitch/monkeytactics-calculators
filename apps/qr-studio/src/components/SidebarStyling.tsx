@@ -118,6 +118,14 @@ export function SidebarStyling({ style, qrType, logoFileName, logoSource, select
   const updateFrameGradient = (patch: Partial<QrStyle["frame"]["gradient"]>) => updateFrame({ gradient: { ...style.frame.gradient, ...patch } });
 
   return <div className="qr-panel-content qr-style-sections">
+    <div className="qr-preset-heading"><strong>Start with a look</strong><span>Then fine-tune every detail.</span></div>
+    <div className="qr-look-presets" aria-label="Design presets">{([
+      { name: "Classic", shape: "square", color: "#17251c" },
+      { name: "Rounded", shape: "rounded", color: "#17251c" },
+      { name: "Forest", shape: "rounded", color: "#166534" },
+    ] as const).map((preset) => <button type="button" key={preset.name} onClick={() => onChange({ moduleShape: preset.shape, moduleScale: 1, eyeShape: preset.shape, foreground: preset.color, eyeOuterColor: preset.color, eyeInnerColor: preset.color, background: "#ffffff", gradientType: "none", eyeGradientMode: "none", patternPreset: "classic", artistic: false })}>
+      <svg viewBox="0 0 29 29" aria-hidden="true" style={{ color: preset.color }}><rect width="29" height="29" rx="2" fill="white" />{[[3,3],[19,3],[3,19]].map(([x,y]) => <g key={`${x}-${y}`}><rect x={x} y={y} width="7" height="7" rx={preset.shape === "rounded" ? 2 : 0} fill="currentColor" /><rect x={x+1} y={y+1} width="5" height="5" rx="1" fill="white" /><rect x={x+2} y={y+2} width="3" height="3" fill="currentColor" /></g>)}{Array.from({length: 121}, (_, i) => { const x = 3 + (i % 11) * 2; const y = 3 + Math.floor(i / 11) * 2; return ((x < 11 && (y < 11 || y > 17)) || (x > 17 && y < 11) || (i * 7 + Math.floor(i / 11)) % 5 < 2) ? null : <rect key={i} x={x} y={y} width="1.8" height="1.8" rx={preset.shape === "rounded" ? .6 : 0} fill="currentColor" />; })}</svg><strong>{preset.name}</strong>
+    </button>)}</div>
     <div className="qr-style-subtabs" role="tablist" aria-label="Styling controls">
       {([['colors', 'Colors'], ['dots', 'QR Dots'], ['eyes', 'Corner Squares (Eyes)'], ['logo', 'Logo'], ['frames', 'Frames'], ['effects', 'Effects']] as const).map(([panel, label]) => <button key={panel} type="button" role="tab" aria-selected={stylePanel === panel} className={stylePanel === panel ? "active" : ""} onClick={() => setStylePanel(panel)}>{label}</button>)}
     </div>

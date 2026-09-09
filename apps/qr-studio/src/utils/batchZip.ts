@@ -13,6 +13,7 @@ export function createStoredZip(entries: ZipEntry[]): Uint8Array {
     const localView = new DataView(local.buffer);
     localView.setUint32(0, 0x04034b50, true);
     localView.setUint16(4, 20, true);
+    localView.setUint16(6, 0x0800, true);
     localView.setUint16(8, 0, true);
     localView.setUint32(14, checksum, true);
     localView.setUint32(18, entry.bytes.length, true);
@@ -27,6 +28,7 @@ export function createStoredZip(entries: ZipEntry[]): Uint8Array {
     centralView.setUint32(0, 0x02014b50, true);
     centralView.setUint16(4, 20, true);
     centralView.setUint16(6, 20, true);
+    centralView.setUint16(8, 0x0800, true);
     centralView.setUint32(16, checksum, true);
     centralView.setUint32(20, entry.bytes.length, true);
     centralView.setUint32(24, entry.bytes.length, true);
@@ -62,6 +64,7 @@ export async function createStoredZipAsync(entries: ZipEntry[], onProgress?: (co
     const localView = new DataView(local.buffer);
     localView.setUint32(0, 0x04034b50, true);
     localView.setUint16(4, 20, true);
+    localView.setUint16(6, 0x0800, true);
     localView.setUint16(8, 0, true);
     localView.setUint32(14, checksum, true);
     localView.setUint32(18, entry.bytes.length, true);
@@ -76,6 +79,7 @@ export async function createStoredZipAsync(entries: ZipEntry[], onProgress?: (co
     centralView.setUint32(0, 0x02014b50, true);
     centralView.setUint16(4, 20, true);
     centralView.setUint16(6, 20, true);
+    centralView.setUint16(8, 0x0800, true);
     centralView.setUint32(16, checksum, true);
     centralView.setUint32(20, entry.bytes.length, true);
     centralView.setUint32(24, entry.bytes.length, true);

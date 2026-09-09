@@ -1,3 +1,4 @@
+import { allocateBatchName } from "../utils/batchFilenames";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PreviewCanvas } from "./PreviewCanvas";
 import { BatchProgressDialog } from "./BatchProgressDialog";
@@ -124,11 +125,13 @@ export function QrStudio() {
 
   useEffect(() => {
     if (!authorized || !engine.current) return;
+    setResult(null);
+    hasGenerated.current = false;
+    if (!payload) {
+      setError(payloadState.error);
+      return;
+    }
     const timer = window.setTimeout(() => {
-      if (!payload) {
-        setError(payloadState.error);
-        return;
-      }
       try {
         const next = engine.current!.generate(payload, style, errorCorrectionForStyle(style));
         generatedEcc.current = errorCorrectionForStyle(style);
@@ -136,6 +139,8 @@ export function QrStudio() {
         setResult(next);
         setError("");
       } catch (generationError) {
+        setResult(null);
+        hasGenerated.current = false;
         setError(generationError instanceof Error ? generationError.message : "Unable to generate this QR code");
       }
     }, 160);
@@ -174,7 +179,8 @@ export function QrStudio() {
 
   const ensureResult = () => {
     if (!engine.current || !authorized) throw new Error("The QR engine is not ready");
-    const data = buildPayload(qrType, values);
+    if (payloadState.error || !payload) throw new Error(payloadState.error || "Enter valid content before exporting");
+    const data = payload;
     const next = engine.current.generate(data, style, errorCorrectionForStyle(style));
     generatedEcc.current = errorCorrectionForStyle(style);
     hasGenerated.current = true;
@@ -419,6 +425,7 @@ export function QrStudio() {
       const entries: Array<{ name: string; bytes: Uint8Array }> = [];
       const sourcePdfs: Uint8Array[] = [];
       const records: Array<{ name: string; data: string; textLogo?: string; frameText?: string; frameColor?: string; frameStyle?: string; filenames: string[]; reliabilityScore: number; reliabilityLabel: string }> = [];
+      const usedNames = new Set(["thumbnail-contact-sheet", "monkeytactics-qr-batch-booklet", "manifest", "final-qr-list"]);
       const textLogoStyleCache = new Map<string, QrStyle>();
       const needsPdfSources = batchMode === "pdf-booklet" || includeContactSheet || (batchMode === "selected" && exportFormat === "pdf");
       for (let index = 0; index < rows.length; index += 1) {
@@ -426,13 +433,14 @@ export function QrStudio() {
         setExportProgress({ current: index + 1, total: rows.length, label: `Processing QR ${index + 1} of ${rows.length}`, detail: item.name });
         await yieldToBrowser();
         let rowStyle = style;
-        if (style.logoMode === "text" && item.textLogo) {
+        if (item.textLogo) {
           const cached = textLogoStyleCache.get(item.textLogo);
           if (cached) rowStyle = cached;
           else {
             const textLogo = renderTextLogoDataUrl({ ...style.textLogo, text: item.textLogo });
             rowStyle = {
               ...style,
+              logoMode: "text",
               logoDataUrl: textLogo.dataUrl,
               logoPadding: textLogo.settings.padding,
               logoBackgroundShape: textLogoEngineShape(textLogo.settings.backgroundShape),
@@ -451,8 +459,10 @@ export function QrStudio() {
             preset: null,
           }).settings };
         }
-        const rendered = currentEngine.generate(item.data, rowStyle, errorCorrectionForStyle(rowStyle));
-        const baseName = batchFileName(item, index, filenamePattern, qrType);
+        let rendered: QrResult;
+        try { rendered = currentEngine.generate(item.data, rowStyle, errorCorrectionForStyle(rowStyle)); }
+        catch (rowError) { throw new Error(`Batch item ${index + 1} (${item.name}): ${rowError instanceof Error ? rowError.message : "QR generation failed"}`); }
+        const baseName = allocateBatchName(batchFileName(item, index, filenamePattern, qrType), usedNames);
         const filenames: string[] = [];
         if (batchMode === "selected" && exportFormat !== "pdf") {
           const filename = `${baseName}.${exportFormat}`;
@@ -528,15 +538,16 @@ export function QrStudio() {
   };
 
   if (!authorized && status !== "Loading QR engine…") {
-    return <div className="qr-engine-blocked"><strong>QR Studio unavailable</strong><p>{error || status}</p></div>;
+    return <div className="qr-engine-blocked"><strong>QR Code Generator unavailable</strong><p>{error || status}</p></div>;
   }
 
   return <div className="qr-studio-shell">
+    <div className="qr-workspace-toolbar"><div><span className="qr-workspace-dot" />QR Code Generator <span className="qr-workspace-caption">Your ideas, ready to scan</span></div><button type="button" aria-expanded={activeTab === "projects"} aria-controls="qr-panel-projects" onClick={() => setActiveTab(activeTab === "projects" ? "content" : "projects")}>Saved projects</button></div>
     <aside className="qr-sidebar">
-      <div className="qr-tablist" role="tablist" aria-label="QR Studio settings">
-        {(["projects", "content", "styling", "export"] as StudioTab[]).map((tab) => <button key={tab} id={`qr-tab-${tab}`} type="button" role="tab" aria-controls={`qr-panel-${tab}`} aria-selected={activeTab === tab} className={activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)}>{tab[0].toUpperCase() + tab.slice(1)}</button>)}
+      <div className="qr-tablist" role="tablist" aria-label="QR Code Generator settings">
+        {(["content", "styling", "export"] as StudioTab[]).map((tab, index) => <button key={tab} id={`qr-tab-${tab}`} type="button" role="tab" aria-controls={`qr-panel-${tab}`} aria-selected={activeTab === tab} className={activeTab === tab ? "active" : ""} onClick={() => setActiveTab(tab)}><span className="qr-step-number">0{index + 1}</span>{{ content: "Content", styling: "Design", export: "Download", projects: "Projects" }[tab]}</button>)}
       </div>
-      <div id="qr-panel-projects" role="tabpanel" aria-labelledby="qr-tab-projects" hidden={activeTab !== "projects"}>
+      <div id="qr-panel-projects" role="region" aria-label="Saved projects" hidden={activeTab !== "projects"}>
         <SidebarProjects projects={projects} selectedProjectId={selectedProjectId} name={projectName} description={projectDescription} tags={projectTags} notes={projectNotes} status={projectStatus} onSelect={selectProject} onNameChange={setProjectName} onDescriptionChange={setProjectDescription} onTagsChange={setProjectTags} onNotesChange={setProjectNotes} onNew={newProject} onSave={saveProject} onSaveAs={saveProjectAs} onLoad={loadProject} onDelete={deleteProject} onDuplicate={duplicateProject} onExport={exportProjectJson} onImport={importProjectJson} />
       </div>
       <div id="qr-panel-content" role="tabpanel" aria-labelledby="qr-tab-content" hidden={activeTab !== "content"}>
@@ -549,7 +560,7 @@ export function QrStudio() {
         <SidebarExport dpi={dpi} transparent={style.transparent} format={exportFormat} batchFileName={batchCsv?.fileName ?? ""} batchCount={batchCount} batchAnalysis={batchAnalysis} exportStatus={exportStatus} isExporting={isExporting} pdfLayout={pdfLayout} averyTemplate={averyTemplate} posterGrid={posterGrid} batchMode={batchMode} filenamePattern={filenamePattern} includeManifest={includeManifest} includeFinalCsv={includeFinalCsv} includeContactSheet={includeContactSheet} onDpiChange={setDpi} onTransparentChange={(transparent) => changeStyle({ transparent })} onFormatChange={setExportFormat} onPdfLayoutChange={setPdfLayout} onAveryTemplateChange={setAveryTemplate} onPosterGridChange={setPosterGrid} onBatchModeChange={setBatchMode} onFilenamePatternChange={setFilenamePattern} onIncludeManifestChange={setIncludeManifest} onIncludeFinalCsvChange={setIncludeFinalCsv} onIncludeContactSheetChange={setIncludeContactSheet} onBatchCsvChange={selectBatchCsv} onBatchCsvRemove={removeBatchCsv} onExport={exportQr} />
       </div>
     </aside>
-    <PreviewCanvas result={result} style={style} zoom={zoom} showGrid={showGrid} simulation={simulation} errorCorrection={errorCorrectionForStyle(style)} engineStatus={status} onZoomChange={setZoom} onGridChange={setShowGrid} onSimulationChange={setSimulation} />
+    <PreviewCanvas result={result} style={style} zoom={zoom} showGrid={showGrid} simulation={simulation} errorCorrection={errorCorrectionForStyle(style)} engineStatus={status} onZoomChange={setZoom} onGridChange={setShowGrid} onSimulationChange={setSimulation} onDownload={() => { setActiveTab("export"); requestAnimationFrame(() => { document.getElementById("qr-tab-export")?.focus(); }); }} />
     {exportProgress && <BatchProgressDialog progress={exportProgress} />}
     {csvError && <CsvErrorDialog message={csvError} onClose={() => setCsvError("")} />}
   </div>;

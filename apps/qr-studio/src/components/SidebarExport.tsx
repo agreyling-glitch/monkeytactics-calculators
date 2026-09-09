@@ -6,14 +6,14 @@ const csvCell = (value: string) => /[",\r\n]/.test(value) ? `"${value.replace(/"
 const CSV_TEMPLATE = [
   ["name", "data", "text_logo", "frame_text", "frame_color", "frame_style"],
   ["url-homepage", "https://monkeytactics.com", "HOME", "SCAN ME", "#111827", "rounded-rectangle"],
-  ["plain-text", "Welcome to MonkeyTactics QR Studio"],
+  ["plain-text", "Welcome to MonkeyTactics QR Code Generator"],
   ["wifi-guest", "WIFI:T:WPA;S:MonkeyTactics Guest;P:ExamplePassword123;H:false;;"],
   ["vcard-contact", "BEGIN:VCARD\r\nVERSION:4.0\r\nFN:Jane Doe\r\nORG:MonkeyTactics\r\nTEL;TYPE=cell;VALUE=uri:tel:+15551234567\r\nEMAIL:jane@example.com\r\nADR;TYPE=work:;;123 Main Street;Minneapolis;MN;55401;USA\r\nURL:https://monkeytactics.com\r\nEND:VCARD"],
   ["email-prefilled", "mailto:hello@example.com?subject=Hello&body=Thanks%20for%20connecting"],
   ["sms-prefilled", "sms:+15551234567?body=Hello%20from%20MonkeyTactics"],
   ["phone-call", "tel:+15551234567"],
   ["geo-location", "geo:44.9537,-93.0900"],
-  ["calendar-event", "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//MonkeyTactics//QR Studio//EN\r\nBEGIN:VEVENT\r\nSUMMARY:MonkeyTactics Demo\r\nDTSTART:20260810T140000\r\nDTEND:20260810T150000\r\nLOCATION:123 Main Street\, Minneapolis\r\nDESCRIPTION:QR Studio demonstration\r\nEND:VEVENT\r\nEND:VCALENDAR"],
+  ["calendar-event", "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//MonkeyTactics//QR Code Generator//EN\r\nBEGIN:VEVENT\r\nSUMMARY:MonkeyTactics Demo\r\nDTSTART:20260810T140000\r\nDTEND:20260810T150000\r\nLOCATION:123 Main Street\, Minneapolis\r\nDESCRIPTION:QR Code Generator demonstration\r\nEND:VEVENT\r\nEND:VCALENDAR"],
   ["totp-authenticator", "otpauth://totp/MonkeyTactics:demo@example.com?secret=JBSWY3DPEHPK3PXP&issuer=MonkeyTactics&algorithm=SHA1&digits=6&period=30"],
   ["crypto-bitcoin", "bitcoin:bc1qexampleaddress?amount=0.001&label=MonkeyTactics"],
   ["social-whatsapp", "https://wa.me/15551234567"],
@@ -79,7 +79,7 @@ export function SidebarExport(props: Props) {
       <div className="qr-export-formats" role="group" aria-label="Export format">
         {(["png", "svg", "pdf"] as ExportFormat[]).map((format) => <button key={format} type="button" disabled={props.isExporting} className={props.format === format ? "active" : ""} aria-pressed={props.format === format} onClick={() => props.onFormatChange(format)}><strong>{format.toUpperCase()}</strong><small>{format === "png" ? "Raster image" : format === "svg" ? "Scalable vector" : "Print-ready"}</small></button>)}
       </div>
-      {props.format === "png" && <label className="qr-field"><span>PNG resolution</span><select disabled={props.isExporting} value={props.dpi} onChange={(event) => props.onDpiChange(Number(event.target.value))}><option value={72}>72 DPI · web</option><option value={300}>300 DPI · print</option><option value={600}>600 DPI · high detail</option><option value={1200}>1200 DPI · production</option></select></label>}
+      {(props.format === "png" || (props.batchFileName && props.batchMode === "mixed")) && <label className="qr-field"><span>PNG resolution</span><select disabled={props.isExporting} value={props.dpi} onChange={(event) => props.onDpiChange(Number(event.target.value))}><option value={72}>72 DPI · web</option><option value={300}>300 DPI · print</option><option value={600}>600 DPI · high detail</option><option value={1200}>1200 DPI · production</option></select></label>}
       {props.format === "pdf" && <div className="qr-pdf-options">
         <label className="qr-field"><span>PDF layout</span><select disabled={props.isExporting} value={props.pdfLayout} onChange={(event) => props.onPdfLayoutChange(event.target.value as PdfLayout)}><option value="standard">Standard · one QR per file</option><option value="labels">Label sheet · Avery templates</option><option value="poster">Poster · multiple QR codes per page</option><option value="business-cards">Business cards · 10 per sheet</option></select></label>
         {props.pdfLayout === "labels" && <label className="qr-field"><span>Avery template</span><select disabled={props.isExporting} value={props.averyTemplate} onChange={(event) => props.onAveryTemplateChange(event.target.value as AveryTemplate)}><option value="5160">5160 / 8160 · 30 labels</option><option value="5163">5163 / 8163 · 10 labels</option><option value="5164">5164 / 8164 · 6 labels</option></select></label>}
@@ -91,7 +91,7 @@ export function SidebarExport(props: Props) {
 
     <section className="qr-style-section">
       <h3>Optional batch CSV</h3>
-      <p className="qr-help">Upload a CSV with <code>name,data</code> columns to switch Export into batch mode. Optional <code>text_logo</code>, <code>frame_text</code>, <code>frame_color</code>, and <code>frame_style</code> columns can override styling per row. The file stays in this browser so you can change styling before exporting. Batch files can contain up to 250 QR codes. <a className="qr-template-link" download="qr-batch-template.csv" href={CSV_TEMPLATE_URL}>Download CSV template</a></p>
+      <p className="qr-help">Upload a CSV with <code>name,data</code> columns to switch Export into batch mode. Optional <code>text_logo</code>, <code>frame_text</code>, <code>frame_color</code>, and <code>frame_style</code> columns can override styling per row. Data is encoded exactly as supplied; use complete URLs or preformatted Wi-Fi, contact, and other payloads. The file stays in this browser so you can change styling before exporting. Batch files can contain up to 250 QR codes. <a className="qr-template-link" download="qr-batch-template.csv" href={CSV_TEMPLATE_URL}>Download CSV template</a></p>
       {!props.batchFileName ? <label className="qr-field"><span>Choose CSV file</span><input type="file" disabled={props.isExporting} accept=".csv,text/csv" onChange={chooseCsv} /></label> : <div className="qr-selected-upload" aria-live="polite">
         <button type="button" disabled={props.isExporting} onClick={props.onBatchCsvRemove}>Remove file</button>
         <p>Selected: <strong>{props.batchFileName}</strong> · {props.batchCount} QR {props.batchCount === 1 ? "code" : "codes"}</p>
@@ -109,7 +109,7 @@ export function SidebarExport(props: Props) {
     </section>
 
     <section className="qr-style-section qr-export-final">
-      <button type="button" className="qr-primary-action" disabled={props.isExporting} onClick={props.onExport}>{props.isExporting ? "Exporting…" : props.batchCount > 1 ? `Export Batch (${props.batchCount})` : "Export"}</button>
+      <button type="button" className="qr-primary-action" disabled={props.isExporting} onClick={props.onExport}>{props.isExporting ? "Exporting…" : props.batchFileName ? `Export Batch (${props.batchCount})` : "Export"}</button>
       {props.exportStatus && <p className="qr-batch-status" role="status">{props.exportStatus}</p>}
     </section>
   </div>;

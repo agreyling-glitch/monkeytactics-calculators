@@ -1,0 +1,7 @@
+name,data,text_logo,frame_text,frame_color,frame_style
+Menu,https://example.com/a,ONE,SCAN,#166534,rounded-rectangle
+Menu,https://example.com/b,TWO,,,
+Café,https://example.com/c,,,,
+東京,https://example.com/d,,,,
+Menu,https://example.com/a,ONE,SCAN,#166534,rounded-rectangle
+Blank,,,,,

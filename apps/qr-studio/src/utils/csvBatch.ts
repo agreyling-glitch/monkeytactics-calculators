@@ -58,9 +58,10 @@ export function analyzeBatchCsv(csv: string): BatchCsvAnalysis {
   let duplicateRowsRemoved = 0;
 
   rows.slice(1).forEach((cells, index) => {
+    if (cells.length > header.length) throw new Error(`CSV row ${index + 2} has more values than headers. Quote data containing commas.`);
     const name = cells[nameIndex]?.trim() || `qrcode-${index + 1}`;
-    const data = cells[dataIndex]?.trim() ?? "";
-    if (!data) {
+    const data = cells[dataIndex] ?? "";
+    if (!data.trim()) {
       emptyRowsRemoved += 1;
       return;
     }
@@ -108,6 +109,7 @@ export function analyzeBatchCsv(csv: string): BatchCsvAnalysis {
     items.push({ name, data, ...(textLogo ? { textLogo } : {}), ...(frameText ? { frameText } : {}), ...(frameColor ? { frameColor } : {}), ...(frameStyle ? { frameStyle } : {}) });
   });
 
+  if (items.length > 250) throw new Error("Batch CSV files are limited to 250 QR codes after cleanup.");
   return { items, originalDataRows: rows.length - 1, emptyRowsRemoved, duplicateRowsRemoved, ignoredColumns, textLogoWarnings, frameWarnings };
 }
 
@@ -116,6 +118,7 @@ function parseCsvRows(csv: string): string[][] {
   let row: string[] = [];
   let cell = "";
   let quoted = false;
+  let closedQuote = false;
 
   for (let index = 0; index < csv.length; index += 1) {
     const character = csv[index];
@@ -123,17 +126,22 @@ function parseCsvRows(csv: string): string[][] {
       cell += '"';
       index += 1;
     } else if (character === '"') {
+      if (!quoted && (cell.length || closedQuote)) throw new Error("CSV contains a quote inside an unquoted value.");
+      closedQuote = quoted;
       quoted = !quoted;
     } else if (character === "," && !quoted) {
       row.push(cell);
       cell = "";
+      closedQuote = false;
     } else if ((character === "\n" || character === "\r") && !quoted) {
       if (character === "\r" && csv[index + 1] === "\n") index += 1;
       row.push(cell);
       rows.push(row);
       row = [];
       cell = "";
+      closedQuote = false;
     } else {
+      if (closedQuote && !quoted) throw new Error("CSV contains characters after a closing quote. Add a comma or line break.");
       cell += character;
     }
   }
