@@ -2,5 +2,8 @@
 User-agent: *
 Allow: /
 
+User-agent: SemrushBot
+Disallow: /tools/word-unscrambler/
+
 # Sitemap (update if you move domain)
 Sitemap: https://monkeytactics.com/sitemap.xml
