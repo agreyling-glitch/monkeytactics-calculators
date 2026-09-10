@@ -5,5 +5,11 @@ Allow: /
 User-agent: SemrushBot
 Disallow: /tools/word-unscrambler/
 
+User-agent: Claude-SearchBot
+Disallow: /tools/word-unscrambler/
+
+User-agent: Claude-User
+Disallow: /tools/word-unscrambler/
+
 # Sitemap (update if you move domain)
 Sitemap: https://monkeytactics.com/sitemap.xml
