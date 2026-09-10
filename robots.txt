@@ -1,5 +1,11 @@
 # robots.txt for monkeytactics.com
 User-agent: *
+Disallow: /tools/word-unscrambler/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
 Allow: /
 
 User-agent: SemrushBot
