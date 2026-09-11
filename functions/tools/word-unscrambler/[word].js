@@ -10,6 +10,8 @@ const SITE_URL = "https://monkeytactics.com";
 const TOOL_PATH = "/tools/word-unscrambler";
 const WORD_DATA_PATH = "/assets/data/words";
 const WORD_DATA_VERSION = "wiktionary-v1";
+const PAGE_CACHE_VERSION = "v1";
+const PAGE_CACHE_TTL_SECONDS = 86400;
 const DICTIONARY_BIT = 3;
 
 let wasmInitialized = false;
@@ -90,6 +92,21 @@ function normalizeWord(value) {
   }
 }
 
+function createPageCacheKey(request, word) {
+  const cacheURL = new URL(request.url);
+  cacheURL.pathname = `${TOOL_PATH}/${encodeURIComponent(word)}`;
+  cacheURL.search = `?page-cache=${PAGE_CACHE_VERSION}`;
+  cacheURL.hash = "";
+
+  return new Request(cacheURL.toString(), { method: "GET" });
+}
+
+function createBrowserResponse(response) {
+  const browserResponse = new Response(response.body, response);
+  browserResponse.headers.set("Cache-Control", "no-cache");
+  return browserResponse;
+}
+
 function renderResultsHTML(results) {
   if (!Array.isArray(results) || results.length === 0) {
     return "<p>No words can be made from these letters.</p>";
@@ -160,14 +177,34 @@ export async function onRequest(context) {
     });
   }
 
+  const shouldCache = context.request.method === "GET";
+  const cache = shouldCache ? caches.default : null;
+  const cacheKey = shouldCache
+    ? createPageCacheKey(context.request, word)
+    : null;
+  const cachedResponse = cacheKey ? await cache.match(cacheKey) : null;
+
+  if (cachedResponse) {
+    return createBrowserResponse(cachedResponse);
+  }
+
   await initWasm();
   await loadRequiredDictionaryShards(context, word);
 
   const results = unscramble(word);
   const valid = is_valid_word(word);
 
-  return new Response(renderPageHTML({ word, results, valid }), {
+  const response = new Response(renderPageHTML({ word, results, valid }), {
     status: 200,
-    headers: { "content-type": "text/html; charset=UTF-8" },
+    headers: {
+      "content-type": "text/html; charset=UTF-8",
+      "Cache-Control": `public, max-age=${PAGE_CACHE_TTL_SECONDS}`,
+    },
   });
+
+  if (cacheKey) {
+    context.waitUntil(cache.put(cacheKey, response.clone()));
+  }
+
+  return createBrowserResponse(response);
 }
