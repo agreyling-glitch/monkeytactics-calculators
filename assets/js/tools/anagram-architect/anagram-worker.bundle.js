@@ -777,12 +777,12 @@ async function loadDictionary(kind) {
 	return words;
 }
 async function loadLanguageData() {
-	const response = await fetch("/assets/data/words/anagram-language-v1.tsv.gz");
+	const response = await fetch("/assets/data/words/anagram-language-v1.txt.gz?v=2");
 	if (!response.ok) throw new Error("Language ranking data could not be loaded.");
 	return (await decodeResponse(response)).split(/\r?\n/).filter(Boolean);
 }
 async function loadNgramData() {
-	const response = await fetch("/assets/data/words/anagram-ngrams-v1.tsv.gz?v=2");
+	const response = await fetch("/assets/data/words/anagram-ngrams-v1.txt.gz?v=3");
 	if (!response.ok) throw new Error("Phrase-ranking data could not be loaded.");
 	return (await decodeResponse(response)).split(/\r?\n/).filter(Boolean);
 }

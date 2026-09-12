@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { gunzipSync, gzipSync } from "node:zlib";
 
-const OUTPUT = new URL("../assets/data/words/anagram-language-v1.tsv.gz", import.meta.url);
+const OUTPUT = new URL("../assets/data/words/anagram-language-v1.txt.gz", import.meta.url);
 const MANIFEST = new URL("../assets/data/word-definitions/manifest.wordnet-definitions-v1.json", import.meta.url);
 const FREQUENCY_URL = "https://norvig.com/ngrams/count_1w.txt";
 const POS_BITS = { noun: 1, verb: 2, adjective: 4, adverb: 8 };

@@ -28,6 +28,6 @@ for (const [phrase, count] of [...trigrams].filter(([, count]) => count >= 2).so
 }
 
 const compressed = gzipSync(`${records.join("\n")}\n`, { level: 9, mtime: 0 });
-await writeFile(new URL("../assets/data/words/anagram-ngrams-v1.tsv.gz", import.meta.url), compressed);
+await writeFile(new URL("../assets/data/words/anagram-ngrams-v1.txt.gz", import.meta.url), compressed);
 await writeFile(new URL("../assets/data/words/anagram-ngrams-v1.json", import.meta.url), `${JSON.stringify({ version: 1, records: records.length, bigramSource: BIGRAM_URL, trigramSource: TEXT_URL, sha256: createHash("sha256").update(compressed).digest("hex") })}\n`);
 console.log(`Built ${records.length.toLocaleString()} anagram n-gram records (${compressed.byteLength.toLocaleString()} bytes).`);
