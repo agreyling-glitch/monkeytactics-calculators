@@ -4,6 +4,11 @@
   "version": "1.0.0",
   "scripts": {
     "build:word-dictionary": "node scripts/build-word-dictionary.mjs",
+    "build:anagram-architect": "node scripts/build-anagram-architect.mjs",
+    "build:anagram-wasm": "wasm-pack build wasm/anagram-architect-engine --target web --release --out-dir ../../assets/wasm/anagram-architect --out-name anagram_architect_engine && node -e \"require('fs').rmSync('assets/wasm/anagram-architect/.gitignore',{force:true})\"",
+    "build:anagram-language": "node scripts/build-anagram-language-data.mjs",
+    "build:anagram-ngrams": "node scripts/build-anagram-ngrams.mjs",
+    "benchmark:anagram": "node scripts/benchmark-anagram-quality.mjs",
     "build:qr": "vite build",
     "build:qr-wasm": "wasm-pack build wasm/qr-code-generator-engine --target web --release --out-dir ../../assets/wasm/qr-code-generator --out-name qr_engine && node -e \"require('fs').rmSync('assets/wasm/qr-code-generator/.gitignore',{force:true})\"",
     "build:qr-decoder-wasm": "node wasm/qr-code-decoder-engine/build.mjs",
@@ -19,7 +24,7 @@
     "build:tools-directory": "node scripts/generate-tools-directory-capabilities.mjs",
     "build:wasm": "npm run build:qr-wasm && npm run build:qr-decoder-wasm && npm run build:mortgage-wasm && npm run build:precious-metals-wasm && npm run build:insulation-wasm && npm run build:word-wasm && npm run build:text-wasm && npm run build:menu-wasm",
     "build:sitemaps": "node scripts/generate-sitemaps.mjs",
-    "build": "npm run build:tools-directory && npm run build:wasm && npm run build:qr && npm run build:sitemaps",
+    "build": "npm run build:tools-directory && npm run build:anagram-wasm && npm run build:anagram-architect && npm run build:wasm && npm run build:qr && npm run build:sitemaps",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.cjs tests/*.test.mjs"
   },

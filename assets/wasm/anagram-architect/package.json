@@ -1,0 +1,17 @@
+{
+  "name": "anagram-architect-engine",
+  "type": "module",
+  "description": "Resumable Rust/WASM phrase-anagram search engine for MonkeyTactics",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "anagram_architect_engine_bg.wasm",
+    "anagram_architect_engine.js",
+    "anagram_architect_engine.d.ts"
+  ],
+  "main": "anagram_architect_engine.js",
+  "types": "anagram_architect_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
