@@ -10,7 +10,10 @@ const dictionary = [];
 for (const chunk of Object.values(dictionaryManifest.chunks)) {
   for (const word of gunzipSync(await readFile(new URL(`assets/data/words/${chunk.file}`, root))).toString().split(/\r?\n/)) if (word) dictionary.push(word);
 }
-const language = gunzipSync(await readFile(new URL("assets/data/words/anagram-language-v1.txt.gz", root))).toString().split(/\r?\n/).filter(Boolean);
+const languageManifest = JSON.parse(await readFile(new URL("assets/data/words/anagram-language-v1.json", root)));
+const language = (await Promise.all(languageManifest.shards.map(async ({ file }) =>
+  gunzipSync(await readFile(new URL(`assets/data/words/${file}`, root))).toString()
+))).flatMap((chunk) => chunk.split(/\r?\n/).filter(Boolean));
 const ngrams = gunzipSync(await readFile(new URL("assets/data/words/anagram-ngrams-v1.txt.gz", root))).toString().split(/\r?\n/).filter(Boolean);
 init_engine(dictionary);
 init_language_metadata(language);

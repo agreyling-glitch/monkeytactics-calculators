@@ -86,7 +86,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260912-45/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260912-46/);
 });
 
 test("the result toolbar loads the cache-busted responsive stylesheet", async () => {
