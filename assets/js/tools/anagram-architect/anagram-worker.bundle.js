@@ -782,7 +782,7 @@ async function loadLanguageData() {
 	const manifest = await manifestResponse.json();
 	if (!Array.isArray(manifest.shards) || !manifest.shards.length) throw new Error("Language ranking manifest is invalid.");
 	return (await Promise.all(manifest.shards.map(async ({ file }) => {
-		const response = await fetch(`/assets/data/words/${file}`);
+		const response = await fetch(`/assets/data/words/${file}?v=2`);
 		if (!response.ok) throw new Error("Language ranking data could not be loaded.");
 		return decodeResponse(response);
 	}))).flatMap((chunk) => chunk.split(/\r?\n/).filter(Boolean));

@@ -239,7 +239,7 @@ function solveInWorker(source, options, dictionaryKind, showProgress) {
       }
     };
     for (let shardIndex = 0; shardIndex < workerCount; shardIndex += 1) {
-      const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260912-26", { type: "module" });
+      const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260912-27", { type: "module" });
       workers.push(worker);
       worker.addEventListener("message", ({ data }) => handleMessage(shardIndex, worker, data));
       worker.addEventListener("error", () => fail(new Error("A parallel anagram worker could not start. Reload the page and try again.")));
