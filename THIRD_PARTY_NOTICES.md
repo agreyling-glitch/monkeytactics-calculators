@@ -18,14 +18,15 @@ to use, modify, and distribute.
 
 - Source: <https://wordnetcode.princeton.edu/3.0/WNdb-3.0.tar.gz>
 - Version: `3.0`
-- Purpose: Source glosses and lexical metadata for Crossword Clue Search feasibility work
+- Purpose: Source glosses and lexical metadata for the Crossword Solver and language-ranking metadata used by Anagram Architect
 - License: Princeton WordNet 3.0 License
 - Full license: [WordNet 3.0 license](licenses/wordnet-3.0.txt)
 - Provenance and checksum: [WordNet source record](docs/crossword-clue-search/wordnet-3.0-source.json)
 
 WordNet permits use, copying, modification, and distribution without fee or royalty
 when its copyright notice, statements, and disclaimer are retained on all copies.
-The generated feasibility records retain per-record WordNet source identifiers.
+The generated records retain source provenance. Crossword and anagram processing,
+searching, and ranking run locally in the visitor's browser.
 
 ## JavaScript libraries
 
@@ -98,8 +99,9 @@ The node-qrcode browser bundle contains the following declared dependencies:
 - Processor license: MIT, Copyright (c) 2024-2026 Eric Mika
 
 The Expanded dictionary is a normalized, lowercase ASCII subset of the May 2026
-Wiktionary-derived word list. Wiktionary contributors are credited collectively;
-the source page history provides individual attribution.
+Wiktionary-derived word list. It is available to the word solvers and Anagram
+Architect. Wiktionary contributors are credited collectively; the source page
+history provides individual attribution.
 
 ## Word-list and trademark notice
 

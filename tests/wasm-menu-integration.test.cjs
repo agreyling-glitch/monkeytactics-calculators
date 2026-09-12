@@ -97,9 +97,9 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "labs", "text-data", "batch-automation"]);
   assert.deepEqual(
     groups.find(({ id }) => id === "word-games").children.map(({ id }) => id),
-    ["word-unscrambler", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-solver", "absurdle-solver", "quordle-solver", "octordle-solver", "sedecordle-solver"],
+    ["word-unscrambler", "anagram-architect", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-solver", "absurdle-solver", "quordle-solver", "octordle-solver", "sedecordle-solver"],
   );
-  assert.equal(leaves.length, 38);
+  assert.equal(leaves.length, 39);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
 });
 
@@ -161,7 +161,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
   for (const [id, label, count] of [
-    ["word-games", "Word Games", 10],
+    ["word-games", "Word Games", 11],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
     ["labs", "Labs", 1],
@@ -175,7 +175,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 38);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 39);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -198,14 +198,14 @@ test("site-wide references describe the Batt and Blown Insulation Calculator", (
   assert.match(construction, /batt packages or blown-in bags, R-value, depth, load, and cost/i);
 });
 
-test("the homepage features eleven designated popular tools", () => {
+test("the homepage features twelve designated popular tools", () => {
   const html = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
   const homeCss = fs.readFileSync(path.join(siteRoot, "assets", "css", "pages", "home.css"), "utf8");
   const titles = [...html.matchAll(/<article class="featured-tool[^>]*>[\s\S]*?<h3>([^<]+)<\/h3>/g)]
     .map((match) => match[1]);
 
   assert.deepEqual(titles, [
-    "Crossword Solver",
+    "Anagram Architect",
     "Compound Interest Calculator",
     "Loan Mortgage Calculator",
     "Wordle Solver",
@@ -213,33 +213,30 @@ test("the homepage features eleven designated popular tools", () => {
     "Absurdle Solver",
     "Word Unscrambler",
     "Words With Friends Solver",
+    "Crossword Solver",
     "Quordle Solver",
     "Octordle Solver",
     "Sedecordle Solver",
   ]);
 
-  assert.match(html, /featured-tool--absurdle[\s\S]*?featured-tool__new">New<[\s\S]*?<h3>Absurdle Solver<\/h3>/);
-  assert.match(html, /featured-tool--quordle[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Quordle Solver<\/h3>/);
-  assert.match(html, /featured-tool--octordle[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Octordle Solver<\/h3>/);
-  assert.match(html, /featured-tool--sedecordle[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Sedecordle Solver<\/h3>/);
-  assert.match(html, /featured-tool--crossword[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Crossword Solver<\/h3>/);
-  assert.match(html, /featured-tool--word[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Word Unscrambler<\/h3>/);
-  assert.match(html, /featured-tool--wwf[\s\S]*?featured-tool__updated">Updated<[\s\S]*?<h3>Words With Friends Solver<\/h3>/);
+  assert.match(html, /featured-tool--anagram[\s\S]*?featured-tool__new">NEW<[\s\S]*?<h3>Anagram Architect<\/h3>/);
+  assert.doesNotMatch(html, /featured-tool__updated/);
   assert.match(html, /Find single- and multi-word crossword answers using WordNet clue similarity/);
   assert.match(html, /Rank definitions, synonyms, and WordNet graph relationships/);
   assert.match(html, /Group candidate answers by reusable Grid Positions/);
   assert.match(html, /Import, export, restore, and share complete Pick Lists/);
   assert.match(html, /home\.css\?v=20260901-featured-spacing-1/);
   assert.match(homeCss, /\.featured-tool > p \{ min-height: 5\.25rem; margin: 0\.6rem 0 0\.75rem;/);
-  assert.equal((html.match(/class="capability-list"/g) || []).length, 11);
-  assert.equal((html.match(/<li>/g) || []).length, 44);
-  assert.equal((html.match(/class="featured-tool__new">New</g) || []).length, 1);
-  assert.equal((html.match(/class="featured-tool__updated">Updated/g) || []).length, 6);
+  assert.equal((html.match(/class="capability-list"/g) || []).length, 12);
+  assert.equal((html.match(/<li>/g) || []).length, 48);
+  assert.equal((html.match(/class="featured-tool__new">NEW</g) || []).length, 1);
+  assert.equal((html.match(/class="featured-tool__updated">Updated/g) || []).length, 0);
   assert.match(html, /featured-tool--wordle[\s\S]*?featured-tool--antiwordle[\s\S]*?featured-tool--absurdle/);
   assert.match(html, /href="\/tools\/antiwordle-solver"/);
   assert.match(html, /href="\/tools\/absurdle-solver"/);
   assert.match(html, /href="\/tools\/sedecordle-solver"/);
   assert.match(html, /href="\/tools\/crossword-solver"/);
+  assert.match(html, /href="\/tools\/anagram-architect"/);
   assert.match(html, /href="\/tools\/compound-interest-calculator"/);
   assert.match(html, /href="\/tools\/loan-mortgage-calculator"/);
 });
@@ -247,7 +244,7 @@ test("the homepage features eleven designated popular tools", () => {
 test("the homepage collection links every menu category with matching counts", () => {
   const html = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
   const expected = [
-    ["word-games", "Word Games", 10],
+    ["word-games", "Word Games", 11],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
     ["labs", "Labs", 1],
@@ -589,7 +586,7 @@ test("the All Tools directory reinforces the compound calculator search intent",
   assert.match(html, /<small>Calculate future savings and investment growth with monthly contributions\.<\/small>/);
   assert.match(manifest, /"description":"Calculate future savings and investment growth with monthly contributions\."/);
   assert.match(manifest, /"compound interest with monthly contributions","investment growth calculator"/);
-  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>2026-09-02<\/lastmod>/);
+  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>2026-09-12<\/lastmod>/);
 });
 
 test("the Mortgage Calculator identifies its author and review scope", () => {
@@ -683,8 +680,8 @@ test("the Compound Interest Calculator uses the premium growth presentation", ()
 test("the About page lists the Rust WebAssembly apps", () => {
   const html = fs.readFileSync(path.join(siteRoot, "about.html"), "utf8");
   const css = fs.readFileSync(path.join(siteRoot, "assets", "css", "pages", "about.css"), "utf8");
-  assert.match(html, /seven distinct first-party <code>Rust<\/code> crates compiled to <code>WebAssembly<\/code>/);
-  assert.match(html, /seven compiled components power the 15 browser experiences listed below/);
+  assert.match(html, /nine distinct first-party <code>Rust<\/code> crates compiled to <code>WebAssembly<\/code>/);
+  assert.match(html, /those components power the 18 browser experiences listed below/);
   assert.match(html, /href="\/tools\/qr-code-decoder">QR Code Decoder<\/a>/);
   assert.match(html, /href="\/tools\/compound-interest-calculator">Compound Interest Calculator<\/a>/);
   assert.match(html, /href="\/tools\/password-generator">Password Generator<\/a>/);
@@ -692,6 +689,8 @@ test("the About page lists the Rust WebAssembly apps", () => {
   assert.match(html, /href="\/tools\/words-with-friends-solver">Words With Friends Solver<\/a>/);
   assert.match(html, /href="\/tools\/crossword-solver">Crossword Solver<\/a>/);
   assert.match(html, /href="\/tools\/wordle-helper">Wordle Solver<\/a>/);
+  assert.match(html, /href="\/tools\/anagram-architect">Anagram Architect<\/a>/);
+  assert.match(html, /href="\/tools\/antiwordle-solver">Antiwordle Solver<\/a>/);
   assert.match(html, /href="\/tools\/absurdle-solver">Absurdle Solver<\/a>/);
   assert.match(html, /href="\/tools\/quordle-solver">Quordle Solver<\/a>/);
   assert.match(html, /href="\/tools\/sedecordle-solver">Sedecordle Solver<\/a>/);
@@ -715,7 +714,7 @@ test("featured pages are ad-free and top tools invite Trustpilot reviews", () =>
     .map((name) => `tools/${name}`)
     .filter((name) => fs.readFileSync(path.join(siteRoot, name), "utf8").includes('class="review-collector"'));
 
-  assert.equal(reviewPages.length, 28, "all review prompts should be covered");
+  assert.equal(reviewPages.length, 29, "all review prompts should be covered");
 
   for (const name of reviewPages) {
     const html = fs.readFileSync(path.join(siteRoot, name), "utf8");

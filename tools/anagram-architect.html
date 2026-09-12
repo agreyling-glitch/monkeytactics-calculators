@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anagram Solver for Names &amp; Phrases — Anagram Architect</title>
+  <meta name="description" content="Find exact anagrams of names and phrases with ranked multi-word results, pattern matching, required words, local dictionaries, and private browser-based solving.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="MonkeyTactics">
+  <meta name="date" content="2026-09-12">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="canonical" href="https://monkeytactics.com/tools/anagram-architect">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
+  <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
+  <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
+  <link rel="stylesheet" href="../assets/css/tools/anagram-architect.css?v=20260912-19">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Anagram Solver for Names &amp; Phrases — Anagram Architect">
+  <meta property="og:description" content="Generate and rank exact multi-word anagrams privately in your browser.">
+  <meta property="og:url" content="https://monkeytactics.com/tools/anagram-architect">
+  <meta property="og:site_name" content="MonkeyTactics">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Anagram Solver for Names &amp; Phrases">
+  <meta name="twitter:description" content="Generate and rank exact multi-word anagrams privately in your browser.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://monkeytactics.com/tools/anagram-architect#app","name":"Anagram Architect","url":"https://monkeytactics.com/tools/anagram-architect","description":"A private browser-based anagram solver for exact multi-word name and phrase anagrams.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript and WebAssembly","isAccessibleForFree":true,"inLanguage":"en-US","featureList":["Exact name and phrase anagrams","Ranked multi-word results","Phrase pattern matching","Preferred, required, and excluded words","Standard and expanded dictionaries","Browser-local Pick List"]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Tools","item":"https://monkeytactics.com/tools/"},{"@type":"ListItem","position":3,"name":"Anagram Architect","item":"https://monkeytactics.com/tools/anagram-architect"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is a phrase anagram?","acceptedAnswer":{"@type":"Answer","text":"A phrase anagram rearranges every letter from a name or phrase into new words, ignoring spaces, punctuation, and capitalization."}},{"@type":"Question","name":"Are Anagram Architect results exact?","acceptedAnswer":{"@type":"Answer","text":"Yes. Every displayed result is checked against the source and must use exactly the same letters."}},{"@type":"Question","name":"Does the anagram solver send my phrase to a server?","acceptedAnswer":{"@type":"Answer","text":"No. Dictionary loading, generation, ranking, filtering, and the Pick List operate in the browser."}},{"@type":"Question","name":"How can I find a specific anagram phrase?","acceptedAnswer":{"@type":"Answer","text":"Use a phrase pattern, require known words, prefer promising vocabulary, or exclude unwanted words before running the search."}}]}]}</script>
+</head>
+<body class="anagram-page">
+  <main>
+    <div id="mt-header"></div>
+    <script type="module" src="/assets/wasm/menu/menu.js?v=20260828-menu-manifest-v1"></script>
+
+    <nav class="breadcrumb anagram-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/tools/">Tools</a><span aria-hidden="true">/</span><span aria-current="page">Anagram Architect</span></nav>
+    <section class="hero hero--inner anagram-hero" aria-labelledby="anagram-title">
+      <span class="eyebrow">Word laboratory · First edition</span>
+      <h1 id="anagram-title">Anagram Solver for Names and Phrases</h1>
+      <p>Turn a name, title, or sentence into ranked multi-word anagrams. Anagram Architect checks every letter and runs privately in your browser.</p>
+      <div class="anagram-hero-pills" aria-label="Solver features"><span>Exact letter matching</span><span>Ranked phrases</span><span>Pattern search</span><span>Rust/WASM speed</span></div>
+    </section>
+
+    <section class="anagram-shell" aria-labelledby="workbench-title">
+      <div class="anagram-workbench" data-focus-mode data-focus-mode-label="Anagram Architect">
+        <header><h2 id="workbench-title">Phrase workbench</h2></header>
+        <form class="anagram-form" id="anagram-form">
+          <label class="anagram-input-label" for="anagram-input">Name or phrase</label>
+          <div class="anagram-input-wrap">
+            <input id="anagram-input" name="phrase" type="text" maxlength="80" autocomplete="off" placeholder="Try Osama Bin Laden" required>
+            <button id="anagram-submit" type="submit">Architect anagrams</button>
+          </div>
+          <span class="anagram-input-summary" id="anagram-summary">Letters, spaces, and punctuation are accepted</span>
+          <details class="anagram-advanced-options" id="anagram-advanced-options">
+            <summary><span>Advanced options</span><small>Patterns, required words, and search settings</small></summary>
+            <div class="anagram-advanced-body">
+              <section class="anagram-option-group anagram-option-group--pattern" aria-labelledby="anagram-pattern-heading">
+                <div class="anagram-option-heading"><span class="anagram-option-icon" aria-hidden="true">⌁</span><span><strong id="anagram-pattern-heading">Shape the phrase</strong><small>Match a known arrangement</small></span></div>
+                <label class="anagram-pattern-control" for="anagram-phrase-pattern"><span>Phrase pattern <small>Optional</small></span><input id="anagram-phrase-pattern" type="search" autocomplete="off" spellcheck="false" placeholder="THE FINE GAME OF NIL" aria-describedby="anagram-phrase-pattern-hint"><small id="anagram-phrase-pattern-hint"><code>?</code> one letter&nbsp;&nbsp; <code>*</code> any number&nbsp;&nbsp; Spaces ignored</small></label>
+              </section>
+              <section class="anagram-option-group" aria-labelledby="anagram-words-heading">
+                <div class="anagram-option-heading"><span class="anagram-option-icon" aria-hidden="true">Aa</span><span><strong id="anagram-words-heading">Guide the vocabulary</strong><small>Separate words with spaces or commas</small></span></div>
+                <div class="anagram-word-steering">
+                  <label class="anagram-pattern-control anagram-lock-control" for="anagram-locked-words"><span>Required <small>Always include</small></span><input id="anagram-locked-words" type="text" autocomplete="off" spellcheck="false" placeholder="game, life"></label>
+                  <label class="anagram-pattern-control" for="anagram-preferred-words"><span>Preferred <small>Rank higher</small></span><input id="anagram-preferred-words" type="text" autocomplete="off" spellcheck="false" placeholder="customer, disaster"></label>
+                  <label class="anagram-pattern-control" for="anagram-excluded-words"><span>Excluded <small>Never use</small></span><input id="anagram-excluded-words" type="text" autocomplete="off" spellcheck="false" placeholder="obscure, unwanted"></label>
+                </div>
+                <label class="anagram-vulgar-control"><input id="anagram-exclude-vulgar" type="checkbox" checked><span><strong>Exclude vulgar words</strong><small>Hide clearly explicit dictionary entries</small></span></label>
+              </section>
+              <section class="anagram-option-group" aria-labelledby="anagram-search-heading">
+                <div class="anagram-option-heading"><span class="anagram-option-icon" aria-hidden="true">⌕</span><span><strong id="anagram-search-heading">Tune the search</strong><small>Balance breadth and speed</small></span></div>
+                <div class="anagram-controls">
+                  <label>Dictionary<select id="anagram-dictionary"><option value="standard">Standard · faster</option><option value="expanded">Expanded Wiktionary · experimental</option></select></label>
+                  <label>Search depth<select id="anagram-search-mode"><option value="quick">Quick · responsive</option><option value="deep" selected>Deep · parallel</option><option value="exhaustive">Exhaustive · longest</option></select></label>
+                  <label>Maximum words<select id="anagram-max-words"><option>3</option><option>4</option><option selected>5</option><option>6</option></select></label>
+                  <label>Shortest word<select id="anagram-min-length"><option value="2" selected>2 letters</option><option value="3">3 letters</option><option value="4">4 letters</option></select></label>
+                </div>
+              </section>
+            </div>
+          </details>
+          <div class="anagram-actions"><span>Load an example:</span><button type="button" data-anagram-example="Osama Bin Laden">Osama Bin Laden</button><button type="button" data-anagram-example="The meaning of life">The meaning of life</button><button type="button" data-anagram-example="Acorn Computers">Acorn Computers</button><button id="anagram-clear" type="button">Clear</button></div>
+        </form>
+        <p class="anagram-status" id="anagram-status" role="status" aria-live="polite">Ready to architect a phrase.</p>
+        <details class="anagram-analysis" id="anagram-analysis" hidden open>
+          <summary>Live search analysis <span id="anagram-analysis-phase">Preparing</span></summary>
+          <div class="anagram-analysis-body">
+            <div class="anagram-overall-track" role="progressbar" aria-label="Overall parallel search progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+            <div class="anagram-analysis-metrics">
+              <div><strong id="anagram-metric-progress">0%</strong><span>search complete</span></div>
+              <div><strong id="anagram-metric-rate">0</strong><span>branches / second</span></div>
+              <div><strong id="anagram-metric-matches">0</strong><span>exact combinations</span></div>
+              <div><strong id="anagram-metric-retained">0</strong><span>strongest retained</span></div>
+            </div>
+            <div class="anagram-worker-lanes" id="anagram-worker-lanes" aria-label="Parallel worker progress"></div>
+            <div class="anagram-analysis-chart"><canvas id="anagram-throughput-chart" width="720" height="120" aria-label="Recent search throughput"></canvas></div>
+            <p class="anagram-current-leader"><span>Current leader</span><strong id="anagram-current-leader">Waiting for an exact phrase…</strong></p>
+            <div class="anagram-analysis-footer"><p class="anagram-analysis-foot" id="anagram-analysis-foot">Candidate and pruning statistics will appear when searching begins.</p><button id="anagram-analysis-cancel" type="button" hidden>Cancel search</button></div>
+          </div>
+        </details>
+        <details class="anagram-pick-list" id="anagram-pick-list">
+          <summary><span><strong>Pick List</strong><small>Promising phrases saved in this browser</small></span><span><em id="anagram-pick-count">0 picks</em><button id="anagram-pick-clear" type="button">Clear</button></span></summary>
+          <div class="anagram-pick-body"><p id="anagram-pick-empty">Pick promising results to build a shortlist across searches.</p><div id="anagram-pick-entries"></div></div>
+        </details>
+        <div class="anagram-result-tools" id="anagram-result-tools" hidden>
+          <label for="anagram-result-search"><span>Search or match a pattern</span><input id="anagram-result-search" type="search" autocomplete="off" spellcheck="false" placeholder="Try old man or *life?????" aria-describedby="anagram-result-search-hint"><small id="anagram-result-search-hint"><code>?</code> matches one unknown letter; <code>*</code> matches any number. Spaces are ignored in patterns.</small></label>
+          <nav class="anagram-pagination" aria-label="Anagram result pages">
+            <button id="anagram-previous-page" type="button">← Previous 120</button>
+            <span id="anagram-page-summary" aria-live="polite"></span>
+            <button id="anagram-next-page" type="button">Next 120 →</button>
+          </nav>
+        </div>
+        <div class="anagram-results" id="anagram-results" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="anagram-explainer seo-section" aria-labelledby="how-anagrams-work">
+      <div class="anagram-section-heading"><span>How it works</span><h2 id="how-anagrams-work">Build exact phrase anagrams, not approximate matches</h2><p>The solver accounts for every letter in the original text. Spaces, punctuation, and capitalization are ignored, but no letter can be added, removed, or reused.</p></div>
+      <ol class="anagram-steps"><li><span>01</span><strong>Count the letters</strong>Normalize the source into an exact letter inventory.</li><li><span>02</span><strong>Explore combinations</strong>Search local dictionaries across parallel browser workers.</li><li><span>03</span><strong>Rank natural phrases</strong>Score vocabulary, word order, and phrase shape.</li><li><span>04</span><strong>Verify every result</strong>Reject anything that is not an exact anagram.</li></ol>
+
+      <div class="anagram-content-grid">
+        <article class="anagram-content-card"><span class="anagram-card-kicker">Name anagrams</span><h2>Discover memorable rearrangements</h2><p>Names often produce thousands of valid combinations. Ranking and short-phrase specialists bring readable results forward while the Pick List lets you save promising discoveries.</p><p class="anagram-example-line"><strong>Osama Bin Laden</strong><span aria-hidden="true">→</span><em>Old man in a base</em></p></article>
+        <article class="anagram-content-card"><span class="anagram-card-kicker">Phrase anagrams</span><h2>Guide a difficult search</h2><p>Use a phrase pattern when you know the shape of the answer. Required words reserve letters, preferred words receive a ranking boost, and exclusions remove unwanted vocabulary before generation.</p><p class="anagram-example-line"><strong>The meaning of life</strong><span aria-hidden="true">→</span><em>The fine game of nil</em></p></article>
+      </div>
+
+      <section class="anagram-guide" aria-labelledby="anagram-search-tips"><div><span class="anagram-card-kicker">Better results</span><h2 id="anagram-search-tips">How to use the advanced anagram filters</h2></div><ul><li><strong>Phrase pattern:</strong> use <code>?</code> for one unknown letter and <code>*</code> for any number.</li><li><strong>Required:</strong> lock one or more words into every generated result.</li><li><strong>Preferred:</strong> promote interesting vocabulary without making it mandatory.</li><li><strong>Excluded:</strong> remove distracting words or families of unwanted results.</li><li><strong>Search depth:</strong> start with Deep and use Exhaustive when breadth matters more than speed.</li><li><strong>Dictionary:</strong> Expanded finds more unusual words but can introduce additional noise.</li></ul></section>
+
+      <section class="anagram-privacy" aria-labelledby="private-anagram-solver"><div class="anagram-privacy-mark" aria-hidden="true">✓</div><div><h2 id="private-anagram-solver">Private, local anagram generation</h2><p>Your source phrase, filters, generated results, and Pick List remain in your browser. The Rust/WebAssembly search engine loads local word data and does not send the text you enter to a remote solving service.</p></div></section>
+
+      <section class="anagram-faq" aria-labelledby="anagram-faq-title"><div class="anagram-section-heading"><span>Questions</span><h2 id="anagram-faq-title">Anagram solver FAQ</h2></div><div class="anagram-faq-grid"><details><summary>What is a phrase anagram?</summary><p>A phrase anagram rearranges every letter from a name or phrase into new words. Spaces, punctuation, and capitalization do not affect the match.</p></details><details><summary>Are all results exact?</summary><p>Yes. Each displayed phrase is validated against the source and must contain exactly the same letters.</p></details><details><summary>Why do some searches take longer?</summary><p>Long phrases, larger dictionaries, short minimum word lengths, and exhaustive depth create far more combinations to explore.</p></details><details><summary>How do I find a specific phrase?</summary><p>Add its known structure to Phrase pattern, lock confirmed words as Required, or mark promising vocabulary as Preferred.</p></details><details><summary>What does the vulgar-word filter do?</summary><p>It removes clearly explicit and profane dictionary entries before searching. It can be disabled under Advanced options.</p></details><details><summary>Where is my Pick List stored?</summary><p>The Pick List is saved locally in this browser so it can remain available across searches.</p></details></div></section>
+
+      <section class="word-game-related-guides" id="anagram-architect-related-guides" aria-labelledby="anagram-guides-heading" data-related-guides-tool="anagram-architect" data-related-guides-limit="2">
+        <div class="word-game-related-guides-heading"><p class="anagram-card-kicker">Learn more</p><h2 id="anagram-guides-heading">Related Anagram and Word-Finder Guides</h2><p>Explore practical techniques for recognizing letter patterns, comparing candidate words, and turning a large result set into a useful shortlist.</p></div>
+        <div class="word-game-guide-grid">
+          <article class="word-game-guide-card"><span>Word-finder strategy</span><h3><a href="https://blog.monkeytactics.com/posts/how-to-win-at-scrabble-with-a-word-unscrambler/">How to Win at Scrabble With a Smarter Word-Finder Strategy</a></h3><p>Use patterns, scores, hooks, and shortlists to find stronger words among a large collection of exact letter combinations.</p><a class="word-game-guide-link" href="https://blog.monkeytactics.com/posts/how-to-win-at-scrabble-with-a-word-unscrambler/">Read guide <span aria-hidden="true">→</span></a></article>
+          <article class="word-game-guide-card"><span>Advanced unscrambling</span><h3><a href="https://blog.monkeytactics.com/posts/most-difficult-scrabble-words-to-unscramble/">The Most Difficult Scrabble Words to Unscramble</a></h3><p>Learn how repeated letters, consonant clusters, vowel patterns, and anagram families make some combinations much harder to recognize.</p><a class="word-game-guide-link" href="https://blog.monkeytactics.com/posts/most-difficult-scrabble-words-to-unscramble/">Read guide <span aria-hidden="true">→</span></a></article>
+        </div>
+      </section>
+
+      <section class="anagram-related" aria-labelledby="related-word-tools"><div><span class="anagram-card-kicker">Keep solving</span><h2 id="related-word-tools">Related word tools</h2></div><div class="anagram-related-links"><a href="/tools/word-unscrambler"><strong>Word Unscrambler</strong><span>Find words from a letter rack</span></a><a href="/tools/crossword-solver"><strong>Crossword Solver</strong><span>Match clues and answer patterns</span></a><a href="/tools/wordle-helper"><strong>Wordle Helper</strong><span>Filter candidates from tile feedback</span></a></div></section>
+    </section>
+  </main>
+
+  <section class="review-collector" aria-label="Review MonkeyTactics on Trustpilot">
+    <div class="review-collector__intro"><h2>Was this tool helpful?</h2><p>Help others discover useful tools &mdash; leave a review on Trustpilot.</p></div>
+    <a class="trustpilot-review-link" href="https://www.trustpilot.com/evaluate/monkeytactics.com" target="_blank" rel="noopener noreferrer"><img src="/assets/images/trustpilot-review.svg" width="360" height="52" alt="Review MonkeyTactics on Trustpilot"></a>
+  </section>
+
+  <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/third-party-notices">Third-Party Notices</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
+  <div class="anagram-progress-modal" id="anagram-progress-modal" role="dialog" aria-modal="true" aria-labelledby="anagram-progress-title" aria-describedby="anagram-progress-message" hidden>
+    <div class="anagram-progress-card">
+      <span class="anagram-progress-kicker" id="anagram-progress-kicker">Extended search</span>
+      <h2 id="anagram-progress-title">Architecting your anagram</h2>
+      <p id="anagram-progress-message">Preparing the phrase pattern…</p>
+      <div class="anagram-progress-track" role="progressbar" aria-label="Phrase-pattern search in progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Preparing the phrase pattern">
+        <span></span>
+      </div>
+      <small id="anagram-progress-detail">Workers are preparing the search.</small>
+      <ol class="anagram-progress-preview" id="anagram-progress-preview" aria-label="Strongest provisional results"></ol>
+      <div class="anagram-progress-actions">
+        <button id="anagram-progress-background" type="button">Continue in background</button>
+        <button id="anagram-progress-cancel" type="button">Cancel search</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const form = document.querySelector("#anagram-form");
+      const status = document.querySelector("#anagram-status");
+      form.addEventListener("submit", (event) => event.preventDefault());
+      window.setTimeout(() => {
+        if (form.dataset.architectReady !== "true") {
+          status.textContent = "Anagram Architect could not start. Reload the page to fetch the latest solver files.";
+        }
+      }, 3000);
+    })();
+  </script>
+  <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
+  <script src="../assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
+  <script src="../assets/js/tools/anagram-architect/anagram-architect.bundle.js?v=20260912-44" defer></script>
+</body>
+</html>
