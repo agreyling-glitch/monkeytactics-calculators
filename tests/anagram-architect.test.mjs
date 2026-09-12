@@ -257,6 +257,8 @@ test("presents Learn More guides before related solvers", async () => {
   assert.match(html, /id="anagram-architect-related-guides"/);
   assert.match(html, /data-related-guides-tool="anagram-architect"/);
   assert.match(html, /Related Anagram and Word-Finder Guides/);
+  assert.match(html, /How We Built Anagram Architect: Meaningful Anagrams with Rust and WebAssembly/);
+  assert.match(html, /https:\/\/blog\.monkeytactics\.com\/posts\/how-we-built-anagram-architect-rust-wasm\//);
   assert.match(html, /assets\/js\/shared\/related-guides\.js\?v=/);
   assert.ok(html.indexOf('id="anagram-architect-related-guides"') < html.indexOf('class="anagram-related"'));
 });

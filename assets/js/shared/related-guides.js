@@ -23,7 +23,11 @@
   function safeBlogUrl(value) {
     try {
       const url = new URL(value);
-      return url.protocol === "https:" && url.hostname === "blog.monkeytactics.com" ? url.href : "";
+      if (url.protocol === "https:" && url.hostname === "blog.monkeytactics.com") return url.href;
+      if (isLocal && url.protocol === "http:" && (url.hostname === "localhost" || url.hostname === "127.0.0.1")) {
+        return new URL(`${url.pathname}${url.search}${url.hash}`, "https://blog.monkeytactics.com").href;
+      }
+      return "";
     } catch (_error) {
       return "";
     }
