@@ -181,12 +181,12 @@
       {
         "@type": "Question",
         "name": "What sorting options are available?",
-        "acceptedAnswer": { "@type": "Answer", "text": "The compact Sort Results menu includes score, longest-first, shortest-first, and alphabetical sorting. More options opens grouped Basic, Strategic, and Hook sorts for rack use, high-value letters, bingos, patterns, and hook utility. Selecting a sort automatically reruns the current search." }
+        "acceptedAnswer": { "@type": "Answer", "text": "The compact Sort Results menu includes score, longest-first, shortest-first, and alphabetical sorting. More options opens grouped Basic, Strategic, and Hook sorts. Length sorts provide Jump bars above and below results with selectable gold page bubbles, word-length shortcuts, collapsible groups, and Collapse All." }
       },
       {
         "@type": "Question",
         "name": "How do I look up definitions and hooks for a result word?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Hover over, focus, or select a result word to load its local WordNet definition and complete front and back hook words with inline Words With Friends scores. Select the spyglass button to open a separate menu of external dictionary lookups." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Hover over, focus, or select a result word to see its rack leave, estimated leave quality, vowel-to-consonant balance, available leave words, local WordNet definition, and complete front and back hooks with inline Words With Friends scores. Select the spyglass button for external dictionary lookups." }
       },
       {
         "@type": "Question",
@@ -201,7 +201,7 @@
       {
         "@type": "Question",
         "name": "Does the Words With Friends Solver have keyboard shortcuts?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+I, or Command+I on a Mac, to focus the rack input. Press Ctrl+Enter, or Command+Enter, to search. Press Ctrl+R to reset the rack, basic and advanced filters, History, and Pick List. Press Ctrl+B, or Command+B, to open Word Breakdown. Press Ctrl+H, or Command+Shift+H, to open History." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Press Ctrl+I, or Command+I on a Mac, to focus the rack and Ctrl+Enter, or Command+Enter, to search. On the rack-options control, Down Arrow opens the panel; Up and Down navigate choices; Left Arrow closes it and returns to the rack; Right Arrow closes it and focuses Unscramble. Ctrl+R resets, Ctrl+B opens Word Breakdown, Ctrl+H opens History, and Alt+L toggles Pick List." }
       },
       {
         "@type": "Question",
@@ -216,12 +216,12 @@
       {
         "@type": "Question",
         "name": "What does Reset All clear?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Reset All opens a warning before clearing anything. Select OK to clear the rack input, Basic Filters, Advanced Filters, History, Pick List, and current results. Select Cancel to keep everything unchanged. Your dictionary and sorting selections are preserved." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Reset All opens a warning before clearing anything. Select OK to clear the rack input, Basic Filters, Advanced Filters, History, Pick List, and current results. Select Cancel to keep everything unchanged. Your dictionary, sorting selections, and tile-color theme are preserved." }
       },
       {
         "@type": "Question",
         "name": "How can I sort the letters on my Words With Friends rack?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Select the rack-sort icon between the input and Unscramble button. You can arrange vowels and consonants, alphabetize letters, separate blanks or S, cluster duplicates and digraphs, isolate power tiles, use English frequency order, or follow RETINA, SATINE, TISANE, SENIOR, and LATRINE stem order. An optional pattern after the slash is preserved." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Select the rack-options icon between the input and Unscramble. The Rack Sorting tab provides common and strategic arrangements while preserving an optional pattern. The Tile Color tab offers Classic Wood, Modern Minimalist, value-coded, Dark Rack, Tournament, and Playful Puzzle themes; your selection is saved in this browser." }
       },
       {
         "@type": "Question",
@@ -231,7 +231,7 @@
       {
         "@type": "Question",
         "name": "Does the Words With Friends Solver have a Focus Mode?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select the expand icon in the upper-right corner of the solver to open a distraction-free Focus Mode. The rack, filters, results, History, Pick List, definitions, and sorting tools remain available. Select the collapse icon to return to the full page." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select the expand icon in the upper-right corner to open Focus Mode. The 01 / Solve setup collapses automatically to maximize workspace and can be reopened with its gold chevron. The rack, filters, results, History, Pick List, word details, and rack options remain available." }
       },
       {
         "@type": "Question",
@@ -243,17 +243,18 @@
   </script>
 
   <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
-  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260905-list-search-21">
+  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler.css?v=20260913-empty-artwork-45">
   <link rel="stylesheet" href="../assets/css/shared/dictionary-selector.css?v=20260904-wiktionary-check-14">
   <link rel="stylesheet" href="../assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
   <link rel="stylesheet" href="../assets/css/shared/premium-tool.css?v=20260903-word-heading-align-3">
   <link rel="stylesheet" href="../assets/css/shared/focus-mode.css?v=20260829-2">
+  <link rel="stylesheet" href="../assets/css/tools/word-unscrambler-architect-palette.css?v=20260912-1">
   <script src="../assets/js/shared/ads.js" defer></script>
   <!-- TrustBox script -->
   <!-- End TrustBox script -->
 </head>
 
-<body class="premium-tool-page word-tool-page" data-word-game="wwf">
+<body class="premium-tool-page word-tool-page word-unscrambler-page" data-word-game="wwf">
   <main>
     <div id="mt-header"></div>
     <script type="module" src="/assets/wasm/menu/menu.js?v=20260828-menu-manifest-v1"></script>
@@ -281,6 +282,7 @@
       <div class="tool-widget" data-focus-mode data-focus-mode-label="Words With Friends Solver">
         <form id="unscramble-form" novalidate>
           <div class="tool-heading-row">
+            <div class="tool-heading-content" id="solver-heading-content">
             <div class="premium-app-title"><div class="premium-section-kicker">01 / Solve</div><h2 id="unscrambler-heading">Unscramble Letters Into Words</h2><p>Choose a dictionary, enter your rack, then refine the result for the board in front of you.</p></div>
             <div class="tool-heading-controls">
             <fieldset class="dictionary-selector">
@@ -334,6 +336,8 @@
               <progress id="word-tool-offline-progress" value="0" max="1" hidden>0%</progress>
             </div>
             </div>
+            </div>
+            <button class="tool-heading-collapse" id="tool-heading-collapse" type="button" aria-expanded="true" aria-controls="solver-heading-content" aria-label="Collapse solver setup"><span class="tool-heading-collapse-icon" aria-hidden="true">›</span></button>
           </div>
 
           <div class="calc-layout">
@@ -406,7 +410,7 @@
                   <button class="rack-sort-trigger" id="rack-sort-trigger" type="button" aria-label="Sort rack letters" aria-haspopup="menu" aria-expanded="false" aria-controls="rack-sort-menu" title="Sort rack letters">
                     <span class="rack-sort-icon" aria-hidden="true"></span>
                   </button>
-                  <div class="rack-sort-menu" id="rack-sort-menu" role="menu" aria-label="Rack sorting options" hidden></div>
+                  <div class="rack-sort-menu" id="rack-sort-menu" aria-label="Rack sorting and tile color options" hidden></div>
                 </div>
                 <button class="rack-help-trigger" id="rack-help-trigger" type="button" tabindex="-1" aria-label="Open rack syntax guide" aria-haspopup="dialog" aria-controls="rack-syntax-dialog" title="Rack syntax guide">?</button>
                 <div class="primary-search-actions">
@@ -420,9 +424,6 @@
                   >
                   <span class="button-icon" aria-hidden="true">⇄</span>
                   <span class="button-label">Loading word index…</span>
-                  <span class="button-shortcut" aria-hidden="true">
-                    <kbd>Ctrl</kbd><span>+</span><kbd>↵</kbd>
-                  </span>
                   </button>
                   <button
                     class="btn-reset-filters"
@@ -433,9 +434,6 @@
                   >
                     <span class="reset-filter-icon" aria-hidden="true">&#8634;</span>
                     <span>Reset All</span>
-                    <span class="reset-filter-shortcut" aria-hidden="true">
-                      <kbd>Ctrl</kbd><span>+</span><kbd>R</kbd>
-                    </span>
                   </button>
                 </div>
               </div>
@@ -753,10 +751,8 @@
                 <span class="match-count" id="match-count" hidden></span>
               </div>
 
-              <div class="results-empty" id="empty-state">
-                <span class="empty-icon" aria-hidden="true">🔤</span>
-                <strong>Your words will appear here</strong>
-                <p>Enter your letters and click Unscramble.</p>
+              <div class="results-empty results-empty--artwork" id="empty-state">
+                <img class="results-empty-artwork" src="../assets/images/word-tools/tiles-empty-rack-wwf.jpg?v=20260913-compressed-2" alt="Golden Words With Friends letter tiles sweeping across a glowing rainbow arc" width="1024" height="575">
               </div>
 
               <div class="word-list" id="word-list" aria-label="Matching words"></div>
@@ -902,8 +898,9 @@
             smart input, or press <kbd>Ctrl</kbd>+<kbd>Enter</kbd>. On a Mac, use
             <kbd>Command</kbd>+<kbd>Enter</kbd>.</li>
         <li><strong>Inspect a word:</strong> hover over, focus, or select a result word to open its
-            dictionary links and automatically load complete front and back hook words with inline
-            Words With Friends point values.</li>
+            Word Details window. It shows the remaining rack tiles, estimated leave quality,
+            vowel-to-consonant ratio, available leave words, local definition, and complete front
+            and back hooks. Use the spyglass for external dictionaries.</li>
         <li><strong>Analyze the matches:</strong> when results exist, expand
             <strong>Word Breakdown</strong> beneath the word list or press
             <kbd>Ctrl</kbd>+<kbd>B</kbd> to jump to it.</li>
@@ -918,15 +915,18 @@
          more often than it appears in your input. Add <code>:length</code> for an exact length;
          digits are accepted only after the colon. A single <code>*</code> before the colon removes
          the rack restriction and requires an exact length. Broad searches show the exact match
-         total while displaying 250 results per page to keep the page responsive. Paging controls
-         appear above and below the word groups. The selected
+         total while displaying 250 results per page to keep the page responsive. Length sorting
+         replaces paging controls with Jump bars above and below the results; select a gold page
+         bubble or word-length shortcut to navigate, and expand or collapse length groups. Other
+         sorts retain paging controls above and below the word list. The selected
          <strong>ENABLE and/or EXPANDED</strong> word data is
          compressed and loaded in small chunks only when a search needs them.</p>
       <p>Press <kbd>Ctrl</kbd>+<kbd>I</kbd>, or <kbd>Command</kbd>+<kbd>I</kbd> on a Mac, to jump
          back to the rack input from anywhere on the page.</p>
       <p><strong>Reset All</strong>, or <kbd>Ctrl</kbd>+<kbd>R</kbd>, clears the rack, Basic and
          Advanced Filters, History, Pick List, and current results. A warning with
-         <strong>OK</strong> and <strong>Cancel</strong> appears before anything is removed.</p>
+         <strong>OK</strong> and <strong>Cancel</strong> appears before anything is removed. The
+         dictionary, result sort, and tile-color theme are preserved.</p>
     </section>
 
     <section class="seo-section" id="recent-search-history">
@@ -972,7 +972,8 @@
         <li><strong>Accurate repeats:</strong> a letter is never used more times than you entered it.</li>
         <li><strong>Words With Friends scores:</strong> compare standard tile values before board bonuses.</li>
         <li><strong>Rack sorting:</strong> rearrange tiles by vowels, alphabet, blanks, S placement,
-            duplicates, digraphs, power tiles, letter frequency, or common anagram stems.</li>
+            duplicates, digraphs, power tiles, letter frequency, or common anagram stems. Switch
+            to Tile Color for Classic Wood, Minimalist, value-coded, Dark, Tournament, or Playful themes.</li>
         <li><strong>Word Breakdown:</strong> explore rack balance, tile values, entropy, pattern,
             length, and score charts after the search returns matches.</li>
         <li><strong>Private Pick List:</strong> save, annotate, sort, compare, and reinsert useful
@@ -980,13 +981,16 @@
         <li><strong>Keyboard shortcuts:</strong> focus the rack with <kbd>Ctrl</kbd>+<kbd>I</kbd>,
             search with <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, open analysis with
             <kbd>Ctrl</kbd>+<kbd>B</kbd>, and open History with <kbd>Ctrl</kbd>+<kbd>H</kbd>
-            (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> on Mac).</li>
-        <li><strong>Definition and hook lookup:</strong> hover over or focus a result word to load a local WordNet definition and scored front and back hook words. Select the spyglass button to open external lookups for Merriam-Webster, Collins, Wiktionary, Wordnik, Dictionary.com, and Cambridge.</li>
+            (<kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> on Mac). On Rack Options, use Down to
+            open, Up/Down to navigate, Left to return to the rack, and Right to focus Unscramble.</li>
+        <li><strong>Word Details:</strong> hover over or focus a result word to inspect rack leave,
+            estimated leave quality, vowel/consonant balance, available words, a local WordNet
+            definition, and scored hooks. Use the spyglass for external dictionary lookups.</li>
         <li><strong>Optional Offline Mode:</strong> download the complete solver, word lists, hooks,
             and WordNet definitions for searches without an internet connection.</li>
         <li><strong>Focus Mode:</strong> select the expand icon to give the interactive solver the
-            full browser workspace while keeping rack sorting, filters, results, History, and the
-            Pick List available.</li>
+            full browser workspace. The 01 / Solve setup collapses automatically and can be
+            reopened with its gold chevron.</li>
         <li><strong>Dictionary choice:</strong> search Standard ENABLE, Expanded Wiktionary-derived, or Both across 867,000+ unique entries.</li>
       </ul>
     </section>
@@ -998,7 +1002,9 @@
          <code>/</code>. Common layouts place vowels first, alphabetize tiles, separate blanks, or
          move S to the far right. Strategic layouts cluster duplicates, keep common digraphs near
          each other, separate J, Q, X, and Z, follow English letter frequency, or organize letters
-         around RETINA, SATINE, TISANE, SENIOR, and LATRINE stems.</p>
+         around RETINA, SATINE, TISANE, SENIOR, and LATRINE stems. Open the <strong>Tile Color</strong>
+         tab to choose Classic Scrabble Wood, Modern Minimalist, Color-Coded by Value, Dark Mode,
+         Tournament, or Playful Puzzle tiles. The theme is saved in this browser.</p>
       <p><strong>Enable Offline Mode</strong> downloads the WWF solver and all Standard, Expanded, and combined dictionary options,
          scoring engine, hook data, and local WordNet definitions to this browser. After the
          download, searches and definition lookups work without an internet connection. External
@@ -1177,11 +1183,14 @@
               <p>The compact Sort Results menu includes score, longest-first, shortest-first, and
                  alphabetical sorting. Select <strong>More options…</strong> to open grouped Basic,
                  Strategic, and Hook sorts for rack use, high-value letters, bingos, patterns, and
-                 hook utility. Selecting a sort automatically reruns the current search.</p>
+                 hook utility. Length sorts add Jump bars above and below results with selectable
+                 gold page bubbles, word-length shortcuts, collapsible groups, and Collapse All.</p>
             </li>
             <li class="faq-item">
               <h3>How do I look up definitions and hooks for a result word?</h3>
-              <p>Hover over, focus, or select a result word to load its local WordNet definition and complete front and back hook words with inline Words With Friends scores. Select the spyglass button to open a separate list of external dictionary lookups.</p>
+              <p>Hover over, focus, or select a result word to open Word Details. It shows the rack
+                 leave, estimated leave quality, vowel-to-consonant ratio, available leave words,
+                 local WordNet definition, and complete scored hooks. Select the spyglass for external dictionaries.</p>
             </li>
             <li class="faq-item">
               <h3>What does Word Breakdown show?</h3>
@@ -1208,7 +1217,9 @@
                  After results appear, press <kbd>Ctrl</kbd>+<kbd>B</kbd>, or
                  <kbd>Command</kbd>+<kbd>B</kbd> on a Mac, to expand and jump to Word Breakdown.
                  Press <kbd>Ctrl</kbd>+<kbd>H</kbd>, or
-                 <kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> on a Mac, to open History.</p>
+                 <kbd>Command</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> on a Mac, to open History. When the
+                 Rack Options control is focused, Down opens it; Up and Down navigate; Left closes
+                 it and returns to the rack; Right closes it and focuses Unscramble.</p>
             </li>
             <li class="faq-item">
               <h3>How does recent search history work?</h3>
@@ -1229,14 +1240,15 @@
               <p><strong>Reset All</strong> opens a warning before clearing anything. Select
                  <strong>OK</strong> to clear the rack input, Basic Filters, Advanced Filters,
                  History, Pick List, and current results. Select <strong>Cancel</strong> to keep
-                 everything unchanged. Your dictionary and sorting selections are preserved.</p>
+                 everything unchanged. Your dictionary, sorting selections, and tile-color theme are preserved.</p>
             </li>
             <li class="faq-item">
               <h3>How can I sort the letters on my Words With Friends rack?</h3>
               <p>Select the rack-sort icon between the input and <strong>Unscramble</strong>. Choose
                  a common vowel, alphabet, blank, or S layout; cluster duplicates and digraphs;
                  separate power tiles; use letter-frequency order; or follow a named anagram stem.
-                 Sorting changes only the rack and preserves an optional pattern after <code>/</code>.</p>
+                 Sorting changes only the rack and preserves an optional pattern after <code>/</code>.
+                 The Tile Color tab provides six saved visual themes, including value-coded tiles.</p>
             </li>
             <li class="faq-item">
               <h3>Can I use the Words With Friends Solver offline?</h3>
@@ -1248,9 +1260,9 @@
             <li class="faq-item">
               <h3>Does the Words With Friends Solver have a Focus Mode?</h3>
               <p>Yes. Select the expand icon in the solver's upper-right corner to open a
-                 distraction-free workspace. Rack sorting, filters, results, History, the Pick
-                 List, hooks, and definitions remain available. Select the collapse icon to
-                 return to the complete page.</p>
+                 distraction-free workspace. The 01 / Solve setup collapses automatically and can
+                 be reopened with its gold chevron. Rack options, filters, results, History, Pick
+                 List, hooks, and definitions remain available.</p>
             </li>
             <li class="faq-item">
               <h3>Are my searches private?</h3>
@@ -1383,7 +1395,7 @@
   <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
   <script src="../assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10" defer></script>
   <script src="../assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
-  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260905-list-search-19" defer></script>
+  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20260913-compressed-artwork-43" defer></script>
 <script src="../assets/js/shared/dictionary-offline-controls.js?v=20260904-active-dictionary-icon-10" defer></script>
 </body>
 </html>

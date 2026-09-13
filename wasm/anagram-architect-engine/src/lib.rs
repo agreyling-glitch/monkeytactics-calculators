@@ -916,6 +916,17 @@ fn phrase_score(words: &[String]) -> i32 {
     }
     score
 }
+fn inferred_pos(word: &str, metadata: &HashMap<String, (u64, u8)>) -> u8 {
+    let direct = metadata.get(word).map(|value| value.1).unwrap_or(0);
+    let adjective_suffix = word.ends_with("ish") || word.ends_with("ful") || word.ends_with("ous");
+    if direct != 0 || adjective_suffix {
+        return direct | if adjective_suffix { 4 } else { 0 };
+    }
+    word.strip_suffix('s')
+        .and_then(|stem| metadata.get(stem))
+        .map(|value| value.1)
+        .unwrap_or(0)
+}
 fn phrase_score_with_metadata(
     words: &[String],
     metadata: &HashMap<String, (u64, u8)>,
@@ -927,10 +938,13 @@ fn phrase_score_with_metadata(
     const PREP: &[&str] = &[
         "of", "to", "in", "on", "at", "by", "for", "from", "with", "into", "over", "under",
     ];
+    const SUBJECT_PRONOUNS: &[&str] = &["i", "you", "he", "she", "it", "we", "they"];
+    const COPULAS: &[&str] = &["am", "are", "is", "was", "were", "be"];
     const FUNCTION: &[&str] = &[
         "a", "an", "the", "this", "that", "my", "your", "our", "his", "her", "their", "of", "to",
         "in", "on", "at", "by", "for", "from", "with", "into", "over", "under", "and", "or", "but",
-        "nor", "yet", "so", "if", "than", "is", "am", "are", "was", "were", "be",
+        "nor", "yet", "so", "if", "than", "is", "am", "are", "was", "were", "be", "i", "you", "he",
+        "she", "it", "we", "they",
     ];
     let mut score = phrase_score(words)
         + words
@@ -967,25 +981,25 @@ fn phrase_score_with_metadata(
         score += 75;
     }
     if let Some(last) = words.last() {
-        if metadata
-            .get(last)
-            .map(|value| value.1 & 1 != 0)
-            .unwrap_or(false)
-        {
+        if inferred_pos(last, metadata) & 1 != 0 {
             score += 24;
         }
     }
     if words.len() == 3 {
-        let first = metadata.get(&words[0]).map(|value| value.1).unwrap_or(0);
-        let middle = metadata.get(&words[1]).map(|value| value.1).unwrap_or(0);
-        let last = metadata.get(&words[2]).map(|value| value.1).unwrap_or(0);
+        let first = inferred_pos(&words[0], metadata);
+        let middle = inferred_pos(&words[1], metadata);
+        let last = inferred_pos(&words[2], metadata);
         if first & (2 | 4) != 0 && middle & (1 | 4) != 0 && last & 1 != 0 {
             score += 70;
         }
     }
     if let Some(first) = words.first() {
         if PREP.contains(&first.as_str())
-            || FUNCTION.contains(&first.as_str()) && first != "a" && first != "an" && first != "the"
+            || FUNCTION.contains(&first.as_str())
+                && first != "a"
+                && first != "an"
+                && first != "the"
+                && !SUBJECT_PRONOUNS.contains(&first.as_str())
         {
             score -= 55;
         }
@@ -1017,8 +1031,35 @@ fn phrase_score_with_metadata(
         }
     }
     for pair in words.windows(2) {
-        let left = metadata.get(&pair[0]).map(|v| v.1).unwrap_or(0);
-        let right = metadata.get(&pair[1]).map(|v| v.1).unwrap_or(0);
+        let left = inferred_pos(&pair[0], metadata);
+        let right = inferred_pos(&pair[1], metadata);
+        let left_is_subject = SUBJECT_PRONOUNS.contains(&pair[0].as_str());
+        let right_is_subject = SUBJECT_PRONOUNS.contains(&pair[1].as_str());
+        if left_is_subject && right & 2 != 0 {
+            score += 115;
+        }
+        if left_is_subject && COPULAS.contains(&pair[1].as_str()) {
+            score += 145;
+        }
+        let article_agrees = !matches!(pair[0].as_str(), "a" | "an")
+            || pair[0] == "a" && !pair[1].starts_with(['a', 'e', 'i', 'o', 'u'])
+            || pair[0] == "an" && pair[1].starts_with(['a', 'e', 'i', 'o', 'u']);
+        if DET.contains(&pair[0].as_str()) && right & 4 != 0 && article_agrees {
+            score += 70;
+        }
+        if matches!(pair[0].as_str(), "he" | "she" | "it") && right & 2 != 0 {
+            if pair[1]
+                .strip_suffix('s')
+                .is_some_and(|stem| inferred_pos(stem, metadata) & 2 != 0)
+            {
+                score += 85;
+            } else if !matches!(pair[1].as_str(), "is" | "was" | "has" | "does") {
+                score -= 60;
+            }
+        }
+        if !left_is_subject && right_is_subject {
+            score -= 170;
+        }
         if left & 4 != 0 && right & 1 != 0 {
             score += 34;
         }
@@ -1041,7 +1082,20 @@ fn phrase_score_with_metadata(
             .map(|value| value / 3 + 18)
             .unwrap_or(-22);
     }
+    if words.len() == 3 && SUBJECT_PRONOUNS.contains(&words[0].as_str()) {
+        let middle = inferred_pos(&words[1], metadata);
+        let last = inferred_pos(&words[2], metadata);
+        if middle & 2 != 0 && last & 1 != 0 {
+            score += 145;
+        }
+    }
     for triple in words.windows(3) {
+        if SUBJECT_PRONOUNS.contains(&triple[0].as_str())
+            && COPULAS.contains(&triple[1].as_str())
+            && DET.contains(&triple[2].as_str())
+        {
+            score += 180;
+        }
         score += ngrams
             .trigrams
             .get(&triple[0])
@@ -1218,6 +1272,50 @@ mod tests {
         assert!(
             phrase_score_with_metadata(&natural, &metadata, &ngrams)
                 > phrase_score_with_metadata(&awkward, &metadata, &ngrams)
+        );
+    }
+    #[test]
+    fn subject_pronoun_order_beats_inverted_word_order() {
+        let natural = ["he", "bugs", "gore"].map(String::from);
+        let inverted = ["bugs", "he", "gore"].map(String::from);
+        let metadata = HashMap::from([
+            ("he".into(), (50_000, 1)),
+            ("bugs".into(), (8_000, 1 | 2)),
+            ("gore".into(), (4_000, 1 | 2)),
+        ]);
+        assert!(
+            phrase_score_with_metadata(&natural, &metadata, &LanguageModel::default())
+                > phrase_score_with_metadata(&inverted, &metadata, &LanguageModel::default())
+        );
+    }
+    #[test]
+    fn third_person_inflection_selects_the_natural_verb() {
+        let natural = ["he", "bugs", "gore"].map(String::from);
+        let wrong_verb = ["he", "gore", "bugs"].map(String::from);
+        let metadata = HashMap::from([
+            ("he".into(), (50_000, 1)),
+            ("bug".into(), (20_000, 1 | 2)),
+            ("bugs".into(), (8_000, 0)),
+            ("gore".into(), (4_000, 1 | 2)),
+        ]);
+        assert!(
+            phrase_score_with_metadata(&natural, &metadata, &LanguageModel::default())
+                > phrase_score_with_metadata(&wrong_verb, &metadata, &LanguageModel::default())
+        );
+    }
+    #[test]
+    fn copular_template_places_an_inferred_adjective_before_a_noun() {
+        let natural = ["i", "am", "a", "weakish", "speller"].map(String::from);
+        let misplaced = ["i", "am", "a", "speller", "weakish"].map(String::from);
+        let metadata = HashMap::from([
+            ("i".into(), (3_000_000_000, 1 | 4)),
+            ("am".into(), (500_000_000, 1)),
+            ("a".into(), (9_000_000_000, 1)),
+            ("speller".into(), (150_000, 1)),
+        ]);
+        assert!(
+            phrase_score_with_metadata(&natural, &metadata, &LanguageModel::default())
+                > phrase_score_with_metadata(&misplaced, &metadata, &LanguageModel::default())
         );
     }
     #[test]

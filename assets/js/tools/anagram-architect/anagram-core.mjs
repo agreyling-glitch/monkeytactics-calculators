@@ -139,7 +139,14 @@ const DETERMINERS = new Set("a an the this that my your our his her their".split
 const PREPOSITIONS = new Set("of to in on at by for from with as into over under".split(" "));
 const CONJUNCTIONS = new Set("and or but nor yet so".split(" "));
 const ADJECTIVES = new Set("old new good bad big small great little dark light true real damn".split(" "));
+const SUBJECT_PRONOUNS = new Set("i you he she it we they".split(" "));
+const COMMON_VERBS = new Set("am are be been being bug bugs can could did do does get gets got had has have is make makes may might must see sees should was were will would".split(" "));
+const COPULAS = new Set("am are is was were be".split(" "));
 const NATURAL_PAIRS = new Set(["old man", "new world", "good man", "bad man", "dark night", "a base", "the world", "of life"]);
+
+function isAdjective(word) {
+  return ADJECTIVES.has(word) || /(?:ish|ful|ous)$/.test(word);
+}
 
 function wordPriority(word) {
   let score = Math.min(word.length, 8) * 2;
@@ -152,19 +159,33 @@ function wordPriority(word) {
 function phraseScore(words) {
   let score = words.reduce((total, word) => total + wordPriority(word), 0);
   if (DETERMINERS.has(words[0]) || PREPOSITIONS.has(words[0])) score -= 5;
-  if (ADJECTIVES.has(words[0])) score += 3;
+  if (isAdjective(words[0])) score += 3;
+  if (SUBJECT_PRONOUNS.has(words[0])) score += 30;
   if (DETERMINERS.has(words.at(-1)) || PREPOSITIONS.has(words.at(-1)) || CONJUNCTIONS.has(words.at(-1))) score -= 18;
   for (let index = 0; index < words.length - 1; index += 1) {
     const current = words[index];
     const next = words[index + 1];
     if (NATURAL_PAIRS.has(`${current} ${next}`)) score += 14;
-    if (ADJECTIVES.has(current) && !PREPOSITIONS.has(next) && !DETERMINERS.has(next)) score += 8;
+    if (isAdjective(current) && !PREPOSITIONS.has(next) && !DETERMINERS.has(next)) score += 8;
     if (PREPOSITIONS.has(current) && DETERMINERS.has(next)) score += 10;
     if (DETERMINERS.has(current) && !DETERMINERS.has(next) && !PREPOSITIONS.has(next)) score += 9;
     if (current === "a" && /^[aeiou]/.test(next)) score -= 12;
     if (current === "an" && !/^[aeiou]/.test(next)) score -= 12;
     if (DETERMINERS.has(current) && DETERMINERS.has(next)) score -= 15;
     if (PREPOSITIONS.has(current) && PREPOSITIONS.has(next)) score -= 12;
+    if (SUBJECT_PRONOUNS.has(current) && COMMON_VERBS.has(next)) score += 55;
+    if (SUBJECT_PRONOUNS.has(current) && COPULAS.has(next)) score += 70;
+    if (DETERMINERS.has(current) && isAdjective(next)
+      && !(current === "a" && /^[aeiou]/.test(next))
+      && !(current === "an" && !/^[aeiou]/.test(next))) score += 35;
+    if (["he", "she", "it"].includes(current) && COMMON_VERBS.has(next)) {
+      if (next.endsWith("s") && COMMON_VERBS.has(next.slice(0, -1))) score += 45;
+      else if (!["is", "was", "has", "does"].includes(next)) score -= 30;
+    }
+    if (!SUBJECT_PRONOUNS.has(current) && SUBJECT_PRONOUNS.has(next)) score -= 75;
+  }
+  for (let index = 0; index < words.length - 2; index += 1) {
+    if (SUBJECT_PRONOUNS.has(words[index]) && COPULAS.has(words[index + 1]) && DETERMINERS.has(words[index + 2])) score += 90;
   }
   return score;
 }

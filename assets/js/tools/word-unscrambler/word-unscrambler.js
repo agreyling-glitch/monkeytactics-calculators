@@ -37,6 +37,8 @@ const buttonLabel = button.querySelector(".button-label");
 const message = document.querySelector("#form-message");
 const results = document.querySelector("#results");
 const resultsHeading = document.querySelector("#results-heading");
+const toolHeadingCollapse = document.querySelector("#tool-heading-collapse");
+const solverHeadingContent = document.querySelector("#solver-heading-content");
 const matchCount = document.querySelector("#match-count");
 const emptyState = document.querySelector("#empty-state");
 const wordList = document.querySelector("#word-list");
@@ -92,6 +94,7 @@ const OFFLINE_VERSION = "20260904-wiktionary-2";
 const OFFLINE_CACHE_PREFIX = "monkeytactics-word-tool-offline-";
 const OFFLINE_TOOL_ID = IS_WWF ? "words-with-friends-solver" : "word-unscrambler";
 const OFFLINE_STORAGE_KEY = `monkeytactics.${OFFLINE_TOOL_ID}.offline-cache`;
+const RACK_TILE_THEME_KEY = `monkeytactics.${OFFLINE_TOOL_ID}.rack-tile-theme`;
 const VOWELS = "aeiou";
 const HIGH_VALUE_LETTERS = "jqxz";
 const SCRABBLE_TILE_VALUES = Object.freeze({
@@ -103,7 +106,82 @@ const WWF_TILE_VALUES = Object.freeze({
   n: 2, o: 1, p: 4, q: 10, r: 1, s: 1, t: 1, u: 2, v: 5, w: 4, x: 8, y: 3, z: 10
 });
 const LENGTH_GROUP_SORTS = new Set(["length-desc", "length-asc", "uses-most"]);
+const COLLAPSIBLE_LENGTH_GROUP_SORTS = new Set(["length-desc", "length-asc"]);
 const RESULT_PAGE_SIZE = 250;
+
+function initializeWordParticles() {
+  const host = document.querySelector("[data-focus-mode]");
+  if (!host || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (!context) return;
+  canvas.className = "word-particle-canvas";
+  canvas.setAttribute("aria-hidden", "true");
+  host.prepend(canvas);
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let width = 0;
+  let height = 0;
+  let particles = [];
+  let animationFrame = 0;
+  let lastTime = performance.now();
+  const createParticle = (kind, initial = false) => ({
+    kind,
+    x: Math.random() * width,
+    y: initial ? Math.random() * height : height + 20,
+    size: kind === "letter" ? 10 + Math.random() * 11 : 1 + Math.random() * 1.8,
+    speed: kind === "letter" ? 5 + Math.random() * 8 : 8 + Math.random() * 14,
+    drift: (Math.random() - 0.5) * (kind === "letter" ? 4 : 8),
+    alpha: kind === "letter" ? 0.045 + Math.random() * 0.045 : 0.12 + Math.random() * 0.16,
+    phase: Math.random() * Math.PI * 2,
+    letter: letters[Math.floor(Math.random() * letters.length)]
+  });
+  const resize = () => {
+    const bounds = host.getBoundingClientRect();
+    width = Math.max(1, bounds.width);
+    height = Math.max(1, bounds.height);
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const count = Math.min(52, Math.max(24, Math.round((width * height) / 28000)));
+    particles = Array.from({ length: count }, (_, index) => createParticle(index % 3 === 0 ? "letter" : "dust", true));
+  };
+  const draw = (time) => {
+    const elapsed = Math.min((time - lastTime) / 1000, 0.05);
+    lastTime = time;
+    context.clearRect(0, 0, width, height);
+    particles.forEach((particle) => {
+      particle.phase += elapsed * 0.8;
+      particle.y -= particle.speed * elapsed;
+      particle.x += (particle.drift + Math.sin(particle.phase) * 2) * elapsed;
+      if (particle.y < -24 || particle.x < -30 || particle.x > width + 30) Object.assign(particle, createParticle(particle.kind));
+      if (particle.kind === "letter") {
+        context.fillStyle = `rgba(94, 234, 212, ${particle.alpha})`;
+        context.font = `700 ${particle.size}px Georgia, serif`;
+        context.fillText(particle.letter, particle.x, particle.y);
+      } else {
+        context.beginPath();
+        context.fillStyle = `rgba(242, 201, 76, ${particle.alpha})`;
+        context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        context.fill();
+      }
+    });
+    animationFrame = requestAnimationFrame(draw);
+  };
+  new ResizeObserver(resize).observe(host);
+  resize();
+  const setAnimationState = () => {
+    cancelAnimationFrame(animationFrame);
+    if (!document.hidden) {
+      lastTime = performance.now();
+      animationFrame = requestAnimationFrame(draw);
+    }
+  };
+  document.addEventListener("visibilitychange", setAnimationState);
+  setAnimationState();
+}
 const DICTIONARY_LINKS = Object.freeze([
   {
     abbreviation: "MW",
@@ -158,6 +236,7 @@ const DICTIONARY_BITS = Object.freeze({
 const loadedChunks = new Set();
 const chunkPromises = new Map();
 const dictionaryPopoverPositioners = new WeakMap();
+const rackLeaveAnagramCountCache = new Map();
 let manifest = null;
 let breakdownState = null;
 let historyEntries = HistoryStore.read();
@@ -229,6 +308,12 @@ function closeRackSortMenu({ restoreFocus = false } = {}) {
   if (restoreFocus) rackSortTrigger.focus();
 }
 
+function openRackSortMenu() {
+  rackSortMenu.hidden = false;
+  rackSortTrigger.setAttribute("aria-expanded", "true");
+  rackSortMenu.querySelector('[role="tabpanel"]:not([hidden]) button')?.focus();
+}
+
 function applyRackSort(method) {
   const syntaxIndex = input.value.search(/[:/+\-]/);
   let suffixStart = syntaxIndex < 0 ? input.value.length : syntaxIndex;
@@ -244,6 +329,55 @@ function applyRackSort(method) {
 }
 
 function initializeRackSortMenu() {
+  const tabs = document.createElement("div");
+  const sortingTab = document.createElement("button");
+  const colorTab = document.createElement("button");
+  const sortingPanel = document.createElement("div");
+  const colorPanel = document.createElement("div");
+  tabs.className = "rack-option-tabs";
+  tabs.setAttribute("role", "tablist");
+  tabs.setAttribute("aria-label", "Rack options");
+  sortingTab.type = "button";
+  sortingTab.id = "rack-sorting-tab";
+  sortingTab.className = "rack-option-tab";
+  sortingTab.textContent = "Rack Sorting";
+  sortingTab.setAttribute("role", "tab");
+  sortingTab.setAttribute("aria-controls", "rack-sorting-panel");
+  colorTab.type = "button";
+  colorTab.id = "rack-color-tab";
+  colorTab.className = "rack-option-tab";
+  colorTab.textContent = "Tile Color";
+  colorTab.setAttribute("role", "tab");
+  colorTab.setAttribute("aria-controls", "rack-color-panel");
+  sortingPanel.id = "rack-sorting-panel";
+  sortingPanel.className = "rack-option-panel";
+  sortingPanel.setAttribute("role", "tabpanel");
+  sortingPanel.setAttribute("aria-labelledby", sortingTab.id);
+  colorPanel.id = "rack-color-panel";
+  colorPanel.className = "rack-option-panel rack-color-panel";
+  colorPanel.setAttribute("role", "tabpanel");
+  colorPanel.setAttribute("aria-labelledby", colorTab.id);
+  const selectTab = (selectedTab, selectedPanel) => {
+    [[sortingTab, sortingPanel], [colorTab, colorPanel]].forEach(([tab, panel]) => {
+      const selected = tab === selectedTab;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      panel.hidden = !selected;
+    });
+  };
+  sortingTab.addEventListener("click", () => selectTab(sortingTab, sortingPanel));
+  colorTab.addEventListener("click", () => selectTab(colorTab, colorPanel));
+  tabs.addEventListener("keydown", (event) => {
+    if (!event.target.matches('[role="tab"]') || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const chooseColor = event.key === "ArrowRight" || event.key === "End";
+    const nextTab = chooseColor ? colorTab : sortingTab;
+    selectTab(nextTab, chooseColor ? colorPanel : sortingPanel);
+    nextTab.focus();
+  });
+  tabs.append(sortingTab, colorTab);
+
   for (const definition of RACK_SORT_GROUPS) {
     const group = document.createElement("section");
     const label = document.createElement("span");
@@ -254,14 +388,52 @@ function initializeRackSortMenu() {
     for (const [value, text] of definition.options) {
       const option = document.createElement("button");
       option.type = "button";
-      option.role = "menuitem";
       option.dataset.rackSort = value;
       option.textContent = text;
       option.addEventListener("click", () => applyRackSort(value));
       group.append(option);
     }
-    rackSortMenu.append(group);
+    sortingPanel.append(group);
   }
+  let selectedTheme = "classic";
+  try { selectedTheme = localStorage.getItem(RACK_TILE_THEME_KEY) || "classic"; } catch (_error) { /* Storage may be unavailable. */ }
+  if (!RACK_TILE_THEMES.some(({ value }) => value === selectedTheme)) selectedTheme = "classic";
+  const applyTileTheme = (theme) => {
+    selectedTheme = theme;
+    rackTiles.dataset.tileTheme = theme;
+    colorPanel.querySelectorAll("[data-tile-theme]").forEach((option) => {
+      const selected = option.dataset.tileTheme === theme;
+      option.classList.toggle("is-selected", selected);
+      option.setAttribute("aria-pressed", String(selected));
+    });
+    try { localStorage.setItem(RACK_TILE_THEME_KEY, theme); } catch (_error) { /* Storage may be unavailable. */ }
+  };
+  RACK_TILE_THEMES.forEach(({ value, label, description, colors }) => {
+    const option = document.createElement("button");
+    const copy = document.createElement("span");
+    const title = document.createElement("strong");
+    const detail = document.createElement("small");
+    const swatches = document.createElement("span");
+    option.type = "button";
+    option.className = "rack-theme-option";
+    option.dataset.tileTheme = value;
+    copy.className = "rack-theme-copy";
+    title.textContent = label;
+    detail.textContent = description;
+    swatches.className = "rack-theme-swatches";
+    colors.forEach((color) => {
+      const swatch = document.createElement("i");
+      swatch.style.backgroundColor = color;
+      swatches.append(swatch);
+    });
+    copy.append(title, detail);
+    option.append(swatches, copy);
+    option.addEventListener("click", () => applyTileTheme(value));
+    colorPanel.append(option);
+  });
+  rackSortMenu.append(tabs, sortingPanel, colorPanel);
+  selectTab(sortingTab, sortingPanel);
+  applyTileTheme(selectedTheme);
 }
 
 function renderOfflineState(message = "") {
@@ -986,6 +1158,11 @@ function createRackTile(letter, index, isDraggableRackTile = false) {
   }
   tile.classList.toggle("rack-tile--wildcard", isWildcard);
   tile.classList.toggle("rack-tile--pattern", isPatternCharacter);
+  const tileValue = isWildcard || isPatternCharacter ? 0 : getScrabbleTileValue(letter);
+  tile.classList.toggle("rack-tile--value-low", tileValue >= 1 && tileValue <= 2);
+  tile.classList.toggle("rack-tile--value-mid", tileValue >= 3 && tileValue <= 4);
+  tile.classList.toggle("rack-tile--value-high", tileValue >= 5 && tileValue <= 8);
+  tile.classList.toggle("rack-tile--value-power", "jqxz".includes(letter.toLowerCase()));
   tile.style.display = "inline-flex";
   tile.style.width = "2.5rem";
   tile.style.height = "2.5rem";
@@ -1330,6 +1507,7 @@ function clearMessage() {
 }
 
 function setEmptyState(title, text) {
+  emptyState.classList.remove("results-empty--artwork");
   const icon = document.createElement("span");
   icon.className = "empty-icon";
   icon.setAttribute("aria-hidden", "true");
@@ -1344,14 +1522,30 @@ function setEmptyState(title, text) {
   emptyState.replaceChildren(icon, heading, description);
 }
 
+function setInitialEmptyState() {
+  const artwork = document.createElement("img");
+  artwork.className = "results-empty-artwork";
+  artwork.src = IS_WWF
+    ? "../assets/images/word-tools/tiles-empty-rack-wwf.jpg?v=20260913-compressed-2"
+    : "../assets/images/word-tools/tiles-empty-rack.jpg?v=20260913-compressed-2";
+  artwork.alt = IS_WWF
+    ? "Golden Words With Friends letter tiles sweeping across a glowing rainbow arc"
+    : "Colorful letter tiles sweeping across a glowing rainbow arc";
+  artwork.width = 1024;
+  artwork.height = IS_WWF ? 575 : 493;
+  emptyState.classList.add("results-empty--artwork");
+  emptyState.replaceChildren(artwork);
+}
+
 function clearResults() {
   wordList.replaceChildren();
   breakdownCharts.replaceChildren();
   breakdownState = null;
   wordBreakdown.hidden = true;
-  setEmptyState("Your words will appear here", "Enter your letters and click Unscramble.");
+  setInitialEmptyState();
   emptyState.hidden = false;
   matchCount.hidden = true;
+  resultsHeading.classList.remove("visually-hidden");
 }
 
 function isWordPicked(word) {
@@ -1517,6 +1711,91 @@ function renderPickListWord(word) {
   });
 
   return wordRow;
+}
+
+function getRackLeave(word, rackLetters, dictionaryBit) {
+  const remaining = [...String(rackLetters).toLowerCase().replace(/[^a-z?]/g, "")];
+  for (const letter of word.toLowerCase()) {
+    let index = remaining.indexOf(letter);
+    if (index < 0) index = remaining.indexOf("?");
+    if (index < 0) return { valid: false, letters: remaining, value: 0, label: "Not from rack", vowels: 0, consonants: 0, anagramCount: 0 };
+    remaining.splice(index, 1);
+  }
+
+  const vowels = remaining.filter((letter) => VOWELS.includes(letter)).length;
+  const consonants = remaining.filter((letter) => /[a-z]/.test(letter) && !VOWELS.includes(letter)).length;
+  const counts = remaining.reduce((map, letter) => map.set(letter, (map.get(letter) ?? 0) + 1), new Map());
+  const duplicates = [...counts.values()].reduce((total, count) => total + Math.max(0, count - 1), 0);
+  let value = 50;
+  if (vowels && consonants) value += 12;
+  value -= Math.abs(vowels - consonants) * 7;
+  value -= duplicates * 6;
+  value += remaining.filter((letter) => letter === "?").length * 18;
+  value += remaining.filter((letter) => letter === "s").length * 10;
+  value -= remaining.filter((letter) => HIGH_VALUE_LETTERS.includes(letter)).length * 9;
+  if (remaining.length >= 2 && remaining.length <= 5) value += 5;
+  value = clamp(Math.round(value), 0, 100);
+  const label = value >= 75 ? "Excellent" : value >= 60 ? "Good" : value >= 40 ? "Fair" : "Tough";
+  const leaveRack = remaining.join("");
+  const anagramKey = `${dictionaryBit}:${[...leaveRack].sort().join("")}`;
+  if (!rackLeaveAnagramCountCache.has(anagramKey)) {
+    const availableWords = leaveRack.length < 2
+      ? []
+      : Engine.unscramble(leaveRack, "", { dictionaryBit, scoring: IS_WWF ? "wwf" : "scrabble" });
+    rackLeaveAnagramCountCache.set(anagramKey, availableWords.length);
+  }
+  return {
+    valid: true,
+    letters: remaining,
+    value,
+    label,
+    vowels,
+    consonants,
+    anagramCount: rackLeaveAnagramCountCache.get(anagramKey)
+  };
+}
+
+function createRackLeave(word, rackLetters, dictionaryBit) {
+  const leave = getRackLeave(word, rackLetters, dictionaryBit);
+  const container = document.createElement("div");
+  const heading = document.createElement("div");
+  const label = document.createElement("strong");
+  const value = document.createElement("span");
+  const tiles = document.createElement("div");
+  const stats = document.createElement("div");
+  const ratio = document.createElement("span");
+  const anagrams = document.createElement("span");
+  const meter = document.createElement("span");
+  const fill = document.createElement("span");
+  container.className = `rack-leave${leave.valid ? "" : " is-invalid"}`;
+  heading.className = "rack-leave-heading";
+  label.textContent = "Rack leave";
+  value.textContent = leave.valid ? `${leave.value} · ${leave.label}` : leave.label;
+  tiles.className = "rack-leave-tiles";
+  if (leave.letters.length) leave.letters.forEach((letter) => tiles.append(createScrabbleTile(letter)));
+  else tiles.textContent = leave.valid ? "No tiles remain" : "Current rack cannot make this word";
+  ratio.className = "rack-leave-ratio";
+  ratio.textContent = leave.valid ? `V:C ${leave.vowels}:${leave.consonants}` : "V:C unavailable";
+  ratio.setAttribute("aria-label", leave.valid
+    ? `${leave.vowels} vowels and ${leave.consonants} consonants remain`
+    : "Vowel and consonant ratio unavailable");
+  stats.className = "rack-leave-stats";
+  anagrams.className = "rack-leave-words";
+  anagrams.textContent = leave.valid
+    ? `${leave.anagramCount.toLocaleString()} ${leave.anagramCount === 1 ? "word" : "words"} available`
+    : "Words unavailable";
+  stats.append(ratio, anagrams);
+  meter.className = "rack-leave-meter";
+  meter.setAttribute("role", "progressbar");
+  meter.setAttribute("aria-label", `Leave value for ${word}`);
+  meter.setAttribute("aria-valuemin", "0");
+  meter.setAttribute("aria-valuemax", "100");
+  meter.setAttribute("aria-valuenow", String(leave.value));
+  fill.style.width = `${leave.value}%`;
+  meter.append(fill);
+  heading.append(label, value);
+  container.append(heading, tiles, stats, meter);
+  return container;
 }
 
 function createPickListFlag(text, modifier = "") {
@@ -1857,7 +2136,7 @@ function createWordItem(word, letters, options) {
 
   dictionaryLinks.className = "dictionary-popover";
   dictionaryLinks.setAttribute("role", "dialog");
-  dictionaryLinks.setAttribute("aria-label", `Dictionary links for ${word}`);
+  dictionaryLinks.setAttribute("aria-label", `Word details for ${word}`);
   dictionaryPopoverHeader.className = "dictionary-popover-header";
   dictionaryPopoverActions.className = "dictionary-popover-actions";
   dictionaryPopoverTitle.className = "dictionary-popover-title";
@@ -1874,7 +2153,7 @@ function createWordItem(word, letters, options) {
   dictionaryDirectoryButton.addEventListener("click", () => openDictionaryDirectory(word, dictionaryDirectoryButton));
   dictionaryPopoverActions.append(insertButton, pickButton, dictionaryDirectoryButton);
   dictionaryPopoverHeader.append(dictionaryPopoverActions, dictionaryPopoverTitle);
-  dictionaryLinks.append(dictionaryPopoverHeader);
+  dictionaryLinks.append(dictionaryPopoverHeader, createRackLeave(word, letters, options.dictionaryBit));
 
   let localDefinitionLoaded = false;
   let localDefinitionLoading = false;
@@ -2008,7 +2287,7 @@ function createWordItem(word, letters, options) {
     loadHookLookup();
   };
 
-  wordLookup.addEventListener("mouseenter", openDictionaryPopover);
+  wordLabel.addEventListener("mouseenter", openDictionaryPopover);
   wordLookup.addEventListener("focusin", openDictionaryPopover);
 
   dictionaryLinks.append(hookLookup);
@@ -2018,11 +2297,18 @@ function createWordItem(word, letters, options) {
   return item;
 }
 
-function appendWordGroup(fragment, headingText, words, ariaLabel, letters, options, totalCount = words.length) {
-  const group = document.createElement("section");
+function appendWordGroup(fragment, headingText, words, ariaLabel, letters, options, totalCount = words.length, collapsible = false, groupId = "") {
+  const group = document.createElement(collapsible ? "details" : "section");
   group.className = "word-group";
+  if (groupId) group.id = groupId;
+  if (collapsible) group.open = true;
 
-  const heading = document.createElement("h4");
+  const heading = document.createElement(collapsible ? "span" : "h4");
+  if (collapsible) {
+    heading.className = "word-group-heading";
+    heading.setAttribute("role", "heading");
+    heading.setAttribute("aria-level", "4");
+  }
   heading.textContent = `${headingText} [${totalCount.toLocaleString()}]`;
 
   const grid = document.createElement("ul");
@@ -2030,8 +2316,89 @@ function appendWordGroup(fragment, headingText, words, ariaLabel, letters, optio
   grid.setAttribute("aria-label", ariaLabel);
 
   words.forEach((word) => grid.append(createWordItem(word, letters, options)));
-  group.append(heading, grid);
+  if (collapsible) {
+    const summary = document.createElement("summary");
+    summary.append(heading);
+    group.append(summary, grid);
+  } else {
+    group.append(heading, grid);
+  }
   fragment.append(group);
+  return group;
+}
+
+function createLengthGroupNavigation(entries, groups, currentPage, navigate) {
+  const toolbar = document.createElement("nav");
+  const label = document.createElement("span");
+  const shortcuts = document.createElement("div");
+  const toggleAll = document.createElement("button");
+
+  toolbar.className = "word-group-navigation";
+  toolbar.setAttribute("aria-label", "Jump to word length");
+  label.className = "word-group-navigation-label";
+  label.textContent = "Jump";
+  shortcuts.className = "word-group-shortcuts";
+
+  const updateToggleAll = () => {
+    const anyOpen = groups.some(({ group }) => group.open);
+    toggleAll.textContent = anyOpen ? "Collapse all" : "Expand all";
+    toggleAll.setAttribute("aria-expanded", String(anyOpen));
+  };
+
+  const jumpToGroup = (length) => {
+    const group = document.querySelector(`#word-length-${length}`);
+    if (!group) return;
+    group.open = true;
+    group.scrollIntoView({ behavior: "smooth", block: "start" });
+    group.querySelector("summary")?.focus({ preventScroll: true });
+  };
+
+  entries.forEach(({ length, count, page, startsPage }) => {
+    const wrapper = document.createElement("span");
+    const shortcut = document.createElement("button");
+    wrapper.className = "word-group-shortcut-wrap";
+    if (startsPage) {
+      const pageMarker = document.createElement("button");
+      pageMarker.type = "button";
+      pageMarker.className = "word-group-page-marker";
+      pageMarker.textContent = String(page);
+      pageMarker.setAttribute("aria-label", `Go to results page ${page}`);
+      if (page === currentPage) pageMarker.setAttribute("aria-current", "page");
+      pageMarker.addEventListener("click", () => {
+        if (page !== currentPage) navigate(page);
+      });
+      wrapper.append(pageMarker);
+    }
+    shortcut.type = "button";
+    shortcut.className = "word-group-shortcut";
+    shortcut.setAttribute("aria-label", `Jump to ${length}-letter words on page ${page}, ${count.toLocaleString()} total`);
+    const shortcutLength = document.createElement("strong");
+    const shortcutCount = document.createElement("small");
+    shortcutLength.textContent = String(length);
+    shortcutCount.textContent = count.toLocaleString();
+    shortcut.append(shortcutLength, shortcutCount);
+    shortcut.addEventListener("click", () => {
+      if (page !== currentPage) navigate(page);
+      jumpToGroup(length);
+    });
+    wrapper.append(shortcut);
+    shortcuts.append(wrapper);
+  });
+
+  groups.forEach(({ group }) => {
+    group.addEventListener("toggle", updateToggleAll);
+  });
+
+  toggleAll.type = "button";
+  toggleAll.className = "word-group-toggle-all";
+  toggleAll.addEventListener("click", () => {
+    const shouldOpen = !groups.some(({ group }) => group.open);
+    groups.forEach(({ group }) => { group.open = shouldOpen; });
+    updateToggleAll();
+  });
+  updateToggleAll();
+  toolbar.append(label, shortcuts, toggleAll);
+  return toolbar;
 }
 
 function createResultPagination(currentPage, pageCount, navigate, position) {
@@ -2101,10 +2468,8 @@ function renderMatches(letters, matches, options, requestedPage = 1, focusResult
   const pageStart = (currentPage - 1) * RESULT_PAGE_SIZE;
   const pageEnd = Math.min(pageStart + RESULT_PAGE_SIZE, matches.length);
   const visibleMatches = matches.slice(pageStart, pageEnd);
-  const foundLabel = matches.length === 1 ? "1 word found" : `${matches.length.toLocaleString()} words found`;
-  resultsHeading.textContent = options.unrestricted
-    ? `${foundLabel} in the selected dictionary`
-    : `${foundLabel} made by unscrambling the letters ${letters.toUpperCase()}`;
+  resultsHeading.textContent = "Matching words";
+  resultsHeading.classList.add("visually-hidden");
   matchCount.textContent = pageCount > 1
     ? `Showing ${(pageStart + 1).toLocaleString()}–${pageEnd.toLocaleString()} of ${matches.length.toLocaleString()} matches`
     : `${matches.length.toLocaleString()} ${matches.length === 1 ? "match" : "matches"}`;
@@ -2113,18 +2478,36 @@ function renderMatches(letters, matches, options, requestedPage = 1, focusResult
 
   const fragment = document.createDocumentFragment();
   const navigate = (page) => renderMatches(letters, matches, options, page, true);
+  const hasMultipleLengthSections = new Set(matches.map((word) => word.length)).size > 1;
+  const showsJumpControls = COLLAPSIBLE_LENGTH_GROUP_SORTS.has(options.sortBy)
+    && (pageCount > 1 || hasMultipleLengthSections);
 
-  if (pageCount > 1) {
+  if (pageCount > 1 && !showsJumpControls) {
     fragment.append(createResultPagination(currentPage, pageCount, navigate, "top"));
   }
 
   if (LENGTH_GROUP_SORTS.has(options.sortBy)) {
     const wordsByLength = new Map();
     const totalWordsByLength = new Map();
+    const lengthGroups = [];
+    const collapsibleGroups = COLLAPSIBLE_LENGTH_GROUP_SORTS.has(options.sortBy);
 
     matches.forEach((word) => {
       totalWordsByLength.set(word.length, (totalWordsByLength.get(word.length) || 0) + 1);
     });
+
+    const navigationEntries = [];
+    for (let page = 1; page <= pageCount; page += 1) {
+      const pageMatches = matches.slice((page - 1) * RESULT_PAGE_SIZE, page * RESULT_PAGE_SIZE);
+      const pageLengths = new Set();
+      pageMatches.forEach((word) => pageLengths.add(word.length));
+      [...pageLengths].forEach((length, index) => navigationEntries.push({
+        length,
+        count: totalWordsByLength.get(length),
+        page,
+        startsPage: index === 0
+      }));
+    }
 
     visibleMatches.forEach((word) => {
       const group = wordsByLength.get(word.length);
@@ -2136,22 +2519,38 @@ function renderMatches(letters, matches, options, requestedPage = 1, focusResult
     });
 
     wordsByLength.forEach((words, length) => {
-      appendWordGroup(
+      const group = appendWordGroup(
         fragment,
         `${length}-letter words`,
         words,
         `${length}-letter words`,
         letters,
         options,
-        totalWordsByLength.get(length)
+        totalWordsByLength.get(length),
+        collapsibleGroups,
+        collapsibleGroups ? `word-length-${length}` : ""
       );
+      if (collapsibleGroups) {
+        lengthGroups.push({ length, count: totalWordsByLength.get(length), group });
+      }
     });
+    if (showsJumpControls && lengthGroups.length) {
+      const topNavigation = createLengthGroupNavigation(navigationEntries, lengthGroups, currentPage, navigate);
+      topNavigation.classList.add("word-group-navigation--top");
+      fragment.insertBefore(
+        topNavigation,
+        lengthGroups[0].group
+      );
+      const bottomNavigation = createLengthGroupNavigation(navigationEntries, lengthGroups, currentPage, navigate);
+      bottomNavigation.classList.add("word-group-navigation--bottom");
+      fragment.append(bottomNavigation);
+    }
   } else {
     const heading = SORT_LABELS[options.sortBy] ?? "Matching words";
     appendWordGroup(fragment, heading, visibleMatches, heading, letters, options, matches.length);
   }
 
-  if (pageCount > 1) {
+  if (pageCount > 1 && !showsJumpControls) {
     fragment.append(createResultPagination(currentPage, pageCount, navigate, "bottom"));
   }
 
@@ -3390,6 +3789,14 @@ const RACK_SORT_GROUPS = Object.freeze([
     ["frequency", "English tile frequency order"]
   ] }
 ]);
+const RACK_TILE_THEMES = Object.freeze([
+  { value: "classic", label: "Classic Scrabble Wood", description: "Warm maple and honey oak", colors: ["#F3E5C3", "#E2C28F", "#4A2F1B"] },
+  { value: "minimal", label: "Modern Minimalist", description: "Clean gray and off-white", colors: ["#E8E8E8", "#DDE2E8", "#333333"] },
+  { value: "value", label: "Color-Coded by Value", description: "See tile strength instantly", colors: ["#F5F0E6", "#DCE8F7", "#F7D774", "#C94A4A"] },
+  { value: "dark", label: "Dark Mode Rack", description: "Charcoal with warm ivory", colors: ["#2B2B2B", "#3A3A3A", "#E8D49A"] },
+  { value: "tournament", label: "Tournament Style", description: "Crisp cream and black", colors: ["#FFF7E0", "#2A2A2A"] },
+  { value: "playful", label: "Playful Puzzle", description: "A rotating pastel palette", colors: ["#FCEFB4", "#DFF7E3", "#E6D9FF", "#FFD9C8"] }
+]);
 function focusRackInput() {
   window.scrollTo({ top: 0, behavior: "auto" });
   const focusModePanel = input.closest("[data-focus-mode].is-focus-mode");
@@ -3589,17 +3996,28 @@ resetConfirmModal.addEventListener("keydown", (event) => {
 resetBasicFiltersButton.addEventListener("click", resetBasicFilters);
 resetAdvancedFiltersButton.addEventListener("click", resetAdvancedFilters);
 rackSortTrigger.addEventListener("click", () => {
-  const opening = rackSortMenu.hidden;
-  rackSortMenu.hidden = !opening;
-  rackSortTrigger.setAttribute("aria-expanded", String(opening));
-  if (opening) rackSortMenu.querySelector("button")?.focus();
+  if (rackSortMenu.hidden) openRackSortMenu();
+  else closeRackSortMenu({ restoreFocus: true });
+});
+rackSortTrigger.addEventListener("keydown", (event) => {
+  if (event.key !== "ArrowDown") return;
+  event.preventDefault();
+  openRackSortMenu();
 });
 rackSortMenu.addEventListener("keydown", (event) => {
-  const options = [...rackSortMenu.querySelectorAll("button")];
+  const options = [...rackSortMenu.querySelectorAll("button")].filter((option) => !option.closest("[hidden]"));
   const index = options.indexOf(document.activeElement);
   if (event.key === "Escape") {
     event.preventDefault();
     closeRackSortMenu({ restoreFocus: true });
+  } else if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    closeRackSortMenu();
+    input.focus();
+  } else if (event.key === "ArrowRight") {
+    event.preventDefault();
+    closeRackSortMenu();
+    button.focus();
   } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
     event.preventDefault();
     const direction = event.key === "ArrowDown" ? 1 : -1;
@@ -3609,11 +4027,28 @@ rackSortMenu.addEventListener("keydown", (event) => {
 document.addEventListener("click", (event) => {
   if (!rackSortMenu.hidden && !event.target.closest("#rack-sort-picker")) closeRackSortMenu();
 });
+function setSolverHeadingExpanded(nextExpanded) {
+  if (!toolHeadingCollapse || !solverHeadingContent) return;
+  solverHeadingContent.hidden = !nextExpanded;
+  toolHeadingCollapse.setAttribute("aria-expanded", String(nextExpanded));
+  toolHeadingCollapse.setAttribute("aria-label", `${nextExpanded ? "Collapse" : "Expand"} solver setup`);
+}
+toolHeadingCollapse?.addEventListener("click", () => {
+  if (!toolHeadingCollapse.closest("[data-focus-mode]")?.classList.contains("is-focus-mode")) return;
+  setSolverHeadingExpanded(toolHeadingCollapse.getAttribute("aria-expanded") !== "true");
+});
+const solverFocusModePanel = toolHeadingCollapse?.closest("[data-focus-mode]");
+if (solverFocusModePanel) {
+  new MutationObserver(() => {
+    setSolverHeadingExpanded(!solverFocusModePanel.classList.contains("is-focus-mode"));
+  }).observe(solverFocusModePanel, { attributes: true, attributeFilter: ["class"] });
+}
 syncSectionFilterResetButtons();
 renderAllHistory();
 renderAllPickList();
 renderRackTiles();
 initializeRackSortMenu();
+initializeWordParticles();
 offlineToggle?.addEventListener("click", toggleOfflineMode);
 renderOfflineState();
 if (offlineModeEnabled && "caches" in window) {

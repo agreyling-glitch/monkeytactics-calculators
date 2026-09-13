@@ -20,6 +20,28 @@ test("finds complete multi-word phrases without inventing letters", () => {
   assert.ok(outcome.results.every(({ phrase }) => isExactAnagram("Osama Bin Laden", phrase)));
 });
 
+test("orders subject pronouns before verbs in the JavaScript fallback", () => {
+  const outcome = solveAnagrams("George Bush", ["gore", "he", "bugs"], {
+    maxWords: 3,
+    minimumLength: 2,
+    lockedWords: "gore",
+    limit: 20,
+    nodeLimit: 20000
+  });
+  assert.equal(outcome.results[0]?.phrase, "he bugs gore");
+});
+
+test("orders copular phrases with inferred adjectives in the JavaScript fallback", () => {
+  const outcome = solveAnagrams("William Shakespeare", ["i", "am", "a", "weakish", "speller"], {
+    maxWords: 5,
+    minimumLength: 1,
+    lockedWords: "weakish speller",
+    limit: 20,
+    nodeLimit: 20000
+  });
+  assert.equal(outcome.results[0]?.phrase, "i am a weakish speller");
+});
+
 test("filters phrases and pages results in groups of 120", () => {
   const results = Array.from({ length: 250 }, (_, index) => ({ phrase: `${index % 2 ? "blue" : "gold"} phrase ${index}` }));
   const secondPage = filterAndPageResults(results, "", 2);
@@ -86,7 +108,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260912-47/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260912-49/);
 });
 
 test("the result toolbar loads the cache-busted responsive stylesheet", async () => {

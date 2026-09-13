@@ -122,6 +122,9 @@
 	new Set("of to in on at by for from with as into over under".split(" "));
 	new Set("and or but nor yet so".split(" "));
 	new Set("old new good bad big small great little dark light true real damn".split(" "));
+	new Set("i you he she it we they".split(" "));
+	new Set("am are be been being bug bugs can could did do does get gets got had has have is make makes may might must see sees should was were will would".split(" "));
+	new Set("am are is was were be".split(" "));
 	//#endregion
 	//#region assets/js/tools/anagram-architect/anagram-architect.js
 	var form = document.querySelector("#anagram-form");
@@ -436,7 +439,7 @@
 				}
 			};
 			for (let shardIndex = 0; shardIndex < workerCount; shardIndex += 1) {
-				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260912-27", { type: "module" });
+				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260912-29", { type: "module" });
 				workers.push(worker);
 				worker.addEventListener("message", ({ data }) => handleMessage(shardIndex, worker, data));
 				worker.addEventListener("error", () => fail(/* @__PURE__ */ new Error("A parallel anagram worker could not start. Reload the page and try again.")));

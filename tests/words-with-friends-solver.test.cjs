@@ -101,7 +101,7 @@ test("the FAQ above related guides uses the full content width", () => {
   assert.match(wordSolverCss, /\.faq-list\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*none;/s);
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
-    assert.match(page, /word-unscrambler\.css\?v=20260905-list-search-21/);
+    assert.match(page, /word-unscrambler\.css\?v=20260913-empty-artwork-45/);
   }
 });
 
@@ -130,6 +130,10 @@ test("dictionary guidance appears before Offline Mode controls", () => {
 });
 
 test("word result popovers use local definitions and move external links behind a spyglass", () => {
+  assert.match(wordSolverScript, /wordLabel\.addEventListener\("mouseenter", openDictionaryPopover\)/);
+  assert.doesNotMatch(wordSolverScript, /wordLookup\.addEventListener\("mouseenter", openDictionaryPopover\)/);
+  assert.match(wordSolverCss, /\.word-label:hover \+ \.dictionary-popover/);
+  assert.doesNotMatch(wordSolverCss, /\.word-lookup:hover \.dictionary-popover/);
   assert.match(wordSolverScript, /DefinitionService\.lookup\(word, \{ allowRemote: false \}\)/);
   assert.match(wordSolverScript, /className = "local-definition-lookup"/);
   assert.match(wordSolverScript, /className = "dictionary-directory-trigger"/);
@@ -142,8 +146,8 @@ test("word result popovers use local definitions and move external links behind 
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
     assert.match(page, /input-rules\.js\?v=20260905-list-search-16/);
-    assert.match(page, /word-unscrambler\.js\?v=20260905-list-search-19/);
-    assert.match(page, /word-unscrambler\.css\?v=20260905-list-search-21/);
+    assert.match(page, /word-unscrambler\.js\?v=20260913-compressed-artwork-43/);
+    assert.match(page, /word-unscrambler\.css\?v=20260913-empty-artwork-45/);
   }
 });
 
@@ -181,7 +185,7 @@ test("word solvers provide common and strategic rack sorting", () => {
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /id="rack-sort-trigger"[^>]*aria-haspopup="menu"/);
-    assert.match(page, /id="rack-sort-menu"[^>]*role="menu"/);
+    assert.match(page, /id="rack-sort-menu"[^>]*aria-label="Rack sorting and tile color options"/);
   }
   for (const method of ["vowels-first", "alphabetical", "grouped-alphabetical", "blanks-left", "blanks-right", "s-right", "tile-function", "duplicates", "stem-retina", "stem-satine", "stem-tisane", "stem-senior", "stem-latrine", "frequency"]) {
     assert.match(wordSolverScript, new RegExp(`\\["${method}"`));
@@ -189,6 +193,17 @@ test("word solvers provide common and strategic rack sorting", () => {
   assert.match(wordSolverScript, /const syntaxIndex = input\.value\.search/);
   assert.match(wordSolverScript, /sortRack\(rack, method\).*suffix/s);
   assert.match(wordSolverScript, /renderRackTiles\(\);/);
+  assert.match(wordSolverScript, /sortingTab\.textContent = "Rack Sorting"/);
+  assert.match(wordSolverScript, /colorTab\.textContent = "Tile Color"/);
+  assert.match(wordSolverScript, /RACK_TILE_THEMES = Object\.freeze/);
+  assert.match(wordSolverScript, /rackTiles\.dataset\.tileTheme = theme/);
+  assert.match(wordSolverScript, /localStorage\.setItem\(RACK_TILE_THEME_KEY, theme\)/);
+  for (const theme of ["classic", "minimal", "value", "dark", "tournament", "playful"]) {
+    assert.match(wordSolverScript, new RegExp(`value: "${theme}"`));
+  }
+  assert.match(wordSolverScript, /rackSortTrigger\.addEventListener\("keydown"[\s\S]*event\.key !== "ArrowDown"[\s\S]*openRackSortMenu\(\)/);
+  assert.match(wordSolverScript, /event\.key === "ArrowLeft"[\s\S]*closeRackSortMenu\(\);[\s\S]*input\.focus\(\)/);
+  assert.match(wordSolverScript, /event\.key === "ArrowRight"[\s\S]*closeRackSortMenu\(\);[\s\S]*button\.focus\(\)/);
   assert.match(wordSolverCss, /\.rack-sort-menu\s*\{[^}]*max-height:[^;}]*100dvh[^;}]*;[^}]*overflow-y:\s*auto;/s);
 });
 
@@ -210,6 +225,75 @@ test("word solvers support exact-length unrestricted list searches with paginati
   assert.match(wordSolverScript, /createResultPagination\(currentPage, pageCount, navigate, "bottom"\)/);
   assert.match(wordSolverScript, /\["\/", "\*", ":", "\+", "-"\]\.includes\(letter\) \|\| \/\^\\d\$\/\.test\(letter\)/);
   assert.doesNotMatch(wordSolverScript, /Load .* more/);
+});
+
+test("word hover shows rack-aware leaves and a graphical leave value", () => {
+  assert.match(wordSolverScript, /function getRackLeave\(word, rackLetters, dictionaryBit\)/);
+  assert.match(wordSolverScript, /remaining\.indexOf\("\?"\)/);
+  assert.match(wordSolverScript, /label\.textContent = "Rack leave"/);
+  assert.match(wordSolverScript, /meter\.setAttribute\("role", "progressbar"\)/);
+  assert.match(wordSolverScript, /`V:C \$\{leave\.vowels\}:\$\{leave\.consonants\}`/);
+  assert.match(wordSolverScript, /dictionaryLinks\.append\(dictionaryPopoverHeader, createRackLeave\(word, letters, options\.dictionaryBit\)\)/);
+  assert.match(wordSolverScript, /rackLeaveAnagramCountCache/);
+  assert.match(wordSolverScript, /Engine\.unscramble\(leaveRack/);
+  assert.match(wordSolverScript, /words"} available/);
+  assert.doesNotMatch(wordSolverScript, /item\.append\(top, meta, note, tileRow, leave, flags\)/);
+  assert.match(wordSolverCss, /\.rack-leave-meter\s*\{/);
+});
+
+test("length sorts provide jump shortcuts and collapsible word groups", () => {
+  assert.match(wordSolverScript, /LENGTH_GROUP_SORTS\.has\(options\.sortBy\)/);
+  assert.match(wordSolverScript, /COLLAPSIBLE_LENGTH_GROUP_SORTS = new Set\(\["length-desc", "length-asc"\]\)/);
+  assert.match(wordSolverScript, /function createLengthGroupNavigation\(entries, groups, currentPage, navigate\)/);
+  assert.match(wordSolverScript, /createLengthGroupNavigation\(navigationEntries, lengthGroups, currentPage, navigate\)/);
+  assert.match(wordSolverScript, /pageMarker\.type = "button"/);
+  assert.match(wordSolverScript, /pageMarker\.className = "word-group-page-marker"/);
+  assert.match(wordSolverScript, /pageMarker\.addEventListener\("click"/);
+  assert.match(wordSolverScript, /if \(page !== currentPage\) navigate\(page\)/);
+  assert.match(wordSolverScript, /pageCount > 1 && !showsJumpControls/);
+  assert.match(wordSolverScript, /hasMultipleLengthSections = new Set\(matches\.map\(\(word\) => word\.length\)\)\.size > 1/);
+  assert.match(wordSolverScript, /&& \(pageCount > 1 \|\| hasMultipleLengthSections\)/);
+  assert.match(wordSolverScript, /if \(showsJumpControls && lengthGroups\.length\)/);
+  assert.match(wordSolverScript, /word-group-navigation--top/);
+  assert.match(wordSolverScript, /word-group-navigation--bottom/);
+  assert.match(wordSolverCss, /\.word-group-page-marker\s*\{[^}]*color: #f2c94c;/s);
+  assert.match(wordSolverScript, /document\.createElement\(collapsible \? "details" : "section"\)/);
+  assert.match(wordSolverScript, /group\.open = true/);
+  assert.match(wordSolverScript, /Jump to \$\{length\}-letter words/);
+  assert.match(wordSolverScript, /anyOpen \? "Collapse all" : "Expand all"/);
+  assert.match(wordSolverScript, /group\.scrollIntoView\(\{ behavior: "smooth", block: "start" \}\)/);
+  assert.match(wordSolverCss, /\.word-group-navigation\s*\{/);
+  assert.match(wordSolverCss, /\.result-pagination--top \+ \.word-group-navigation \{ margin-top: 1rem; \}/);
+  assert.match(wordSolverCss, /details\.word-group > summary/);
+});
+
+test("empty racks show the shared letter-tile artwork", () => {
+  const wordUnscramblerPage = fs.readFileSync(path.join(root, "tools", "word-unscrambler.html"), "utf8");
+  for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
+    const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
+    assert.match(page, /class="results-empty results-empty--artwork"/);
+    assert.doesNotMatch(page, /Your words will appear here/);
+  }
+  assert.match(wordUnscramblerPage, /src="\.\.\/assets\/images\/word-tools\/tiles-empty-rack\.jpg\?v=20260913-compressed-2"[^>]*width="1024" height="493"/);
+  assert.match(html, /src="\.\.\/assets\/images\/word-tools\/tiles-empty-rack-wwf\.jpg\?v=20260913-compressed-2"[^>]*width="1024" height="575"/);
+  assert.match(wordSolverScript, /function setInitialEmptyState\(\)/);
+  assert.match(wordSolverScript, /artwork\.src = IS_WWF/);
+  assert.match(wordSolverScript, /tiles-empty-rack-wwf\.jpg/);
+  assert.match(wordSolverScript, /emptyState\.classList\.remove\("results-empty--artwork"\)/);
+  assert.match(wordSolverScript, /setInitialEmptyState\(\)/);
+  assert.match(wordSolverCss, /\.results-empty--artwork\s*\{/);
+});
+
+test("solver setup heading and controls can be collapsed", () => {
+  for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
+    const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
+    assert.match(page, /id="tool-heading-collapse"[^>]*aria-expanded="true"[^>]*aria-controls="solver-heading-content"/);
+    assert.match(page, /class="tool-heading-content" id="solver-heading-content"/);
+  }
+  assert.match(wordSolverScript, /solverHeadingContent\.hidden = !nextExpanded/);
+  assert.match(wordSolverScript, /setSolverHeadingExpanded\(!solverFocusModePanel\.classList\.contains\("is-focus-mode"\)\)/);
+  assert.match(wordSolverScript, /aria-label", `\$\{nextExpanded \? "Collapse" : "Expand"\} solver setup`/);
+  assert.match(wordSolverCss, /\.tool-heading-collapse\[aria-expanded="false"\]/);
 });
 
 test("word solvers use the same native search clear control as Crossword", () => {
@@ -264,7 +348,9 @@ test("desktop search actions align right and return to full width on mobile", ()
 });
 
 test("rack description appears once in the result heading rather than every length group", () => {
-  assert.match(wordSolverScript, /made by unscrambling the letters \$\{letters\.toUpperCase\(\)\}/);
+  assert.doesNotMatch(wordSolverScript, /made by unscrambling the letters/);
+  assert.match(wordSolverScript, /resultsHeading\.textContent = "Matching words"/);
+  assert.match(wordSolverScript, /resultsHeading\.classList\.add\("visually-hidden"\)/);
   assert.match(wordSolverScript, /`\$\{length\}-letter words`,/);
   assert.doesNotMatch(wordSolverScript, /`\$\{length\}-letter words made by unscrambling/);
 });

@@ -1,0 +1,111 @@
+/* Anagram Architect palette, scoped so the shared WWF solver stays unchanged. */
+.word-unscrambler-page {
+  --accent: #2dd4bf;
+  --accent-soft: rgba(45, 212, 191, 0.15);
+  --premium-green: #2dd4bf;
+  --premium-mint: #99f6e4;
+  --premium-orange: #f5b942;
+  --premium-panel: #0f172a;
+  --premium-line: rgba(45, 212, 191, 0.2);
+  background: radial-gradient(circle at 78% 5%, rgba(45, 212, 191, 0.1), transparent 28%), var(--bg);
+}
+
+.word-unscrambler-page .premium-tool-hero {
+  border-color: rgba(45, 212, 191, 0.24);
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(20, 35, 52, 0.98));
+}
+
+.word-unscrambler-page .premium-tool-hero::after {
+  border-color: rgba(45, 212, 191, 0.18);
+  box-shadow: 0 0 0 3rem rgba(45, 212, 191, 0.025), 0 0 0 6rem rgba(45, 212, 191, 0.02);
+}
+
+.word-unscrambler-page .premium-hero-copy { color: #cbd5e1; }
+.word-unscrambler-page .premium-hero-pills span {
+  border-color: rgba(45, 212, 191, 0.18);
+  background: rgba(45, 212, 191, 0.06);
+  color: #bae6e1;
+}
+.word-unscrambler-page .premium-hero-stat { border-left-color: rgba(45, 212, 191, 0.2); }
+
+.word-unscrambler-page .tool-widget,
+.word-unscrambler-page .calc-panel,
+.word-unscrambler-page .results-panel {
+  border-color: rgba(45, 212, 191, 0.2);
+  background-color: #0f172a;
+}
+
+.word-unscrambler-page .tool-widget {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(20, 35, 52, 0.98));
+}
+
+.word-unscrambler-page .btn-calculate,
+.word-unscrambler-page #search-btn {
+  border-color: #2dd4bf;
+  background: linear-gradient(135deg, #5eead4, #f5b942);
+  box-shadow: 0 8px 24px rgba(45, 212, 191, 0.26);
+  color: #082f2c;
+}
+
+.word-unscrambler-page .btn-calculate:hover,
+.word-unscrambler-page #search-btn:hover {
+  box-shadow: 0 10px 28px rgba(245, 185, 66, 0.3);
+}
+
+.word-unscrambler-page input:focus,
+.word-unscrambler-page select:focus,
+.word-unscrambler-page button:focus-visible {
+  border-color: #2dd4bf;
+  outline-color: rgba(45, 212, 191, 0.7);
+}
+
+.word-unscrambler-page .segmented-control button.active,
+.word-unscrambler-page .sort-btn.active,
+.word-unscrambler-page [aria-pressed="true"] {
+  border-color: rgba(45, 212, 191, 0.55);
+  background-color: rgba(45, 212, 191, 0.14);
+  color: #99f6e4;
+}
+
+.word-unscrambler-page .rack-help-trigger,
+.word-unscrambler-page .rack-help-inline-icon {
+  border-color: rgba(245, 185, 66, 0.7);
+  background: rgba(245, 185, 66, 0.12);
+  color: #f5b942;
+}
+
+.word-unscrambler-page .rack-example-list {
+  scrollbar-color: rgba(45, 212, 191, 0.7) rgba(15, 23, 42, 0.55);
+}
+.word-unscrambler-page .rack-example-list::-webkit-scrollbar-thumb { background: rgba(45, 212, 191, 0.7); }
+.word-unscrambler-page .rack-example button {
+  border-color: rgba(45, 212, 191, 0.45);
+  background: rgba(45, 212, 191, 0.1);
+  color: #99f6e4;
+}
+
+.word-unscrambler-page .word-tool-offline-toggle .offline-switch-track {
+  border-color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.15);
+}
+.word-unscrambler-page .word-tool-offline-toggle .offline-switch-thumb,
+.word-unscrambler-page .status-dot { background: #5eead4; }
+.word-unscrambler-page .word-tool-offline-toggle[aria-checked="true"] .offline-switch-track {
+  border-color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.42);
+}
+.word-unscrambler-page .word-tool-offline-copy span { color: #99f6e4; }
+
+.word-unscrambler-page .result-card:hover,
+.word-unscrambler-page .word-result:hover,
+.word-unscrambler-page .related-card:hover {
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+.word-unscrambler-page .score-badge,
+.word-unscrambler-page .result-score,
+.word-unscrambler-page mark {
+  border-color: rgba(245, 185, 66, 0.35);
+  background: rgba(245, 185, 66, 0.12);
+  color: #fde68a;
+}
