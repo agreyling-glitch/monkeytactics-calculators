@@ -9,6 +9,7 @@
     "build:anagram-language": "node scripts/build-anagram-language-data.mjs",
     "build:anagram-ngrams": "node scripts/build-anagram-ngrams.mjs",
     "benchmark:anagram": "node scripts/benchmark-anagram-quality.mjs",
+    "benchmark:anagram:update": "node scripts/benchmark-anagram-quality.mjs --update-baseline",
     "build:qr": "vite build",
     "build:qr-wasm": "wasm-pack build wasm/qr-code-generator-engine --target web --release --out-dir ../../assets/wasm/qr-code-generator --out-name qr_engine && node -e \"require('fs').rmSync('assets/wasm/qr-code-generator/.gitignore',{force:true})\"",
     "build:qr-decoder-wasm": "node wasm/qr-code-decoder-engine/build.mjs",

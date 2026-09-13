@@ -1,1 +1,229 @@
-{"version":9,"cases":[{"name":"Osama Bin Laden unguided","source":"Osama Bin Laden","pattern":"","lockedWords":"","expected":"old man in a base","maxRank":1,"nodeLimit":150000,"forbiddenTop":["old man ain as be"],"forbiddenTopLimit":20},{"name":"Acorn Computers UI merge","source":"Acorn Computers","pattern":"","lockedWords":"","expected":"crap on customer","maxRank":5,"specialistMaxRank":5,"nodeLimit":300000,"uiWorkers":4},{"name":"President Saddam Hussein UI merge","source":"President Saddam Hussein","pattern":"","lockedWords":"","expected":"dispensed human disaster","maxRank":25,"specialistMaxRank":10,"nodeLimit":300000,"uiWorkers":4},{"name":"George Bush guided grammar","source":"George Bush","pattern":"","lockedWords":"gore","expected":"he bugs gore","maxRank":1,"nodeLimit":50000},{"name":"William Shakespeare guided grammar","source":"William Shakespeare","pattern":"","lockedWords":"weakish speller","expected":"i am a weakish speller","maxRank":1,"nodeLimit":50000},{"name":"Meaning of life guided","source":"The meaning of life","pattern":"","lockedWords":"fine game nil","expected":"the fine game of nil","maxRank":3,"nodeLimit":50000},{"name":"Osama Bin Laden guided","source":"Osama Bin Laden","pattern":"","lockedWords":"old base","expected":"old man in a base","maxRank":3,"nodeLimit":50000},{"name":"Meaning of life exact pattern","source":"The meaning of life","pattern":"THE FINE GAME OF NIL","lockedWords":"","expected":"the fine game of nil","maxRank":1,"nodeLimit":50000}]}
+{
+  "version": 14,
+  "cases": [
+    {
+      "name": "Schoolmaster phrase",
+      "source": "SCHOOLMASTER",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "the classroom",
+      "maxRank": 1,
+      "nodeLimit": 150000,
+      "maxWords": 5
+    },
+    {
+      "name": "A gentleman phrase",
+      "source": "A GENTLEMAN",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "elegant man",
+      "maxRank": 1,
+      "nodeLimit": 100000,
+      "maxWords": 5
+    },
+    {
+      "name": "Listen single word",
+      "source": "LISTEN",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "silent",
+      "maxRank": 5,
+      "nodeLimit": 50000,
+      "maxWords": 5
+    },
+    {
+      "name": "Earth single word",
+      "source": "EARTH",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "heart",
+      "maxRank": 5,
+      "nodeLimit": 50000,
+      "maxWords": 5
+    },
+    {
+      "name": "Night single word",
+      "source": "NIGHT",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "thing",
+      "maxRank": 5,
+      "nodeLimit": 50000,
+      "maxWords": 5
+    },
+    {
+      "name": "Elbow single word",
+      "source": "ELBOW",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "below",
+      "maxRank": 5,
+      "nodeLimit": 50000,
+      "maxWords": 5
+    },
+    {
+      "name": "State single word",
+      "source": "STATE",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "taste",
+      "maxRank": 5,
+      "nodeLimit": 50000,
+      "maxWords": 5
+    },
+    {
+      "name": "Angel single word",
+      "source": "ANGEL",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "glean",
+      "maxRank": 5,
+      "nodeLimit": 50000,
+      "maxWords": 5
+    },
+    {
+      "name": "The eyes phrase",
+      "source": "THE EYES",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "they see",
+      "maxRank": 5,
+      "nodeLimit": 50000,
+      "maxWords": 5
+    },
+    {
+      "name": "Dormitory phrase",
+      "source": "DORMITORY",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "dirty room",
+      "maxRank": 20,
+      "nodeLimit": 100000,
+      "maxWords": 5
+    },
+    {
+      "name": "Slot machines phrase",
+      "source": "SLOT MACHINES",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "cash lost in em",
+      "maxRank": 25,
+      "nodeLimit": 900000,
+      "maxWords": 5,
+      "uiWorkers": 4
+    },
+    {
+      "name": "The Morse Code phrase",
+      "source": "THE MORSE CODE",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "here come dots",
+      "maxRank": 10,
+      "nodeLimit": 900000,
+      "maxWords": 5,
+      "uiWorkers": 4,
+      "specialistMaxRank": 10
+    },
+    {
+      "name": "Astronomer phrase",
+      "source": "ASTRONOMER",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "moon starer",
+      "maxRank": 25,
+      "nodeLimit": 150000,
+      "maxWords": 5
+    },
+    {
+      "name": "Clint Eastwood phrase",
+      "source": "Clint Eastwood",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "old west action",
+      "maxRank": 10,
+      "specialistMaxRank": 10,
+      "nodeLimit": 300000,
+      "uiWorkers": 4
+    },
+    {
+      "name": "Osama Bin Laden unguided",
+      "source": "Osama Bin Laden",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "old man in a base",
+      "maxRank": 1,
+      "nodeLimit": 150000,
+      "forbiddenTop": [
+        "old man ain as be"
+      ],
+      "forbiddenTopLimit": 20
+    },
+    {
+      "name": "Acorn Computers UI merge",
+      "source": "Acorn Computers",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "crap on customer",
+      "maxRank": 5,
+      "specialistMaxRank": 5,
+      "nodeLimit": 300000,
+      "uiWorkers": 4
+    },
+    {
+      "name": "President Saddam Hussein UI merge",
+      "source": "President Saddam Hussein",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "dispensed human disaster",
+      "maxRank": 25,
+      "specialistMaxRank": 10,
+      "nodeLimit": 300000,
+      "uiWorkers": 4
+    },
+    {
+      "name": "George Bush guided grammar",
+      "source": "George Bush",
+      "pattern": "",
+      "lockedWords": "gore",
+      "expected": "he bugs gore",
+      "maxRank": 1,
+      "nodeLimit": 50000
+    },
+    {
+      "name": "William Shakespeare guided grammar",
+      "source": "William Shakespeare",
+      "pattern": "",
+      "lockedWords": "weakish speller",
+      "expected": "i am a weakish speller",
+      "maxRank": 1,
+      "nodeLimit": 50000
+    },
+    {
+      "name": "Meaning of life guided",
+      "source": "The meaning of life",
+      "pattern": "",
+      "lockedWords": "fine game nil",
+      "expected": "the fine game of nil",
+      "maxRank": 3,
+      "nodeLimit": 50000
+    },
+    {
+      "name": "Osama Bin Laden guided",
+      "source": "Osama Bin Laden",
+      "pattern": "",
+      "lockedWords": "old base",
+      "expected": "old man in a base",
+      "maxRank": 3,
+      "nodeLimit": 50000
+    },
+    {
+      "name": "Meaning of life exact pattern",
+      "source": "The meaning of life",
+      "pattern": "THE FINE GAME OF NIL",
+      "lockedWords": "",
+      "expected": "the fine game of nil",
+      "maxRank": 1,
+      "nodeLimit": 50000
+    }
+  ]
+}

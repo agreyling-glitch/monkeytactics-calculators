@@ -20,6 +20,17 @@ test("finds complete multi-word phrases without inventing letters", () => {
   assert.ok(outcome.results.every(({ phrase }) => isExactAnagram("Osama Bin Laden", phrase)));
 });
 
+test("excludes the unchanged source phrase from results", () => {
+  const outcome = solveAnagrams("Dormitory.", ["dormitory", "dirty", "room"], {
+    maxWords: 2,
+    minimumLength: 2,
+    limit: 20,
+    nodeLimit: 10_000
+  });
+  assert.equal(outcome.results.some(({ phrase }) => phrase === "dormitory"), false);
+  assert.equal(outcome.results.some(({ phrase }) => phrase === "dirty room"), true);
+});
+
 test("orders subject pronouns before verbs in the JavaScript fallback", () => {
   const outcome = solveAnagrams("George Bush", ["gore", "he", "bugs"], {
     maxWords: 3,
@@ -108,7 +119,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260912-49/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260913-10/);
 });
 
 test("the result toolbar loads the cache-busted responsive stylesheet", async () => {
@@ -214,8 +225,8 @@ test("preferred and excluded words steer generation", () => {
 });
 
 test("vulgar filtering is enabled by default and can be disabled", () => {
-  const filtered = solveAnagrams("shit", ["shit"], { maxWords: 1, minimumLength: 2 });
-  const allowed = solveAnagrams("shit", ["shit"], { maxWords: 1, minimumLength: 2, excludeVulgar: false });
+  const filtered = solveAnagrams("hits", ["shit"], { maxWords: 1, minimumLength: 2 });
+  const allowed = solveAnagrams("hits", ["shit"], { maxWords: 1, minimumLength: 2, excludeVulgar: false });
   assert.equal(filtered.results.length, 0);
   assert.equal(allowed.results[0]?.phrase, "shit");
 });
@@ -265,13 +276,21 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.match(html, /class="breadcrumb anagram-breadcrumb"/);
   assert.match(html, /<h1 id="anagram-title">Anagram Solver for Names and Phrases<\/h1>/);
   assert.match(html, /Build exact phrase anagrams, not approximate matches/);
+  assert.match(html, /Language-aware search/);
+  assert.match(html, /Estimate readability from word frequency, grammar, local phrase evidence, word order, and phrase shape/);
+  assert.match(html, /Exactness is guaranteed, but ranking is an estimate/);
   assert.match(html, /Anagram solver FAQ/);
   assert.match(html, /Related word tools/);
   const structured = html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];
   const data = JSON.parse(structured);
-  assert.ok(data["@graph"].some((entry) => entry["@type"] === "WebApplication"));
+  const application = data["@graph"].find((entry) => entry["@type"] === "WebApplication");
+  assert.ok(application);
+  assert.ok(application.featureList.includes("Language-aware multi-word ranking"));
+  assert.ok(application.featureList.includes("Dead-branch search pruning"));
   assert.ok(data["@graph"].some((entry) => entry["@type"] === "BreadcrumbList"));
-  assert.ok(data["@graph"].some((entry) => entry["@type"] === "FAQPage"));
+  const faq = data["@graph"].find((entry) => entry["@type"] === "FAQPage");
+  assert.ok(faq);
+  assert.ok(faq.mainEntity.some((entry) => entry.name === "How are anagram results ranked?"));
 });
 
 test("presents Learn More guides before related solvers", async () => {

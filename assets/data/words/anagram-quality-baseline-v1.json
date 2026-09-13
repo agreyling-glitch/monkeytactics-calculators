@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "benchmarkVersion": 14,
+  "generatedAt": "2026-09-13T22:12:18.574Z",
+  "cases": {
+    "Schoolmaster phrase": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 150000,
+      "elapsedMs": 4065
+    },
+    "A gentleman phrase": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 6280,
+      "elapsedMs": 96
+    },
+    "Listen single word": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 114,
+      "elapsedMs": 21
+    },
+    "Earth single word": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 47,
+      "elapsedMs": 21
+    },
+    "Night single word": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 8,
+      "elapsedMs": 20
+    },
+    "Elbow single word": {
+      "rank": 2,
+      "specialistRank": 0,
+      "nodes": 25,
+      "elapsedMs": 20
+    },
+    "State single word": {
+      "rank": 3,
+      "specialistRank": 0,
+      "nodes": 41,
+      "elapsedMs": 22
+    },
+    "Angel single word": {
+      "rank": 2,
+      "specialistRank": 0,
+      "nodes": 36,
+      "elapsedMs": 21
+    },
+    "The eyes phrase": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 108,
+      "elapsedMs": 22
+    },
+    "Dormitory phrase": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 841,
+      "elapsedMs": 26
+    },
+    "Slot machines phrase": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 598176,
+      "elapsedMs": 22504
+    },
+    "The Morse Code phrase": {
+      "rank": 1,
+      "specialistRank": 1,
+      "nodes": 188942,
+      "elapsedMs": 7447
+    },
+    "Astronomer phrase": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 19800,
+      "elapsedMs": 265
+    },
+    "Clint Eastwood phrase": {
+      "rank": 1,
+      "specialistRank": 1,
+      "nodes": 1122873,
+      "elapsedMs": 71159
+    },
+    "Osama Bin Laden unguided": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 150000,
+      "elapsedMs": 14715
+    },
+    "Acorn Computers UI merge": {
+      "rank": 1,
+      "specialistRank": 1,
+      "nodes": 1138416,
+      "elapsedMs": 59170
+    },
+    "President Saddam Hussein UI merge": {
+      "rank": 22,
+      "specialistRank": 4,
+      "nodes": 1200000,
+      "elapsedMs": 30289
+    },
+    "George Bush guided grammar": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 27,
+      "elapsedMs": 33
+    },
+    "William Shakespeare guided grammar": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 19,
+      "elapsedMs": 27
+    },
+    "Meaning of life guided": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 23,
+      "elapsedMs": 28
+    },
+    "Osama Bin Laden guided": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 78,
+      "elapsedMs": 31
+    },
+    "Meaning of life exact pattern": {
+      "rank": 1,
+      "specialistRank": 0,
+      "nodes": 0,
+      "elapsedMs": 23
+    }
+  }
+}

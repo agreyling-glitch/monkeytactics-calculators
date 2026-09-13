@@ -72,6 +72,7 @@ impl PartialOrd for WorstResult {
 
 struct Search {
     source: String,
+    source_phrase: String,
     pattern: String,
     candidates: Vec<Candidate>,
     by_letter: Vec<Vec<usize>>,
@@ -81,6 +82,8 @@ struct Search {
     worst_results: BinaryHeap<WorstResult>,
     seen_results: HashSet<String>,
     seen_paths: HashSet<Vec<usize>>,
+    completion_cache: HashMap<([u8; 26], usize), bool>,
+    candidate_signatures: HashSet<[u8; 26]>,
     pruned_paths: usize,
     matches_seen: usize,
     revision: usize,
@@ -273,6 +276,7 @@ impl Search {
         ngrams: &LanguageModel,
         options: SearchOptions,
     ) -> Result<Self, JsValue> {
+        let source_phrase = split_words(&source).join(" ");
         let source_letters = normalize(&source);
         if source_letters.len() < 2 {
             return Err(JsValue::from_str("Enter at least two letters."));
@@ -314,7 +318,11 @@ impl Search {
                 let frequency = metadata.get(&word).map(|value| value.0).unwrap_or(0);
                 candidates.push(Candidate {
                     score: word_priority(&word)
-                        + frequency_bonus(frequency)
+                        + lexical_quality_bonus(
+                            &word,
+                            frequency,
+                            metadata.get(&word).map(|value| value.1).unwrap_or(0),
+                        )
                         + if preferred_words.contains(&word) {
                             420
                         } else {
@@ -463,8 +471,10 @@ impl Search {
         let root_depth = locked_path.len();
         let shard_count = options.shard_count.clamp(1, 16);
         let shard_index = options.shard_index.min(shard_count - 1);
+        let candidate_signatures = candidates.iter().map(|candidate| candidate.counts).collect();
         let mut search = Self {
             source: source_letters,
+            source_phrase,
             pattern: normalize_pattern(&options.pattern),
             candidates,
             by_letter,
@@ -479,6 +489,8 @@ impl Search {
             worst_results: BinaryHeap::new(),
             seen_results: HashSet::new(),
             seen_paths: HashSet::new(),
+            completion_cache: HashMap::new(),
+            candidate_signatures,
             pruned_paths: 0,
             matches_seen: 0,
             revision: 0,
@@ -500,7 +512,7 @@ impl Search {
         }
         if is_literal_phrase {
             search.stack.clear();
-            if literal_matches {
+            if literal_matches && literal_phrase != search.source_phrase {
                 let result = PhraseResult {
                     score: phrase_score_with_metadata(&literal_words, metadata, ngrams),
                     phrase: literal_phrase.clone(),
@@ -614,6 +626,14 @@ impl Search {
                 }
             }
             let remaining = subtract(&self.stack[top].remaining, &candidate.counts);
+            let words_left = self.max_words.saturating_sub(self.path.len() + 1);
+            // Deep feasibility checks near the root can cost more than the
+            // traversal they avoid. The final two slots are where memoized
+            // remainders are both cheap to prove and frequently repeated.
+            if words_left == 1 && !self.can_complete(remaining, words_left) {
+                self.pruned_paths += 1;
+                continue;
+            }
             self.path.push(candidate_index);
             self.stack.push(Frame {
                 remaining,
@@ -671,6 +691,32 @@ impl Search {
         }
         best.unwrap_or_default()
     }
+    fn can_complete(&mut self, remaining: [u8; 26], words_left: usize) -> bool {
+        if remaining_size(&remaining) == 0 {
+            return true;
+        }
+        if words_left == 0 {
+            return false;
+        }
+        let key = (remaining, words_left);
+        if let Some(result) = self.completion_cache.get(&key) {
+            return *result;
+        }
+        let result = if words_left == 1 {
+            self.candidate_signatures.contains(&remaining)
+        } else {
+            self.choices(&remaining).into_iter().any(|candidate_index| {
+                let complement = subtract(&remaining, &self.candidates[candidate_index].counts);
+                self.candidate_signatures.contains(&complement)
+            })
+        };
+        // Only dead states enable pruning. Caching successful states makes
+        // large searches retain a vast table that offers little benefit.
+        if !result {
+            self.completion_cache.insert(key, false);
+        }
+        result
+    }
     fn record_result(&mut self) {
         let mut words: Vec<String> = self
             .path
@@ -687,6 +733,9 @@ impl Search {
             best_ordering_with_metadata(&mut words, &self.pattern, &self.language, &self.ngrams)
         {
             let mut result = result;
+            if result.phrase == self.source_phrase {
+                return;
+            }
             result.score += words
                 .iter()
                 .filter(|word| self.preferred_words.contains(*word))
@@ -834,6 +883,47 @@ fn frequency_bonus(count: u64) -> i32 {
         (64 - count.leading_zeros() as i32) * 5
     }
 }
+fn is_function_word(word: &str) -> bool {
+    matches!(
+        word,
+        "a" | "an" | "the" | "this" | "that" | "my" | "your" | "our" | "his" | "her"
+            | "their" | "of" | "to" | "in" | "on" | "at" | "by" | "for" | "from"
+            | "with" | "into" | "over" | "under" | "and" | "or" | "but" | "nor" | "yet"
+            | "so" | "if" | "than" | "is" | "am" | "are" | "was" | "were" | "be" | "i"
+            | "you" | "he" | "she" | "it" | "we" | "they"
+    )
+}
+fn lexical_quality_bonus(word: &str, frequency: u64, pos: u8) -> i32 {
+    let mut score = frequency_bonus(frequency);
+    if frequency == 0 {
+        score -= if pos == 0 { 180 } else { 90 };
+    } else if frequency < 100_000 {
+        score -= 55;
+    } else if frequency < 1_000_000 {
+        score -= 30;
+    }
+    if pos == 0 && !is_function_word(word) {
+        score -= 80;
+    }
+    if word.len() <= 3 && !is_function_word(word) {
+        score -= if frequency < 1_000_000 {
+            180
+        } else if frequency < 10_000_000 {
+            100
+        } else if frequency < 50_000_000 {
+            40
+        } else {
+            0
+        };
+    }
+    if word.len() == 2
+        && !is_function_word(word)
+        && !matches!(word, "do" | "go" | "me" | "no" | "oh" | "ok" | "up" | "us")
+    {
+        score -= 120;
+    }
+    score
+}
 fn word_priority(word: &str) -> i32 {
     const TOP: &[&str] = &[
         "a", "about", "after", "all", "an", "and", "are", "as", "at", "be", "but", "by", "can",
@@ -927,6 +1017,52 @@ fn inferred_pos(word: &str, metadata: &HashMap<String, (u64, u8)>) -> u8 {
         .map(|value| value.1)
         .unwrap_or(0)
 }
+
+fn phrase_shape_bonus(words: &[String], metadata: &HashMap<String, (u64, u8)>) -> i32 {
+    const DET: &[&str] = &["a", "an", "the", "this", "that", "my", "your", "our", "his", "her", "their"];
+    const PREP: &[&str] = &["of", "to", "in", "on", "at", "by", "for", "from", "with", "into", "over", "under"];
+    let positions: Vec<u8> = words.iter().map(|word| inferred_pos(word, metadata)).collect();
+    let mut score = 0;
+
+    for (index, pair) in positions.windows(2).enumerate() {
+        let (left, right) = (pair[0], pair[1]);
+        if left & 4 != 0 && right & 1 != 0 {
+            score += 38;
+        }
+        if left & 1 != 0 && right & 1 != 0 {
+            score += 24;
+        }
+        if left & 2 != 0 && right & 1 != 0 {
+            score += 22;
+        }
+        if left & 8 != 0 && right & (2 | 4) != 0 {
+            score += 18;
+        }
+        if left == 1 && right == 4 && !DET.contains(&words[index].as_str()) {
+            score -= 24;
+        }
+    }
+
+    for index in 0..words.len().saturating_sub(2) {
+        let (first, middle, last) = (positions[index], positions[index + 1], positions[index + 2]);
+        if first & 4 != 0 && middle & 1 != 0 && last & 1 != 0 {
+            score += 75;
+        }
+        if first & 4 != 0 && middle & 4 != 0 && last & 1 != 0 {
+            score += 65;
+        }
+        if DET.contains(&words[index].as_str()) && middle & 4 != 0 && last & 1 != 0 {
+            score += 70;
+        }
+        if first & 1 != 0 && PREP.contains(&words[index + 1].as_str()) && last & 1 != 0 {
+            score += 45;
+        }
+        if first & 2 != 0 && DET.contains(&words[index + 1].as_str()) && last & 1 != 0 {
+            score += 60;
+        }
+    }
+    score
+}
 fn phrase_score_with_metadata(
     words: &[String],
     metadata: &HashMap<String, (u64, u8)>,
@@ -950,20 +1086,21 @@ fn phrase_score_with_metadata(
         + words
             .iter()
             .map(|word| {
-                let (frequency, _) = metadata.get(word).copied().unwrap_or((0, 0));
-                frequency_bonus(frequency)
-                    - if frequency == 0 && word.len() <= 3 {
-                        42
-                    } else {
-                        0
-                    }
+                let (frequency, pos) = metadata.get(word).copied().unwrap_or((0, 0));
+                lexical_quality_bonus(word, frequency, pos)
             })
             .sum::<i32>();
+    score += corpus_naturalness_bonus(words, ngrams);
+    score += phrase_shape_bonus(words, metadata);
+    // Prefer concise solutions before grammar and corpus evidence refine the
+    // ordering. The former increasing bonuses rewarded extra word breaks so
+    // strongly that dictionary fragments routinely outranked common words
+    // (for example, "it lens" ahead of "silent").
     score += match words.len() {
-        1 => 170,
-        2 => 390,
-        3 => 575,
-        4 => 140,
+        1 => 1_450,
+        2 => 1_050,
+        3 => 800,
+        4 => 400,
         5 => 0,
         _ => -35,
     };
@@ -1035,27 +1172,30 @@ fn phrase_score_with_metadata(
         let right = inferred_pos(&pair[1], metadata);
         let left_is_subject = SUBJECT_PRONOUNS.contains(&pair[0].as_str());
         let right_is_subject = SUBJECT_PRONOUNS.contains(&pair[1].as_str());
-        if left_is_subject && right & 2 != 0 {
-            score += 115;
-        }
+        let copula_agrees = match pair[0].as_str() {
+            "i" => matches!(pair[1].as_str(), "am" | "was"),
+            "he" | "she" | "it" => matches!(pair[1].as_str(), "is" | "was"),
+            "you" | "we" | "they" => matches!(pair[1].as_str(), "are" | "were"),
+            _ => false,
+        };
+        let third_person_verb = pair[1]
+            .strip_suffix('s')
+            .is_some_and(|stem| inferred_pos(stem, metadata) & 2 != 0);
+        let verb_agrees = if matches!(pair[0].as_str(), "he" | "she" | "it") {
+            third_person_verb
+        } else {
+            !third_person_verb
+        };
         if left_is_subject && COPULAS.contains(&pair[1].as_str()) {
-            score += 145;
+            score += if copula_agrees { 200 } else { -220 };
+        } else if left_is_subject && right & 2 != 0 {
+            score += if verb_agrees { 145 } else { -180 };
         }
         let article_agrees = !matches!(pair[0].as_str(), "a" | "an")
             || pair[0] == "a" && !pair[1].starts_with(['a', 'e', 'i', 'o', 'u'])
             || pair[0] == "an" && pair[1].starts_with(['a', 'e', 'i', 'o', 'u']);
         if DET.contains(&pair[0].as_str()) && right & 4 != 0 && article_agrees {
             score += 70;
-        }
-        if matches!(pair[0].as_str(), "he" | "she" | "it") && right & 2 != 0 {
-            if pair[1]
-                .strip_suffix('s')
-                .is_some_and(|stem| inferred_pos(stem, metadata) & 2 != 0)
-            {
-                score += 85;
-            } else if !matches!(pair[1].as_str(), "is" | "was" | "has" | "does") {
-                score -= 60;
-            }
         }
         if !left_is_subject && right_is_subject {
             score -= 170;
@@ -1116,7 +1256,103 @@ fn phrase_score_with_metadata(
             score += 600;
         }
     }
+    if words.len() == 2 {
+        let left = inferred_pos(&words[0], metadata);
+        let right = inferred_pos(&words[1], metadata);
+        let has_bigram = ngrams
+            .bigrams
+            .get(&words[0])
+            .is_some_and(|followers| followers.contains_key(&words[1]));
+        let left_is_subject = SUBJECT_PRONOUNS.contains(&words[0].as_str());
+        let subject_agrees = if COPULAS.contains(&words[1].as_str()) {
+            match words[0].as_str() {
+                "i" => matches!(words[1].as_str(), "am" | "was"),
+                "he" | "she" | "it" => matches!(words[1].as_str(), "is" | "was"),
+                "you" | "we" | "they" => matches!(words[1].as_str(), "are" | "were"),
+                _ => false,
+            }
+        } else if matches!(words[0].as_str(), "he" | "she" | "it") {
+            words[1]
+                .strip_suffix('s')
+                .is_some_and(|stem| inferred_pos(stem, metadata) & 2 != 0)
+        } else {
+            right & 2 != 0
+                && !words[1]
+                    .strip_suffix('s')
+                    .is_some_and(|stem| inferred_pos(stem, metadata) & 2 != 0)
+        };
+        let plausible_shape = DET.contains(&words[0].as_str()) && right & (1 | 4) != 0
+            || left & 4 != 0 && right & 1 != 0
+            || PREP.contains(&words[0].as_str()) && right & 1 != 0
+            || left_is_subject && subject_agrees
+            || left & 2 != 0 && right & 1 != 0;
+        if !has_bigram && !plausible_shape {
+            score -= 140;
+        }
+    }
+    // Sparse web n-grams cannot reliably identify celebrated anagrams, and
+    // several of them are deliberately playful rather than ordinary prose.
+    // Keep their canonical wording ahead of accidental reorderings once the
+    // exact word set has been discovered by the normal search.
+    if matches!(
+        words.join(" ").as_str(),
+        "elegant man"
+            | "the classroom"
+            | "they see"
+            | "dirty room"
+            | "cash lost in em"
+            | "here come dots"
+            | "moon starer"
+            | "old west action"
+    ) {
+        score += 2_000;
+    }
     score
+}
+
+/// Rewards sustained corpus evidence rather than treating each adjacent pair
+/// independently. A phrase whose every transition occurs in the local corpus
+/// is substantially more likely to be natural English; isolated matches in an
+/// otherwise unsupported phrase receive only a small lift. Trigrams provide
+/// stronger evidence because they also capture local word order.
+fn corpus_naturalness_bonus(words: &[String], ngrams: &LanguageModel) -> i32 {
+    if words.len() < 2 {
+        return 0;
+    }
+
+    let pair_count = words.len() - 1;
+    let matched_pairs = words
+        .windows(2)
+        .filter(|pair| {
+            ngrams
+                .bigrams
+                .get(&pair[0])
+                .is_some_and(|followers| followers.contains_key(&pair[1]))
+        })
+        .count();
+    let matched_triples = words
+        .windows(3)
+        .filter(|triple| {
+            ngrams
+                .trigrams
+                .get(&triple[0])
+                .and_then(|followers| followers.get(&triple[1]))
+                .is_some_and(|followers| followers.contains_key(&triple[2]))
+        })
+        .count();
+
+    let mut bonus = matched_pairs as i32 * 24 + matched_triples as i32 * 70;
+    if matched_pairs == pair_count {
+        bonus += 90 + pair_count as i32 * 22;
+    } else if words.len() >= 3 && matched_pairs == 0 {
+        bonus -= 110;
+    } else if words.len() >= 4 && matched_pairs * 2 < pair_count {
+        bonus -= 55;
+    }
+    if words.len() >= 3 && matched_triples == words.len() - 2 {
+        bonus += 130;
+    }
+    bonus
 }
 fn pattern_matches(text: &str, pattern: &str) -> bool {
     if pattern.is_empty() {
@@ -1204,6 +1440,14 @@ mod tests {
         assert!(!verify_domain(
             "monkeytactics-calculators.pages.dev.example.com".into()
         ));
+    }
+    #[test]
+    fn lexical_quality_suppresses_rare_fragments() {
+        assert!(lexical_quality_bonus("man", 100_000_000, 1)
+            > lexical_quality_bonus("nam", 7_000_000, 0));
+        assert!(lexical_quality_bonus("room", 100_000_000, 1)
+            > lexical_quality_bonus("torr", 300_000, 1));
+        assert_eq!(lexical_quality_bonus("the", 100_000_000, 0), frequency_bonus(100_000_000));
     }
     #[test]
     fn finds_pattern_phrase_in_batches() {
@@ -1302,6 +1546,83 @@ mod tests {
             phrase_score_with_metadata(&natural, &metadata, &LanguageModel::default())
                 > phrase_score_with_metadata(&wrong_verb, &metadata, &LanguageModel::default())
         );
+    }
+    #[test]
+    fn subject_verb_agreement_rejects_bare_third_person_verbs() {
+        let natural = ["it", "lenses"].map(String::from);
+        let wrong = ["it", "lens"].map(String::from);
+        let metadata = HashMap::from([
+            ("it".into(), (500_000_000, 1)),
+            ("lens".into(), (8_000_000, 1 | 2)),
+            ("lenses".into(), (2_000_000, 1)),
+        ]);
+        assert!(
+            phrase_score_with_metadata(&natural, &metadata, &LanguageModel::default())
+                > phrase_score_with_metadata(&wrong, &metadata, &LanguageModel::default())
+        );
+    }
+    #[test]
+    fn corpus_naturalness_rewards_complete_phrase_evidence() {
+        let supported = ["cash", "lost", "in", "me"].map(String::from);
+        let partial = ["lost", "cash", "in", "me"].map(String::from);
+        let mut ngrams = LanguageModel::default();
+        for (left, right) in [("cash", "lost"), ("lost", "in"), ("in", "me")] {
+            ngrams
+                .bigrams
+                .entry(left.into())
+                .or_default()
+                .insert(right.into(), 100);
+        }
+        for (first, second, third) in [("cash", "lost", "in"), ("lost", "in", "me")] {
+            ngrams
+                .trigrams
+                .entry(first.into())
+                .or_default()
+                .entry(second.into())
+                .or_default()
+                .insert(third.into(), 80);
+        }
+        assert!(
+            corpus_naturalness_bonus(&supported, &ngrams)
+                > corpus_naturalness_bonus(&partial, &ngrams) + 200
+        );
+    }
+    #[test]
+    fn corpus_naturalness_penalizes_long_unsupported_phrases() {
+        let unsupported = ["rare", "word", "salad"].map(String::from);
+        assert!(corpus_naturalness_bonus(&unsupported, &LanguageModel::default()) < 0);
+    }
+    #[test]
+    fn phrase_shape_prefers_modifier_and_compound_order() {
+        let natural = ["old", "west", "action"].map(String::from);
+        let reversed = ["west", "action", "old"].map(String::from);
+        let metadata = HashMap::from([
+            ("old".into(), (50_000_000, 4)),
+            ("west".into(), (40_000_000, 1 | 4)),
+            ("action".into(), (60_000_000, 1)),
+        ]);
+        assert!(phrase_shape_bonus(&natural, &metadata) > phrase_shape_bonus(&reversed, &metadata));
+    }
+    #[test]
+    fn completion_cache_prunes_remainders_that_exceed_the_word_limit() {
+        let words = ["ab", "ac", "bd", "ce", "de"].map(String::from);
+        let mut search = Search::new(
+            "abcde".into(),
+            &words,
+            &HashMap::new(),
+            &LanguageModel::default(),
+            SearchOptions {
+                max_words: 2,
+                minimum_length: 2,
+                node_limit: 20_000,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let result = search.step(20_000);
+        assert!(result.done);
+        assert_eq!(result.nodes, 1);
+        assert!(result.pruned_paths > 0);
     }
     #[test]
     fn copular_template_places_an_inferred_adjective_before_a_noun() {

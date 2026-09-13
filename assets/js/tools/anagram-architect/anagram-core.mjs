@@ -222,6 +222,7 @@ function bestOrdering(words, pattern = "") {
 
 export function solveAnagrams(source, words, options = {}) {
   const letters = normalizeLetters(source);
+  const sourcePhrase = (String(source || "").toLowerCase().match(/[a-z]+/g) || []).join(" ");
   const maxWords = Math.max(1, Math.min(6, Number(options.maxWords) || 5));
   const minimumLength = Math.max(1, Math.min(8, Number(options.minimumLength) || 2));
   const limit = Math.max(1, Number(options.limit) || 100);
@@ -264,7 +265,7 @@ export function solveAnagrams(source, words, options = {}) {
       return true;
     });
     if (literalPatternWords.length <= maxWords && wordsAreAllowed && containsLockedWords && isExactAnagram(letters, literalPhrase)) {
-      return { results: [{ phrase: literalPhrase, score: phraseScore(literalPatternWords) }], nodes: 0, truncated: false };
+      return { results: literalPhrase === sourcePhrase ? [] : [{ phrase: literalPhrase, score: phraseScore(literalPatternWords) }], nodes: 0, truncated: false };
     }
     if (!containsLockedWords) throw new Error("The phrase pattern does not contain every required word.");
     return { results: [], nodes: 0, truncated: false };
@@ -301,6 +302,7 @@ export function solveAnagrams(source, words, options = {}) {
       if (!seenResults.has(key)) {
         seenResults.add(key);
         const ordered = bestOrdering(path, phrasePattern);
+        if (ordered?.phrase === sourcePhrase) return;
         if (ordered) ordered.score += path.filter((word) => preferredWords.has(word)).length * 520;
         if (ordered) {
           if (found.size < limit) found.set(key, ordered);
