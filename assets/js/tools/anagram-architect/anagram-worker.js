@@ -59,7 +59,7 @@ self.addEventListener("message", async ({ data }) => {
     let wasmFailure = "";
     let wasmReady = false;
     try {
-      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260913-10" });
+      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260914-11" });
       if (!verifyWasmDomain(self.location.hostname)) throw new Error("Anagram Architect is not authorized on this host.");
       initWasmEngine(words);
       initLanguageMetadata(languageRecords);
@@ -68,6 +68,7 @@ self.addEventListener("message", async ({ data }) => {
     } catch (wasmError) {
       wasmFailure = wasmError instanceof Error ? wasmError.message : String(wasmError);
     }
+    if (!wasmReady && data.options.grammarTemplate) throw new Error(`Grammar templates require the Rust/WASM engine. ${wasmFailure}`);
     if (wasmReady) {
       startWasmSearch(data.source, data.options);
       engine = "wasm";

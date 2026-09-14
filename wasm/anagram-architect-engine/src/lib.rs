@@ -41,6 +41,12 @@ struct Candidate {
     score: i32,
 }
 
+#[derive(Clone, Debug)]
+enum GrammarSlot {
+    Pos(u8),
+    Literal(String),
+}
+
 struct Frame {
     remaining: [u8; 26],
     choices: Vec<usize>,
@@ -99,6 +105,7 @@ struct Search {
     shard_index: usize,
     shard_count: usize,
     preferred_words: HashSet<String>,
+    grammar_slots: Vec<GrammarSlot>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -115,6 +122,7 @@ struct SearchOptions {
     preferred_words: String,
     excluded_words: String,
     exclude_vulgar: bool,
+    grammar_template: String,
 }
 
 impl Default for SearchOptions {
@@ -131,6 +139,7 @@ impl Default for SearchOptions {
             preferred_words: String::new(),
             excluded_words: String::new(),
             exclude_vulgar: true,
+            grammar_template: String::new(),
         }
     }
 }
@@ -282,6 +291,11 @@ impl Search {
             return Err(JsValue::from_str("Enter at least two letters."));
         }
         let target = counts(&source_letters);
+        let grammar_slots = grammar_template_slots(&options.grammar_template);
+        let grammar_literals: HashSet<String> = grammar_slots
+            .iter()
+            .filter_map(|slot| match slot { GrammarSlot::Literal(word) => Some(word.clone()), _ => None })
+            .collect();
         let pattern_slots: Vec<String> = options
             .pattern
             .split_whitespace()
@@ -304,12 +318,13 @@ impl Search {
                 || (options.exclude_vulgar && is_vulgar(&word))
                 || !seen.insert(word.clone())
                 || word.len() > source_letters.len()
-                || (word.len() < minimum_length && word != "a" && word != "i")
+                || (word.len() < minimum_length && word != "a" && word != "i" && !grammar_literals.contains(&word))
             {
                 continue;
             }
             let word_counts = counts(&word);
             if fits(&word_counts, &target)
+                && (grammar_slots.is_empty() || grammar_slots.iter().any(|slot| grammar_slot_matches(&word, slot, metadata)))
                 && (!fixed_slots
                     || pattern_slots
                         .iter()
@@ -399,12 +414,17 @@ impl Search {
                 .all(|word| seen.contains(word) || word == "a" || word == "i");
         let literal_phrase = literal_words.join(" ");
         let literal_matches = literal_allowed && counts(&literal_phrase) == target;
-        let locked_words: Vec<String> = options
+        let mut locked_words: Vec<String> = options
             .locked_words
             .split(|character: char| !character.is_ascii_alphabetic())
             .filter(|word| !word.is_empty())
             .map(|word| word.to_ascii_lowercase())
             .collect();
+        for slot in &grammar_slots {
+            if let GrammarSlot::Literal(word) = slot {
+                if !locked_words.contains(word) { locked_words.push(word.clone()); }
+            }
+        }
         let mut remaining = target;
         let mut locked_path = Vec::new();
         for word in &locked_words {
@@ -418,7 +438,8 @@ impl Search {
             remaining = subtract(&remaining, &candidates[index].counts);
             locked_path.push(index);
         }
-        if locked_path.len() > options.max_words {
+        let effective_max_words = if grammar_slots.is_empty() { options.max_words.clamp(1, 6) } else { grammar_slots.len() };
+        if locked_path.len() > effective_max_words {
             return Err(JsValue::from_str(
                 "The locked words exceed the maximum word count.",
             ));
@@ -494,7 +515,7 @@ impl Search {
             pruned_paths: 0,
             matches_seen: 0,
             revision: 0,
-            max_words: options.max_words.clamp(1, 6),
+            max_words: effective_max_words,
             limit: options.limit.max(1),
             node_limit: options.node_limit.max(1000),
             nodes: 0,
@@ -506,8 +527,9 @@ impl Search {
             shard_index,
             shard_count,
             preferred_words,
+            grammar_slots,
         };
-        if !is_literal_phrase && search.root_depth == 0 && search.max_words == 3 {
+        if !is_literal_phrase && search.root_depth == 0 && search.max_words == 3 && search.grammar_slots.is_empty() {
             search.seed_complementary_phrases(3_500);
         }
         if is_literal_phrase {
@@ -625,6 +647,11 @@ impl Search {
                     continue;
                 }
             }
+            if !self.grammar_slots.is_empty() {
+                let mut path_words: Vec<&str> = self.path.iter().map(|index| self.candidates[*index].word.as_str()).collect();
+                path_words.push(&candidate.word);
+                if !can_assign_grammar_slots(&path_words, &self.grammar_slots, &self.language) { continue; }
+            }
             let remaining = subtract(&self.stack[top].remaining, &candidate.counts);
             let words_left = self.max_words.saturating_sub(self.path.len() + 1);
             // Deep feasibility checks near the root can cost more than the
@@ -730,7 +757,7 @@ impl Search {
             return;
         }
         if let Some(result) =
-            best_ordering_with_metadata(&mut words, &self.pattern, &self.language, &self.ngrams)
+            best_ordering_with_metadata(&mut words, &self.pattern, &self.grammar_slots, &self.language, &self.ngrams)
         {
             let mut result = result;
             if result.phrase == self.source_phrase {
@@ -875,6 +902,38 @@ fn can_assign_slots(words: &[&str], slots: &[String]) -> bool {
         false
     }
     words.len() <= slots.len() && visit(words, slots, 0, &mut vec![false; slots.len()])
+}
+fn grammar_template_slots(value: &str) -> Vec<GrammarSlot> {
+    match value {
+        "noun-of-noun" => vec![GrammarSlot::Pos(1), GrammarSlot::Literal("of".into()), GrammarSlot::Pos(1)],
+        "verb-the-noun" => vec![GrammarSlot::Pos(2), GrammarSlot::Literal("the".into()), GrammarSlot::Pos(1)],
+        "adjective-noun" => vec![GrammarSlot::Pos(4), GrammarSlot::Pos(1)],
+        "noun-in-the-noun" => vec![GrammarSlot::Pos(1), GrammarSlot::Literal("in".into()), GrammarSlot::Literal("the".into()), GrammarSlot::Pos(1)],
+        _ => Vec::new(),
+    }
+}
+fn grammar_slot_matches(word: &str, slot: &GrammarSlot, metadata: &HashMap<String, (u64, u8)>) -> bool {
+    match slot {
+        GrammarSlot::Literal(literal) => word == literal,
+        GrammarSlot::Pos(mask) => inferred_pos(word, metadata) & mask != 0,
+    }
+}
+fn can_assign_grammar_slots(words: &[&str], slots: &[GrammarSlot], metadata: &HashMap<String, (u64, u8)>) -> bool {
+    fn visit(words: &[&str], slots: &[GrammarSlot], metadata: &HashMap<String, (u64, u8)>, index: usize, used: &mut [bool]) -> bool {
+        if index == words.len() { return true; }
+        for slot_index in 0..slots.len() {
+            if !used[slot_index] && grammar_slot_matches(words[index], &slots[slot_index], metadata) {
+                used[slot_index] = true;
+                if visit(words, slots, metadata, index + 1, used) { return true; }
+                used[slot_index] = false;
+            }
+        }
+        false
+    }
+    words.len() <= slots.len() && visit(words, slots, metadata, 0, &mut vec![false; slots.len()])
+}
+fn grammar_order_matches(words: &[String], slots: &[GrammarSlot], metadata: &HashMap<String, (u64, u8)>) -> bool {
+    slots.is_empty() || (words.len() == slots.len() && words.iter().zip(slots).all(|(word, slot)| grammar_slot_matches(word, slot, metadata)))
 }
 fn frequency_bonus(count: u64) -> i32 {
     if count == 0 {
@@ -1381,24 +1440,26 @@ fn pattern_matches(text: &str, pattern: &str) -> bool {
 fn best_ordering_with_metadata(
     words: &mut [String],
     pattern: &str,
+    grammar_slots: &[GrammarSlot],
     metadata: &HashMap<String, (u64, u8)>,
     ngrams: &LanguageModel,
 ) -> Option<PhraseResult> {
     let mut best = None;
-    permute(words, 0, pattern, metadata, ngrams, &mut best);
+    permute(words, 0, pattern, grammar_slots, metadata, ngrams, &mut best);
     best
 }
 fn permute(
     words: &mut [String],
     index: usize,
     pattern: &str,
+    grammar_slots: &[GrammarSlot],
     metadata: &HashMap<String, (u64, u8)>,
     ngrams: &LanguageModel,
     best: &mut Option<PhraseResult>,
 ) {
     if index == words.len() {
         let phrase = words.join(" ");
-        if pattern_matches(&phrase, pattern) {
+        if pattern_matches(&phrase, pattern) && grammar_order_matches(words, grammar_slots, metadata) {
             let score = phrase_score_with_metadata(words, metadata, ngrams);
             if best.as_ref().is_none_or(|v| score > v.score) {
                 *best = Some(PhraseResult { phrase, score });
@@ -1412,7 +1473,7 @@ fn permute(
             continue;
         }
         words.swap(index, swap);
-        permute(words, index + 1, pattern, metadata, ngrams, best);
+        permute(words, index + 1, pattern, grammar_slots, metadata, ngrams, best);
         words.swap(index, swap);
     }
 }
@@ -1672,6 +1733,26 @@ mod tests {
         let slots = vec!["t??".into(), "????".into()];
         assert!(can_assign_slots(&["the", "game"], &slots));
         assert!(!can_assign_slots(&["the", "ten"], &slots));
+    }
+    #[test]
+    fn grammatical_template_enforces_pos_order() {
+        let slots = grammar_template_slots("adjective-noun");
+        let metadata = HashMap::from([
+            ("old".into(), (50_000_000, 4)),
+            ("west".into(), (40_000_000, 1)),
+        ]);
+        assert!(grammar_order_matches(&["old".into(), "west".into()], &slots, &metadata));
+        assert!(!grammar_order_matches(&["west".into(), "old".into()], &slots, &metadata));
+    }
+    #[test]
+    fn grammatical_template_reserves_literal_connector() {
+        let slots = grammar_template_slots("noun-of-noun");
+        let metadata = HashMap::from([
+            ("heart".into(), (50_000_000, 1)),
+            ("earth".into(), (40_000_000, 1)),
+        ]);
+        assert!(grammar_order_matches(&["heart".into(), "of".into(), "earth".into()], &slots, &metadata));
+        assert!(!grammar_order_matches(&["heart".into(), "in".into(), "earth".into()], &slots, &metadata));
     }
     #[test]
     fn complementary_search_finds_long_three_word_phrase_before_tree_walk() {
