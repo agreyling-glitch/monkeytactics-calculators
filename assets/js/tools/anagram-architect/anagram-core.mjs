@@ -1,4 +1,5 @@
 const LETTERS = "abcdefghijklmnopqrstuvwxyz";
+const NAME_CASE_MINOR_WORDS = new Set("a an and as at but by for from in nor of on or over the to with yet".split(" "));
 
 export function normalizeLetters(value) {
   return String(value || "").toLowerCase().replace(/[^a-z]/g, "");
@@ -141,11 +142,49 @@ const CONJUNCTIONS = new Set("and or but nor yet so".split(" "));
 const ADJECTIVES = new Set("old new good bad big small great little dark light true real damn".split(" "));
 const SUBJECT_PRONOUNS = new Set("i you he she it we they".split(" "));
 const COMMON_VERBS = new Set("am are be been being bug bugs can could did do does get gets got had has have is make makes may might must see sees should was were will would".split(" "));
+const TRANSITIVE_VERBS = new Set((
+  "admire avoid build call catch choose create despise drain find give hate help hit hold keep kill know leave like love make meet move need open praise read save scorn see take tell use want watch"
+).split(" "));
 const COPULAS = new Set("am are is was were be".split(" "));
 const NATURAL_PAIRS = new Set(["old man", "new world", "good man", "bad man", "dark night", "a base", "the world", "of life"]);
 
 function isAdjective(word) {
   return ADJECTIVES.has(word) || /(?:ish|ful|ous)$/.test(word);
+}
+
+export function formatAnagramPhrase(phrase, options = {}) {
+  const sourceWords = String(phrase || "").match(/[a-z]+/gi) || [];
+  const caseMode = ["title", "sentence", "upper", "lower", "name"].includes(options.caseMode) ? options.caseMode : "title";
+  const words = sourceWords.map((sourceWord, index) => {
+    const word = sourceWord.toLowerCase();
+    if (caseMode === "upper") return word.toUpperCase();
+    if (caseMode === "lower") return word;
+    if (caseMode === "sentence") return index === 0 ? word[0].toUpperCase() + word.slice(1) : word;
+    if (caseMode === "name" && index > 0 && NAME_CASE_MINOR_WORDS.has(word)) return word;
+    return word[0].toUpperCase() + word.slice(1);
+  });
+  const separator = options.separator === "hyphen" ? "-" : options.separator === "emDash" ? " — " : " ";
+  const boundaryIndex = options.boundaryIndex === "" || options.boundaryIndex == null ? Number.NaN : Number(options.boundaryIndex);
+  const boundaryMark = ["comma", "colon", "emDash"].includes(options.boundaryMark) ? options.boundaryMark : "comma";
+  let formatted = words.map((word, index) => {
+    if (index >= words.length - 1) return word;
+    if (Number.isInteger(boundaryIndex) && boundaryIndex === index) {
+      if (boundaryMark === "emDash") return `${word} — `;
+      return `${word}${boundaryMark === "colon" ? ":" : ","} `;
+    }
+    return word + separator;
+  }).join("");
+  const ending = [".", "?", "!"].includes(options.ending) ? options.ending : "";
+  if (ending) formatted += ending;
+  return formatted;
+}
+
+function isTransitiveVerb(word) {
+  if (TRANSITIVE_VERBS.has(word)) return true;
+  if (word.endsWith("s") && TRANSITIVE_VERBS.has(word.slice(0, -1))) return true;
+  if (word.endsWith("ed") && TRANSITIVE_VERBS.has(word.slice(0, -2))) return true;
+  if (word.endsWith("ing") && TRANSITIVE_VERBS.has(word.slice(0, -3))) return true;
+  return false;
 }
 
 function wordPriority(word) {
@@ -184,10 +223,73 @@ function phraseScore(words) {
     }
     if (!SUBJECT_PRONOUNS.has(current) && SUBJECT_PRONOUNS.has(next)) score -= 75;
   }
+  // A determiner-led object can naturally follow an imperative/transitive verb
+  // ("scorn a computer"), but not an arbitrary noun ("computer a scorn").
+  if (words.length === 3 && DETERMINERS.has(words[1])) {
+    score += isTransitiveVerb(words[0]) ? 22 : -22;
+  }
   for (let index = 0; index < words.length - 2; index += 1) {
     if (SUBJECT_PRONOUNS.has(words[index]) && COPULAS.has(words[index + 1]) && DETERMINERS.has(words[index + 2])) score += 90;
   }
   return score;
+}
+
+export function rankPhrasePermutations(phrase, limit = 720, lockedPositions = []) {
+  const words = String(phrase || "").toLowerCase().match(/[a-z]+/g) || [];
+  if (!words.length || words.length > 6) return [];
+  const locked = new Set((Array.isArray(lockedPositions) ? lockedPositions : [])
+    .map(Number).filter((index) => Number.isInteger(index) && index >= 0 && index < words.length));
+  const ranked = [];
+  const used = words.map((_, index) => locked.has(index));
+  const current = [];
+  const visit = () => {
+    if (current.length === words.length) {
+      ranked.push({ phrase: current.join(" "), score: phraseScore(current) });
+      return;
+    }
+    if (locked.has(current.length)) {
+      current.push(words[current.length]);
+      visit();
+      current.pop();
+      return;
+    }
+    const seen = new Set();
+    for (let index = 0; index < words.length; index += 1) {
+      if (used[index] || seen.has(words[index])) continue;
+      seen.add(words[index]);
+      used[index] = true;
+      current.push(words[index]);
+      visit();
+      current.pop();
+      used[index] = false;
+    }
+  };
+  visit();
+  return ranked
+    .sort((left, right) => right.score - left.score || left.phrase.localeCompare(right.phrase))
+    .slice(0, Math.max(1, Math.min(720, Number(limit) || 720)))
+    .map((result, index) => ({ ...result, rank: index + 1 }));
+}
+
+export function rankWordReplacements(phrase, wordIndex, dictionary, limit = 120) {
+  const words = String(phrase || "").toLowerCase().match(/[a-z]+/g) || [];
+  const index = Number(wordIndex);
+  if (!Number.isInteger(index) || index < 0 || index >= words.length || !Array.isArray(dictionary)) return [];
+  const original = words[index];
+  const signature = [...original].sort().join("");
+  const replacements = new Map();
+  for (const value of dictionary) {
+    const word = String(value || "").toLowerCase();
+    if (word === original || !/^[a-z]+$/.test(word) || word.length !== original.length) continue;
+    if ([...word].sort().join("") !== signature || replacements.has(word)) continue;
+    const candidateWords = words.slice();
+    candidateWords[index] = word;
+    replacements.set(word, { word, phrase: candidateWords.join(" "), score: phraseScore(candidateWords) });
+  }
+  return [...replacements.values()]
+    .sort((left, right) => right.score - left.score || left.word.localeCompare(right.word))
+    .slice(0, Math.max(1, Math.min(500, Number(limit) || 120)))
+    .map((result, rankIndex) => ({ ...result, rank: rankIndex + 1 }));
 }
 
 function bestOrdering(words, pattern = "") {

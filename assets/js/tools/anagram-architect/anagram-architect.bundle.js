@@ -1,5 +1,6 @@
 (function() {
 	//#region assets/js/tools/anagram-architect/anagram-core.mjs
+	var NAME_CASE_MINOR_WORDS = new Set("a an and as at but by for from in nor of on or over the to with yet".split(" "));
 	function normalizeLetters(value) {
 		return String(value || "").toLowerCase().replace(/[^a-z]/g, "");
 	}
@@ -117,14 +118,183 @@
 			rank: index + 1
 		}));
 	}
-	new Set("a i an the and or but of to in on at by for from with as is am are was be been being old new good bad big small man woman person people base alien damn love life time world mind heart name true real great little dark light home house day night art architect".split(/\s+/));
-	new Set("a an the this that my your our his her their".split(" "));
-	new Set("of to in on at by for from with as into over under".split(" "));
-	new Set("and or but nor yet so".split(" "));
-	new Set("old new good bad big small great little dark light true real damn".split(" "));
-	new Set("i you he she it we they".split(" "));
-	new Set("am are be been being bug bugs can could did do does get gets got had has have is make makes may might must see sees should was were will would".split(" "));
-	new Set("am are is was were be".split(" "));
+	var COMMON = new Set("a i an the and or but of to in on at by for from with as is am are was be been being old new good bad big small man woman person people base alien damn love life time world mind heart name true real great little dark light home house day night art architect".split(/\s+/));
+	var DETERMINERS = new Set("a an the this that my your our his her their".split(" "));
+	var PREPOSITIONS = new Set("of to in on at by for from with as into over under".split(" "));
+	var CONJUNCTIONS = new Set("and or but nor yet so".split(" "));
+	var ADJECTIVES = new Set("old new good bad big small great little dark light true real damn".split(" "));
+	var SUBJECT_PRONOUNS = new Set("i you he she it we they".split(" "));
+	var COMMON_VERBS = new Set("am are be been being bug bugs can could did do does get gets got had has have is make makes may might must see sees should was were will would".split(" "));
+	var TRANSITIVE_VERBS = new Set("admire avoid build call catch choose create despise drain find give hate help hit hold keep kill know leave like love make meet move need open praise read save scorn see take tell use want watch".split(" "));
+	var COPULAS = new Set("am are is was were be".split(" "));
+	var NATURAL_PAIRS = /* @__PURE__ */ new Set([
+		"old man",
+		"new world",
+		"good man",
+		"bad man",
+		"dark night",
+		"a base",
+		"the world",
+		"of life"
+	]);
+	function isAdjective(word) {
+		return ADJECTIVES.has(word) || /(?:ish|ful|ous)$/.test(word);
+	}
+	function formatAnagramPhrase(phrase, options = {}) {
+		const sourceWords = String(phrase || "").match(/[a-z]+/gi) || [];
+		const caseMode = [
+			"title",
+			"sentence",
+			"upper",
+			"lower",
+			"name"
+		].includes(options.caseMode) ? options.caseMode : "title";
+		const words = sourceWords.map((sourceWord, index) => {
+			const word = sourceWord.toLowerCase();
+			if (caseMode === "upper") return word.toUpperCase();
+			if (caseMode === "lower") return word;
+			if (caseMode === "sentence") return index === 0 ? word[0].toUpperCase() + word.slice(1) : word;
+			if (caseMode === "name" && index > 0 && NAME_CASE_MINOR_WORDS.has(word)) return word;
+			return word[0].toUpperCase() + word.slice(1);
+		});
+		const separator = options.separator === "hyphen" ? "-" : options.separator === "emDash" ? " — " : " ";
+		const boundaryIndex = options.boundaryIndex === "" || options.boundaryIndex == null ? NaN : Number(options.boundaryIndex);
+		const boundaryMark = [
+			"comma",
+			"colon",
+			"emDash"
+		].includes(options.boundaryMark) ? options.boundaryMark : "comma";
+		let formatted = words.map((word, index) => {
+			if (index >= words.length - 1) return word;
+			if (Number.isInteger(boundaryIndex) && boundaryIndex === index) {
+				if (boundaryMark === "emDash") return `${word} — `;
+				return `${word}${boundaryMark === "colon" ? ":" : ","} `;
+			}
+			return word + separator;
+		}).join("");
+		const ending = [
+			".",
+			"?",
+			"!"
+		].includes(options.ending) ? options.ending : "";
+		if (ending) formatted += ending;
+		return formatted;
+	}
+	function isTransitiveVerb(word) {
+		if (TRANSITIVE_VERBS.has(word)) return true;
+		if (word.endsWith("s") && TRANSITIVE_VERBS.has(word.slice(0, -1))) return true;
+		if (word.endsWith("ed") && TRANSITIVE_VERBS.has(word.slice(0, -2))) return true;
+		if (word.endsWith("ing") && TRANSITIVE_VERBS.has(word.slice(0, -3))) return true;
+		return false;
+	}
+	function wordPriority(word) {
+		let score = Math.min(word.length, 8) * 2;
+		if (COMMON.has(word)) score += 24;
+		if (DETERMINERS.has(word) || PREPOSITIONS.has(word) || CONJUNCTIONS.has(word)) score += 14;
+		if (word.length === 2) score -= COMMON.has(word) ? 0 : 12;
+		return score;
+	}
+	function phraseScore(words) {
+		let score = words.reduce((total, word) => total + wordPriority(word), 0);
+		if (DETERMINERS.has(words[0]) || PREPOSITIONS.has(words[0])) score -= 5;
+		if (isAdjective(words[0])) score += 3;
+		if (SUBJECT_PRONOUNS.has(words[0])) score += 30;
+		if (DETERMINERS.has(words.at(-1)) || PREPOSITIONS.has(words.at(-1)) || CONJUNCTIONS.has(words.at(-1))) score -= 18;
+		for (let index = 0; index < words.length - 1; index += 1) {
+			const current = words[index];
+			const next = words[index + 1];
+			if (NATURAL_PAIRS.has(`${current} ${next}`)) score += 14;
+			if (isAdjective(current) && !PREPOSITIONS.has(next) && !DETERMINERS.has(next)) score += 8;
+			if (PREPOSITIONS.has(current) && DETERMINERS.has(next)) score += 10;
+			if (DETERMINERS.has(current) && !DETERMINERS.has(next) && !PREPOSITIONS.has(next)) score += 9;
+			if (current === "a" && /^[aeiou]/.test(next)) score -= 12;
+			if (current === "an" && !/^[aeiou]/.test(next)) score -= 12;
+			if (DETERMINERS.has(current) && DETERMINERS.has(next)) score -= 15;
+			if (PREPOSITIONS.has(current) && PREPOSITIONS.has(next)) score -= 12;
+			if (SUBJECT_PRONOUNS.has(current) && COMMON_VERBS.has(next)) score += 55;
+			if (SUBJECT_PRONOUNS.has(current) && COPULAS.has(next)) score += 70;
+			if (DETERMINERS.has(current) && isAdjective(next) && !(current === "a" && /^[aeiou]/.test(next)) && !(current === "an" && !/^[aeiou]/.test(next))) score += 35;
+			if ([
+				"he",
+				"she",
+				"it"
+			].includes(current) && COMMON_VERBS.has(next)) {
+				if (next.endsWith("s") && COMMON_VERBS.has(next.slice(0, -1))) score += 45;
+				else if (![
+					"is",
+					"was",
+					"has",
+					"does"
+				].includes(next)) score -= 30;
+			}
+			if (!SUBJECT_PRONOUNS.has(current) && SUBJECT_PRONOUNS.has(next)) score -= 75;
+		}
+		if (words.length === 3 && DETERMINERS.has(words[1])) score += isTransitiveVerb(words[0]) ? 22 : -22;
+		for (let index = 0; index < words.length - 2; index += 1) if (SUBJECT_PRONOUNS.has(words[index]) && COPULAS.has(words[index + 1]) && DETERMINERS.has(words[index + 2])) score += 90;
+		return score;
+	}
+	function rankPhrasePermutations(phrase, limit = 720, lockedPositions = []) {
+		const words = String(phrase || "").toLowerCase().match(/[a-z]+/g) || [];
+		if (!words.length || words.length > 6) return [];
+		const locked = new Set((Array.isArray(lockedPositions) ? lockedPositions : []).map(Number).filter((index) => Number.isInteger(index) && index >= 0 && index < words.length));
+		const ranked = [];
+		const used = words.map((_, index) => locked.has(index));
+		const current = [];
+		const visit = () => {
+			if (current.length === words.length) {
+				ranked.push({
+					phrase: current.join(" "),
+					score: phraseScore(current)
+				});
+				return;
+			}
+			if (locked.has(current.length)) {
+				current.push(words[current.length]);
+				visit();
+				current.pop();
+				return;
+			}
+			const seen = /* @__PURE__ */ new Set();
+			for (let index = 0; index < words.length; index += 1) {
+				if (used[index] || seen.has(words[index])) continue;
+				seen.add(words[index]);
+				used[index] = true;
+				current.push(words[index]);
+				visit();
+				current.pop();
+				used[index] = false;
+			}
+		};
+		visit();
+		return ranked.sort((left, right) => right.score - left.score || left.phrase.localeCompare(right.phrase)).slice(0, Math.max(1, Math.min(720, Number(limit) || 720))).map((result, index) => ({
+			...result,
+			rank: index + 1
+		}));
+	}
+	function rankWordReplacements(phrase, wordIndex, dictionary, limit = 120) {
+		const words = String(phrase || "").toLowerCase().match(/[a-z]+/g) || [];
+		const index = Number(wordIndex);
+		if (!Number.isInteger(index) || index < 0 || index >= words.length || !Array.isArray(dictionary)) return [];
+		const original = words[index];
+		const signature = [...original].sort().join("");
+		const replacements = /* @__PURE__ */ new Map();
+		for (const value of dictionary) {
+			const word = String(value || "").toLowerCase();
+			if (word === original || !/^[a-z]+$/.test(word) || word.length !== original.length) continue;
+			if ([...word].sort().join("") !== signature || replacements.has(word)) continue;
+			const candidateWords = words.slice();
+			candidateWords[index] = word;
+			replacements.set(word, {
+				word,
+				phrase: candidateWords.join(" "),
+				score: phraseScore(candidateWords)
+			});
+		}
+		return [...replacements.values()].sort((left, right) => right.score - left.score || left.word.localeCompare(right.word)).slice(0, Math.max(1, Math.min(500, Number(limit) || 120))).map((result, rankIndex) => ({
+			...result,
+			rank: rankIndex + 1
+		}));
+	}
 	//#endregion
 	//#region assets/js/tools/anagram-architect/anagram-architect.js
 	var form = document.querySelector("#anagram-form");
@@ -139,6 +309,7 @@
 	var dictionary = document.querySelector("#anagram-dictionary");
 	var searchMode = document.querySelector("#anagram-search-mode");
 	var phrasePattern = document.querySelector("#anagram-phrase-pattern");
+	var grammarTemplate = document.querySelector("#anagram-grammar-template");
 	var lockedWords = document.querySelector("#anagram-locked-words");
 	var preferredWords = document.querySelector("#anagram-preferred-words");
 	var excludedWords = document.querySelector("#anagram-excluded-words");
@@ -162,6 +333,17 @@
 	var progressKicker = document.querySelector("#anagram-progress-kicker");
 	var progressDetail = document.querySelector("#anagram-progress-detail");
 	var progressPreview = document.querySelector("#anagram-progress-preview");
+	var validationModal = document.querySelector("#anagram-validation-modal");
+	var validationTitle = document.querySelector("#anagram-validation-title");
+	var validationMessage = document.querySelector("#anagram-validation-message");
+	var validationClose = document.querySelector("#anagram-validation-close");
+	var pickDrawerBackdrop = document.querySelector("#anagram-pick-drawer-backdrop");
+	var pickDrawer = document.querySelector("#anagram-pick-drawer");
+	var pickDrawerClose = document.querySelector("#anagram-pick-drawer-close");
+	var pickDrawerPreview = document.querySelector("#anagram-pick-drawer-preview");
+	var pickDrawerContext = document.querySelector("#anagram-pick-drawer-context");
+	var pickDrawerTabs = document.querySelector("#anagram-pick-drawer-tabs");
+	var pickDrawerContent = document.querySelector("#anagram-pick-drawer-content");
 	var analysis = document.querySelector("#anagram-analysis");
 	var analysisPhase = document.querySelector("#anagram-analysis-phase");
 	var analysisProgress = analysis.querySelector("[role=\"progressbar\"]");
@@ -172,10 +354,12 @@
 	var metricRetained = document.querySelector("#anagram-metric-retained");
 	var workerLanes = document.querySelector("#anagram-worker-lanes");
 	var throughputChart = document.querySelector("#anagram-throughput-chart");
+	var throughputRate = document.querySelector("#anagram-throughput-rate");
 	var currentLeader = document.querySelector("#anagram-current-leader");
 	var analysisFoot = document.querySelector("#anagram-analysis-foot");
 	var analysisCancel = document.querySelector("#anagram-analysis-cancel");
 	var examples = document.querySelectorAll("[data-anagram-example]");
+	var inputClearButtons = document.querySelectorAll("[data-clear-input]");
 	var PAGE_SIZE = 120;
 	var PICK_STORAGE_KEY = "monkeytactics.anagram-architect.pick-list.v1";
 	var currentSource = "";
@@ -185,7 +369,23 @@
 	var telemetryStarted = 0;
 	var throughputSamples = [];
 	var pickEntries = readPickList();
+	var pickDictionaryPromises = /* @__PURE__ */ new Map();
 	form.dataset.architectReady = "true";
+	function syncInputClearButtons() {
+		inputClearButtons.forEach((button) => {
+			button.hidden = !document.getElementById(button.dataset.clearInput)?.value;
+		});
+	}
+	inputClearButtons.forEach((button) => {
+		const field = document.getElementById(button.dataset.clearInput);
+		field?.addEventListener("input", syncInputClearButtons);
+		button.addEventListener("click", () => {
+			field.value = "";
+			field.dispatchEvent(new Event("input", { bubbles: true }));
+			field.dispatchEvent(new Event("change", { bubbles: true }));
+			field.focus();
+		});
+	});
 	function readPickList() {
 		try {
 			const value = JSON.parse(localStorage.getItem(PICK_STORAGE_KEY) || "[]");
@@ -200,6 +400,415 @@
 	function isPicked(phrase) {
 		return pickEntries.some((entry) => entry.phrase.toLowerCase() === phrase.toLowerCase());
 	}
+	var GRAMMAR_TEMPLATE_LITERALS = {
+		"noun-of-noun": ["of"],
+		"verb-the-noun": ["the"],
+		"adjective-noun": [],
+		"noun-in-the-noun": ["in", "the"]
+	};
+	function containsRequiredLetters(source, requiredWords) {
+		const available = /* @__PURE__ */ new Map();
+		for (const letter of normalizeLetters(source)) available.set(letter, (available.get(letter) || 0) + 1);
+		for (const letter of normalizeLetters(requiredWords.join(""))) {
+			const count = available.get(letter) || 0;
+			if (!count) return false;
+			available.set(letter, count - 1);
+		}
+		return true;
+	}
+	function lockedPositionSet(entry) {
+		const wordCount = (entry.phrase.match(/[a-z]+/gi) || []).length;
+		return new Set((Array.isArray(entry.lockedPositions) ? entry.lockedPositions : []).map(Number).filter((index) => Number.isInteger(index) && index >= 0 && index < wordCount));
+	}
+	function buildPanelCloseButton(panel, label) {
+		const close = document.createElement("button");
+		close.type = "button";
+		close.className = "anagram-pick-panel-close";
+		close.textContent = "×";
+		close.setAttribute("aria-label", label);
+		close.addEventListener("click", () => panel.dispatchEvent(new Event("anagramclose")));
+		return close;
+	}
+	async function decodeDictionaryResponse(response) {
+		const bytes = new Uint8Array(await response.arrayBuffer());
+		if (bytes[0] !== 31 || bytes[1] !== 139) return new TextDecoder().decode(bytes);
+		if (!("DecompressionStream" in window)) throw new Error("This browser cannot open the compressed local dictionary.");
+		return new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+	}
+	function loadPickDictionary(kind) {
+		if (pickDictionaryPromises.has(kind)) return pickDictionaryPromises.get(kind);
+		const promise = (async () => {
+			const response = await fetch(`/assets/data/words/${kind === "expanded" ? "manifest.wiktionary-v1.json" : "manifest.enable-v1.json"}`);
+			if (!response.ok) throw new Error("The local dictionary manifest could not be loaded.");
+			const manifest = await response.json();
+			return (await Promise.all(Object.values(manifest.chunks).map(async ({ file }) => {
+				const chunkResponse = await fetch(`/assets/data/words/${file}`);
+				if (!chunkResponse.ok) throw new Error("A local dictionary file could not be loaded.");
+				return decodeDictionaryResponse(chunkResponse);
+			}))).flatMap((text) => text.split(/\r?\n/).map((line) => line.split("	", 1)[0]).filter(Boolean));
+		})();
+		pickDictionaryPromises.set(kind, promise);
+		promise.catch(() => pickDictionaryPromises.delete(kind));
+		return promise;
+	}
+	function buildPermutationPanel(entry) {
+		let alternatives = [];
+		const locked = lockedPositionSet(entry);
+		const words = entry.phrase.toLowerCase().match(/[a-z]+/g) || [];
+		const panel = document.createElement("div");
+		panel.className = "anagram-pick-permutations";
+		panel.hidden = true;
+		const close = buildPanelCloseButton(panel, "Close reorder mode");
+		const heading = document.createElement("strong");
+		const hint = document.createElement("small");
+		hint.textContent = "Lock words in place or choose a different ranked ordering.";
+		const lockControls = document.createElement("div");
+		lockControls.className = "anagram-pick-locks";
+		lockControls.setAttribute("aria-label", "Lock words in position");
+		const select = document.createElement("select");
+		select.size = Math.min(6, alternatives.length);
+		select.setAttribute("aria-label", `Word-order alternatives for ${entry.phrase}`);
+		const refreshAlternatives = () => {
+			alternatives = rankPhrasePermutations(entry.phrase, 720, [...locked]);
+			heading.textContent = `${alternatives.length} distinct word-order alternative${alternatives.length === 1 ? "" : "s"}${locked.size ? ` · ${locked.size} word${locked.size === 1 ? "" : "s"} locked` : ""}`;
+			select.replaceChildren(...alternatives.map((alternative) => {
+				const option = document.createElement("option");
+				option.value = alternative.phrase;
+				option.textContent = `#${alternative.rank} ${titleCase(alternative.phrase)}`;
+				return option;
+			}));
+			select.size = Math.min(6, alternatives.length);
+			select.value = entry.phrase.toLowerCase();
+		};
+		words.forEach((word, index) => {
+			const button = document.createElement("button");
+			button.type = "button";
+			const refreshButton = () => {
+				const isLocked = locked.has(index);
+				button.setAttribute("aria-pressed", String(isLocked));
+				button.textContent = `${isLocked ? "🔒" : "○"} ${titleCase(word)}`;
+				button.setAttribute("aria-label", `${isLocked ? "Unlock" : "Lock"} ${word} in position ${index + 1}`);
+			};
+			button.addEventListener("click", () => {
+				if (locked.has(index)) locked.delete(index);
+				else locked.add(index);
+				entry.lockedPositions = [...locked].sort((left, right) => left - right);
+				savePickList();
+				refreshButton();
+				refreshAlternatives();
+			});
+			refreshButton();
+			lockControls.append(button);
+		});
+		refreshAlternatives();
+		const actions = document.createElement("div");
+		actions.className = "anagram-pick-permutation-actions";
+		const use = document.createElement("button");
+		use.type = "button";
+		use.textContent = "Use this order";
+		use.addEventListener("click", () => {
+			const selectedPhrase = select.value || entry.phrase;
+			if (!alternatives.some(({ phrase }) => phrase === selectedPhrase)) return;
+			entry.phrase = selectedPhrase;
+			panel.dispatchEvent(new Event("anagramentrychange"));
+			savePickList();
+			renderPickList();
+			renderResults();
+		});
+		actions.append(use);
+		panel.append(close, heading, hint, lockControls, select, actions);
+		return panel;
+	}
+	function buildFormatPanel(entry) {
+		const panel = document.createElement("div");
+		panel.className = "anagram-pick-format";
+		panel.hidden = true;
+		const close = buildPanelCloseButton(panel, "Close format mode");
+		const heading = document.createElement("strong");
+		heading.textContent = "Style capitalization and punctuation";
+		const hint = document.createElement("small");
+		hint.textContent = "Formatting never changes the letters in the underlying anagram.";
+		const options = {
+			caseMode: "title",
+			separator: "space",
+			ending: "",
+			boundaryIndex: "",
+			boundaryMark: "comma",
+			...entry.formatOptions || {}
+		};
+		const preview = document.createElement("strong");
+		preview.className = "anagram-pick-format-preview";
+		const feedback = document.createElement("small");
+		feedback.className = "anagram-pick-permutation-feedback";
+		feedback.setAttribute("aria-live", "polite");
+		const saveOptions = () => {
+			entry.formatOptions = { ...options };
+			savePickList();
+			preview.textContent = formatAnagramPhrase(entry.phrase, options);
+			panel.dispatchEvent(new CustomEvent("anagramformatchange", { detail: { formattedPhrase: preview.textContent } }));
+		};
+		const makeButtonGroup = (label, choices, key) => {
+			const group = document.createElement("div");
+			group.className = "anagram-pick-format-group";
+			group.setAttribute("aria-label", label);
+			choices.forEach(([value, text]) => {
+				const button = document.createElement("button");
+				button.type = "button";
+				button.textContent = text;
+				button.dataset.optionKey = key;
+				button.dataset.optionValue = value;
+				const refresh = () => button.setAttribute("aria-pressed", String(options[key] === value));
+				button.addEventListener("click", () => {
+					options[key] = value;
+					[...group.children].forEach((child) => child.setAttribute("aria-pressed", "false"));
+					refresh();
+					saveOptions();
+				});
+				refresh();
+				group.append(button);
+			});
+			return group;
+		};
+		const caseLabel = document.createElement("small");
+		caseLabel.textContent = "Capitalization";
+		const caseModes = makeButtonGroup("Capitalization presets", [
+			["title", "Title Case"],
+			["sentence", "Sentence case"],
+			["upper", "ALL CAPS"],
+			["name", "Name Case"],
+			["lower", "lowercase"]
+		], "caseMode");
+		const separatorLabel = document.createElement("small");
+		separatorLabel.textContent = "Word separator";
+		const separators = makeButtonGroup("Word separator", [
+			["space", "Spaces"],
+			["hyphen", "Hyphens"],
+			["emDash", "Em dashes"]
+		], "separator");
+		const endingLabel = document.createElement("small");
+		endingLabel.textContent = "Ending";
+		const endings = makeButtonGroup("Ending punctuation", [
+			["", "None"],
+			[".", "."],
+			["?", "?"],
+			["!", "!"]
+		], "ending");
+		const breakControls = document.createElement("div");
+		breakControls.className = "anagram-pick-format-selects";
+		const boundary = document.createElement("select");
+		boundary.setAttribute("aria-label", "Insert punctuation after word");
+		const noBoundary = document.createElement("option");
+		noBoundary.value = "";
+		noBoundary.textContent = "No internal break";
+		boundary.append(noBoundary);
+		(entry.phrase.match(/[a-z]+/gi) || []).slice(0, -1).forEach((word, index) => {
+			const option = document.createElement("option");
+			option.value = String(index);
+			option.textContent = `Break after ${titleCase(word)}`;
+			boundary.append(option);
+		});
+		boundary.value = String(options.boundaryIndex ?? "");
+		const boundaryMark = document.createElement("select");
+		boundaryMark.setAttribute("aria-label", "Internal punctuation mark");
+		[
+			["comma", "Comma"],
+			["colon", "Colon"],
+			["emDash", "Em dash"]
+		].forEach(([value, text]) => {
+			const option = document.createElement("option");
+			option.value = value;
+			option.textContent = text;
+			boundaryMark.append(option);
+		});
+		boundaryMark.value = options.boundaryMark;
+		boundary.addEventListener("change", () => {
+			options.boundaryIndex = boundary.value;
+			saveOptions();
+		});
+		boundaryMark.addEventListener("change", () => {
+			options.boundaryMark = boundaryMark.value;
+			saveOptions();
+		});
+		breakControls.append(boundary, boundaryMark);
+		const actions = document.createElement("div");
+		actions.className = "anagram-pick-permutation-actions";
+		const reset = document.createElement("button");
+		reset.type = "button";
+		reset.textContent = "Reset formatting";
+		reset.addEventListener("click", () => {
+			Object.assign(options, {
+				caseMode: "title",
+				separator: "space",
+				ending: "",
+				boundaryIndex: "",
+				boundaryMark: "comma"
+			});
+			boundary.value = "";
+			boundaryMark.value = "comma";
+			panel.querySelectorAll("[data-option-key]").forEach((button) => button.setAttribute("aria-pressed", String(options[button.dataset.optionKey] === button.dataset.optionValue)));
+			saveOptions();
+			renderResults();
+		});
+		const copy = document.createElement("button");
+		copy.type = "button";
+		copy.textContent = "Copy formatted";
+		copy.addEventListener("click", async () => {
+			const formatted = formatAnagramPhrase(entry.phrase, options);
+			if (!isExactAnagram(entry.phrase, formatted)) return;
+			await navigator.clipboard.writeText(formatted);
+			feedback.textContent = "Copied formatted phrase.";
+		});
+		actions.append(reset, copy);
+		saveOptions();
+		panel.append(close, heading, hint, caseLabel, caseModes, separatorLabel, separators, endingLabel, endings, breakControls, preview, actions, feedback);
+		return panel;
+	}
+	function buildWordSwapPanel(entry) {
+		const panel = document.createElement("div");
+		panel.className = "anagram-pick-swaps";
+		panel.hidden = true;
+		const close = buildPanelCloseButton(panel, "Close word swap mode");
+		const heading = document.createElement("strong");
+		heading.textContent = "Choose the word that feels wrong";
+		const hint = document.createElement("small");
+		hint.textContent = "Exact-letter replacements keep the complete phrase a valid anagram.";
+		const wordButtons = document.createElement("div");
+		wordButtons.className = "anagram-pick-word-buttons";
+		const replacement = document.createElement("select");
+		replacement.hidden = true;
+		replacement.setAttribute("aria-label", "Exact-letter replacement words");
+		const preview = document.createElement("strong");
+		preview.className = "anagram-pick-swap-preview";
+		preview.textContent = titleCase(entry.phrase);
+		const feedback = document.createElement("small");
+		feedback.className = "anagram-pick-permutation-feedback";
+		feedback.setAttribute("aria-live", "polite");
+		const use = document.createElement("button");
+		use.type = "button";
+		use.textContent = "Use replacement";
+		use.disabled = true;
+		let alternatives = [];
+		const locked = lockedPositionSet(entry);
+		(entry.phrase.toLowerCase().match(/[a-z]+/g) || []).forEach((word, wordIndex) => {
+			const button = document.createElement("button");
+			button.type = "button";
+			button.textContent = titleCase(word);
+			button.setAttribute("aria-pressed", "false");
+			button.disabled = locked.has(wordIndex);
+			if (button.disabled) {
+				button.textContent = `🔒 ${titleCase(word)}`;
+				button.setAttribute("aria-label", `${word} is locked in position ${wordIndex + 1}`);
+			}
+			button.addEventListener("click", async () => {
+				const wasSelected = button.getAttribute("aria-pressed") === "true";
+				[...wordButtons.children].forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
+				if (wasSelected) {
+					button.setAttribute("aria-pressed", "false");
+					replacement.hidden = true;
+					replacement.value = "";
+					use.disabled = true;
+					preview.textContent = titleCase(entry.phrase);
+					feedback.textContent = "Choose a word to see exact-letter alternatives.";
+					return;
+				}
+				replacement.hidden = true;
+				use.disabled = true;
+				preview.textContent = titleCase(entry.phrase);
+				feedback.textContent = `Loading ${dictionary.value} dictionary alternatives for ${word}…`;
+				try {
+					alternatives = rankWordReplacements(entry.phrase, wordIndex, await loadPickDictionary(dictionary.value));
+					replacement.replaceChildren();
+					const prompt = document.createElement("option");
+					prompt.value = "";
+					prompt.textContent = alternatives.length ? "Select a replacement" : "No exact-letter alternatives";
+					prompt.selected = true;
+					replacement.append(prompt);
+					alternatives.forEach((alternative) => {
+						const option = document.createElement("option");
+						option.value = alternative.phrase;
+						option.textContent = `#${alternative.rank} ${titleCase(alternative.word)} — ${titleCase(alternative.phrase)}`;
+						replacement.append(option);
+					});
+					replacement.hidden = false;
+					feedback.textContent = alternatives.length ? `${alternatives.length} exact-letter alternative${alternatives.length === 1 ? "" : "s"}` : `No other ${dictionary.value} dictionary words use exactly those letters.`;
+				} catch (error) {
+					feedback.textContent = error instanceof Error ? error.message : "The local dictionary could not be loaded.";
+				}
+			});
+			wordButtons.append(button);
+		});
+		replacement.addEventListener("change", () => {
+			const selected = alternatives.find(({ phrase }) => phrase === replacement.value);
+			preview.textContent = titleCase(selected?.phrase || entry.phrase);
+			use.disabled = !selected;
+		});
+		use.addEventListener("click", () => {
+			const selected = alternatives.find(({ phrase }) => phrase === replacement.value);
+			if (!selected || !isExactAnagram(entry.phrase, selected.phrase)) return;
+			entry.phrase = selected.phrase;
+			panel.dispatchEvent(new Event("anagramentrychange"));
+			savePickList();
+			renderPickList();
+			renderResults();
+		});
+		const actions = document.createElement("div");
+		actions.className = "anagram-pick-permutation-actions";
+		actions.append(use);
+		panel.append(close, heading, hint, wordButtons, replacement, preview, actions, feedback);
+		return panel;
+	}
+	function closePickDrawer() {
+		if (pickDrawerBackdrop.hidden) return;
+		pickDrawerBackdrop.hidden = true;
+		document.body.classList.remove("anagram-pick-drawer-open");
+		const returnFocus = pickDrawerBackdrop._returnFocus;
+		pickDrawerBackdrop._returnFocus = null;
+		returnFocus?.focus({ preventScroll: true });
+	}
+	function openPickDrawer(entry, returnFocus, rowPhrase) {
+		const panels = [
+			["Arrange", buildPermutationPanel(entry)],
+			["Words", buildWordSwapPanel(entry)],
+			["Style", buildFormatPanel(entry)]
+		];
+		pickDrawerPreview.textContent = formatAnagramPhrase(entry.phrase, entry.formatOptions);
+		pickDrawerContext.textContent = `From ${entry.source}${entry.rank ? ` · rank #${entry.rank}` : ""}`;
+		const activate = (activeIndex) => {
+			[...pickDrawerTabs.children].forEach((button, index) => button.setAttribute("aria-selected", String(index === activeIndex)));
+			panels.forEach(([, panel], index) => {
+				panel.hidden = index !== activeIndex;
+			});
+		};
+		const tabs = panels.map(([label], index) => {
+			const button = document.createElement("button");
+			button.type = "button";
+			button.textContent = label;
+			button.setAttribute("role", "tab");
+			button.addEventListener("click", () => activate(index));
+			return button;
+		});
+		panels.forEach(([, panel]) => {
+			panel.addEventListener("anagramformatchange", ({ detail }) => {
+				pickDrawerPreview.textContent = detail.formattedPhrase;
+				rowPhrase.textContent = detail.formattedPhrase;
+			});
+			panel.addEventListener("anagramentrychange", closePickDrawer);
+		});
+		pickDrawerTabs.replaceChildren(...tabs);
+		pickDrawerContent.replaceChildren(...panels.map(([, panel]) => panel));
+		activate(0);
+		pickDrawerBackdrop._returnFocus = returnFocus;
+		pickDrawerBackdrop.hidden = false;
+		document.body.classList.add("anagram-pick-drawer-open");
+		pickDrawerClose.focus({ preventScroll: true });
+	}
+	pickDrawerClose.addEventListener("click", closePickDrawer);
+	pickDrawerBackdrop.addEventListener("click", (event) => {
+		if (event.target === pickDrawerBackdrop) closePickDrawer();
+	});
+	pickDrawer.addEventListener("keydown", (event) => {
+		if (event.key === "Escape") closePickDrawer();
+	});
 	function renderPickList() {
 		pickCount.textContent = `${pickEntries.length} ${pickEntries.length === 1 ? "pick" : "picks"}`;
 		pickClear.disabled = pickEntries.length === 0;
@@ -209,7 +818,7 @@
 			const row = document.createElement("div");
 			row.className = "anagram-pick-entry";
 			const phrase = document.createElement("strong");
-			phrase.textContent = titleCase(entry.phrase);
+			phrase.textContent = formatAnagramPhrase(entry.phrase, entry.formatOptions);
 			const context = document.createElement("small");
 			context.textContent = `From ${entry.source}${entry.rank ? ` · rank #${entry.rank}` : ""}`;
 			const actions = document.createElement("div");
@@ -219,12 +828,25 @@
 			copy.textContent = "Copy";
 			copy.setAttribute("aria-label", `Copy ${entry.phrase}`);
 			copy.addEventListener("click", async () => {
-				await navigator.clipboard.writeText(titleCase(entry.phrase));
+				await navigator.clipboard.writeText(formatAnagramPhrase(entry.phrase, entry.formatOptions));
 				copy.textContent = "Copied";
 				setTimeout(() => {
 					copy.textContent = "Copy";
 				}, 1200);
 			});
+			const edit = document.createElement("button");
+			edit.type = "button";
+			edit.textContent = "Edit";
+			edit.setAttribute("aria-haspopup", "dialog");
+			edit.setAttribute("aria-label", `Edit ${entry.phrase}`);
+			edit.addEventListener("click", () => openPickDrawer(entry, edit, phrase));
+			const moreWrap = document.createElement("span");
+			moreWrap.className = "anagram-pick-more";
+			const more = document.createElement("button");
+			more.type = "button";
+			more.textContent = "⋯";
+			more.setAttribute("aria-label", `More actions for ${entry.phrase}`);
+			more.setAttribute("aria-expanded", "false");
 			const remove = document.createElement("button");
 			remove.type = "button";
 			remove.textContent = "Remove";
@@ -235,7 +857,14 @@
 				renderPickList();
 				renderResults();
 			});
-			actions.append(copy, remove);
+			remove.hidden = true;
+			more.addEventListener("click", () => {
+				const opening = remove.hidden;
+				remove.hidden = !opening;
+				more.setAttribute("aria-expanded", String(opening));
+			});
+			moreWrap.append(more, remove);
+			actions.append(copy, edit, moreWrap);
 			row.append(phrase, context, actions);
 			fragment.append(row);
 		});
@@ -247,6 +876,7 @@
 			phrase: result.phrase,
 			source: currentSource,
 			rank: result.rank,
+			lockedPositions: [],
 			savedAt: (/* @__PURE__ */ new Date()).toISOString()
 		});
 		pickEntries = pickEntries.slice(0, 100);
@@ -309,9 +939,10 @@
 		analysisProgressFill.style.width = `${percent}%`;
 		metricProgress.textContent = `${Math.round(percent)}%`;
 		metricRate.textContent = rate.toLocaleString();
+		throughputRate.textContent = `${rate.toLocaleString()} branches/s`;
 		metricMatches.textContent = progress.reduce((sum, item) => sum + (item.matchesSeen || 0), 0).toLocaleString();
 		metricRetained.textContent = ranked.length.toLocaleString();
-		currentLeader.textContent = ranked[0] ? titleCase(ranked[0].phrase) : "Waiting for an exact phrase…";
+		currentLeader.textContent = ranked[0] ? titleCase(ranked[0].phrase) : complete ? "No matching phrase found" : "Waiting for an exact phrase…";
 		analysisFoot.textContent = `${Math.max(...progress.map((item) => item.candidateCount || 0)).toLocaleString()} candidate words · ${progress.reduce((sum, item) => sum + (item.prunedPaths || 0), 0).toLocaleString()} duplicate paths pruned · ${elapsed.toFixed(1)}s elapsed`;
 		[...workerLanes.children].forEach((lane, index) => {
 			const item = progress[index];
@@ -347,6 +978,27 @@
 		document.body.removeAttribute("aria-busy");
 		if (restoreFocus) submit.focus({ preventScroll: true });
 	}
+	function showValidationError(message, title = "Adjust your phrase", focusTarget = input) {
+		validationTitle.textContent = title;
+		validationMessage.textContent = message;
+		validationModal.hidden = false;
+		validationModal._focusTarget = focusTarget;
+		validationClose.focus({ preventScroll: true });
+	}
+	function hideValidationError() {
+		if (validationModal.hidden) return;
+		validationModal.hidden = true;
+		const focusTarget = validationModal._focusTarget;
+		validationModal._focusTarget = null;
+		focusTarget?.focus({ preventScroll: true });
+	}
+	validationClose.addEventListener("click", hideValidationError);
+	validationModal.addEventListener("click", (event) => {
+		if (event.target === validationModal) hideValidationError();
+	});
+	validationModal.addEventListener("keydown", (event) => {
+		if (event.key === "Escape") hideValidationError();
+	});
 	function solveInWorker(source, options, dictionaryKind, showProgress) {
 		return new Promise((resolve, reject) => {
 			const workerCount = options.workerCount;
@@ -439,7 +1091,7 @@
 				}
 			};
 			for (let shardIndex = 0; shardIndex < workerCount; shardIndex += 1) {
-				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260913-10", { type: "module" });
+				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260914-11", { type: "module" });
 				workers.push(worker);
 				worker.addEventListener("message", ({ data }) => handleMessage(shardIndex, worker, data));
 				worker.addEventListener("error", () => fail(/* @__PURE__ */ new Error("A parallel anagram worker could not start. Reload the page and try again.")));
@@ -575,12 +1227,20 @@
 		const source = input.value.trim();
 		const letters = normalizeLetters(source);
 		if (letters.length < 2 || letters.length > 30) {
-			status.textContent = "Enter a name or phrase containing 2 to 30 letters.";
-			input.focus();
+			const message = letters.length > 30 ? "Enter a name or phrase containing 2 to 30 letters. Support for longer phrases is planned for a future upgrade." : "Enter a name or phrase containing at least 2 letters.";
+			status.textContent = message;
+			showValidationError(message);
+			return;
+		}
+		const templateLiterals = GRAMMAR_TEMPLATE_LITERALS[grammarTemplate.value] || [];
+		if (!containsRequiredLetters(source, templateLiterals)) {
+			const message = `This grammar template requires the word${templateLiterals.length === 1 ? "" : "s"} ${templateLiterals.map((word) => `“${word}”`).join(" and ")}, but those letters are not available.`;
+			status.textContent = message;
+			showValidationError(message, "Template cannot fit", grammarTemplate);
 			return;
 		}
 		submit.disabled = true;
-		const usesPhrasePattern = Boolean(phrasePattern.value.trim());
+		const usesPhrasePattern = Boolean(phrasePattern.value.trim() || grammarTemplate.value);
 		const showsProgressModal = usesPhrasePattern || searchMode.value === "exhaustive";
 		if (showsProgressModal) showPatternProgress("Loading the local dictionary…", usesPhrasePattern);
 		resetResultView();
@@ -593,6 +1253,7 @@
 				maxWords: Number(maxWords.value),
 				minimumLength: Number(minimumLength.value),
 				pattern: phrasePattern.value,
+				grammarTemplate: grammarTemplate.value,
 				lockedWords: lockedWords.value,
 				preferredWords: preferredWords.value,
 				excludedWords: excludedWords.value,
@@ -606,7 +1267,7 @@
 			allResults = outcome.results;
 			renderResults();
 			const seconds = ((performance.now() - started) / 1e3).toFixed(1);
-			status.textContent = `${outcome.results.length} exact phrase${outcome.results.length === 1 ? "" : "s"} found in ${seconds}s${outcome.truncated ? " · ranked search pass" : ""} · ${workerCount} ${engine === "wasm" ? "Rust/WASM" : "JavaScript"} worker${workerCount === 1 ? "" : "s"}.`;
+			status.textContent = outcome.results.length === 0 && grammarTemplate.value ? `No exact phrases matched the selected grammar template in ${seconds}s. Try another template, Expanded dictionary, or a different source phrase.` : `${outcome.results.length} exact phrase${outcome.results.length === 1 ? "" : "s"} found in ${seconds}s${outcome.truncated ? " · ranked search pass" : ""} · ${workerCount} ${engine === "wasm" ? "Rust/WASM" : "JavaScript"} worker${workerCount === 1 ? "" : "s"}.`;
 			if (wasmFailure) console.warn("Rust/WASM fallback:", wasmFailure);
 		} catch (error) {
 			status.textContent = error?.name === "AbortError" ? "Anagram search cancelled." : error instanceof Error ? error.message : "Anagram Architect could not complete the search.";
@@ -619,6 +1280,7 @@
 	clear.addEventListener("click", () => {
 		input.value = "";
 		phrasePattern.value = "";
+		grammarTemplate.value = "";
 		lockedWords.value = "";
 		preferredWords.value = "";
 		excludedWords.value = "";
@@ -626,6 +1288,7 @@
 		results.replaceChildren();
 		summary.textContent = "Letters, spaces, and punctuation are accepted";
 		status.textContent = "Ready to architect a phrase.";
+		syncInputClearButtons();
 		input.focus();
 	});
 	resultSearch.addEventListener("input", () => {
@@ -650,6 +1313,7 @@
 	});
 	examples.forEach((button) => button.addEventListener("click", () => {
 		input.value = button.dataset.anagramExample;
+		input.dispatchEvent(new Event("input", { bubbles: true }));
 		input.focus();
 	}));
 	pickClear.addEventListener("click", (event) => {
@@ -672,5 +1336,6 @@
 		window.history.replaceState(null, "", window.location.pathname);
 		queueMicrotask(() => form.requestSubmit());
 	}
+	syncInputClearButtons();
 	//#endregion
 })();
