@@ -6,7 +6,8 @@ use std::collections::{HashMap, HashSet};
 
 const BLOG_SEARCH_INDEX_URL: &str = "https://blog.monkeytactics.com/menu-search.json";
 const LOCAL_BLOG_SEARCH_INDEX_URL: &str = "http://localhost:1313/menu-search.json";
-const TOOLS_MANIFEST_URL: &str = "/assets/wasm/menu/tools-manifest.json";
+const TOOLS_MANIFEST_URL: &str =
+    "/assets/wasm/menu/tools-manifest.json?v=20260915-anagram-architect";
 const FAVORITES_STORAGE_KEY: &str = "monkeytactics.menu-favorites";
 const FAVORITES_VERSION: u8 = 1;
 const MAX_FAVORITES: usize = 12;
