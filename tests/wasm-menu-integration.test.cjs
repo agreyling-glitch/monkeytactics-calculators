@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const siteRoot = path.resolve(__dirname, "..");
-const menuAssetVersion = "20260828-menu-manifest-v1";
+const menuAssetVersion = "20260915-menu-manifest-v2";
 const integrationMarkup = [
   '<div id="mt-header"></div>',
 ];
@@ -119,11 +119,13 @@ test("the All Tools page renders manifest-owned capability disclosures", () => {
 
 test("the menu loader versions its CSS and WASM dependencies", () => {
   const loader = fs.readFileSync(path.join(siteRoot, "assets", "wasm", "menu", "menu.js"), "utf8");
+  const source = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "src", "menu.rs"), "utf8");
 
   assert.match(loader, /const menuAssetVersion = new URL\(import\.meta\.url\)\.search;/);
   assert.match(loader, /stylesheet\.href = menuAssetUrl\("menu\.css"\)\.href;/);
   assert.match(loader, /__wbg_init\(\{ module_or_path: menuAssetUrl\("menu_bg\.wasm"\) \}\)/);
   assert.match(loader, /Failed to initialize the MonkeyTactics navigation/);
+  assert.match(source, /tools-manifest\.json\?v=20260915-anagram-architect/);
 });
 
 test("the menu provides versioned browser-local favorites", () => {
