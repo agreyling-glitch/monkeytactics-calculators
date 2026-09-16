@@ -5,6 +5,12 @@ use std::collections::{BinaryHeap, HashMap, HashSet};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
+#[cfg(target_arch = "wasm32")]
+fn current_time_ms() -> f64 { js_sys::Date::now() }
+
+#[cfg(not(target_arch = "wasm32"))]
+fn current_time_ms() -> f64 { 0.0 }
+
 thread_local! {
     static ENGINE: RefCell<Engine> = RefCell::new(Engine::default());
 }
@@ -45,6 +51,7 @@ struct Candidate {
 enum GrammarSlot {
     Pos(u8),
     Literal(String),
+    Any,
 }
 
 struct Frame {
@@ -98,6 +105,8 @@ struct Search {
     node_limit: usize,
     nodes: usize,
     truncated: bool,
+    deadline_ms: Option<f64>,
+    time_limited: bool,
     language: HashMap<String, (u64, u8)>,
     ngrams: LanguageModel,
     pattern_slots: Vec<String>,
@@ -123,6 +132,8 @@ struct SearchOptions {
     excluded_words: String,
     exclude_vulgar: bool,
     grammar_template: String,
+    time_limit_ms: u32,
+    deadline_epoch_ms: f64,
 }
 
 impl Default for SearchOptions {
@@ -140,6 +151,8 @@ impl Default for SearchOptions {
             excluded_words: String::new(),
             exclude_vulgar: true,
             grammar_template: String::new(),
+            time_limit_ms: 0,
+            deadline_epoch_ms: 0.0,
         }
     }
 }
@@ -162,6 +175,7 @@ struct StepResult {
     candidate_count: usize,
     pruned_paths: usize,
     truncated: bool,
+    time_limited: bool,
     results: Option<Vec<PhraseResult>>,
 }
 
@@ -266,6 +280,7 @@ pub fn step_search(node_budget: usize) -> JsValue {
                 candidate_count: 0,
                 pruned_paths: 0,
                 truncated: false,
+                time_limited: false,
                 results: Some(Vec::new()),
             },
         };
@@ -285,6 +300,11 @@ impl Search {
         ngrams: &LanguageModel,
         options: SearchOptions,
     ) -> Result<Self, JsValue> {
+        let deadline_ms = if options.deadline_epoch_ms > 0.0 {
+            Some(options.deadline_epoch_ms)
+        } else {
+            (options.time_limit_ms > 0).then(|| current_time_ms() + f64::from(options.time_limit_ms))
+        };
         let source_phrase = split_words(&source).join(" ");
         let source_letters = normalize(&source);
         if source_letters.len() < 2 {
@@ -438,7 +458,7 @@ impl Search {
             remaining = subtract(&remaining, &candidates[index].counts);
             locked_path.push(index);
         }
-        let effective_max_words = if grammar_slots.is_empty() { options.max_words.clamp(1, 6) } else { grammar_slots.len() };
+        let effective_max_words = if grammar_slots.is_empty() { options.max_words.clamp(1, 10) } else { grammar_slots.len() };
         if locked_path.len() > effective_max_words {
             return Err(JsValue::from_str(
                 "The locked words exceed the maximum word count.",
@@ -520,6 +540,8 @@ impl Search {
             node_limit: options.node_limit.max(1000),
             nodes: 0,
             truncated: false,
+            deadline_ms,
+            time_limited: false,
             language,
             ngrams: language_ngrams,
             pattern_slots,
@@ -529,7 +551,13 @@ impl Search {
             preferred_words,
             grammar_slots,
         };
-        if !is_literal_phrase && search.root_depth == 0 && search.max_words == 3 && search.grammar_slots.is_empty() {
+        if !is_literal_phrase
+            && options.time_limit_ms == 0
+            && search.source.len() <= 30
+            && search.root_depth == 0
+            && search.max_words == 3
+            && search.grammar_slots.is_empty()
+        {
             search.seed_complementary_phrases(3_500);
         }
         if is_literal_phrase {
@@ -586,6 +614,12 @@ impl Search {
     fn step(&mut self, budget: usize) -> StepResult {
         let stop_at = (self.nodes + budget).min(self.node_limit);
         while !self.stack.is_empty() && self.nodes < stop_at {
+            if self.deadline_ms.is_some_and(|deadline| current_time_ms() >= deadline) {
+                self.truncated = true;
+                self.time_limited = true;
+                self.stack.clear();
+                break;
+            }
             let top = self.stack.len() - 1;
             if !self.stack[top].entered {
                 self.stack[top].entered = true;
@@ -599,6 +633,10 @@ impl Search {
                 }
                 if remaining_size(&self.stack[top].remaining) == 0 {
                     self.record_result();
+                    if self.time_limited {
+                        self.stack.clear();
+                        break;
+                    }
                     self.pop_frame();
                     continue;
                 }
@@ -669,6 +707,11 @@ impl Search {
                 entered: false,
             });
         }
+        if self.deadline_ms.is_some_and(|deadline| current_time_ms() >= deadline) {
+            self.truncated = self.truncated || !self.stack.is_empty();
+            self.time_limited = true;
+            self.stack.clear();
+        }
         if self.nodes >= self.node_limit {
             self.truncated = !self.stack.is_empty();
             self.stack.clear();
@@ -689,6 +732,7 @@ impl Search {
             candidate_count: self.candidates.len(),
             pruned_paths: self.pruned_paths,
             truncated: self.truncated,
+            time_limited: self.time_limited,
             results,
         }
     }
@@ -756,9 +800,20 @@ impl Search {
         if !self.seen_results.insert(key.clone()) {
             return;
         }
-        if let Some(result) =
-            best_ordering_with_metadata(&mut words, &self.pattern, &self.grammar_slots, &self.language, &self.ngrams)
-        {
+        let (ordered, ordering_timed_out) = best_ordering_with_metadata(
+            &mut words,
+            &self.pattern,
+            &self.grammar_slots,
+            &self.language,
+            &self.ngrams,
+            self.deadline_ms,
+        );
+        if ordering_timed_out {
+            self.truncated = true;
+            self.time_limited = true;
+            return;
+        }
+        if let Some(result) = ordered {
             let mut result = result;
             if result.phrase == self.source_phrase {
                 return;
@@ -904,6 +959,21 @@ fn can_assign_slots(words: &[&str], slots: &[String]) -> bool {
     words.len() <= slots.len() && visit(words, slots, 0, &mut vec![false; slots.len()])
 }
 fn grammar_template_slots(value: &str) -> Vec<GrammarSlot> {
+    if let Some(custom) = value.strip_prefix("custom:") {
+        return custom
+            .split('|')
+            .take(10)
+            .filter_map(|slot| match slot {
+                "noun" => Some(GrammarSlot::Pos(1)),
+                "verb" => Some(GrammarSlot::Pos(2)),
+                "adjective" => Some(GrammarSlot::Pos(4)),
+                "any" => Some(GrammarSlot::Any),
+                _ => slot.strip_prefix("literal=")
+                    .filter(|word| !word.is_empty() && word.chars().all(|character| character.is_ascii_lowercase()))
+                    .map(|word| GrammarSlot::Literal(word.into())),
+            })
+            .collect();
+    }
     match value {
         "noun-of-noun" => vec![GrammarSlot::Pos(1), GrammarSlot::Literal("of".into()), GrammarSlot::Pos(1)],
         "verb-the-noun" => vec![GrammarSlot::Pos(2), GrammarSlot::Literal("the".into()), GrammarSlot::Pos(1)],
@@ -916,6 +986,7 @@ fn grammar_slot_matches(word: &str, slot: &GrammarSlot, metadata: &HashMap<Strin
     match slot {
         GrammarSlot::Literal(literal) => word == literal,
         GrammarSlot::Pos(mask) => inferred_pos(word, metadata) & mask != 0,
+        GrammarSlot::Any => true,
     }
 }
 fn can_assign_grammar_slots(words: &[&str], slots: &[GrammarSlot], metadata: &HashMap<String, (u64, u8)>) -> bool {
@@ -1443,10 +1514,11 @@ fn best_ordering_with_metadata(
     grammar_slots: &[GrammarSlot],
     metadata: &HashMap<String, (u64, u8)>,
     ngrams: &LanguageModel,
-) -> Option<PhraseResult> {
+    deadline_ms: Option<f64>,
+) -> (Option<PhraseResult>, bool) {
     let mut best = None;
-    permute(words, 0, pattern, grammar_slots, metadata, ngrams, &mut best);
-    best
+    let timed_out = permute(words, 0, pattern, grammar_slots, metadata, ngrams, deadline_ms, &mut best);
+    (best, timed_out)
 }
 fn permute(
     words: &mut [String],
@@ -1455,8 +1527,12 @@ fn permute(
     grammar_slots: &[GrammarSlot],
     metadata: &HashMap<String, (u64, u8)>,
     ngrams: &LanguageModel,
+    deadline_ms: Option<f64>,
     best: &mut Option<PhraseResult>,
-) {
+) -> bool {
+    if deadline_ms.is_some_and(|deadline| current_time_ms() >= deadline) {
+        return true;
+    }
     if index == words.len() {
         let phrase = words.join(" ");
         if pattern_matches(&phrase, pattern) && grammar_order_matches(words, grammar_slots, metadata) {
@@ -1465,7 +1541,7 @@ fn permute(
                 *best = Some(PhraseResult { phrase, score });
             }
         }
-        return;
+        return false;
     }
     let mut seen = HashSet::new();
     for swap in index..words.len() {
@@ -1473,9 +1549,15 @@ fn permute(
             continue;
         }
         words.swap(index, swap);
-        permute(words, index + 1, pattern, grammar_slots, metadata, ngrams, best);
+        if grammar_slots.is_empty() || grammar_slot_matches(&words[index], &grammar_slots[index], metadata) {
+            if permute(words, index + 1, pattern, grammar_slots, metadata, ngrams, deadline_ms, best) {
+                words.swap(index, swap);
+                return true;
+            }
+        }
         words.swap(index, swap);
     }
+    false
 }
 
 #[cfg(test)]
@@ -1753,6 +1835,19 @@ mod tests {
         ]);
         assert!(grammar_order_matches(&["heart".into(), "of".into(), "earth".into()], &slots, &metadata));
         assert!(!grammar_order_matches(&["heart".into(), "in".into(), "earth".into()], &slots, &metadata));
+    }
+    #[test]
+    fn custom_grammar_template_supports_pos_any_and_literal_slots() {
+        let slots = grammar_template_slots("custom:verb|adjective|any|literal=for|noun");
+        let metadata = HashMap::from([
+            ("portrayed".into(), (50_000_000, 2)),
+            ("orphaned".into(), (40_000_000, 4)),
+            ("hero".into(), (40_000_000, 1)),
+            ("hit".into(), (40_000_000, 1)),
+        ]);
+        assert_eq!(slots.len(), 5);
+        assert!(grammar_order_matches(&["portrayed".into(), "orphaned".into(), "hero".into(), "for".into(), "hit".into()], &slots, &metadata));
+        assert!(!grammar_order_matches(&["orphaned".into(), "portrayed".into(), "hero".into(), "for".into(), "hit".into()], &slots, &metadata));
     }
     #[test]
     fn complementary_search_finds_long_three_word_phrase_before_tree_walk() {

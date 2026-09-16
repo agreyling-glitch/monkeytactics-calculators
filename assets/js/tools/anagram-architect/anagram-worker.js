@@ -52,14 +52,22 @@ self.addEventListener("message", async ({ data }) => {
   if (data?.type !== "solve") return;
   try {
     const [words, languageRecords, ngramRecords] = await Promise.all([loadDictionary(data.dictionary), loadLanguageData(), loadNgramData()]);
-    self.postMessage({ type: "progress", phase: "search", nodes: 0, nodeLimit: data.options.nodeLimit, found: 0 });
+    const knownWords = new Set(words.map((word) => word.toLowerCase()));
+    for (const word of data.options.customWords || []) {
+      if (!knownWords.has(word)) { knownWords.add(word); words.push(word); }
+    }
+    self.postMessage({ type: "progress", phase: "search", nodes: 0, nodeLimit: data.options.nodeLimit, found: 0, wordCount: words.length });
     await new Promise((resolve) => setTimeout(resolve, 0));
+    if (data.options.deadlineEpochMs && Date.now() >= data.options.deadlineEpochMs) {
+      self.postMessage({ type: "complete", outcome: { results: [], nodes: 0, truncated: true, timeLimited: true }, wordCount: words.length, engine: "javascript", wasmFailure: "" });
+      return;
+    }
     let outcome;
     let engine = "javascript";
     let wasmFailure = "";
     let wasmReady = false;
     try {
-      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260914-11" });
+      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260915-19" });
       if (!verifyWasmDomain(self.location.hostname)) throw new Error("Anagram Architect is not authorized on this host.");
       initWasmEngine(words);
       initLanguageMetadata(languageRecords);
@@ -70,24 +78,43 @@ self.addEventListener("message", async ({ data }) => {
     }
     if (!wasmReady && data.options.grammarTemplate) throw new Error(`Grammar templates require the Rust/WASM engine. ${wasmFailure}`);
     if (wasmReady) {
+      self.postMessage({ type: "engine", engine: "wasm" });
       startWasmSearch(data.source, data.options);
       engine = "wasm";
       let step;
       let lastRevision = -1;
+      let lastProgressAt = 0;
+      let lastPartialAt = 0;
+      let timeLimited = false;
+      const stepBudget = data.options.timeLimitMs ? 100 : 5000;
       do {
-        step = stepWasmSearch(5000);
-        self.postMessage({ type: "progress", phase: "search", nodes: step.nodes, nodeLimit: step.nodeLimit, found: step.found, matchesSeen: step.matchesSeen, candidateCount: step.candidateCount, prunedPaths: step.prunedPaths, done: step.done, engine });
-        if (!step.done && step.revision !== lastRevision && step.results?.length) self.postMessage({ type: "partial", results: step.results, nodes: step.nodes });
+        step = stepWasmSearch(stepBudget);
+        timeLimited = Boolean(step.timeLimited) || (!step.done && data.options.deadlineEpochMs && Date.now() >= data.options.deadlineEpochMs);
+        const now = performance.now();
+        if (step.done || timeLimited || now - lastProgressAt >= 200) {
+          self.postMessage({ type: "progress", phase: "search", nodes: step.nodes, nodeLimit: step.nodeLimit, found: step.found, matchesSeen: step.matchesSeen, candidateCount: step.candidateCount, prunedPaths: step.prunedPaths, done: step.done, engine });
+          lastProgressAt = now;
+        }
+        if (!step.done && !timeLimited && step.revision !== lastRevision && step.results?.length && now - lastPartialAt >= 1000) {
+          self.postMessage({ type: "partial", results: step.results, nodes: step.nodes });
+          lastPartialAt = now;
+        }
         lastRevision = step.revision;
         if (!step.done) await new Promise((resolve) => setTimeout(resolve, 0));
-      } while (!step.done);
-      outcome = { results: step.results || [], nodes: step.nodes, truncated: step.truncated };
+      } while (!step.done && !timeLimited);
+      outcome = { results: step.results || [], nodes: step.nodes, truncated: step.truncated || timeLimited, timeLimited };
     } else {
       self.postMessage({ type: "engine", engine: "javascript" });
-      outcome = solveAnagrams(data.source, words, {
-        ...data.options,
-        onProgress(progress) { self.postMessage({ type: "progress", phase: "search", ...progress, engine }); }
-      });
+      const remainingTimeMs = data.options.deadlineEpochMs
+        ? Math.max(0, data.options.deadlineEpochMs - Date.now())
+        : 0;
+      outcome = remainingTimeMs || !data.options.timeLimitMs
+        ? solveAnagrams(data.source, words, {
+            ...data.options,
+            timeLimitMs: remainingTimeMs,
+            onProgress(progress) { self.postMessage({ type: "progress", phase: "search", ...progress, engine }); }
+          })
+        : { results: [], nodes: 0, truncated: true, timeLimited: true };
     }
     self.postMessage({ type: "complete", outcome, wordCount: words.length, engine, wasmFailure });
   } catch (error) {
