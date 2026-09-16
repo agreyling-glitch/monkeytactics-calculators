@@ -234,8 +234,13 @@
 .anagram-pick-permutation-actions button { border: 1px solid rgba(245,185,66,.35); border-radius: 7px; background: rgba(245,185,66,.1); color: #fde68a; padding: .4rem .55rem; cursor: pointer; }
 .anagram-pick-permutation-feedback { min-height: 1em; color: #99f6e4 !important; }
 .anagram-pick-locks { display: flex; flex-wrap: wrap; gap: .4rem; }
-.anagram-pick-locks button { border: 1px solid rgba(148,163,184,.25); border-radius: 999px; background: rgba(148,163,184,.07); color: #cbd5e1; padding: .34rem .58rem; cursor: pointer; }
-.anagram-pick-locks button[aria-pressed="true"] { border-color: rgba(245,185,66,.6); background: rgba(245,185,66,.14); color: #fde68a; }
+.anagram-pick-locks button { position: relative; border: 1px solid rgba(148,163,184,.25); border-radius: 999px; background: rgba(148,163,184,.07); color: #cbd5e1; padding: .34rem .58rem; cursor: pointer; }
+.anagram-pick-locks button[aria-pressed="true"] { border-color: rgba(245,185,66,.6); background: rgba(245,185,66,.14); color: #fde68a; cursor: grab; touch-action: none; transition: opacity .12s ease, box-shadow .12s ease, transform .12s ease; }
+.anagram-pick-locks button.is-dragging { opacity: .48; cursor: grabbing; transform: scale(.97); }
+.anagram-pick-locks button.drop-before, .anagram-pick-locks button.drop-after { border-color: #2dd4bf; background: rgba(45,212,191,.16); color: #ccfbf1; }
+.anagram-pick-locks button.drop-before::before, .anagram-pick-locks button.drop-after::after { content: ""; position: absolute; top: -.3rem; bottom: -.3rem; width: 4px; border-radius: 999px; background: #2dd4bf; box-shadow: 0 0 0 2px #0f172a, 0 0 12px rgba(45,212,191,.9); pointer-events: none; }
+.anagram-pick-locks button.drop-before::before { left: -.48rem; }
+.anagram-pick-locks button.drop-after::after { right: -.48rem; }
 .anagram-pick-swaps { position: relative; grid-column: 1 / -1; display: grid; gap: .55rem; margin-top: .45rem; padding: .7rem; border-radius: 8px; background: rgba(15,23,42,.72); }
 .anagram-pick-swaps[hidden], .anagram-pick-swaps select[hidden] { display: none; }
 .anagram-pick-swaps > strong:first-child { color: #fde68a; }

@@ -165,7 +165,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260915-40/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260916-01/);
 });
 
 test("shows phrase validation failures in an accessible modal", async () => {
@@ -232,7 +232,7 @@ test("the result toolbar loads the cache-busted responsive stylesheet", async ()
     readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"),
     readFile(new URL("../assets/css/tools/anagram-architect.css", import.meta.url), "utf8")
   ]);
-  assert.match(html, /anagram-architect\.css\?v=20260915-29/);
+  assert.match(html, /anagram-architect\.css\?v=20260916-01/);
   assert.match(css, /\.anagram-pick-drawer-content > \.anagram-pick-permutations \{[^}]*height: 100%/);
   assert.match(css, /\.anagram-pick-drawer-content > \.anagram-pick-permutations select \{[^}]*height: 100%/);
   assert.match(html, /id="anagram-result-search"/);
@@ -454,6 +454,13 @@ test("offers word steering, vulgar filtering, and a persistent Pick List", async
   assert.match(browser, /Close word swap mode/);
   assert.match(browser, /lockedPositions/);
   assert.match(browser, /Lock words in position/);
+  assert.match(browser, /const moveLockedWord = \(fromIndex, targetIndex, before = true\)/);
+  assert.match(browser, /button\.draggable = isLocked/);
+  assert.match(browser, /pointerLockedDrag/);
+  assert.match(browser, /markLockedDrop/);
+  assert.match(browser, /anagramphrasechange/);
+  assert.match(browser, /drag a locked word between the other words/);
+  assert.doesNotMatch(browser, /Locked \$\{word\}.*press Left or Right Arrow/);
   assert.match(browser, /formatAnagramPhrase/);
   assert.match(browser, /Style capitalization and punctuation/);
   assert.match(browser, /Reset formatting/);
@@ -504,7 +511,9 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.match(html, /Why did my search return no results\?/);
   assert.match(html, /Anagram solver FAQ/);
   assert.match(html, /Related word tools/);
-  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-15<\/lastmod>/);
+  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-16<\/lastmod>/);
+  assert.match(html, /Standard contains 172,820 words/);
+  assert.match(html, /Expanded contains 867,177 Wiktionary-derived words/);
   const structured = html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];
   const data = JSON.parse(structured);
   const application = data["@graph"].find((entry) => entry["@type"] === "WebApplication");
@@ -513,7 +522,8 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.ok(application.featureList.includes("Visual and custom grammar templates"));
   assert.ok(application.featureList.includes("Experimental 31–60 letter Pro mode"));
   assert.ok(application.featureList.includes("Personal vocabulary with up to 500 words or names"));
-  assert.ok(application.featureList.includes("Word-order permutations and position locks"));
+  assert.ok(application.featureList.includes("Word-order permutations with movable position locks"));
+  assert.ok(application.featureList.includes("Standard 172,820-word and expanded 867,177-word dictionaries"));
   assert.ok(application.featureList.includes("Capitalization and punctuation formatting"));
   assert.ok(data["@graph"].some((entry) => entry["@type"] === "BreadcrumbList"));
   const faq = data["@graph"].find((entry) => entry["@type"] === "FAQPage");
