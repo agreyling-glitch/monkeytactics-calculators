@@ -353,12 +353,15 @@ function loadPickDictionary(kind) {
 
 function buildPermutationPanel(entry) {
   let alternatives = [];
-  const locked = lockedPositionSet(entry);
-  const words = entry.phrase.toLowerCase().match(/[a-z]+/g) || [];
+  let locked = lockedPositionSet(entry);
+  let words = entry.phrase.toLowerCase().match(/[a-z]+/g) || [];
+  let draggedLockedIndex = null;
+  let pointerLockedDrag = null;
+  let suppressLockedClick = false;
   const panel = document.createElement("div"); panel.className = "anagram-pick-permutations"; panel.hidden = true;
   const close = buildPanelCloseButton(panel, "Close reorder mode");
   const heading = document.createElement("strong");
-  const hint = document.createElement("small"); hint.textContent = "Lock words in place, then select an ordering or double-click one to use it immediately.";
+  const hint = document.createElement("small"); hint.textContent = "Lock words in place, then drag a locked word between the other words to move its fixed position. Select an ordering or double-click one to use it immediately.";
   const lockControls = document.createElement("div"); lockControls.className = "anagram-pick-locks"; lockControls.setAttribute("aria-label", "Lock words in position");
   const select = document.createElement("select"); select.size = Math.min(6, alternatives.length); select.setAttribute("aria-label", `Word-order alternatives for ${entry.phrase}`);
   const refreshAlternatives = () => {
@@ -368,12 +371,86 @@ function buildPermutationPanel(entry) {
     select.size = Math.min(6, alternatives.length);
     select.value = entry.phrase.toLowerCase();
   };
-  words.forEach((word, index) => {
-    const button = document.createElement("button"); button.type = "button";
-    const refreshButton = () => { const isLocked = locked.has(index); button.setAttribute("aria-pressed", String(isLocked)); button.textContent = `${isLocked ? "🔒" : "○"} ${titleCase(word)}`; button.setAttribute("aria-label", `${isLocked ? "Unlock" : "Lock"} ${word} in position ${index + 1}`); };
-    button.addEventListener("click", () => { if (locked.has(index)) locked.delete(index); else locked.add(index); entry.lockedPositions = [...locked].sort((left, right) => left - right); savePickList(); refreshButton(); refreshAlternatives(); });
-    refreshButton(); lockControls.append(button);
-  });
+  const clearLockedDropState = () => lockControls.querySelectorAll(".is-dragging,.drop-before,.drop-after").forEach((item) => item.classList.remove("is-dragging", "drop-before", "drop-after"));
+  const markLockedDrop = (item, before) => {
+    lockControls.querySelectorAll(".drop-before,.drop-after").forEach((word) => word.classList.remove("drop-before", "drop-after"));
+    item?.classList.add(before ? "drop-before" : "drop-after");
+  };
+  const moveLockedWord = (fromIndex, targetIndex, before = true) => {
+    if (!locked.has(fromIndex) || targetIndex < 0 || targetIndex >= words.length || fromIndex === targetIndex && before) return;
+    const tokens = words.map((word, originalIndex) => ({ word, originalIndex }));
+    const [moved] = tokens.splice(fromIndex, 1);
+    let insertion = targetIndex + (before ? 0 : 1);
+    if (fromIndex < insertion) insertion -= 1;
+    tokens.splice(Math.max(0, Math.min(insertion, tokens.length)), 0, moved);
+    const previouslyLocked = new Set(locked);
+    words = tokens.map(({ word }) => word);
+    locked = new Set(tokens.flatMap(({ originalIndex }, index) => previouslyLocked.has(originalIndex) ? [index] : []));
+    entry.phrase = words.join(" ");
+    entry.lockedPositions = [...locked].sort((left, right) => left - right);
+    savePickList();
+    renderLockControls();
+    refreshAlternatives();
+    panel.dispatchEvent(new CustomEvent("anagramphrasechange", { detail: { phrase: entry.phrase } }));
+  };
+  const renderLockControls = () => {
+    lockControls.replaceChildren(...words.map((word, index) => {
+      const button = document.createElement("button"); button.type = "button";
+      const isLocked = locked.has(index);
+      button.dataset.lockIndex = String(index);
+      button.setAttribute("aria-pressed", String(isLocked));
+      button.textContent = `${isLocked ? "↔ 🔒" : "○"} ${titleCase(word)}`;
+      button.draggable = isLocked;
+      button.setAttribute("aria-label", `${isLocked ? `Locked ${word} in position ${index + 1}. Drag to move or click to unlock` : `Lock ${word} in position ${index + 1}`}`);
+      button.addEventListener("click", () => {
+        if (suppressLockedClick) { suppressLockedClick = false; return; }
+        if (locked.has(index)) locked.delete(index); else locked.add(index);
+        entry.lockedPositions = [...locked].sort((left, right) => left - right);
+        savePickList(); renderLockControls(); refreshAlternatives();
+      });
+      button.addEventListener("dragstart", (event) => {
+        if (!locked.has(index)) { event.preventDefault(); return; }
+        draggedLockedIndex = index; button.classList.add("is-dragging");
+        event.dataTransfer.effectAllowed = "move"; event.dataTransfer.setData("text/plain", String(index));
+      });
+      button.addEventListener("dragover", (event) => {
+        if (draggedLockedIndex === null || draggedLockedIndex === index) return;
+        event.preventDefault(); event.dataTransfer.dropEffect = "move"; markLockedDrop(button, templateDropPosition(button, event.clientX, event.clientY));
+      });
+      button.addEventListener("drop", (event) => {
+        event.preventDefault();
+        const fromIndex = draggedLockedIndex ?? Number(event.dataTransfer.getData("text/plain"));
+        const before = button.classList.contains("drop-before");
+        draggedLockedIndex = null; clearLockedDropState(); moveLockedWord(fromIndex, index, before);
+      });
+      button.addEventListener("dragend", () => {
+        draggedLockedIndex = null; clearLockedDropState();
+      });
+      button.addEventListener("pointerdown", (event) => {
+        if (event.pointerType === "mouse" || !locked.has(index)) return;
+        pointerLockedDrag = { pointerId: event.pointerId, from: index, target: index, before: true };
+        button.setPointerCapture(event.pointerId); button.classList.add("is-dragging");
+      });
+      button.addEventListener("pointermove", (event) => {
+        if (!pointerLockedDrag || pointerLockedDrag.pointerId !== event.pointerId) return;
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-lock-index]");
+        if (!target || !lockControls.contains(target)) return;
+        const before = templateDropPosition(target, event.clientX, event.clientY);
+        pointerLockedDrag.target = Number(target.dataset.lockIndex); pointerLockedDrag.before = before;
+        markLockedDrop(target, before);
+      });
+      const finishPointerDrag = (event) => {
+        if (!pointerLockedDrag || pointerLockedDrag.pointerId !== event.pointerId) return;
+        const { from, target, before } = pointerLockedDrag; pointerLockedDrag = null;
+        suppressLockedClick = from !== target || !before;
+        clearLockedDropState(); moveLockedWord(from, target, before);
+      };
+      button.addEventListener("pointerup", finishPointerDrag);
+      button.addEventListener("pointercancel", () => { pointerLockedDrag = null; clearLockedDropState(); });
+      return button;
+    }));
+  };
+  renderLockControls();
   refreshAlternatives();
   const actions = document.createElement("div"); actions.className = "anagram-pick-permutation-actions";
   const use = document.createElement("button"); use.type = "button"; use.textContent = "Use this order";
@@ -510,6 +587,7 @@ function openPickDrawer(entry, returnFocus, rowPhrase) {
   });
   panels.forEach(([, panel]) => {
     panel.addEventListener("anagramformatchange", ({ detail }) => { pickDrawerPreview.textContent = detail.formattedPhrase; rowPhrase.textContent = detail.formattedPhrase; });
+    panel.addEventListener("anagramphrasechange", ({ detail }) => { const formatted = formatAnagramPhrase(detail.phrase, entry.formatOptions); pickDrawerPreview.textContent = formatted; rowPhrase.textContent = formatted; });
     panel.addEventListener("anagramentrychange", closePickDrawer);
   });
   pickDrawerTabs.replaceChildren(...tabs);
