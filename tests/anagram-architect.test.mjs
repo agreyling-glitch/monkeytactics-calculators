@@ -165,7 +165,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260916-01/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260916-03/);
 });
 
 test("shows phrase validation failures in an accessible modal", async () => {
@@ -459,6 +459,8 @@ test("offers word steering, vulgar filtering, and a persistent Pick List", async
   assert.match(browser, /pointerLockedDrag/);
   assert.match(browser, /markLockedDrop/);
   assert.match(browser, /anagramphrasechange/);
+  assert.match(browser, /\[\[1, buildWordSwapPanel\], \[2, buildFormatPanel\]\]/);
+  assert.match(browser, /previous\.replaceWith\(replacement\)/);
   assert.match(browser, /drag a locked word between the other words/);
   assert.doesNotMatch(browser, /Locked \$\{word\}.*press Left or Right Arrow/);
   assert.match(browser, /formatAnagramPhrase/);
@@ -468,6 +470,7 @@ test("offers word steering, vulgar filtering, and a persistent Pick List", async
   assert.match(browser, /rowPhrase\.textContent = detail\.formattedPhrase/);
   assert.match(browser, /const wasSelected = button\.getAttribute\("aria-pressed"\) === "true"/);
   assert.match(browser, /Choose a word to see exact-letter alternatives/);
+  assert.doesNotMatch(browser, /button\.disabled = locked\.has\(wordIndex\)/);
 });
 
 test("groups advanced controls and supports shared Focus Mode", async () => {

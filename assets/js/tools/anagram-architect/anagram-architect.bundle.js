@@ -1018,17 +1018,11 @@
 		use.textContent = "Use replacement";
 		use.disabled = true;
 		let alternatives = [];
-		const locked = lockedPositionSet(entry);
 		(entry.phrase.toLowerCase().match(/[a-z]+/g) || []).forEach((word, wordIndex) => {
 			const button = document.createElement("button");
 			button.type = "button";
 			button.textContent = titleCase(word);
 			button.setAttribute("aria-pressed", "false");
-			button.disabled = locked.has(wordIndex);
-			if (button.disabled) {
-				button.textContent = `🔒 ${titleCase(word)}`;
-				button.setAttribute("aria-label", `${word} is locked in position ${wordIndex + 1}`);
-			}
 			button.addEventListener("click", async () => {
 				const wasSelected = button.getAttribute("aria-pressed") === "true";
 				[...wordButtons.children].forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
@@ -1117,7 +1111,7 @@
 			button.addEventListener("click", () => activate(index));
 			return button;
 		});
-		panels.forEach(([, panel]) => {
+		const wirePanel = (panel) => {
 			panel.addEventListener("anagramformatchange", ({ detail }) => {
 				pickDrawerPreview.textContent = detail.formattedPhrase;
 				rowPhrase.textContent = detail.formattedPhrase;
@@ -1126,9 +1120,18 @@
 				const formatted = formatAnagramPhrase(detail.phrase, entry.formatOptions);
 				pickDrawerPreview.textContent = formatted;
 				rowPhrase.textContent = formatted;
+				[[1, buildWordSwapPanel], [2, buildFormatPanel]].forEach(([index, buildPanel]) => {
+					const previous = panels[index][1];
+					const replacement = buildPanel(entry);
+					replacement.hidden = previous.hidden;
+					wirePanel(replacement);
+					previous.replaceWith(replacement);
+					panels[index][1] = replacement;
+				});
 			});
 			panel.addEventListener("anagramentrychange", closePickDrawer);
-		});
+		};
+		panels.forEach(([, panel]) => wirePanel(panel));
 		pickDrawerTabs.replaceChildren(...tabs);
 		pickDrawerContent.replaceChildren(...panels.map(([, panel]) => panel));
 		activate(0);
