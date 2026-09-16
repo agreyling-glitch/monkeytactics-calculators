@@ -323,12 +323,14 @@ function bestOrdering(words, pattern = "") {
 }
 
 export function solveAnagrams(source, words, options = {}) {
+  const searchStarted = performance.now();
   const letters = normalizeLetters(source);
   const sourcePhrase = (String(source || "").toLowerCase().match(/[a-z]+/g) || []).join(" ");
   const maxWords = Math.max(1, Math.min(6, Number(options.maxWords) || 5));
   const minimumLength = Math.max(1, Math.min(8, Number(options.minimumLength) || 2));
   const limit = Math.max(1, Number(options.limit) || 100);
   const nodeLimit = Math.max(1000, Number(options.nodeLimit) || 300000);
+  const timeLimitMs = Math.max(0, Number(options.timeLimitMs) || 0);
   const onProgress = typeof options.onProgress === "function" ? options.onProgress : null;
   const progressInterval = Math.max(1000, Number(options.progressInterval) || 5000);
   const phrasePattern = normalizeResultPattern(options.pattern || "");
@@ -390,8 +392,14 @@ export function solveAnagrams(source, words, options = {}) {
   if (path.length > maxWords) throw new Error("The locked words exceed the maximum word count.");
   let nodes = 0;
   let truncated = false;
+  let timeLimited = false;
 
   const visit = (remaining) => {
+    if (timeLimitMs && performance.now() - searchStarted >= timeLimitMs) {
+      truncated = true;
+      timeLimited = true;
+      return;
+    }
     if (nodes >= nodeLimit) {
       truncated = true;
       return;
@@ -444,7 +452,7 @@ export function solveAnagrams(source, words, options = {}) {
       path.push(candidate.word);
       visit(subtract(remaining, candidate.counts));
       path.pop();
-      if (nodes >= nodeLimit) break;
+      if (timeLimited || nodes >= nodeLimit) break;
     }
   };
 
@@ -453,7 +461,7 @@ export function solveAnagrams(source, words, options = {}) {
   const results = [...found.values()]
     .filter((result) => result && isExactAnagram(letters, result.phrase) && phraseMatchesPattern(result.phrase, phrasePattern))
     .sort((left, right) => right.score - left.score || left.phrase.localeCompare(right.phrase));
-  return { results, nodes, truncated };
+  return { results, nodes, truncated, timeLimited };
 }
 
 export { LETTERS };

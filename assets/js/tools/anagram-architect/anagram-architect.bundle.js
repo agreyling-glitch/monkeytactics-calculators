@@ -308,12 +308,28 @@
 	var minimumLength = document.querySelector("#anagram-min-length");
 	var dictionary = document.querySelector("#anagram-dictionary");
 	var searchMode = document.querySelector("#anagram-search-mode");
+	var proMode = document.querySelector("#anagram-pro-mode");
+	var proRecommendation = document.querySelector("#anagram-pro-recommendation");
+	var proWordOptions = document.querySelectorAll("[data-pro-option]");
 	var phrasePattern = document.querySelector("#anagram-phrase-pattern");
 	var grammarTemplate = document.querySelector("#anagram-grammar-template");
+	var grammarControl = document.querySelector("#anagram-grammar-control");
+	var grammarTemplateButtons = document.querySelectorAll("[data-grammar-template]");
+	var templateBuilder = document.querySelector("#anagram-template-builder");
+	var templateSlots = document.querySelector("#anagram-template-slots");
+	var templateSlotType = document.querySelector("#anagram-custom-slot-type");
+	var templateLiteralWrap = document.querySelector("#anagram-custom-literal-wrap");
+	var templateLiteral = document.querySelector("#anagram-custom-literal");
+	var templateAddSlot = document.querySelector("#anagram-add-template-slot");
+	var templatePreview = document.querySelector("#anagram-template-preview");
 	var lockedWords = document.querySelector("#anagram-locked-words");
 	var preferredWords = document.querySelector("#anagram-preferred-words");
 	var excludedWords = document.querySelector("#anagram-excluded-words");
+	var personalVocabulary = document.querySelector("#anagram-personal-vocabulary");
+	var personalVocabularyCount = document.querySelector("#anagram-personal-vocabulary-count");
+	var personalVocabularySummary = document.querySelector("#anagram-personal-vocabulary-summary");
 	var excludeVulgar = document.querySelector("#anagram-exclude-vulgar");
+	var resetAdvanced = document.querySelector("#anagram-reset-advanced");
 	var pickList = document.querySelector("#anagram-pick-list");
 	var pickCount = document.querySelector("#anagram-pick-count");
 	var pickClear = document.querySelector("#anagram-pick-clear");
@@ -357,11 +373,14 @@
 	var throughputRate = document.querySelector("#anagram-throughput-rate");
 	var currentLeader = document.querySelector("#anagram-current-leader");
 	var analysisFoot = document.querySelector("#anagram-analysis-foot");
+	var workerHarmCount = document.querySelector("#anagram-worker-harm-count");
 	var analysisCancel = document.querySelector("#anagram-analysis-cancel");
 	var examples = document.querySelectorAll("[data-anagram-example]");
 	var inputClearButtons = document.querySelectorAll("[data-clear-input]");
 	var PAGE_SIZE = 120;
 	var PICK_STORAGE_KEY = "monkeytactics.anagram-architect.pick-list.v1";
+	var WORKER_HARM_STORAGE_KEY = "monkeytactics.anagram-architect.workers-harmed.v1";
+	var PERSONAL_VOCABULARY_STORAGE_KEY = "monkeytactics.anagram-architect.personal-vocabulary.v1";
 	var currentSource = "";
 	var allResults = [];
 	var currentPage = 1;
@@ -369,8 +388,64 @@
 	var telemetryStarted = 0;
 	var throughputSamples = [];
 	var pickEntries = readPickList();
+	var customGrammarSlots = [];
+	var harmedWorkers = readHarmedWorkers();
+	var draggedTemplateIndex = null;
+	var pointerTemplateDrag = null;
 	var pickDictionaryPromises = /* @__PURE__ */ new Map();
 	form.dataset.architectReady = "true";
+	function readHarmedWorkers() {
+		try {
+			return Math.max(0, Number(sessionStorage.getItem(WORKER_HARM_STORAGE_KEY)) || 0);
+		} catch {
+			return 0;
+		}
+	}
+	function harmWorkers(count) {
+		if (!count) return;
+		harmedWorkers += count;
+		try {
+			sessionStorage.setItem(WORKER_HARM_STORAGE_KEY, String(harmedWorkers));
+		} catch {}
+		renderWorkerHarm();
+	}
+	function renderWorkerHarm() {
+		workerHarmCount.textContent = harmedWorkers === 0 ? "No WASM workers harmed this session. Yet." : harmedWorkers === 1 ? "1 WASM worker harmed this session. It knew the risks." : `${harmedWorkers.toLocaleString()} WASM workers harmed this session. They knew the risks.`;
+	}
+	renderWorkerHarm();
+	function parsePersonalVocabulary() {
+		const tokens = personalVocabulary.value.toLowerCase().match(/[a-z]+/g) || [];
+		const unique = [...new Set(tokens.filter((word) => word.length >= 2 && word.length <= 30))];
+		return {
+			words: unique.slice(0, 500),
+			total: unique.length,
+			invalid: tokens.length - unique.length
+		};
+	}
+	function personalWordFitsSource(word, source) {
+		const available = /* @__PURE__ */ new Map();
+		for (const letter of normalizeLetters(source)) available.set(letter, (available.get(letter) || 0) + 1);
+		for (const letter of word) {
+			const remaining = available.get(letter) || 0;
+			if (!remaining) return false;
+			available.set(letter, remaining - 1);
+		}
+		return true;
+	}
+	function updatePersonalVocabulary() {
+		const { words, total, invalid } = parsePersonalVocabulary();
+		try {
+			localStorage.setItem(PERSONAL_VOCABULARY_STORAGE_KEY, personalVocabulary.value);
+		} catch {}
+		personalVocabularyCount.textContent = `${Math.min(total, 500)} of 500 words`;
+		const relevant = words.filter((word) => personalWordFitsSource(word, input.value)).length;
+		personalVocabularySummary.textContent = total > 500 ? `Limit exceeded: remove ${total - 500} word${total - 500 === 1 ? "" : "s"} before searching.` : `${relevant} relevant to this phrase${invalid ? ` · ${invalid} duplicate or invalid entr${invalid === 1 ? "y" : "ies"} ignored` : ""}. Saved in this browser; words are allowed, not required.`;
+		personalVocabularySummary.classList.toggle("is-warning", total > 500);
+	}
+	try {
+		personalVocabulary.value = localStorage.getItem(PERSONAL_VOCABULARY_STORAGE_KEY) || "";
+	} catch {}
+	personalVocabulary.addEventListener("input", updatePersonalVocabulary);
 	function syncInputClearButtons() {
 		inputClearButtons.forEach((button) => {
 			button.hidden = !document.getElementById(button.dataset.clearInput)?.value;
@@ -406,6 +481,164 @@
 		"adjective-noun": [],
 		"noun-in-the-noun": ["in", "the"]
 	};
+	var CUSTOM_SLOT_LABELS = {
+		noun: "Noun",
+		verb: "Verb",
+		adjective: "Adjective",
+		any: "Any word"
+	};
+	function selectedGrammarTemplate() {
+		if (grammarTemplate.value !== "custom") return grammarTemplate.value;
+		return `custom:${customGrammarSlots.map((slot) => slot.kind === "literal" ? `literal=${slot.word}` : slot.kind).join("|")}`;
+	}
+	function grammarLiteralWords(value) {
+		if (!value.startsWith("custom:")) return GRAMMAR_TEMPLATE_LITERALS[value] || [];
+		return value.slice(7).split("|").filter((slot) => slot.startsWith("literal=")).map((slot) => slot.slice(8));
+	}
+	function clearTemplateDropState() {
+		templateSlots.querySelectorAll(".is-dragging,.drop-before,.drop-after").forEach((item) => item.classList.remove("is-dragging", "drop-before", "drop-after"));
+	}
+	function markTemplateDrop(item, before) {
+		templateSlots.querySelectorAll(".drop-before,.drop-after").forEach((slot) => slot.classList.remove("drop-before", "drop-after"));
+		item?.classList.add(before ? "drop-before" : "drop-after");
+	}
+	function moveCustomTemplateSlot(from, target, before) {
+		if (from === null || target === null || from === target && before) return;
+		const [slot] = customGrammarSlots.splice(from, 1);
+		let insertion = target + (before ? 0 : 1);
+		if (from < insertion) insertion -= 1;
+		customGrammarSlots.splice(Math.max(0, Math.min(insertion, customGrammarSlots.length)), 0, slot);
+		renderCustomTemplate();
+	}
+	function templateDropPosition(item, clientX, clientY) {
+		const bounds = item.getBoundingClientRect();
+		return clientY < bounds.top + bounds.height / 2 || Math.abs(clientY - (bounds.top + bounds.height / 2)) < bounds.height / 3 && clientX < bounds.left + bounds.width / 2;
+	}
+	function renderCustomTemplate() {
+		const fragment = document.createDocumentFragment();
+		customGrammarSlots.forEach((slot, index) => {
+			const item = document.createElement("li");
+			item.className = "anagram-template-slot";
+			item.dataset.index = String(index);
+			item.draggable = true;
+			item.tabIndex = 0;
+			const label = document.createElement("span");
+			label.textContent = slot.kind === "literal" ? `“${slot.word}”` : `[${CUSTOM_SLOT_LABELS[slot.kind]}]`;
+			item.setAttribute("aria-label", `${label.textContent}. Drag to reorder or press Alt plus Left or Right Arrow.`);
+			const remove = document.createElement("button");
+			remove.type = "button";
+			remove.textContent = "×";
+			remove.setAttribute("aria-label", `Remove ${label.textContent}`);
+			remove.addEventListener("click", () => {
+				customGrammarSlots.splice(index, 1);
+				renderCustomTemplate();
+			});
+			item.addEventListener("keydown", (event) => {
+				if (!event.altKey || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+				const target = event.key === "ArrowLeft" ? index - 1 : index + 1;
+				if (target < 0 || target >= customGrammarSlots.length) return;
+				event.preventDefault();
+				[customGrammarSlots[index], customGrammarSlots[target]] = [customGrammarSlots[target], customGrammarSlots[index]];
+				renderCustomTemplate();
+				templateSlots.children[target]?.focus();
+			});
+			item.addEventListener("dragstart", (event) => {
+				draggedTemplateIndex = index;
+				item.classList.add("is-dragging");
+				event.dataTransfer.effectAllowed = "move";
+				event.dataTransfer.setData("text/plain", String(index));
+			});
+			item.addEventListener("dragover", (event) => {
+				event.preventDefault();
+				event.dataTransfer.dropEffect = "move";
+				markTemplateDrop(item, templateDropPosition(item, event.clientX, event.clientY));
+			});
+			item.addEventListener("drop", (event) => {
+				event.preventDefault();
+				moveCustomTemplateSlot(draggedTemplateIndex ?? Number(event.dataTransfer.getData("text/plain")), index, item.classList.contains("drop-before"));
+				draggedTemplateIndex = null;
+				clearTemplateDropState();
+			});
+			item.addEventListener("dragend", () => {
+				draggedTemplateIndex = null;
+				clearTemplateDropState();
+			});
+			item.addEventListener("pointerdown", (event) => {
+				if (event.pointerType === "mouse" || event.target.closest("button")) return;
+				pointerTemplateDrag = {
+					pointerId: event.pointerId,
+					from: index,
+					target: index,
+					before: true
+				};
+				item.setPointerCapture(event.pointerId);
+				item.classList.add("is-dragging");
+			});
+			item.addEventListener("pointermove", (event) => {
+				if (!pointerTemplateDrag || pointerTemplateDrag.pointerId !== event.pointerId) return;
+				const target = document.elementFromPoint(event.clientX, event.clientY)?.closest(".anagram-template-slot");
+				if (!target || !templateSlots.contains(target)) return;
+				const before = templateDropPosition(target, event.clientX, event.clientY);
+				pointerTemplateDrag.target = Number(target.dataset.index);
+				pointerTemplateDrag.before = before;
+				markTemplateDrop(target, before);
+			});
+			const finishPointerDrag = (event) => {
+				if (!pointerTemplateDrag || pointerTemplateDrag.pointerId !== event.pointerId) return;
+				const { from, target, before } = pointerTemplateDrag;
+				pointerTemplateDrag = null;
+				clearTemplateDropState();
+				moveCustomTemplateSlot(from, target, before);
+			};
+			item.addEventListener("pointerup", finishPointerDrag);
+			item.addEventListener("pointercancel", () => {
+				pointerTemplateDrag = null;
+				clearTemplateDropState();
+			});
+			item.append(label, remove);
+			fragment.append(item);
+		});
+		templateSlots.replaceChildren(fragment);
+		templatePreview.textContent = customGrammarSlots.length ? `Template: ${customGrammarSlots.map((slot) => slot.kind === "literal" ? slot.word : `[${CUSTOM_SLOT_LABELS[slot.kind]}]`).join(" ")}` : "Add at least one slot to build your template.";
+	}
+	function syncTemplateBuilder() {
+		grammarTemplateButtons.forEach((button) => {
+			const selected = button.dataset.grammarTemplate === grammarTemplate.value;
+			button.setAttribute("aria-pressed", String(selected));
+		});
+		templateBuilder.hidden = grammarTemplate.value !== "custom";
+		if (!templateBuilder.hidden) renderCustomTemplate();
+	}
+	templateSlotType.addEventListener("change", () => {
+		templateLiteralWrap.hidden = templateSlotType.value !== "literal";
+	});
+	templateAddSlot.addEventListener("click", () => {
+		if (customGrammarSlots.length >= 10) {
+			showValidationError("Custom templates support up to 10 slots.", "Template is full", templateAddSlot);
+			return;
+		}
+		const kind = templateSlotType.value;
+		if (kind === "literal") {
+			const word = templateLiteral.value.trim().toLowerCase();
+			if (!/^[a-z]+$/.test(word)) {
+				showValidationError("Enter one exact word using letters only.", "Add an exact word", templateLiteral);
+				return;
+			}
+			customGrammarSlots.push({
+				kind,
+				word
+			});
+			templateLiteral.value = "";
+			syncInputClearButtons();
+		} else customGrammarSlots.push({ kind });
+		renderCustomTemplate();
+	});
+	grammarTemplate.addEventListener("change", syncTemplateBuilder);
+	grammarTemplateButtons.forEach((button) => button.addEventListener("click", () => {
+		grammarTemplate.value = button.dataset.grammarTemplate;
+		grammarTemplate.dispatchEvent(new Event("change", { bubbles: true }));
+	}));
+	syncTemplateBuilder();
 	function containsRequiredLetters(source, requiredWords) {
 		const available = /* @__PURE__ */ new Map();
 		for (const letter of normalizeLetters(source)) available.set(letter, (available.get(letter) || 0) + 1);
@@ -461,7 +694,7 @@
 		const close = buildPanelCloseButton(panel, "Close reorder mode");
 		const heading = document.createElement("strong");
 		const hint = document.createElement("small");
-		hint.textContent = "Lock words in place or choose a different ranked ordering.";
+		hint.textContent = "Lock words in place, then select an ordering or double-click one to use it immediately.";
 		const lockControls = document.createElement("div");
 		lockControls.className = "anagram-pick-locks";
 		lockControls.setAttribute("aria-label", "Lock words in position");
@@ -506,7 +739,7 @@
 		const use = document.createElement("button");
 		use.type = "button";
 		use.textContent = "Use this order";
-		use.addEventListener("click", () => {
+		const applySelectedOrder = () => {
 			const selectedPhrase = select.value || entry.phrase;
 			if (!alternatives.some(({ phrase }) => phrase === selectedPhrase)) return;
 			entry.phrase = selectedPhrase;
@@ -514,7 +747,9 @@
 			savePickList();
 			renderPickList();
 			renderResults();
-		});
+		};
+		use.addEventListener("click", applySelectedOrder);
+		select.addEventListener("dblclick", applySelectedOrder);
 		actions.append(use);
 		panel.append(close, heading, hint, lockControls, select, actions);
 		return panel;
@@ -903,6 +1138,13 @@
 		context.lineWidth = 4;
 		context.stroke();
 	}
+	function workerRoleLabel(index, workerCount) {
+		if (workerCount > 1 && index === 0) return "short-phrase";
+		if (workerCount > 2 && index === 1) return "compact-phrase";
+		const specialistCount = workerCount > 2 ? 2 : workerCount > 1 ? 1 : 0;
+		const generalCount = workerCount - specialistCount;
+		return generalCount > 1 ? `general ${index - specialistCount + 1}/${generalCount}` : "general";
+	}
 	function beginTelemetry(workerCount) {
 		telemetryStarted = performance.now();
 		throughputSamples = [];
@@ -913,7 +1155,7 @@
 		workerLanes.replaceChildren(...Array.from({ length: workerCount }, (_, index) => {
 			const lane = document.createElement("div");
 			lane.className = "anagram-worker-lane";
-			lane.innerHTML = `<span>Worker ${index + 1}</span><div class="anagram-worker-track"><span></span></div><output>0%</output>`;
+			lane.innerHTML = `<span>Worker ${index + 1} <small>(${workerRoleLabel(index, workerCount)})</small></span><div class="anagram-worker-track"><span></span></div><output>0%</output>`;
 			return lane;
 		}));
 		updateTelemetry(Array.from({ length: workerCount }, () => ({
@@ -1001,6 +1243,11 @@
 	});
 	function solveInWorker(source, options, dictionaryKind, showProgress) {
 		return new Promise((resolve, reject) => {
+			const deadlineEpochMs = options.timeLimitMs ? Date.now() + options.timeLimitMs : 0;
+			const workerOptions = {
+				...options,
+				deadlineEpochMs
+			};
 			const workerCount = options.workerCount;
 			const workers = [];
 			const shardResults = Array.from({ length: workerCount }, () => []);
@@ -1009,32 +1256,76 @@
 				nodeLimit: options.nodeLimit,
 				found: 0
 			}));
+			const shardEngines = Array.from({ length: workerCount }, () => "");
+			const countedHarm = /* @__PURE__ */ new Set();
+			const completedShards = /* @__PURE__ */ new Set();
 			const completions = [];
 			let settled = false;
+			let hardTimeout = null;
+			let loadedWordCount = 0;
 			beginTelemetry(workerCount);
 			const terminateAll = () => workers.forEach((worker) => worker.terminate());
 			const mergeResults = () => {
 				return mergeRankedResults(shardResults, options.limit);
 			};
+			const countHarmedShards = (indexes) => {
+				const newlyHarmed = indexes.filter((index) => shardEngines[index] === "wasm" && !countedHarm.has(index) && !completedShards.has(index));
+				newlyHarmed.forEach((index) => countedHarm.add(index));
+				harmWorkers(newlyHarmed.length);
+			};
 			const fail = (error) => {
 				if (settled) return;
 				settled = true;
+				clearTimeout(hardTimeout);
 				terminateAll();
 				activeSearch = null;
 				reject(error);
 			};
+			const finishTimedOut = () => {
+				if (settled) return;
+				settled = true;
+				countHarmedShards(shardEngines.map((_, index) => index));
+				terminateAll();
+				activeSearch = null;
+				analysisCancel.hidden = true;
+				const mergedResults = mergeResults();
+				const nodes = shardProgress.reduce((sum, entry) => sum + (entry.nodes || 0), 0);
+				updateTelemetry(shardProgress.map((entry) => ({
+					...entry,
+					done: true
+				})), mergedResults, true);
+				resolve({
+					outcome: {
+						results: mergedResults,
+						nodes,
+						truncated: true,
+						timeLimited: true
+					},
+					wordCount: loadedWordCount,
+					engine: shardEngines.every((engine) => engine === "wasm") ? "wasm" : "javascript",
+					wasmFailure: "",
+					workerCount
+				});
+			};
 			activeSearch = {
 				workers,
-				reject: fail
+				reject: fail,
+				countStoppedWorkers: () => countHarmedShards(shardEngines.map((_, index) => index))
 			};
 			const handleMessage = (shardIndex, worker, data) => {
+				if (!settled && deadlineEpochMs && Date.now() >= deadlineEpochMs && data?.type !== "complete") {
+					finishTimedOut();
+					return;
+				}
 				if (data?.type === "progress") {
+					if (data.wordCount) loadedWordCount = data.wordCount;
 					if (data.phase === "dictionary") {
 						const percent = data.completed / data.total * 35;
 						const message = `Loading dictionaries for ${workerCount} parallel worker${workerCount === 1 ? "" : "s"}…`;
 						status.textContent = message;
 						if (showProgress) updatePatternProgress(message, percent);
 					} else {
+						if (data.engine) shardEngines[shardIndex] = data.engine;
 						shardProgress[shardIndex] = data;
 						const nodes = shardProgress.reduce((sum, entry) => sum + entry.nodes, 0);
 						const totalBudget = shardProgress.reduce((sum, entry) => sum + entry.nodeLimit, 0);
@@ -1059,16 +1350,23 @@
 					}));
 					return;
 				}
-				if (data?.type === "engine") return;
+				if (data?.type === "engine") {
+					shardEngines[shardIndex] = data.engine;
+					return;
+				}
 				worker.terminate();
 				if (data?.type !== "complete") {
 					fail(new Error(data?.message || "Anagram Architect could not complete the search."));
 					return;
 				}
+				shardEngines[shardIndex] = data.engine || shardEngines[shardIndex];
+				if (data.outcome.timeLimited) countHarmedShards([shardIndex]);
+				completedShards.add(shardIndex);
 				shardResults[shardIndex] = data.outcome.results;
 				completions.push(data);
 				if (completions.length === workerCount && !settled) {
 					settled = true;
+					clearTimeout(hardTimeout);
 					activeSearch = null;
 					analysisCancel.hidden = true;
 					const nodes = completions.reduce((sum, entry) => sum + entry.outcome.nodes, 0);
@@ -1081,7 +1379,8 @@
 						outcome: {
 							results: mergedResults,
 							nodes,
-							truncated: completions.some((entry) => entry.outcome.truncated)
+							truncated: completions.some((entry) => entry.outcome.truncated),
+							timeLimited: completions.some((entry) => entry.outcome.timeLimited)
 						},
 						wordCount: completions[0].wordCount,
 						engine: completions.every((entry) => entry.engine === "wasm") ? "wasm" : "javascript",
@@ -1091,7 +1390,7 @@
 				}
 			};
 			for (let shardIndex = 0; shardIndex < workerCount; shardIndex += 1) {
-				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260914-11", { type: "module" });
+				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260915-23", { type: "module" });
 				workers.push(worker);
 				worker.addEventListener("message", ({ data }) => handleMessage(shardIndex, worker, data));
 				worker.addEventListener("error", () => fail(/* @__PURE__ */ new Error("A parallel anagram worker could not start. Reload the page and try again.")));
@@ -1103,7 +1402,7 @@
 					type: "solve",
 					source,
 					options: {
-						...options,
+						...workerOptions,
 						maxWords: shortPhraseSpecialist ? Math.min(options.maxWords, 3) : compactPhraseSpecialist ? Math.min(options.maxWords, 4) : options.maxWords,
 						shardIndex: isSpecialist ? 0 : shardIndex - specialistCount,
 						shardCount: isSpecialist ? 1 : workerCount - specialistCount
@@ -1111,14 +1410,17 @@
 					dictionary: dictionaryKind
 				});
 			}
+			if (options.timeLimitMs) hardTimeout = setTimeout(finishTimedOut, options.timeLimitMs);
 		});
 	}
 	progressCancel.addEventListener("click", () => {
 		if (!activeSearch) return;
+		activeSearch.countStoppedWorkers();
 		activeSearch.reject(new DOMException("Search cancelled", "AbortError"));
 	});
 	analysisCancel.addEventListener("click", () => {
 		if (!activeSearch) return;
+		activeSearch.countStoppedWorkers();
 		activeSearch.reject(new DOMException("Search cancelled", "AbortError"));
 	});
 	progressBackground.addEventListener("click", () => {
@@ -1141,6 +1443,7 @@
 	}
 	function renderResults() {
 		results.replaceChildren();
+		const personalWords = new Set(parsePersonalVocabulary().words);
 		const page = getPage();
 		if (!allResults.length) {
 			resultTools.hidden = true;
@@ -1171,7 +1474,8 @@
 			rankBadge.setAttribute("aria-label", `Overall rank ${rank}`);
 			title.append(rankBadge, heading);
 			const meta = document.createElement("span");
-			meta.textContent = `${phrase.split(" ").length} words · ${normalizeLetters(phrase).length} letters · exact match`;
+			const usesPersonalWord = phrase.toLowerCase().split(" ").some((word) => personalWords.has(word));
+			meta.textContent = `${phrase.split(" ").length} words · ${normalizeLetters(phrase).length} letters · exact match${usesPersonalWord ? " · personal vocabulary" : ""}`;
 			const actions = document.createElement("div");
 			actions.className = "anagram-result-actions";
 			const pick = document.createElement("button");
@@ -1206,33 +1510,90 @@
 		allResults = [];
 		analysis.hidden = true;
 	}
-	function searchConfiguration(mode, dictionaryKind) {
+	function deviceProfile() {
 		const available = Math.max(1, Math.min(8, navigator.hardwareConcurrency || 2));
-		const expanded = dictionaryKind === "expanded";
-		if (mode === "exhaustive") return {
-			workerCount: Math.min(available, 6),
-			nodeLimit: expanded ? 12e5 : 9e5
-		};
-		if (mode === "deep") return {
-			workerCount: Math.min(available, 4),
-			nodeLimit: expanded ? 5e5 : 3e5
-		};
+		const memory = Number(navigator.deviceMemory) || 0;
 		return {
-			workerCount: Math.min(available, 2),
-			nodeLimit: expanded ? 18e4 : 1e5
+			available,
+			memory,
+			tier: available >= 8 && (!memory || memory >= 8) ? "high" : available >= 4 && (!memory || memory >= 4) ? "medium" : "low"
+		};
+	}
+	function updateProRecommendation() {
+		const letterCount = normalizeLetters(input.value).length;
+		const { available, memory, tier } = deviceProfile();
+		const hardware = `${available} logical processor${available === 1 ? "" : "s"}${memory ? ` and about ${memory} GB device memory` : ""}`;
+		const baseSeconds = searchMode.value === "exhaustive" ? 60 : searchMode.value === "deep" ? 30 : 15;
+		const seconds = Math.round(baseSeconds * (tier === "high" ? 1 : tier === "medium" ? .85 : .67));
+		if (!proMode.checked) {
+			if (letterCount > 30) proRecommendation.textContent = `This ${letterCount}-letter phrase requires Pro mode. This device reports ${hardware}.`;
+			else if (Number(maxWords.value) >= 6) proRecommendation.textContent = `Six-word searches create a much larger search space${Number(minimumLength.value) <= 2 ? ", especially with a 2-letter minimum" : ""}. This search will stop after about ${seconds} seconds and keep its best results.`;
+			else proRecommendation.textContent = `Standard mode is recommended for this ${letterCount || "short"}-letter phrase.`;
+			return;
+		}
+		const advice = tier === "high" ? "Deep search should be a good starting point." : tier === "medium" ? "Start with Quick or Deep search." : "Start with Quick search and use required words or a template.";
+		proRecommendation.textContent = `${tier[0].toUpperCase()}${tier.slice(1)}-capacity device detected (${hardware}). ${advice} Long searches stop after about ${seconds} seconds and keep their best results.`;
+	}
+	function syncProMode() {
+		proWordOptions.forEach((option) => {
+			option.hidden = !proMode.checked;
+		});
+		if (!proMode.checked && Number(maxWords.value) > 6) maxWords.value = "6";
+		updateProRecommendation();
+	}
+	function searchConfiguration(mode, dictionaryKind, letterCount, usesProMode, maximumWords, shortestWord) {
+		const { available, tier } = deviceProfile();
+		const expanded = dictionaryKind === "expanded";
+		const tierFactor = tier === "high" ? 1 : tier === "medium" ? .85 : .67;
+		const baseTimeMs = mode === "exhaustive" ? 6e4 : mode === "deep" ? 3e4 : 15e3;
+		if (usesProMode && letterCount > 30) {
+			const baseNodes = mode === "exhaustive" ? 15e4 : mode === "deep" ? 75e3 : 25e3;
+			const cap = mode === "exhaustive" ? 8 : mode === "deep" ? 6 : 3;
+			const dictionaryFactor = expanded ? .85 : 1;
+			return {
+				workerCount: Math.min(available, cap),
+				nodeLimit: Math.round(baseNodes * tierFactor * dictionaryFactor),
+				timeLimitMs: Math.round(baseTimeMs * tierFactor)
+			};
+		}
+		return {
+			...mode === "exhaustive" ? {
+				workerCount: Math.min(available, 6),
+				nodeLimit: expanded ? 12e5 : 9e5
+			} : mode === "deep" ? {
+				workerCount: Math.min(available, 4),
+				nodeLimit: expanded ? 5e5 : 3e5
+			} : {
+				workerCount: Math.min(available, 2),
+				nodeLimit: expanded ? 18e4 : 1e5
+			},
+			timeLimitMs: Math.round(baseTimeMs * tierFactor)
 		};
 	}
 	form.addEventListener("submit", async (event) => {
 		event.preventDefault();
 		const source = input.value.trim();
 		const letters = normalizeLetters(source);
-		if (letters.length < 2 || letters.length > 30) {
-			const message = letters.length > 30 ? "Enter a name or phrase containing 2 to 30 letters. Support for longer phrases is planned for a future upgrade." : "Enter a name or phrase containing at least 2 letters.";
+		const maximumLetters = proMode.checked ? 60 : 30;
+		if (letters.length < 2 || letters.length > maximumLetters) {
+			const message = letters.length > maximumLetters ? proMode.checked ? "Pro mode currently supports source phrases containing up to 60 letters. Shorten the phrase or divide it into smaller searches." : "This phrase contains more than 30 letters. Enable experimental Pro mode to search phrases containing up to 60 letters." : "Enter a name or phrase containing at least 2 letters.";
 			status.textContent = message;
 			showValidationError(message);
 			return;
 		}
-		const templateLiterals = GRAMMAR_TEMPLATE_LITERALS[grammarTemplate.value] || [];
+		const grammarValue = selectedGrammarTemplate();
+		const personalWords = parsePersonalVocabulary();
+		if (personalWords.total > 500) {
+			showValidationError("Personal vocabulary supports up to 500 unique words. Remove some entries before searching.", "Personal vocabulary is too large", personalVocabulary);
+			return;
+		}
+		if (grammarTemplate.value === "custom" && customGrammarSlots.length === 0) {
+			const message = "Add at least one noun, verb, adjective, unrestricted, or exact-word slot to the custom template.";
+			status.textContent = message;
+			showValidationError(message, "Build your template", templateAddSlot);
+			return;
+		}
+		const templateLiterals = grammarLiteralWords(grammarValue);
 		if (!containsRequiredLetters(source, templateLiterals)) {
 			const message = `This grammar template requires the word${templateLiterals.length === 1 ? "" : "s"} ${templateLiterals.map((word) => `“${word}”`).join(" and ")}, but those letters are not available.`;
 			status.textContent = message;
@@ -1240,8 +1601,9 @@
 			return;
 		}
 		submit.disabled = true;
-		const usesPhrasePattern = Boolean(phrasePattern.value.trim() || grammarTemplate.value);
-		const showsProgressModal = usesPhrasePattern || searchMode.value === "exhaustive";
+		const usesPhrasePattern = Boolean(phrasePattern.value.trim() || grammarValue);
+		const hasExpensiveShape = Number(maxWords.value) >= 6;
+		const showsProgressModal = usesPhrasePattern || searchMode.value === "exhaustive" || proMode.checked && letters.length > 30 || hasExpensiveShape;
 		if (showsProgressModal) showPatternProgress("Loading the local dictionary…", usesPhrasePattern);
 		resetResultView();
 		results.replaceChildren();
@@ -1253,13 +1615,14 @@
 				maxWords: Number(maxWords.value),
 				minimumLength: Number(minimumLength.value),
 				pattern: phrasePattern.value,
-				grammarTemplate: grammarTemplate.value,
+				grammarTemplate: grammarValue,
 				lockedWords: lockedWords.value,
 				preferredWords: preferredWords.value,
 				excludedWords: excludedWords.value,
 				excludeVulgar: excludeVulgar.checked,
+				customWords: personalWords.words,
 				limit: 1200,
-				...searchConfiguration(searchMode.value, dictionary.value)
+				...searchConfiguration(searchMode.value, dictionary.value, letters.length, proMode.checked, Number(maxWords.value), Number(minimumLength.value))
 			}, dictionary.value, showsProgressModal);
 			status.textContent = `Architecting exact phrases from ${wordCount.toLocaleString()} words…`;
 			if (showsProgressModal) updatePatternProgress("Finalizing your exact matches…", 100);
@@ -1267,7 +1630,7 @@
 			allResults = outcome.results;
 			renderResults();
 			const seconds = ((performance.now() - started) / 1e3).toFixed(1);
-			status.textContent = outcome.results.length === 0 && grammarTemplate.value ? `No exact phrases matched the selected grammar template in ${seconds}s. Try another template, Expanded dictionary, or a different source phrase.` : `${outcome.results.length} exact phrase${outcome.results.length === 1 ? "" : "s"} found in ${seconds}s${outcome.truncated ? " · ranked search pass" : ""} · ${workerCount} ${engine === "wasm" ? "Rust/WASM" : "JavaScript"} worker${workerCount === 1 ? "" : "s"}.`;
+			status.textContent = outcome.results.length === 0 && grammarTemplate.value ? `No exact phrases matched the selected grammar template in ${seconds}s. Try another template, Expanded dictionary, or a different source phrase.` : `${outcome.results.length} exact phrase${outcome.results.length === 1 ? "" : "s"} found in ${seconds}s${outcome.timeLimited ? " · time budget reached" : outcome.truncated ? " · ranked search pass" : ""} · ${workerCount} ${engine === "wasm" ? "Rust/WASM" : "JavaScript"} worker${workerCount === 1 ? "" : "s"}.`;
 			if (wasmFailure) console.warn("Rust/WASM fallback:", wasmFailure);
 		} catch (error) {
 			status.textContent = error?.name === "AbortError" ? "Anagram search cancelled." : error instanceof Error ? error.message : "Anagram Architect could not complete the search.";
@@ -1277,18 +1640,36 @@
 			if (showsProgressModal) hidePatternProgress();
 		}
 	});
-	clear.addEventListener("click", () => {
-		input.value = "";
+	function resetAdvancedOptions(announce = false) {
 		phrasePattern.value = "";
 		grammarTemplate.value = "";
+		grammarControl.open = false;
+		dictionary.value = "standard";
+		searchMode.value = "deep";
+		maxWords.value = "5";
+		minimumLength.value = "2";
+		customGrammarSlots = [];
+		templateSlotType.value = "noun";
+		templateLiteral.value = "";
+		templateLiteralWrap.hidden = true;
+		syncTemplateBuilder();
 		lockedWords.value = "";
 		preferredWords.value = "";
 		excludedWords.value = "";
+		excludeVulgar.checked = true;
+		proMode.checked = false;
+		syncProMode();
+		syncInputClearButtons();
+		if (announce) status.textContent = "Advanced options reset to defaults.";
+	}
+	resetAdvanced.addEventListener("click", () => resetAdvancedOptions(true));
+	clear.addEventListener("click", () => {
+		input.value = "";
+		resetAdvancedOptions();
 		resetResultView();
 		results.replaceChildren();
 		summary.textContent = "Letters, spaces, and punctuation are accepted";
 		status.textContent = "Ready to architect a phrase.";
-		syncInputClearButtons();
 		input.focus();
 	});
 	resultSearch.addEventListener("input", () => {
@@ -1328,7 +1709,14 @@
 	input.addEventListener("input", () => {
 		const letters = normalizeLetters(input.value);
 		summary.textContent = letters ? `${letters.length} letter${letters.length === 1 ? "" : "s"} available` : "Letters, spaces, and punctuation are accepted";
+		updateProRecommendation();
+		updatePersonalVocabulary();
 	});
+	proMode.addEventListener("change", syncProMode);
+	searchMode.addEventListener("change", updateProRecommendation);
+	maxWords.addEventListener("change", updateProRecommendation);
+	minimumLength.addEventListener("change", updateProRecommendation);
+	syncProMode();
 	var initialPhrase = new URLSearchParams(window.location.search).get("phrase")?.trim();
 	if (initialPhrase) {
 		input.value = initialPhrase;
@@ -1337,5 +1725,6 @@
 		queueMicrotask(() => form.requestSubmit());
 	}
 	syncInputClearButtons();
+	updatePersonalVocabulary();
 	//#endregion
 })();
