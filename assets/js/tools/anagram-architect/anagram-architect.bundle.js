@@ -389,6 +389,38 @@
 	var PICK_STORAGE_KEY = "monkeytactics.anagram-architect.pick-list.v1";
 	var WORKER_HARM_STORAGE_KEY = "monkeytactics.anagram-architect.workers-harmed.v1";
 	var PERSONAL_VOCABULARY_STORAGE_KEY = "monkeytactics.anagram-architect.personal-vocabulary.v1";
+	var DICTIONARY_LINKS = Object.freeze([
+		[
+			"MW",
+			"Merriam-Webster",
+			(word) => `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`
+		],
+		[
+			"CO",
+			"Collins",
+			(word) => `https://www.collinsdictionary.com/dictionary/english/${encodeURIComponent(word)}`
+		],
+		[
+			"Wik",
+			"Wiktionary",
+			(word) => `https://en.wiktionary.org/wiki/${encodeURIComponent(word)}`
+		],
+		[
+			"WN",
+			"Wordnik",
+			(word) => `https://www.wordnik.com/words/${encodeURIComponent(word)}`
+		],
+		[
+			"DC",
+			"Dictionary.com",
+			(word) => `https://www.dictionary.com/browse/${encodeURIComponent(word)}`
+		],
+		[
+			"Cam",
+			"Cambridge",
+			(word) => `https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(word)}`
+		]
+	]);
 	var currentSource = "";
 	var searchRequestId = 0;
 	var allResults = [];
@@ -403,6 +435,72 @@
 	var draggedTemplateIndex = null;
 	var pointerTemplateDrag = null;
 	var pickDictionaryPromises = /* @__PURE__ */ new Map();
+	var dictionaryDirectoryDialog = null;
+	var dictionaryDirectoryTitle = null;
+	var dictionaryDirectoryLinks = null;
+	var dictionaryDirectoryReturnFocus = null;
+	function ensureDictionaryDirectoryDialog() {
+		if (dictionaryDirectoryDialog) return;
+		dictionaryDirectoryDialog = document.createElement("dialog");
+		dictionaryDirectoryDialog.className = "anagram-dictionary-directory-modal";
+		dictionaryDirectoryDialog.setAttribute("aria-labelledby", "anagram-dictionary-directory-title");
+		const card = document.createElement("div");
+		card.className = "anagram-dictionary-directory-card";
+		const header = document.createElement("header");
+		header.className = "anagram-dictionary-directory-header";
+		dictionaryDirectoryTitle = document.createElement("h2");
+		dictionaryDirectoryTitle.id = "anagram-dictionary-directory-title";
+		const close = document.createElement("button");
+		close.type = "button";
+		close.className = "anagram-dictionary-directory-close";
+		close.setAttribute("aria-label", "Close dictionary lookups");
+		close.textContent = "×";
+		close.addEventListener("click", () => dictionaryDirectoryDialog.close());
+		header.append(dictionaryDirectoryTitle, close);
+		const introduction = document.createElement("p");
+		introduction.textContent = "Choose an external dictionary. The selected service opens in a new tab.";
+		dictionaryDirectoryLinks = document.createElement("div");
+		dictionaryDirectoryLinks.className = "anagram-dictionary-directory-links";
+		card.append(header, introduction, dictionaryDirectoryLinks);
+		dictionaryDirectoryDialog.append(card);
+		dictionaryDirectoryDialog.addEventListener("click", (event) => {
+			if (event.target === dictionaryDirectoryDialog) dictionaryDirectoryDialog.close();
+		});
+		dictionaryDirectoryDialog.addEventListener("close", () => {
+			dictionaryDirectoryReturnFocus?.focus();
+			dictionaryDirectoryReturnFocus = null;
+		});
+		document.body.append(dictionaryDirectoryDialog);
+	}
+	function openDictionaryDirectory(word, trigger) {
+		ensureDictionaryDirectoryDialog();
+		dictionaryDirectoryReturnFocus = trigger;
+		dictionaryDirectoryTitle.textContent = `Look up ${word.toUpperCase()}`;
+		dictionaryDirectoryLinks.replaceChildren(...DICTIONARY_LINKS.map(([abbreviation, name, getUrl]) => {
+			const link = document.createElement("a");
+			link.href = getUrl(word);
+			link.target = "_blank";
+			link.rel = "noopener noreferrer";
+			const shortName = document.createElement("strong");
+			shortName.textContent = abbreviation;
+			const fullName = document.createElement("span");
+			fullName.textContent = name;
+			link.append(shortName, fullName);
+			return link;
+		}));
+		dictionaryDirectoryDialog.showModal();
+	}
+	function buildDictionaryLookupButton(label = "Look up") {
+		const button = document.createElement("button");
+		button.type = "button";
+		button.className = "anagram-dictionary-lookup";
+		button.textContent = label;
+		button.hidden = true;
+		button.addEventListener("click", () => {
+			if (button.dataset.word) openDictionaryDirectory(button.dataset.word, button);
+		});
+		return button;
+	}
 	form.dataset.architectReady = "true";
 	function readHarmedWorkers() {
 		try {
@@ -1022,9 +1120,13 @@
 		definitionPanel.setAttribute("aria-live", "polite");
 		const definitionHeading = document.createElement("strong");
 		definitionHeading.textContent = "Word definitions";
+		const definitionLookup = buildDictionaryLookupButton();
+		const definitionHeader = document.createElement("div");
+		definitionHeader.className = "anagram-definition-header";
+		definitionHeader.append(definitionHeading, definitionLookup);
 		const definitionContent = document.createElement("div");
 		definitionContent.textContent = "Select a word to see all of its local definitions.";
-		definitionPanel.append(definitionHeading, definitionContent);
+		definitionPanel.append(definitionHeader, definitionContent);
 		const replacement = document.createElement("select");
 		replacement.hidden = true;
 		replacement.setAttribute("aria-label", "Exact-letter replacement words");
@@ -1048,6 +1150,8 @@
 		const showDefinitions = async (word) => {
 			const requestId = ++definitionRequestId;
 			definitionHeading.textContent = `Definition: ${titleCase(word)}`;
+			definitionLookup.dataset.word = word;
+			definitionLookup.hidden = false;
 			definitionContent.textContent = "Loading definitions…";
 			try {
 				const result = await globalThis.MonkeyTacticsWordDefinitions?.lookup(word, { allowRemote: false });
@@ -1078,6 +1182,12 @@
 				const definitions = [...new Set((result?.entries || []).flatMap(({ defs = [] }) => defs).map((value) => String(value).replace(/^[a-z]+\t/i, "").trim()).filter(Boolean))];
 				const heading = document.createElement("strong");
 				heading.textContent = `Definition: ${titleCase(word)}`;
+				const lookup = buildDictionaryLookupButton();
+				lookup.dataset.word = word;
+				lookup.hidden = false;
+				const header = document.createElement("div");
+				header.className = "anagram-definition-header";
+				header.append(heading, lookup);
 				const content = document.createElement("div");
 				if (definitions.length) {
 					const list = document.createElement("ol");
@@ -1088,7 +1198,7 @@
 					});
 					content.append(list);
 				} else content.textContent = "No local definition is available for this replacement.";
-				replacementDefinition.replaceChildren(heading, content);
+				replacementDefinition.replaceChildren(header, content);
 			} catch {
 				if (requestId === replacementDefinitionRequestId) replacementDefinition.textContent = "Replacement definitions could not be loaded.";
 			}
@@ -1113,6 +1223,8 @@
 					feedback.textContent = "Choose a word to see exact-letter alternatives.";
 					definitionRequestId += 1;
 					definitionHeading.textContent = "Word definitions";
+					definitionLookup.hidden = true;
+					delete definitionLookup.dataset.word;
 					definitionContent.textContent = "Select a word to see all of its local definitions.";
 					return;
 				}

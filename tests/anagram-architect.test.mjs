@@ -186,7 +186,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-16/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-17/);
 });
 
 test("shows phrase validation failures in an accessible modal", async () => {
@@ -264,7 +264,7 @@ test("the result toolbar loads the cache-busted responsive stylesheet", async ()
     readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"),
     readFile(new URL("../assets/css/tools/anagram-architect.css", import.meta.url), "utf8")
   ]);
-  assert.match(html, /anagram-architect\.css\?v=20260917-09/);
+  assert.match(html, /anagram-architect\.css\?v=20260917-10/);
   assert.match(css, /\.anagram-pick-drawer-content > \.anagram-pick-permutations \{[^}]*height: 100%/);
   assert.match(css, /\.anagram-pick-drawer-content > \.anagram-pick-permutations select \{[^}]*height: 100%/);
   assert.match(html, /id="anagram-result-search"/);
@@ -285,7 +285,10 @@ test("shows all local definitions beneath the Words-tab chips", async () => {
   assert.match(source, /definitionContent\.replaceChildren\(list\)/);
   assert.equal((source.match(/Definition: \$\{titleCase\(word\)\}/g) || []).length, 2);
   assert.match(source, /showReplacementDefinitions\(selected\.word\)/);
-  assert.match(source, /replacementDefinition\.replaceChildren\(heading, content\)/);
+  assert.match(source, /replacementDefinition\.replaceChildren\(header, content\)/);
+  assert.match(source, /Merriam-Webster/);
+  assert.match(source, /openDictionaryDirectory\(button\.dataset\.word, button\)/);
+  assert.match(source, /The selected service opens in a new tab/);
   assert.match(css, /\.anagram-pick-word-buttons \{[^}]*padding-top: \.5rem/);
   assert.match(css, /\.anagram-pick-word-definitions/);
   assert.match(css, /\.anagram-pick-replacement-definition/);
