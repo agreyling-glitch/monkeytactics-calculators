@@ -14,19 +14,29 @@ async function loadDictionary(kind) {
   if (!response.ok) throw new Error("The local dictionary manifest could not be loaded.");
   const manifest = await response.json();
   const chunks = Object.values(manifest.chunks);
-  const words = [];
-  for (let index = 0; index < chunks.length; index += 1) {
-    const chunkResponse = await fetch(`/assets/data/words/${chunks[index].file}`);
-    if (!chunkResponse.ok) throw new Error("A local dictionary file could not be loaded.");
-    const text = await decodeResponse(chunkResponse);
-    for (const line of text.split(/\r?\n/)) {
-      const word = line.split("\t", 1)[0];
-      if (word) words.push(word);
+  const chunkWords = Array.from({ length: chunks.length }, () => []);
+  let nextChunkIndex = 0;
+  let completedChunks = 0;
+  const loadNextChunk = async () => {
+    while (nextChunkIndex < chunks.length) {
+      const index = nextChunkIndex;
+      nextChunkIndex += 1;
+      const chunkResponse = await fetch(`/assets/data/words/${chunks[index].file}`);
+      if (!chunkResponse.ok) throw new Error("A local dictionary file could not be loaded.");
+      const text = await decodeResponse(chunkResponse);
+      const words = chunkWords[index];
+      for (const line of text.split(/\r?\n/)) {
+        const word = line.split("\t", 1)[0];
+        if (word) words.push(word);
+      }
+      completedChunks += 1;
+      self.postMessage({ type: "progress", phase: "dictionary", completed: completedChunks, total: chunks.length });
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
-    self.postMessage({ type: "progress", phase: "dictionary", completed: index + 1, total: chunks.length });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-  return words;
+  };
+  const downloadConcurrency = Math.min(8, chunks.length);
+  await Promise.all(Array.from({ length: downloadConcurrency }, loadNextChunk));
+  return chunkWords.flat();
 }
 
 async function loadLanguageData() {

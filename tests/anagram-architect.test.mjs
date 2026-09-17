@@ -186,7 +186,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-15/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-16/);
 });
 
 test("shows phrase validation failures in an accessible modal", async () => {
@@ -237,6 +237,8 @@ test("offers an experimental hardware-aware Pro mode for long phrases", async ()
   assert.match(worker, /data\.options\.customWords \|\| \[\]/);
   assert.match(worker, /searchOptions\.deadlineEpochMs - Date\.now\(\)/);
   assert.match(worker, /timeLimitMs: remainingTimeMs/);
+  assert.match(worker, /downloadConcurrency = Math\.min\(8, chunks\.length\)/);
+  assert.match(worker, /return chunkWords\.flat\(\)/);
 });
 
 test("the JavaScript fallback enforces the wall-clock search budget", async () => {
