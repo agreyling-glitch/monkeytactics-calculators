@@ -67,7 +67,7 @@ self.addEventListener("message", async ({ data }) => {
     let wasmFailure = "";
     let wasmReady = false;
     try {
-      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260917-03" });
+      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260917-04" });
       if (!verifyWasmDomain(self.location.hostname)) throw new Error("Anagram Architect is not authorized on this host.");
       initWasmEngine(words);
       initLanguageMetadata(languageRecords);

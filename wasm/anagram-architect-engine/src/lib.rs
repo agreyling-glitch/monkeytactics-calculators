@@ -621,9 +621,16 @@ impl Search {
             .filter_map(|(index, candidate)| CONNECTORS.contains(&candidate.word.as_str()).then_some(index))
             .collect();
         let scan_limit = self.candidates.len().min(candidate_limit);
-        let mut signatures: HashMap<[u8; 26], Vec<usize>> = HashMap::new();
-        for (index, candidate) in self.candidates.iter().enumerate() {
-            signatures.entry(candidate.counts).or_default().push(index);
+        let mut candidate_pairs: HashMap<[u8; 26], Vec<(usize, usize)>> = HashMap::new();
+        for first in 0..scan_limit {
+            for second in first..scan_limit {
+                let mut combined = [0_u8; 26];
+                for (position, value) in combined.iter_mut().enumerate() {
+                    *value = self.candidates[first].counts[position]
+                        .saturating_add(self.candidates[second].counts[position]);
+                }
+                candidate_pairs.entry(combined).or_default().push((first, second));
+            }
         }
         let target = counts(&self.source);
         for (left_position, &left) in connector_indices.iter().enumerate() {
@@ -635,11 +642,9 @@ impl Search {
                 for first in 0..scan_limit {
                     if !fits(&self.candidates[first].counts, &remaining) { continue; }
                     let after_first = subtract(&remaining, &self.candidates[first].counts);
-                    for second in first..scan_limit {
-                        if !fits(&self.candidates[second].counts, &after_first) { continue; }
-                        let complement = subtract(&after_first, &self.candidates[second].counts);
-                        if let Some(matches) = signatures.get(&complement).cloned() {
-                            for third in matches.into_iter().filter(|index| *index >= second) {
+                    if let Some(pairs) = candidate_pairs.get(&after_first).cloned() {
+                        for (second, third) in pairs {
+                            if second >= first {
                                 self.path = vec![left, right, first, second, third];
                                 self.record_result();
                             }
