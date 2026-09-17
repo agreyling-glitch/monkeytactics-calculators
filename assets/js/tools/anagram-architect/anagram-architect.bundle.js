@@ -1770,8 +1770,8 @@
 				workerCount: Math.min(available, 4),
 				nodeLimit: expanded ? 5e5 : 3e5
 			} : {
-				workerCount: Math.min(available, 2),
-				nodeLimit: expanded ? 18e4 : 1e5
+				workerCount: 1,
+				nodeLimit: expanded ? 24e4 : 14e4
 			},
 			timeLimitMs: baseTimeMs
 		};

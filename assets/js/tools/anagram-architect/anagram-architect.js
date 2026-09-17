@@ -1082,7 +1082,7 @@ function searchConfiguration(mode, dictionaryKind, letterCount, usesProMode, max
     ? { workerCount: Math.min(available, 6), nodeLimit: expanded ? 1200000 : 900000 }
     : mode === "deep"
       ? { workerCount: Math.min(available, 4), nodeLimit: expanded ? 500000 : 300000 }
-      : { workerCount: Math.min(available, 2), nodeLimit: expanded ? 180000 : 100000 };
+      : { workerCount: 1, nodeLimit: expanded ? 240000 : 140000 };
   return { ...standard, timeLimitMs: baseTimeMs };
 }
 
