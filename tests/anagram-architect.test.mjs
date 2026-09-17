@@ -71,6 +71,12 @@ test("prefers a transitive verb before a determiner-led object", () => {
   assert.ok(ranked.findIndex(({ phrase }) => phrase === "computer a scorn") > 0);
 });
 
+test("prefers an imperative nationality phrase over ambiguous reorderings", () => {
+  const ranked = rankPhrasePermutations("ignore her german");
+  assert.equal(ranked[0]?.phrase, "ignore her german");
+  assert.ok(ranked.findIndex(({ phrase }) => phrase === "her german ignore") > 0);
+});
+
 test("ranks exact-letter word replacements without changing the rest of a phrase", () => {
   const ranked = rankWordReplacements("despised drains us the man", 1, ["drains", "nadirs", "dinars", "rained", "unrelated"]);
   assert.deepEqual(new Set(ranked.map(({ word }) => word)), new Set(["nadirs", "dinars"]));
@@ -165,7 +171,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260916-03/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-01/);
 });
 
 test("shows phrase validation failures in an accessible modal", async () => {
@@ -514,7 +520,7 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.match(html, /Why did my search return no results\?/);
   assert.match(html, /Anagram solver FAQ/);
   assert.match(html, /Related word tools/);
-  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-16<\/lastmod>/);
+  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-17<\/lastmod>/);
   assert.match(html, /Standard contains 172,820 words/);
   assert.match(html, /Expanded contains 867,177 Wiktionary-derived words/);
   const structured = html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];

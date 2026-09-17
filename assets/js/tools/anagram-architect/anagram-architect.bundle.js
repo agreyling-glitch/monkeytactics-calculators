@@ -124,8 +124,11 @@
 	var CONJUNCTIONS = new Set("and or but nor yet so".split(" "));
 	var ADJECTIVES = new Set("old new good bad big small great little dark light true real damn".split(" "));
 	var SUBJECT_PRONOUNS = new Set("i you he she it we they".split(" "));
+	var OBJECT_PRONOUNS = new Set("me him her us them".split(" "));
+	var POSSESSIVE_DETERMINERS = new Set("my your our his her their".split(" "));
+	var NATIONALITY_NOUNS = new Set("american australian british canadian chinese dutch english french german greek indian irish italian japanese scottish spanish welsh".split(" "));
 	var COMMON_VERBS = new Set("am are be been being bug bugs can could did do does get gets got had has have is make makes may might must see sees should was were will would".split(" "));
-	var TRANSITIVE_VERBS = new Set("admire avoid build call catch choose create despise drain find give hate help hit hold keep kill know leave like love make meet move need open praise read save scorn see take tell use want watch".split(" "));
+	var TRANSITIVE_VERBS = new Set("admire avoid build call catch choose create despise drain find give hate help hit hold ignore keep kill know leave like love make meet move need open praise read save scorn see take tell use want watch".split(" "));
 	var COPULAS = new Set("am are is was were be".split(" "));
 	var NATURAL_PAIRS = /* @__PURE__ */ new Set([
 		"old man",
@@ -230,6 +233,8 @@
 			if (!SUBJECT_PRONOUNS.has(current) && SUBJECT_PRONOUNS.has(next)) score -= 75;
 		}
 		if (words.length === 3 && DETERMINERS.has(words[1])) score += isTransitiveVerb(words[0]) ? 22 : -22;
+		if (words.length === 3 && isTransitiveVerb(words[0]) && POSSESSIVE_DETERMINERS.has(words[1]) && NATIONALITY_NOUNS.has(words[2])) score += 700;
+		if (words.length >= 2 && OBJECT_PRONOUNS.has(words[0]) && PREPOSITIONS.has(words[1])) score -= 120;
 		for (let index = 0; index < words.length - 2; index += 1) if (SUBJECT_PRONOUNS.has(words[index]) && COPULAS.has(words[index + 1]) && DETERMINERS.has(words[index + 2])) score += 90;
 		return score;
 	}
@@ -1493,7 +1498,7 @@
 				}
 			};
 			for (let shardIndex = 0; shardIndex < workerCount; shardIndex += 1) {
-				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260915-23", { type: "module" });
+				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260917-01", { type: "module" });
 				workers.push(worker);
 				worker.addEventListener("message", ({ data }) => handleMessage(shardIndex, worker, data));
 				worker.addEventListener("error", () => fail(/* @__PURE__ */ new Error("A parallel anagram worker could not start. Reload the page and try again.")));

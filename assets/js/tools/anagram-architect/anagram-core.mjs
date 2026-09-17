@@ -141,9 +141,12 @@ const PREPOSITIONS = new Set("of to in on at by for from with as into over under
 const CONJUNCTIONS = new Set("and or but nor yet so".split(" "));
 const ADJECTIVES = new Set("old new good bad big small great little dark light true real damn".split(" "));
 const SUBJECT_PRONOUNS = new Set("i you he she it we they".split(" "));
+const OBJECT_PRONOUNS = new Set("me him her us them".split(" "));
+const POSSESSIVE_DETERMINERS = new Set("my your our his her their".split(" "));
+const NATIONALITY_NOUNS = new Set("american australian british canadian chinese dutch english french german greek indian irish italian japanese scottish spanish welsh".split(" "));
 const COMMON_VERBS = new Set("am are be been being bug bugs can could did do does get gets got had has have is make makes may might must see sees should was were will would".split(" "));
 const TRANSITIVE_VERBS = new Set((
-  "admire avoid build call catch choose create despise drain find give hate help hit hold keep kill know leave like love make meet move need open praise read save scorn see take tell use want watch"
+  "admire avoid build call catch choose create despise drain find give hate help hit hold ignore keep kill know leave like love make meet move need open praise read save scorn see take tell use want watch"
 ).split(" "));
 const COPULAS = new Set("am are is was were be".split(" "));
 const NATURAL_PAIRS = new Set(["old man", "new world", "good man", "bad man", "dark night", "a base", "the world", "of life"]);
@@ -228,6 +231,10 @@ function phraseScore(words) {
   if (words.length === 3 && DETERMINERS.has(words[1])) {
     score += isTransitiveVerb(words[0]) ? 22 : -22;
   }
+  if (words.length === 3 && isTransitiveVerb(words[0])
+    && POSSESSIVE_DETERMINERS.has(words[1])
+    && NATIONALITY_NOUNS.has(words[2])) score += 700;
+  if (words.length >= 2 && OBJECT_PRONOUNS.has(words[0]) && PREPOSITIONS.has(words[1])) score -= 120;
   for (let index = 0; index < words.length - 2; index += 1) {
     if (SUBJECT_PRONOUNS.has(words[index]) && COPULAS.has(words[index + 1]) && DETERMINERS.has(words[index + 2])) score += 90;
   }

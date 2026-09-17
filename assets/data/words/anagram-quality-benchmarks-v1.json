@@ -1,6 +1,22 @@
 {
-  "version": 14,
+  "version": 15,
   "cases": [
+    {
+      "name": "Hermione Granger imperative phrase",
+      "source": "HERMIONE GRANGER",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "ignore her german",
+      "maxRank": 25,
+      "specialistMaxRank": 25,
+      "nodeLimit": 300000,
+      "maxWords": 5,
+      "uiWorkers": 4,
+      "forbiddenTop": [
+        "her in more grange"
+      ],
+      "forbiddenTopLimit": 20
+    },
     {
       "name": "Schoolmaster phrase",
       "source": "SCHOOLMASTER",

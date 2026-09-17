@@ -1150,6 +1150,7 @@ fn inferred_pos(word: &str, metadata: &HashMap<String, (u64, u8)>) -> u8 {
 
 fn phrase_shape_bonus(words: &[String], metadata: &HashMap<String, (u64, u8)>) -> i32 {
     const DET: &[&str] = &["a", "an", "the", "this", "that", "my", "your", "our", "his", "her", "their"];
+    const POSSESSIVE_DETERMINERS: &[&str] = &["my", "your", "our", "his", "her", "their"];
     const PREP: &[&str] = &["of", "to", "in", "on", "at", "by", "for", "from", "with", "into", "over", "under"];
     let positions: Vec<u8> = words.iter().map(|word| inferred_pos(word, metadata)).collect();
     let mut score = 0;
@@ -1190,6 +1191,17 @@ fn phrase_shape_bonus(words: &[String], metadata: &HashMap<String, (u64, u8)>) -
         if first & 2 != 0 && DET.contains(&words[index + 1].as_str()) && last & 1 != 0 {
             score += 60;
         }
+        // Treat possessives as structural determiners even when their
+        // dictionary POS is ambiguous ("ignore her German", "take your time").
+        if words.len() == 3
+            && index == 0
+            && first & 2 != 0
+            && POSSESSIVE_DETERMINERS.contains(&words[index + 1].as_str())
+            && last & 1 != 0
+            && last & 4 != 0
+        {
+            score += 1_800;
+        }
     }
     score
 }
@@ -1205,6 +1217,7 @@ fn phrase_score_with_metadata(
         "of", "to", "in", "on", "at", "by", "for", "from", "with", "into", "over", "under",
     ];
     const SUBJECT_PRONOUNS: &[&str] = &["i", "you", "he", "she", "it", "we", "they"];
+    const OBJECT_PRONOUNS: &[&str] = &["me", "him", "her", "us", "them"];
     const COPULAS: &[&str] = &["am", "are", "is", "was", "were", "be"];
     const FUNCTION: &[&str] = &[
         "a", "an", "the", "this", "that", "my", "your", "our", "his", "her", "their", "of", "to",
@@ -1275,6 +1288,12 @@ fn phrase_score_with_metadata(
         if PREP.contains(&last.as_str()) || FUNCTION.contains(&last.as_str()) {
             score -= 75;
         }
+    }
+    if words.len() >= 2
+        && OBJECT_PRONOUNS.contains(&words[0].as_str())
+        && PREP.contains(&words[1].as_str())
+    {
+        score -= 190;
     }
     for pair in words.windows(2) {
         let left = pair[0].as_str();
@@ -1674,6 +1693,25 @@ mod tests {
             phrase_score_with_metadata(&natural, &metadata, &LanguageModel::default())
                 > phrase_score_with_metadata(&inverted, &metadata, &LanguageModel::default())
         );
+    }
+    #[test]
+    fn imperative_possessive_object_beats_ambiguous_fragments() {
+        let intended = ["ignore", "her", "german"].map(String::from);
+        let modifier_chain = ["ranging", "more", "here"].map(String::from);
+        let pronoun_fragment = ["her", "in", "more", "grange"].map(String::from);
+        let metadata = HashMap::from([
+            ("ignore".into(), (14_353_555, 2)),
+            ("her".into(), (391_961_061, 0)),
+            ("german".into(), (53_710_784, 1 | 4)),
+            ("ranging".into(), (10_213_057, 4)),
+            ("more".into(), (1_544_771_673, 1 | 4 | 8)),
+            ("here".into(), (639_711_198, 1 | 4 | 8)),
+            ("in".into(), (9_000_000_000, 0)),
+            ("grange".into(), (2_247_323, 1)),
+        ]);
+        let language = LanguageModel::default();
+        assert!(phrase_score_with_metadata(&intended, &metadata, &language) > phrase_score_with_metadata(&modifier_chain, &metadata, &language));
+        assert!(phrase_score_with_metadata(&intended, &metadata, &language) > phrase_score_with_metadata(&pronoun_fragment, &metadata, &language));
     }
     #[test]
     fn third_person_inflection_selects_the_natural_verb() {
