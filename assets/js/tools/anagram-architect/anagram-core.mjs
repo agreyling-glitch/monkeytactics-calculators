@@ -243,9 +243,10 @@ function phraseScore(words) {
 
 export function rankPhrasePermutations(phrase, limit = 720, lockedPositions = []) {
   const words = String(phrase || "").toLowerCase().match(/[a-z]+/g) || [];
-  if (!words.length || words.length > 6) return [];
+  if (!words.length) return [];
   const locked = new Set((Array.isArray(lockedPositions) ? lockedPositions : [])
     .map(Number).filter((index) => Number.isInteger(index) && index >= 0 && index < words.length));
+  if (words.length - locked.size > 8) return [];
   const ranked = [];
   const used = words.map((_, index) => locked.has(index));
   const current = [];

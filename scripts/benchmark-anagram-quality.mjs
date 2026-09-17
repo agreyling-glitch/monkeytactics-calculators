@@ -8,6 +8,8 @@ const baselineUrl = new URL("assets/data/words/anagram-quality-baseline-v1.json"
 const updateBaseline = process.argv.includes("--update-baseline");
 const caseArgument = process.argv.find((argument) => argument.startsWith("--case="));
 const caseFilter = caseArgument?.slice("--case=".length).toLowerCase();
+const nodeLimitArgument = process.argv.find((argument) => argument.startsWith("--node-limit="));
+const nodeLimitOverride = nodeLimitArgument ? Number(nodeLimitArgument.slice("--node-limit=".length)) : 0;
 const reportArgument = process.argv.find((argument) => argument.startsWith("--report="));
 const reportUrl = reportArgument
   ? new URL(reportArgument.slice("--report=".length), root)
@@ -37,7 +39,7 @@ let failed = false;
 let warnings = 0;
 const measurements = [];
 function runPass(testCase, overrides = {}) {
-  start_search(testCase.source, { maxWords: testCase.maxWords || 5, minimumLength: testCase.minimumLength || 2, pattern: testCase.pattern, lockedWords: testCase.lockedWords, limit: 1200, nodeLimit: testCase.nodeLimit, shardIndex: 0, shardCount: 1, ...overrides });
+  start_search(testCase.source, { maxWords: testCase.maxWords || 5, minimumLength: testCase.minimumLength || 2, pattern: testCase.pattern, lockedWords: testCase.lockedWords, limit: 1200, nodeLimit: nodeLimitOverride || testCase.nodeLimit, shardIndex: 0, shardCount: 1, deterministicCore: true, ...overrides });
   let step;
   do step = step_search(5000); while (!step.done);
   return step;
@@ -61,7 +63,7 @@ for (const testCase of benchmark.cases.filter(({ name }) => !caseFilter || name.
     }
     const generalWorkers = testCase.uiWorkers - specialistCount;
     for (let shardIndex = 0; shardIndex < generalWorkers; shardIndex += 1) {
-      step = runPass(testCase, { maxWords: testCase.maxWords || 5, shardIndex, shardCount: generalWorkers });
+      step = runPass(testCase, { maxWords: testCase.maxWords || 5, shardIndex, shardCount: generalWorkers, deterministicCore: shardIndex === 0 });
       shards.push(step.results);
       nodes += step.nodes;
     }

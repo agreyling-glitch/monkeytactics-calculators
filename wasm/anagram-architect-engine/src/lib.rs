@@ -134,6 +134,7 @@ struct SearchOptions {
     grammar_template: String,
     time_limit_ms: u32,
     deadline_epoch_ms: f64,
+    deterministic_core: bool,
 }
 
 impl Default for SearchOptions {
@@ -153,6 +154,7 @@ impl Default for SearchOptions {
             grammar_template: String::new(),
             time_limit_ms: 0,
             deadline_epoch_ms: 0.0,
+            deterministic_core: false,
         }
     }
 }
@@ -552,13 +554,15 @@ impl Search {
             grammar_slots,
         };
         if !is_literal_phrase
-            && options.time_limit_ms == 0
+            && (options.deterministic_core || options.time_limit_ms == 0)
             && search.source.len() <= 30
             && search.root_depth == 0
-            && search.max_words == 3
             && search.grammar_slots.is_empty()
         {
             search.seed_complementary_phrases(3_500);
+            if search.max_words >= 5 && search.source.len() <= 18 {
+                search.seed_connector_phrases(300);
+            }
         }
         if is_literal_phrase {
             search.stack.clear();
@@ -604,6 +608,42 @@ impl Search {
                     for third in matches.into_iter().filter(|index| *index >= second) {
                         self.path = vec![first, second, third];
                         self.record_result();
+                    }
+                }
+            }
+        }
+        self.path.clear();
+    }
+
+    fn seed_connector_phrases(&mut self, candidate_limit: usize) {
+        const CONNECTORS: &[&str] = &["a", "i", "an", "as", "at", "be", "by", "for", "in", "is", "of", "on", "or", "the", "to"];
+        let connector_indices: Vec<usize> = self.candidates.iter().enumerate()
+            .filter_map(|(index, candidate)| CONNECTORS.contains(&candidate.word.as_str()).then_some(index))
+            .collect();
+        let scan_limit = self.candidates.len().min(candidate_limit);
+        let mut signatures: HashMap<[u8; 26], Vec<usize>> = HashMap::new();
+        for (index, candidate) in self.candidates.iter().enumerate() {
+            signatures.entry(candidate.counts).or_default().push(index);
+        }
+        let target = counts(&self.source);
+        for (left_position, &left) in connector_indices.iter().enumerate() {
+            if !fits(&self.candidates[left].counts, &target) { continue; }
+            let after_left = subtract(&target, &self.candidates[left].counts);
+            for &right in connector_indices.iter().skip(left_position) {
+                if !fits(&self.candidates[right].counts, &after_left) { continue; }
+                let remaining = subtract(&after_left, &self.candidates[right].counts);
+                for first in 0..scan_limit {
+                    if !fits(&self.candidates[first].counts, &remaining) { continue; }
+                    let after_first = subtract(&remaining, &self.candidates[first].counts);
+                    for second in first..scan_limit {
+                        if !fits(&self.candidates[second].counts, &after_first) { continue; }
+                        let complement = subtract(&after_first, &self.candidates[second].counts);
+                        if let Some(matches) = signatures.get(&complement).cloned() {
+                            for third in matches.into_iter().filter(|index| *index >= second) {
+                                self.path = vec![left, right, first, second, third];
+                                self.record_result();
+                            }
+                        }
                     }
                 }
             }

@@ -1,5 +1,5 @@
 {
-  "version": 15,
+  "version": 16,
   "cases": [
     {
       "name": "Hermione Granger imperative phrase",
@@ -183,6 +183,16 @@
       "maxRank": 5,
       "specialistMaxRank": 5,
       "nodeLimit": 300000,
+      "uiWorkers": 4
+    },
+    {
+      "name": "Meaning of life UI merge",
+      "source": "The meaning of life",
+      "pattern": "",
+      "lockedWords": "",
+      "expected": "the fine game of nil",
+      "maxRank": 1,
+      "nodeLimit": 1000,
       "uiWorkers": 4
     },
     {

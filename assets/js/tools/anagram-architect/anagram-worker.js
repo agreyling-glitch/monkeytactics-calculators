@@ -67,7 +67,7 @@ self.addEventListener("message", async ({ data }) => {
     let wasmFailure = "";
     let wasmReady = false;
     try {
-      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260917-01" });
+      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260917-03" });
       if (!verifyWasmDomain(self.location.hostname)) throw new Error("Anagram Architect is not authorized on this host.");
       initWasmEngine(words);
       initLanguageMetadata(languageRecords);
@@ -82,7 +82,7 @@ self.addEventListener("message", async ({ data }) => {
       startWasmSearch(data.source, data.options);
       engine = "wasm";
       let step;
-      let lastRevision = -1;
+      let lastPartialRevision = -1;
       let lastProgressAt = 0;
       let lastPartialAt = 0;
       let timeLimited = false;
@@ -95,11 +95,11 @@ self.addEventListener("message", async ({ data }) => {
           self.postMessage({ type: "progress", phase: "search", nodes: step.nodes, nodeLimit: step.nodeLimit, found: step.found, matchesSeen: step.matchesSeen, candidateCount: step.candidateCount, prunedPaths: step.prunedPaths, done: step.done, engine });
           lastProgressAt = now;
         }
-        if (!step.done && !timeLimited && step.revision !== lastRevision && step.results?.length && now - lastPartialAt >= 1000) {
+        if (!step.done && !timeLimited && step.revision !== lastPartialRevision && step.results?.length && now - lastPartialAt >= 1000) {
           self.postMessage({ type: "partial", results: step.results, nodes: step.nodes });
           lastPartialAt = now;
+          lastPartialRevision = step.revision;
         }
-        lastRevision = step.revision;
         if (!step.done) await new Promise((resolve) => setTimeout(resolve, 0));
       } while (!step.done && !timeLimited);
       outcome = { results: step.results || [], nodes: step.nodes, truncated: step.truncated || timeLimited, timeLimited };
