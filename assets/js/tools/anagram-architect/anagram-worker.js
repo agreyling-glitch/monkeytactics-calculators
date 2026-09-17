@@ -14,19 +14,29 @@ async function loadDictionary(kind) {
   if (!response.ok) throw new Error("The local dictionary manifest could not be loaded.");
   const manifest = await response.json();
   const chunks = Object.values(manifest.chunks);
-  const words = [];
-  for (let index = 0; index < chunks.length; index += 1) {
-    const chunkResponse = await fetch(`/assets/data/words/${chunks[index].file}`);
-    if (!chunkResponse.ok) throw new Error("A local dictionary file could not be loaded.");
-    const text = await decodeResponse(chunkResponse);
-    for (const line of text.split(/\r?\n/)) {
-      const word = line.split("\t", 1)[0];
-      if (word) words.push(word);
+  const chunkWords = Array.from({ length: chunks.length }, () => []);
+  let nextChunkIndex = 0;
+  let completedChunks = 0;
+  const loadNextChunk = async () => {
+    while (nextChunkIndex < chunks.length) {
+      const index = nextChunkIndex;
+      nextChunkIndex += 1;
+      const chunkResponse = await fetch(`/assets/data/words/${chunks[index].file}`);
+      if (!chunkResponse.ok) throw new Error("A local dictionary file could not be loaded.");
+      const text = await decodeResponse(chunkResponse);
+      const words = chunkWords[index];
+      for (const line of text.split(/\r?\n/)) {
+        const word = line.split("\t", 1)[0];
+        if (word) words.push(word);
+      }
+      completedChunks += 1;
+      self.postMessage({ type: "progress", phase: "dictionary", completed: completedChunks, total: chunks.length });
+      await new Promise((resolve) => setTimeout(resolve, 0));
     }
-    self.postMessage({ type: "progress", phase: "dictionary", completed: index + 1, total: chunks.length });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  }
-  return words;
+  };
+  const downloadConcurrency = Math.min(8, chunks.length);
+  await Promise.all(Array.from({ length: downloadConcurrency }, loadNextChunk));
+  return chunkWords.flat();
 }
 
 async function loadLanguageData() {
@@ -56,18 +66,12 @@ self.addEventListener("message", async ({ data }) => {
     for (const word of data.options.customWords || []) {
       if (!knownWords.has(word)) { knownWords.add(word); words.push(word); }
     }
-    self.postMessage({ type: "progress", phase: "search", nodes: 0, nodeLimit: data.options.nodeLimit, found: 0, wordCount: words.length });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    if (data.options.deadlineEpochMs && Date.now() >= data.options.deadlineEpochMs) {
-      self.postMessage({ type: "complete", outcome: { results: [], nodes: 0, truncated: true, timeLimited: true }, wordCount: words.length, engine: "javascript", wasmFailure: "" });
-      return;
-    }
     let outcome;
     let engine = "javascript";
     let wasmFailure = "";
     let wasmReady = false;
     try {
-      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260915-19" });
+      await initWasm({ module_or_path: "/assets/wasm/anagram-architect/anagram_architect_engine_bg.wasm?v=20260917-04" });
       if (!verifyWasmDomain(self.location.hostname)) throw new Error("Anagram Architect is not authorized on this host.");
       initWasmEngine(words);
       initLanguageMetadata(languageRecords);
@@ -77,40 +81,46 @@ self.addEventListener("message", async ({ data }) => {
       wasmFailure = wasmError instanceof Error ? wasmError.message : String(wasmError);
     }
     if (!wasmReady && data.options.grammarTemplate) throw new Error(`Grammar templates require the Rust/WASM engine. ${wasmFailure}`);
+    const searchOptions = {
+      ...data.options,
+      deadlineEpochMs: data.options.timeLimitMs ? Date.now() + data.options.timeLimitMs : 0
+    };
+    self.postMessage({ type: "progress", phase: "search", nodes: 0, nodeLimit: searchOptions.nodeLimit, found: 0, wordCount: words.length });
+    await new Promise((resolve) => setTimeout(resolve, 0));
     if (wasmReady) {
       self.postMessage({ type: "engine", engine: "wasm" });
-      startWasmSearch(data.source, data.options);
+      startWasmSearch(data.source, searchOptions);
       engine = "wasm";
       let step;
-      let lastRevision = -1;
+      let lastPartialRevision = -1;
       let lastProgressAt = 0;
       let lastPartialAt = 0;
       let timeLimited = false;
       const stepBudget = data.options.timeLimitMs ? 100 : 5000;
       do {
         step = stepWasmSearch(stepBudget);
-        timeLimited = Boolean(step.timeLimited) || (!step.done && data.options.deadlineEpochMs && Date.now() >= data.options.deadlineEpochMs);
+        timeLimited = Boolean(step.timeLimited) || (!step.done && searchOptions.deadlineEpochMs && Date.now() >= searchOptions.deadlineEpochMs);
         const now = performance.now();
         if (step.done || timeLimited || now - lastProgressAt >= 200) {
           self.postMessage({ type: "progress", phase: "search", nodes: step.nodes, nodeLimit: step.nodeLimit, found: step.found, matchesSeen: step.matchesSeen, candidateCount: step.candidateCount, prunedPaths: step.prunedPaths, done: step.done, engine });
           lastProgressAt = now;
         }
-        if (!step.done && !timeLimited && step.revision !== lastRevision && step.results?.length && now - lastPartialAt >= 1000) {
+        if (!step.done && !timeLimited && step.revision !== lastPartialRevision && step.results?.length && now - lastPartialAt >= 1000) {
           self.postMessage({ type: "partial", results: step.results, nodes: step.nodes });
           lastPartialAt = now;
+          lastPartialRevision = step.revision;
         }
-        lastRevision = step.revision;
         if (!step.done) await new Promise((resolve) => setTimeout(resolve, 0));
       } while (!step.done && !timeLimited);
       outcome = { results: step.results || [], nodes: step.nodes, truncated: step.truncated || timeLimited, timeLimited };
     } else {
       self.postMessage({ type: "engine", engine: "javascript" });
-      const remainingTimeMs = data.options.deadlineEpochMs
-        ? Math.max(0, data.options.deadlineEpochMs - Date.now())
+      const remainingTimeMs = searchOptions.deadlineEpochMs
+        ? Math.max(0, searchOptions.deadlineEpochMs - Date.now())
         : 0;
       outcome = remainingTimeMs || !data.options.timeLimitMs
         ? solveAnagrams(data.source, words, {
-            ...data.options,
+            ...searchOptions,
             timeLimitMs: remainingTimeMs,
             onProgress(progress) { self.postMessage({ type: "progress", phase: "search", ...progress, engine }); }
           })

@@ -71,6 +71,27 @@ test("prefers a transitive verb before a determiner-led object", () => {
   assert.ok(ranked.findIndex(({ phrase }) => phrase === "computer a scorn") > 0);
 });
 
+test("ranks word-order alternatives for seven-word Pro-mode results", () => {
+  const ranked = rankPhrasePermutations("portrayed orphaned hit for the next hero");
+  assert.equal(ranked.length, 720);
+  assert.ok(ranked.some(({ phrase }) => phrase === "portrayed orphaned hero for the next hit"));
+  assert.ok(ranked.every(({ phrase }) => isExactAnagram("portrayed orphaned hit for the next hero", phrase)));
+});
+
+test("enables long-phrase arranging after enough words are locked", () => {
+  const phrase = "one two three four five six seven eight nine ten";
+  assert.deepEqual(rankPhrasePermutations(phrase), []);
+  const ranked = rankPhrasePermutations(phrase, 720, [0, 9]);
+  assert.equal(ranked.length, 720);
+  assert.ok(ranked.every(({ phrase: result }) => result.split(" ")[0] === "one" && result.split(" ")[9] === "ten"));
+});
+
+test("prefers an imperative nationality phrase over ambiguous reorderings", () => {
+  const ranked = rankPhrasePermutations("ignore her german");
+  assert.equal(ranked[0]?.phrase, "ignore her german");
+  assert.ok(ranked.findIndex(({ phrase }) => phrase === "her german ignore") > 0);
+});
+
 test("ranks exact-letter word replacements without changing the rest of a phrase", () => {
   const ranked = rankWordReplacements("despised drains us the man", 1, ["drains", "nadirs", "dinars", "rained", "unrelated"]);
   assert.deepEqual(new Set(ranked.map(({ word }) => word)), new Set(["nadirs", "dinars"]));
@@ -165,7 +186,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260916-03/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-17/);
 });
 
 test("shows phrase validation failures in an accessible modal", async () => {
@@ -190,23 +211,34 @@ test("offers an experimental hardware-aware Pro mode for long phrases", async ()
   assert.match(source, /const maximumLetters = proMode\.checked \? 60 : 30/);
   assert.match(source, /navigator\.deviceMemory/);
   assert.match(source, /usesProMode && letterCount > 30/);
-  assert.match(source, /baseTimeMs = mode === "exhaustive" \? 60000 : mode === "deep" \? 30000 : 15000/);
+  assert.match(html, /id="anagram-time-budget"/);
+  assert.match(html, /<option value="120">120 seconds<\/option>/);
+  assert.match(source, /mode === "exhaustive" \? 120000 : mode === "deep" \? 60000 : 15000/);
+  assert.match(source, /\{ workerCount: 1, nodeLimit: expanded \? 240000 : 140000 \}/);
+  assert.match(source, /deterministicCore: shortPhraseSpecialist/);
   assert.match(source, /time budget reached/);
-  assert.match(source, /hardTimeout = setTimeout\(finishTimedOut, options\.timeLimitMs\)/);
-  assert.match(source, /deadlineEpochMs = options\.timeLimitMs \? Date\.now\(\) \+ options\.timeLimitMs : 0/);
+  assert.match(source, /hardTimeout = setTimeout\(finishTimedOut, options\.timeLimitMs \+ 2000\)/);
+  assert.match(source, /startBudget\(\)/);
+  assert.match(source, /deadlineEpochMs = Date\.now\(\) \+ options\.timeLimitMs \+ 2000/);
   assert.match(source, /resolve\(\{ outcome: \{ results: mergedResults, nodes, truncated: true, timeLimited: true \}/);
-  assert.match(source, /return \{ \.\.\.standard, timeLimitMs: Math\.round\(baseTimeMs \* tierFactor\) \}/);
+  assert.match(source, /return \{ \.\.\.standard, timeLimitMs: baseTimeMs \}/);
   assert.match(source, /Number\(maxWords\.value\) >= 6/);
   assert.match(source, /Six-word searches create a much larger search space/);
-  assert.match(worker, /Date\.now\(\) >= data\.options\.deadlineEpochMs/);
+  assert.match(worker, /deadlineEpochMs: data\.options\.timeLimitMs \? Date\.now\(\) \+ data\.options\.timeLimitMs : 0/);
   assert.match(worker, /Boolean\(step\.timeLimited\)/);
   assert.match(worker, /stepBudget = data\.options\.timeLimitMs \? 100 : 5000/);
   assert.match(worker, /now - lastProgressAt >= 200/);
   assert.match(worker, /now - lastPartialAt >= 1000/);
+  assert.match(worker, /step\.revision !== lastPartialRevision/);
+  assert.match(worker, /lastPartialRevision = step\.revision/);
+  assert.match(source, /currentSource = source;[\s\S]*await solveInWorker/);
+  assert.match(source, /requestId === searchRequestId/);
   assert.match(worker, /type: "engine", engine: "wasm"/);
   assert.match(worker, /data\.options\.customWords \|\| \[\]/);
-  assert.match(worker, /data\.options\.deadlineEpochMs - Date\.now\(\)/);
+  assert.match(worker, /searchOptions\.deadlineEpochMs - Date\.now\(\)/);
   assert.match(worker, /timeLimitMs: remainingTimeMs/);
+  assert.match(worker, /downloadConcurrency = Math\.min\(8, chunks\.length\)/);
+  assert.match(worker, /return chunkWords\.flat\(\)/);
 });
 
 test("the JavaScript fallback enforces the wall-clock search budget", async () => {
@@ -232,12 +264,34 @@ test("the result toolbar loads the cache-busted responsive stylesheet", async ()
     readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"),
     readFile(new URL("../assets/css/tools/anagram-architect.css", import.meta.url), "utf8")
   ]);
-  assert.match(html, /anagram-architect\.css\?v=20260916-01/);
+  assert.match(html, /anagram-architect\.css\?v=20260917-10/);
   assert.match(css, /\.anagram-pick-drawer-content > \.anagram-pick-permutations \{[^}]*height: 100%/);
   assert.match(css, /\.anagram-pick-drawer-content > \.anagram-pick-permutations select \{[^}]*height: 100%/);
   assert.match(html, /id="anagram-result-search"/);
   assert.match(html, /id="anagram-previous-page"/);
   assert.match(html, /id="anagram-next-page"/);
+});
+
+test("shows all local definitions beneath the Words-tab chips", async () => {
+  const [html, source, css] = await Promise.all([
+    readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"),
+    readFile(new URL("../assets/js/tools/anagram-architect/anagram-architect.js", import.meta.url), "utf8"),
+    readFile(new URL("../assets/css/tools/anagram-architect.css", import.meta.url), "utf8")
+  ]);
+  assert.match(html, /shared\/word-definitions\.js/);
+  assert.match(source, /MonkeyTacticsWordDefinitions\?\.lookup\(word, \{ allowRemote: false \}\)/);
+  assert.match(source, /Select a word to see all of its local definitions\./);
+  assert.match(source, /flatMap\(\(\{ defs = \[\] \}\) => defs\)/);
+  assert.match(source, /definitionContent\.replaceChildren\(list\)/);
+  assert.equal((source.match(/Definition: \$\{titleCase\(word\)\}/g) || []).length, 2);
+  assert.match(source, /showReplacementDefinitions\(selected\.word\)/);
+  assert.match(source, /replacementDefinition\.replaceChildren\(header, content\)/);
+  assert.match(source, /Merriam-Webster/);
+  assert.match(source, /openDictionaryDirectory\(button\.dataset\.word, button\)/);
+  assert.match(source, /The selected service opens in a new tab/);
+  assert.match(css, /\.anagram-pick-word-buttons \{[^}]*padding-top: \.5rem/);
+  assert.match(css, /\.anagram-pick-word-definitions/);
+  assert.match(css, /\.anagram-pick-replacement-definition/);
 });
 
 test("uses the optimized Anagram Architect artwork as the hero badge", async () => {
@@ -338,11 +392,13 @@ test("renders live graphical worker and throughput telemetry", async () => {
   assert.match(browser, /function workerRoleLabel/);
   assert.match(browser, /short-phrase/);
   assert.match(browser, /compact-phrase/);
-  assert.match(browser, /general \$\{index - specialistCount \+ 1\}\/\$\{generalCount\}/);
+  assert.match(browser, /core \+ general 1\/\$\{generalCount\}/);
   assert.match(html, /id="anagram-current-leader"/);
   assert.match(html, /id="anagram-analysis-cancel"/);
   assert.match(browser, /function drawThroughput/);
   assert.match(browser, /throughputRate\.textContent/);
+  assert.match(browser, /until budget exhausted/);
+  assert.match(html, /faster hardware may explore more combinations/);
   assert.match(browser, /matchesSeen/);
   assert.match(browser, /prunedPaths/);
 });
@@ -462,6 +518,8 @@ test("offers word steering, vulgar filtering, and a persistent Pick List", async
   assert.match(browser, /\[\[1, buildWordSwapPanel\], \[2, buildFormatPanel\]\]/);
   assert.match(browser, /previous\.replaceWith\(replacement\)/);
   assert.match(browser, /drag a locked word between the other words/);
+  assert.match(browser, /Word-order alternatives unavailable/);
+  assert.match(browser, /Lock at least \$\{locksNeeded\} more word/);
   assert.doesNotMatch(browser, /Locked \$\{word\}.*press Left or Right Arrow/);
   assert.match(browser, /formatAnagramPhrase/);
   assert.match(browser, /Style capitalization and punctuation/);
@@ -510,11 +568,15 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.match(html, /estimates readability and naturalness using word frequency, grammar, local phrase evidence, word order, and phrase shape/i);
   assert.match(html, /Exactness is guaranteed, but ranking is an estimate/);
   assert.match(html, /Search long anagrams up to 60 letters/);
+  assert.match(html, /Guided search:<\/strong> enable Pro mode, set Maximum words to 8/);
+  assert.match(html, /portrayed, orphaned, hero/);
   assert.match(html, /Add names and specialist vocabulary/);
+  assert.match(html, /Reorder, define, replace, and format anagrams/);
+  assert.match(html, /compare local WordNet definitions for original and replacement words/);
   assert.match(html, /Why did my search return no results\?/);
   assert.match(html, /Anagram solver FAQ/);
   assert.match(html, /Related word tools/);
-  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-16<\/lastmod>/);
+  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-17<\/lastmod>/);
   assert.match(html, /Standard contains 172,820 words/);
   assert.match(html, /Expanded contains 867,177 Wiktionary-derived words/);
   const structured = html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];
@@ -526,12 +588,14 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.ok(application.featureList.includes("Experimental 31–60 letter Pro mode"));
   assert.ok(application.featureList.includes("Personal vocabulary with up to 500 words or names"));
   assert.ok(application.featureList.includes("Word-order permutations with movable position locks"));
+  assert.ok(application.featureList.includes("Local WordNet definitions for original and replacement words"));
   assert.ok(application.featureList.includes("Standard 172,820-word and expanded 867,177-word dictionaries"));
   assert.ok(application.featureList.includes("Capitalization and punctuation formatting"));
   assert.ok(data["@graph"].some((entry) => entry["@type"] === "BreadcrumbList"));
   const faq = data["@graph"].find((entry) => entry["@type"] === "FAQPage");
   assert.ok(faq);
   assert.ok(faq.mainEntity.some((entry) => entry.name === "How are anagram results ranked?"));
+  assert.match(faq.mainEntity.find((entry) => entry.name === "What can I do with the Pick List phrase editor?")?.acceptedAnswer?.text || "", /WordNet definitions/);
   assert.ok(faq.mainEntity.some((entry) => entry.name === "Can I add names or specialist words to the anagram dictionary?"));
   assert.ok(faq.mainEntity.some((entry) => entry.name === "Why did my anagram search return no results?"));
 });

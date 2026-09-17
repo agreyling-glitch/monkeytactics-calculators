@@ -134,6 +134,7 @@ struct SearchOptions {
     grammar_template: String,
     time_limit_ms: u32,
     deadline_epoch_ms: f64,
+    deterministic_core: bool,
 }
 
 impl Default for SearchOptions {
@@ -153,6 +154,7 @@ impl Default for SearchOptions {
             grammar_template: String::new(),
             time_limit_ms: 0,
             deadline_epoch_ms: 0.0,
+            deterministic_core: false,
         }
     }
 }
@@ -552,13 +554,15 @@ impl Search {
             grammar_slots,
         };
         if !is_literal_phrase
-            && options.time_limit_ms == 0
+            && (options.deterministic_core || options.time_limit_ms == 0)
             && search.source.len() <= 30
             && search.root_depth == 0
-            && search.max_words == 3
             && search.grammar_slots.is_empty()
         {
             search.seed_complementary_phrases(3_500);
+            if search.max_words >= 5 && search.source.len() <= 18 {
+                search.seed_connector_phrases(300);
+            }
         }
         if is_literal_phrase {
             search.stack.clear();
@@ -604,6 +608,47 @@ impl Search {
                     for third in matches.into_iter().filter(|index| *index >= second) {
                         self.path = vec![first, second, third];
                         self.record_result();
+                    }
+                }
+            }
+        }
+        self.path.clear();
+    }
+
+    fn seed_connector_phrases(&mut self, candidate_limit: usize) {
+        const CONNECTORS: &[&str] = &["a", "i", "an", "as", "at", "be", "by", "for", "in", "is", "of", "on", "or", "the", "to"];
+        let connector_indices: Vec<usize> = self.candidates.iter().enumerate()
+            .filter_map(|(index, candidate)| CONNECTORS.contains(&candidate.word.as_str()).then_some(index))
+            .collect();
+        let scan_limit = self.candidates.len().min(candidate_limit);
+        let mut candidate_pairs: HashMap<[u8; 26], Vec<(usize, usize)>> = HashMap::new();
+        for first in 0..scan_limit {
+            for second in first..scan_limit {
+                let mut combined = [0_u8; 26];
+                for (position, value) in combined.iter_mut().enumerate() {
+                    *value = self.candidates[first].counts[position]
+                        .saturating_add(self.candidates[second].counts[position]);
+                }
+                candidate_pairs.entry(combined).or_default().push((first, second));
+            }
+        }
+        let target = counts(&self.source);
+        for (left_position, &left) in connector_indices.iter().enumerate() {
+            if !fits(&self.candidates[left].counts, &target) { continue; }
+            let after_left = subtract(&target, &self.candidates[left].counts);
+            for &right in connector_indices.iter().skip(left_position) {
+                if !fits(&self.candidates[right].counts, &after_left) { continue; }
+                let remaining = subtract(&after_left, &self.candidates[right].counts);
+                for first in 0..scan_limit {
+                    if !fits(&self.candidates[first].counts, &remaining) { continue; }
+                    let after_first = subtract(&remaining, &self.candidates[first].counts);
+                    if let Some(pairs) = candidate_pairs.get(&after_first).cloned() {
+                        for (second, third) in pairs {
+                            if second >= first {
+                                self.path = vec![left, right, first, second, third];
+                                self.record_result();
+                            }
+                        }
                     }
                 }
             }
@@ -1150,6 +1195,7 @@ fn inferred_pos(word: &str, metadata: &HashMap<String, (u64, u8)>) -> u8 {
 
 fn phrase_shape_bonus(words: &[String], metadata: &HashMap<String, (u64, u8)>) -> i32 {
     const DET: &[&str] = &["a", "an", "the", "this", "that", "my", "your", "our", "his", "her", "their"];
+    const POSSESSIVE_DETERMINERS: &[&str] = &["my", "your", "our", "his", "her", "their"];
     const PREP: &[&str] = &["of", "to", "in", "on", "at", "by", "for", "from", "with", "into", "over", "under"];
     let positions: Vec<u8> = words.iter().map(|word| inferred_pos(word, metadata)).collect();
     let mut score = 0;
@@ -1190,6 +1236,17 @@ fn phrase_shape_bonus(words: &[String], metadata: &HashMap<String, (u64, u8)>) -
         if first & 2 != 0 && DET.contains(&words[index + 1].as_str()) && last & 1 != 0 {
             score += 60;
         }
+        // Treat possessives as structural determiners even when their
+        // dictionary POS is ambiguous ("ignore her German", "take your time").
+        if words.len() == 3
+            && index == 0
+            && first & 2 != 0
+            && POSSESSIVE_DETERMINERS.contains(&words[index + 1].as_str())
+            && last & 1 != 0
+            && last & 4 != 0
+        {
+            score += 1_800;
+        }
     }
     score
 }
@@ -1205,6 +1262,7 @@ fn phrase_score_with_metadata(
         "of", "to", "in", "on", "at", "by", "for", "from", "with", "into", "over", "under",
     ];
     const SUBJECT_PRONOUNS: &[&str] = &["i", "you", "he", "she", "it", "we", "they"];
+    const OBJECT_PRONOUNS: &[&str] = &["me", "him", "her", "us", "them"];
     const COPULAS: &[&str] = &["am", "are", "is", "was", "were", "be"];
     const FUNCTION: &[&str] = &[
         "a", "an", "the", "this", "that", "my", "your", "our", "his", "her", "their", "of", "to",
@@ -1275,6 +1333,12 @@ fn phrase_score_with_metadata(
         if PREP.contains(&last.as_str()) || FUNCTION.contains(&last.as_str()) {
             score -= 75;
         }
+    }
+    if words.len() >= 2
+        && OBJECT_PRONOUNS.contains(&words[0].as_str())
+        && PREP.contains(&words[1].as_str())
+    {
+        score -= 190;
     }
     for pair in words.windows(2) {
         let left = pair[0].as_str();
@@ -1674,6 +1738,25 @@ mod tests {
             phrase_score_with_metadata(&natural, &metadata, &LanguageModel::default())
                 > phrase_score_with_metadata(&inverted, &metadata, &LanguageModel::default())
         );
+    }
+    #[test]
+    fn imperative_possessive_object_beats_ambiguous_fragments() {
+        let intended = ["ignore", "her", "german"].map(String::from);
+        let modifier_chain = ["ranging", "more", "here"].map(String::from);
+        let pronoun_fragment = ["her", "in", "more", "grange"].map(String::from);
+        let metadata = HashMap::from([
+            ("ignore".into(), (14_353_555, 2)),
+            ("her".into(), (391_961_061, 0)),
+            ("german".into(), (53_710_784, 1 | 4)),
+            ("ranging".into(), (10_213_057, 4)),
+            ("more".into(), (1_544_771_673, 1 | 4 | 8)),
+            ("here".into(), (639_711_198, 1 | 4 | 8)),
+            ("in".into(), (9_000_000_000, 0)),
+            ("grange".into(), (2_247_323, 1)),
+        ]);
+        let language = LanguageModel::default();
+        assert!(phrase_score_with_metadata(&intended, &metadata, &language) > phrase_score_with_metadata(&modifier_chain, &metadata, &language));
+        assert!(phrase_score_with_metadata(&intended, &metadata, &language) > phrase_score_with_metadata(&pronoun_fragment, &metadata, &language));
     }
     #[test]
     fn third_person_inflection_selects_the_natural_verb() {

@@ -6,6 +6,10 @@ import { mergeRankedResults } from "../assets/js/tools/anagram-architect/anagram
 const root = new URL("../", import.meta.url);
 const baselineUrl = new URL("assets/data/words/anagram-quality-baseline-v1.json", root);
 const updateBaseline = process.argv.includes("--update-baseline");
+const caseArgument = process.argv.find((argument) => argument.startsWith("--case="));
+const caseFilter = caseArgument?.slice("--case=".length).toLowerCase();
+const nodeLimitArgument = process.argv.find((argument) => argument.startsWith("--node-limit="));
+const nodeLimitOverride = nodeLimitArgument ? Number(nodeLimitArgument.slice("--node-limit=".length)) : 0;
 const reportArgument = process.argv.find((argument) => argument.startsWith("--report="));
 const reportUrl = reportArgument
   ? new URL(reportArgument.slice("--report=".length), root)
@@ -35,12 +39,12 @@ let failed = false;
 let warnings = 0;
 const measurements = [];
 function runPass(testCase, overrides = {}) {
-  start_search(testCase.source, { maxWords: testCase.maxWords || 5, minimumLength: testCase.minimumLength || 2, pattern: testCase.pattern, lockedWords: testCase.lockedWords, limit: 1200, nodeLimit: testCase.nodeLimit, shardIndex: 0, shardCount: 1, ...overrides });
+  start_search(testCase.source, { maxWords: testCase.maxWords || 5, minimumLength: testCase.minimumLength || 2, pattern: testCase.pattern, lockedWords: testCase.lockedWords, limit: 1200, nodeLimit: nodeLimitOverride || testCase.nodeLimit, shardIndex: 0, shardCount: 1, deterministicCore: true, ...overrides });
   let step;
   do step = step_search(5000); while (!step.done);
   return step;
 }
-for (const testCase of benchmark.cases) {
+for (const testCase of benchmark.cases.filter(({ name }) => !caseFilter || name.toLowerCase().includes(caseFilter))) {
   const started = performance.now();
   let step = runPass(testCase);
   let results = step.results;
@@ -59,13 +63,14 @@ for (const testCase of benchmark.cases) {
     }
     const generalWorkers = testCase.uiWorkers - specialistCount;
     for (let shardIndex = 0; shardIndex < generalWorkers; shardIndex += 1) {
-      step = runPass(testCase, { maxWords: testCase.maxWords || 5, shardIndex, shardCount: generalWorkers });
+      step = runPass(testCase, { maxWords: testCase.maxWords || 5, shardIndex, shardCount: generalWorkers, deterministicCore: shardIndex === 0 });
       shards.push(step.results);
       nodes += step.nodes;
     }
     results = mergeRankedResults(shards, 1200);
   }
   const rank = results.findIndex(({ phrase }) => phrase === testCase.expected) + 1;
+  const expectedResult = rank ? results[rank - 1] : null;
   const noisyTop = (testCase.forbiddenTop || []).filter((phrase) => results.slice(0, testCase.forbiddenTopLimit || 20).some((result) => result.phrase === phrase));
   const specialistPassed = !testCase.specialistMaxRank || (specialistRank > 0 && specialistRank <= testCase.specialistMaxRank);
   const passed = rank > 0 && rank <= testCase.maxRank && specialistPassed && noisyTop.length === 0;
@@ -82,7 +87,10 @@ for (const testCase of benchmark.cases) {
   const specialistNote = testCase.uiWorkers ? `, specialist rank ${specialistRank || "not found"}/${testCase.specialistMaxRank}` : "";
   const status = passed && !regressionFailed ? "PASS" : "FAIL";
   console.log(`${status}  ${testCase.name}: overall rank ${rank || "not found"}/${testCase.maxRank}${specialistNote}, ${nodes.toLocaleString()} nodes, ${elapsed.toFixed(0)} ms`);
-  if (!passed) console.log(`      Top results: ${results.slice(0, 5).map(({ phrase }) => phrase).join(" | ") || "none"}`);
+  if (!passed) {
+    console.log(`      Expected score: ${expectedResult?.score ?? "not found"}; rank cutoff score: ${results[Math.min(testCase.maxRank, results.length) - 1]?.score ?? "n/a"}`);
+    console.log(`      Top results: ${results.slice(0, 5).map(({ phrase, score }) => `${phrase} (${score})`).join(" | ") || "none"}`);
+  }
   if (noisyTop.length) console.log(`      Noise in top results: ${noisyTop.join(" | ")}`);
   if (rankRegression) console.log(`      REGRESSION: rank ${prior.rank} → ${rank} exceeds tolerance +${rankTolerance}`);
   if (missingRegression) console.log(`      REGRESSION: previously ranked #${prior.rank}, now not found`);

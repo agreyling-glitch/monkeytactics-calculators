@@ -128,7 +128,7 @@
 .anagram-vulgar-control span { display: grid; gap: .15rem; }
 .anagram-vulgar-control strong { font-size: .76rem; }
 .anagram-vulgar-control small { color: var(--muted); font-size: .7rem; }
-.anagram-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-top: 0; }
+.anagram-controls { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; margin-top: 0; }
 .anagram-controls label { display: grid; gap: .35rem; color: #cbd5e1; font-size: .76rem; font-weight: 700; }
 .anagram-controls select { width: 100%; background: rgba(2,6,23,.5); color: #f8fafc; border: 1px solid rgba(148,163,184,.28); border-radius: 10px; padding: .65rem .7rem; }
 .anagram-pro-control { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(15rem,1fr); gap: .8rem 1rem; align-items: center; margin-top: 1rem; padding: .85rem 1rem; border: 1px solid rgba(56,189,248,.22); border-radius: 12px; background: rgba(14,165,233,.07); }
@@ -173,7 +173,8 @@
 .anagram-chart-heading output { flex: none; color: #5eead4; font-size: .72rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 .anagram-analysis-chart canvas { display: block; width: 100%; height: 64px; }
 .anagram-current-leader { display: flex; gap: .6rem; align-items: baseline; margin: 0; }
-.anagram-current-leader strong { color: #fde68a; font-size: .82rem; }
+.anagram-current-leader span { font-size: .78rem; }
+.anagram-current-leader strong { color: #fde68a; font-size: 1rem; line-height: 1.35; }
 .anagram-analysis-foot { margin: 0; }
 .anagram-analysis-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .anagram-worker-harm { display: flex; gap: .45rem; align-items: center; width: fit-content; margin: 0; padding: .42rem .6rem; border: 1px solid rgba(245,185,66,.18); border-radius: 999px; background: rgba(245,185,66,.055); color: #fde68a; font-size: .67rem; }
@@ -245,10 +246,37 @@
 .anagram-pick-swaps[hidden], .anagram-pick-swaps select[hidden] { display: none; }
 .anagram-pick-swaps > strong:first-child { color: #fde68a; }
 .anagram-pick-swaps select { width: 100%; border: 1px solid rgba(148,163,184,.25); border-radius: 7px; background: #0f172a; color: #e2e8f0; padding: .48rem; }
-.anagram-pick-word-buttons { display: flex; flex-wrap: wrap; gap: .4rem; }
+.anagram-pick-word-buttons { display: flex; flex-wrap: wrap; gap: .4rem; padding-top: .5rem; }
 .anagram-pick-word-buttons button { border: 1px solid rgba(45,212,191,.28); border-radius: 999px; background: rgba(45,212,191,.08); color: #99f6e4; padding: .38rem .65rem; cursor: pointer; }
 .anagram-pick-word-buttons button[aria-pressed="true"] { border-color: rgba(245,185,66,.6); background: rgba(245,185,66,.14); color: #fde68a; }
 .anagram-pick-word-buttons button:disabled { border-color: rgba(148,163,184,.12); background: rgba(148,163,184,.04); color: #64748b; cursor: not-allowed; }
+.anagram-pick-word-definitions { display: grid; gap: .35rem; padding: .7rem .8rem; border: 1px solid rgba(45,212,191,.22); border-radius: 8px; background: rgba(7,20,33,.72); color: #cbd5e1; }
+.anagram-pick-word-definitions > strong { color: #99f6e4; }
+.anagram-pick-word-definitions ol { max-height: 13rem; margin: 0; padding-left: 1.35rem; overflow-y: auto; }
+.anagram-pick-word-definitions li { padding: .18rem 0; line-height: 1.4; }
+.anagram-definition-header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.anagram-definition-header > strong { color: #99f6e4; }
+.anagram-dictionary-lookup { padding: .3rem .55rem; border: 1px solid rgba(96,165,250,.45); border-radius: 7px; background: rgba(96,165,250,.1); color: #bfdbfe; font: inherit; font-size: .78rem; font-weight: 750; cursor: pointer; }
+.anagram-dictionary-lookup:hover { background: rgba(96,165,250,.2); color: #fff; }
+.anagram-dictionary-directory-modal { width: min(30rem, calc(100vw - 2rem)); max-width: none; padding: 0; border: 1px solid rgba(96,165,250,.45); border-radius: .8rem; background: #0f172a; color: #e2e8f0; box-shadow: 0 24px 70px rgba(2,6,23,.75); }
+.anagram-dictionary-directory-modal::backdrop { background: rgba(2,6,23,.78); backdrop-filter: blur(3px); }
+.anagram-dictionary-directory-card { padding: 1rem; }
+.anagram-dictionary-directory-card > p { margin: 0 0 .9rem; color: #94a3b8; font-size: .85rem; }
+.anagram-dictionary-directory-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .45rem; }
+.anagram-dictionary-directory-header h2 { margin: 0; color: #fff; font-size: 1.15rem; }
+.anagram-dictionary-directory-close { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; padding: 0; border: 1px solid rgba(148,163,184,.25); border-radius: .45rem; background: transparent; color: #94a3b8; font: 400 1.5rem/1 sans-serif; cursor: pointer; }
+.anagram-dictionary-directory-close:hover { border-color: #60a5fa; color: #fff; }
+.anagram-dictionary-directory-links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .55rem; }
+.anagram-dictionary-directory-links a { display: grid; grid-template-columns: auto minmax(0,1fr); gap: .6rem; align-items: center; padding: .7rem; border: 1px solid rgba(148,163,184,.2); border-radius: .55rem; background: rgba(255,255,255,.025); color: #e2e8f0; text-decoration: none; }
+.anagram-dictionary-directory-links a:hover { border-color: rgba(96,165,250,.55); background: rgba(96,165,250,.1); }
+.anagram-dictionary-directory-links strong { color: #93c5fd; font-size: .72rem; }
+.anagram-dictionary-directory-links span { min-width: 0; font-size: .78rem; overflow-wrap: anywhere; }
+@media (max-width: 480px) { .anagram-dictionary-directory-links { grid-template-columns: 1fr; } }
+.anagram-pick-replacement-definition { display: grid; gap: .3rem; padding: .6rem .7rem; border-left: 3px solid rgba(45,212,191,.65); background: rgba(45,212,191,.06); color: #cbd5e1; }
+.anagram-pick-replacement-definition[hidden] { display: none; }
+.anagram-pick-replacement-definition > strong { color: #99f6e4; }
+.anagram-pick-replacement-definition ol { max-height: 10rem; margin: 0; padding-left: 1.25rem; overflow-y: auto; }
+.anagram-pick-replacement-definition li { padding: .14rem 0; line-height: 1.35; }
 .anagram-pick-swap-preview { padding: .5rem .65rem; border-left: 3px solid rgba(245,185,66,.55); color: #e2e8f0; }
 .anagram-pick-panel-close { position: absolute; top: .4rem; right: .45rem; width: 1.5rem; height: 1.5rem; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgba(148,163,184,.1); color: #94a3b8; font: 700 1rem/1 sans-serif; cursor: pointer; }
 .anagram-pick-panel-close:hover, .anagram-pick-panel-close:focus-visible { background: rgba(251,113,133,.14); color: #fda4af; }
@@ -334,6 +362,9 @@ body.anagram-pick-drawer-open { overflow: hidden; }
 .anagram-example-line strong { color: #e2e8f0; }
 .anagram-example-line span { color: var(--architect-blue); }
 .anagram-example-line em { color: #fde68a; font-style: normal; }
+.anagram-example-note { margin: .7rem 0 0 !important; padding: .65rem .75rem; border-left: 3px solid rgba(245,185,66,.7); border-radius: 0 7px 7px 0; background: rgba(245,185,66,.08); color: #cbd5e1; font-size: .86rem; line-height: 1.45; }
+.anagram-example-note strong { color: #fde68a; }
+.anagram-example-note em { color: #e2e8f0; font-style: normal; }
 .anagram-guide { display: grid; grid-template-columns: minmax(220px,.65fr) minmax(0,1.35fr); gap: 2rem; margin-top: 2rem; padding: 1.5rem; border: 1px solid rgba(45,212,191,.18); border-radius: 15px; background: rgba(2,6,23,.34); }
 .anagram-guide ul { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem 1.2rem; margin: 0; padding-left: 1.1rem; }
 .anagram-guide li { font-size: .84rem; }

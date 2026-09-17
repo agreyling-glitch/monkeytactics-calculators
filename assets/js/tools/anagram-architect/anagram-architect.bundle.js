@@ -124,8 +124,11 @@
 	var CONJUNCTIONS = new Set("and or but nor yet so".split(" "));
 	var ADJECTIVES = new Set("old new good bad big small great little dark light true real damn".split(" "));
 	var SUBJECT_PRONOUNS = new Set("i you he she it we they".split(" "));
+	var OBJECT_PRONOUNS = new Set("me him her us them".split(" "));
+	var POSSESSIVE_DETERMINERS = new Set("my your our his her their".split(" "));
+	var NATIONALITY_NOUNS = new Set("american australian british canadian chinese dutch english french german greek indian irish italian japanese scottish spanish welsh".split(" "));
 	var COMMON_VERBS = new Set("am are be been being bug bugs can could did do does get gets got had has have is make makes may might must see sees should was were will would".split(" "));
-	var TRANSITIVE_VERBS = new Set("admire avoid build call catch choose create despise drain find give hate help hit hold keep kill know leave like love make meet move need open praise read save scorn see take tell use want watch".split(" "));
+	var TRANSITIVE_VERBS = new Set("admire avoid build call catch choose create despise drain find give hate help hit hold ignore keep kill know leave like love make meet move need open praise read save scorn see take tell use want watch".split(" "));
 	var COPULAS = new Set("am are is was were be".split(" "));
 	var NATURAL_PAIRS = /* @__PURE__ */ new Set([
 		"old man",
@@ -230,13 +233,16 @@
 			if (!SUBJECT_PRONOUNS.has(current) && SUBJECT_PRONOUNS.has(next)) score -= 75;
 		}
 		if (words.length === 3 && DETERMINERS.has(words[1])) score += isTransitiveVerb(words[0]) ? 22 : -22;
+		if (words.length === 3 && isTransitiveVerb(words[0]) && POSSESSIVE_DETERMINERS.has(words[1]) && NATIONALITY_NOUNS.has(words[2])) score += 700;
+		if (words.length >= 2 && OBJECT_PRONOUNS.has(words[0]) && PREPOSITIONS.has(words[1])) score -= 120;
 		for (let index = 0; index < words.length - 2; index += 1) if (SUBJECT_PRONOUNS.has(words[index]) && COPULAS.has(words[index + 1]) && DETERMINERS.has(words[index + 2])) score += 90;
 		return score;
 	}
 	function rankPhrasePermutations(phrase, limit = 720, lockedPositions = []) {
 		const words = String(phrase || "").toLowerCase().match(/[a-z]+/g) || [];
-		if (!words.length || words.length > 6) return [];
+		if (!words.length) return [];
 		const locked = new Set((Array.isArray(lockedPositions) ? lockedPositions : []).map(Number).filter((index) => Number.isInteger(index) && index >= 0 && index < words.length));
+		if (words.length - locked.size > 8) return [];
 		const ranked = [];
 		const used = words.map((_, index) => locked.has(index));
 		const current = [];
@@ -308,6 +314,7 @@
 	var minimumLength = document.querySelector("#anagram-min-length");
 	var dictionary = document.querySelector("#anagram-dictionary");
 	var searchMode = document.querySelector("#anagram-search-mode");
+	var timeBudget = document.querySelector("#anagram-time-budget");
 	var proMode = document.querySelector("#anagram-pro-mode");
 	var proRecommendation = document.querySelector("#anagram-pro-recommendation");
 	var proWordOptions = document.querySelectorAll("[data-pro-option]");
@@ -365,6 +372,7 @@
 	var analysisProgress = analysis.querySelector("[role=\"progressbar\"]");
 	var analysisProgressFill = analysisProgress.querySelector("span");
 	var metricProgress = document.querySelector("#anagram-metric-progress");
+	var metricProgressLabel = document.querySelector("#anagram-metric-progress-label");
 	var metricRate = document.querySelector("#anagram-metric-rate");
 	var metricMatches = document.querySelector("#anagram-metric-matches");
 	var metricRetained = document.querySelector("#anagram-metric-retained");
@@ -381,11 +389,45 @@
 	var PICK_STORAGE_KEY = "monkeytactics.anagram-architect.pick-list.v1";
 	var WORKER_HARM_STORAGE_KEY = "monkeytactics.anagram-architect.workers-harmed.v1";
 	var PERSONAL_VOCABULARY_STORAGE_KEY = "monkeytactics.anagram-architect.personal-vocabulary.v1";
+	var DICTIONARY_LINKS = Object.freeze([
+		[
+			"MW",
+			"Merriam-Webster",
+			(word) => `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`
+		],
+		[
+			"CO",
+			"Collins",
+			(word) => `https://www.collinsdictionary.com/dictionary/english/${encodeURIComponent(word)}`
+		],
+		[
+			"Wik",
+			"Wiktionary",
+			(word) => `https://en.wiktionary.org/wiki/${encodeURIComponent(word)}`
+		],
+		[
+			"WN",
+			"Wordnik",
+			(word) => `https://www.wordnik.com/words/${encodeURIComponent(word)}`
+		],
+		[
+			"DC",
+			"Dictionary.com",
+			(word) => `https://www.dictionary.com/browse/${encodeURIComponent(word)}`
+		],
+		[
+			"Cam",
+			"Cambridge",
+			(word) => `https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(word)}`
+		]
+	]);
 	var currentSource = "";
+	var searchRequestId = 0;
 	var allResults = [];
 	var currentPage = 1;
 	var activeSearch = null;
 	var telemetryStarted = 0;
+	var telemetryTimeLimitMs = 0;
 	var throughputSamples = [];
 	var pickEntries = readPickList();
 	var customGrammarSlots = [];
@@ -393,6 +435,72 @@
 	var draggedTemplateIndex = null;
 	var pointerTemplateDrag = null;
 	var pickDictionaryPromises = /* @__PURE__ */ new Map();
+	var dictionaryDirectoryDialog = null;
+	var dictionaryDirectoryTitle = null;
+	var dictionaryDirectoryLinks = null;
+	var dictionaryDirectoryReturnFocus = null;
+	function ensureDictionaryDirectoryDialog() {
+		if (dictionaryDirectoryDialog) return;
+		dictionaryDirectoryDialog = document.createElement("dialog");
+		dictionaryDirectoryDialog.className = "anagram-dictionary-directory-modal";
+		dictionaryDirectoryDialog.setAttribute("aria-labelledby", "anagram-dictionary-directory-title");
+		const card = document.createElement("div");
+		card.className = "anagram-dictionary-directory-card";
+		const header = document.createElement("header");
+		header.className = "anagram-dictionary-directory-header";
+		dictionaryDirectoryTitle = document.createElement("h2");
+		dictionaryDirectoryTitle.id = "anagram-dictionary-directory-title";
+		const close = document.createElement("button");
+		close.type = "button";
+		close.className = "anagram-dictionary-directory-close";
+		close.setAttribute("aria-label", "Close dictionary lookups");
+		close.textContent = "×";
+		close.addEventListener("click", () => dictionaryDirectoryDialog.close());
+		header.append(dictionaryDirectoryTitle, close);
+		const introduction = document.createElement("p");
+		introduction.textContent = "Choose an external dictionary. The selected service opens in a new tab.";
+		dictionaryDirectoryLinks = document.createElement("div");
+		dictionaryDirectoryLinks.className = "anagram-dictionary-directory-links";
+		card.append(header, introduction, dictionaryDirectoryLinks);
+		dictionaryDirectoryDialog.append(card);
+		dictionaryDirectoryDialog.addEventListener("click", (event) => {
+			if (event.target === dictionaryDirectoryDialog) dictionaryDirectoryDialog.close();
+		});
+		dictionaryDirectoryDialog.addEventListener("close", () => {
+			dictionaryDirectoryReturnFocus?.focus();
+			dictionaryDirectoryReturnFocus = null;
+		});
+		document.body.append(dictionaryDirectoryDialog);
+	}
+	function openDictionaryDirectory(word, trigger) {
+		ensureDictionaryDirectoryDialog();
+		dictionaryDirectoryReturnFocus = trigger;
+		dictionaryDirectoryTitle.textContent = `Look up ${word.toUpperCase()}`;
+		dictionaryDirectoryLinks.replaceChildren(...DICTIONARY_LINKS.map(([abbreviation, name, getUrl]) => {
+			const link = document.createElement("a");
+			link.href = getUrl(word);
+			link.target = "_blank";
+			link.rel = "noopener noreferrer";
+			const shortName = document.createElement("strong");
+			shortName.textContent = abbreviation;
+			const fullName = document.createElement("span");
+			fullName.textContent = name;
+			link.append(shortName, fullName);
+			return link;
+		}));
+		dictionaryDirectoryDialog.showModal();
+	}
+	function buildDictionaryLookupButton(label = "Look up") {
+		const button = document.createElement("button");
+		button.type = "button";
+		button.className = "anagram-dictionary-lookup";
+		button.textContent = label;
+		button.hidden = true;
+		button.addEventListener("click", () => {
+			if (button.dataset.word) openDictionaryDirectory(button.dataset.word, button);
+		});
+		return button;
+	}
 	form.dataset.architectReady = "true";
 	function readHarmedWorkers() {
 		try {
@@ -706,7 +814,10 @@
 		select.setAttribute("aria-label", `Word-order alternatives for ${entry.phrase}`);
 		const refreshAlternatives = () => {
 			alternatives = rankPhrasePermutations(entry.phrase, 720, [...locked]);
-			heading.textContent = `${alternatives.length} distinct word-order alternative${alternatives.length === 1 ? "" : "s"}${locked.size ? ` · ${locked.size} word${locked.size === 1 ? "" : "s"} locked` : ""}`;
+			const movableWords = words.length - locked.size;
+			const locksNeeded = Math.max(0, movableWords - 8);
+			heading.textContent = alternatives.length ? `${alternatives.length} distinct word-order alternative${alternatives.length === 1 ? "" : "s"}${locked.size ? ` · ${locked.size} word${locked.size === 1 ? "" : "s"} locked` : ""}` : movableWords > 8 ? "Word-order alternatives unavailable" : "No distinct word-order alternatives";
+			hint.textContent = movableWords > 8 ? `This phrase has ${movableWords} movable words. Arrange can rank up to 8 movable words because possible orders grow rapidly. Lock at least ${locksNeeded} more word${locksNeeded === 1 ? "" : "s"} to enable alternatives.` : "Lock words in place, then drag a locked word between the other words to move its fixed position. Select an ordering or double-click one to use it immediately.";
 			select.replaceChildren(...alternatives.map((alternative) => {
 				const option = document.createElement("option");
 				option.value = alternative.phrase;
@@ -1004,12 +1115,28 @@
 		hint.textContent = "Exact-letter replacements keep the complete phrase a valid anagram.";
 		const wordButtons = document.createElement("div");
 		wordButtons.className = "anagram-pick-word-buttons";
+		const definitionPanel = document.createElement("section");
+		definitionPanel.className = "anagram-pick-word-definitions";
+		definitionPanel.setAttribute("aria-live", "polite");
+		const definitionHeading = document.createElement("strong");
+		definitionHeading.textContent = "Word definitions";
+		const definitionLookup = buildDictionaryLookupButton();
+		const definitionHeader = document.createElement("div");
+		definitionHeader.className = "anagram-definition-header";
+		definitionHeader.append(definitionHeading, definitionLookup);
+		const definitionContent = document.createElement("div");
+		definitionContent.textContent = "Select a word to see all of its local definitions.";
+		definitionPanel.append(definitionHeader, definitionContent);
 		const replacement = document.createElement("select");
 		replacement.hidden = true;
 		replacement.setAttribute("aria-label", "Exact-letter replacement words");
 		const preview = document.createElement("strong");
 		preview.className = "anagram-pick-swap-preview";
 		preview.textContent = titleCase(entry.phrase);
+		const replacementDefinition = document.createElement("section");
+		replacementDefinition.className = "anagram-pick-replacement-definition";
+		replacementDefinition.setAttribute("aria-live", "polite");
+		replacementDefinition.hidden = true;
 		const feedback = document.createElement("small");
 		feedback.className = "anagram-pick-permutation-feedback";
 		feedback.setAttribute("aria-live", "polite");
@@ -1018,6 +1145,64 @@
 		use.textContent = "Use replacement";
 		use.disabled = true;
 		let alternatives = [];
+		let definitionRequestId = 0;
+		let replacementDefinitionRequestId = 0;
+		const showDefinitions = async (word) => {
+			const requestId = ++definitionRequestId;
+			definitionHeading.textContent = `Definition: ${titleCase(word)}`;
+			definitionLookup.dataset.word = word;
+			definitionLookup.hidden = false;
+			definitionContent.textContent = "Loading definitions…";
+			try {
+				const result = await globalThis.MonkeyTacticsWordDefinitions?.lookup(word, { allowRemote: false });
+				if (requestId !== definitionRequestId) return;
+				const definitions = [...new Set((result?.entries || []).flatMap(({ defs = [] }) => defs).map((value) => String(value).replace(/^[a-z]+\t/i, "").trim()).filter(Boolean))];
+				if (!definitions.length) {
+					definitionContent.textContent = "No local definition is available for this word.";
+					return;
+				}
+				const list = document.createElement("ol");
+				definitions.forEach((text) => {
+					const item = document.createElement("li");
+					item.textContent = text;
+					list.append(item);
+				});
+				definitionContent.replaceChildren(list);
+			} catch {
+				if (requestId === definitionRequestId) definitionContent.textContent = "Definitions could not be loaded.";
+			}
+		};
+		const showReplacementDefinitions = async (word) => {
+			const requestId = ++replacementDefinitionRequestId;
+			replacementDefinition.hidden = false;
+			replacementDefinition.textContent = `Loading definitions for ${titleCase(word)}…`;
+			try {
+				const result = await globalThis.MonkeyTacticsWordDefinitions?.lookup(word, { allowRemote: false });
+				if (requestId !== replacementDefinitionRequestId) return;
+				const definitions = [...new Set((result?.entries || []).flatMap(({ defs = [] }) => defs).map((value) => String(value).replace(/^[a-z]+\t/i, "").trim()).filter(Boolean))];
+				const heading = document.createElement("strong");
+				heading.textContent = `Definition: ${titleCase(word)}`;
+				const lookup = buildDictionaryLookupButton();
+				lookup.dataset.word = word;
+				lookup.hidden = false;
+				const header = document.createElement("div");
+				header.className = "anagram-definition-header";
+				header.append(heading, lookup);
+				const content = document.createElement("div");
+				if (definitions.length) {
+					const list = document.createElement("ol");
+					definitions.forEach((text) => {
+						const item = document.createElement("li");
+						item.textContent = text;
+						list.append(item);
+					});
+					content.append(list);
+				} else content.textContent = "No local definition is available for this replacement.";
+				replacementDefinition.replaceChildren(header, content);
+			} catch {
+				if (requestId === replacementDefinitionRequestId) replacementDefinition.textContent = "Replacement definitions could not be loaded.";
+			}
+		};
 		(entry.phrase.toLowerCase().match(/[a-z]+/g) || []).forEach((word, wordIndex) => {
 			const button = document.createElement("button");
 			button.type = "button";
@@ -1025,16 +1210,28 @@
 			button.setAttribute("aria-pressed", "false");
 			button.addEventListener("click", async () => {
 				const wasSelected = button.getAttribute("aria-pressed") === "true";
-				[...wordButtons.children].forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
+				wordButtons.querySelectorAll("button").forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
 				if (wasSelected) {
 					button.setAttribute("aria-pressed", "false");
 					replacement.hidden = true;
 					replacement.value = "";
 					use.disabled = true;
+					replacementDefinitionRequestId += 1;
+					replacementDefinition.hidden = true;
+					replacementDefinition.replaceChildren();
 					preview.textContent = titleCase(entry.phrase);
 					feedback.textContent = "Choose a word to see exact-letter alternatives.";
+					definitionRequestId += 1;
+					definitionHeading.textContent = "Word definitions";
+					definitionLookup.hidden = true;
+					delete definitionLookup.dataset.word;
+					definitionContent.textContent = "Select a word to see all of its local definitions.";
 					return;
 				}
+				showDefinitions(word);
+				replacementDefinitionRequestId += 1;
+				replacementDefinition.hidden = true;
+				replacementDefinition.replaceChildren();
 				replacement.hidden = true;
 				use.disabled = true;
 				preview.textContent = titleCase(entry.phrase);
@@ -1065,6 +1262,12 @@
 			const selected = alternatives.find(({ phrase }) => phrase === replacement.value);
 			preview.textContent = titleCase(selected?.phrase || entry.phrase);
 			use.disabled = !selected;
+			if (selected) showReplacementDefinitions(selected.word);
+			else {
+				replacementDefinitionRequestId += 1;
+				replacementDefinition.hidden = true;
+				replacementDefinition.replaceChildren();
+			}
 		});
 		use.addEventListener("click", () => {
 			const selected = alternatives.find(({ phrase }) => phrase === replacement.value);
@@ -1078,7 +1281,7 @@
 		const actions = document.createElement("div");
 		actions.className = "anagram-pick-permutation-actions";
 		actions.append(use);
-		panel.append(close, heading, hint, wordButtons, replacement, preview, actions, feedback);
+		panel.append(close, heading, hint, wordButtons, definitionPanel, replacement, preview, replacementDefinition, actions, feedback);
 		return panel;
 	}
 	function closePickDrawer() {
@@ -1246,13 +1449,17 @@
 		if (workerCount > 2 && index === 1) return "compact-phrase";
 		const specialistCount = workerCount > 2 ? 2 : workerCount > 1 ? 1 : 0;
 		const generalCount = workerCount - specialistCount;
-		return generalCount > 1 ? `general ${index - specialistCount + 1}/${generalCount}` : "general";
+		const generalIndex = index - specialistCount;
+		if (generalIndex === 0) return generalCount > 1 ? `core + general 1/${generalCount}` : "core + general";
+		return `general ${generalIndex + 1}/${generalCount}`;
 	}
-	function beginTelemetry(workerCount) {
+	function beginTelemetry(workerCount, timeLimitMs = 0) {
 		telemetryStarted = performance.now();
+		telemetryTimeLimitMs = Math.max(0, Number(timeLimitMs) || 0);
 		throughputSamples = [];
 		analysis.hidden = false;
 		analysis.open = true;
+		metricProgressLabel.textContent = "search progress";
 		analysisCancel.hidden = false;
 		analysisPhase.textContent = "Loading";
 		workerLanes.replaceChildren(...Array.from({ length: workerCount }, (_, index) => {
@@ -1270,7 +1477,7 @@
 			prunedPaths: 0
 		})), []);
 	}
-	function updateTelemetry(progress, ranked, complete = false) {
+	function updateTelemetry(progress, ranked, complete = false, budgetExhausted = false) {
 		const nodes = progress.reduce((sum, item) => sum + (item.nodes || 0), 0);
 		const budget = progress.reduce((sum, item) => sum + (item.nodeLimit || 0), 0) || 1;
 		const percent = complete ? 100 : Math.min(100, nodes / budget * 100);
@@ -1288,7 +1495,9 @@
 		metricMatches.textContent = progress.reduce((sum, item) => sum + (item.matchesSeen || 0), 0).toLocaleString();
 		metricRetained.textContent = ranked.length.toLocaleString();
 		currentLeader.textContent = ranked[0] ? titleCase(ranked[0].phrase) : complete ? "No matching phrase found" : "Waiting for an exact phrase…";
-		analysisFoot.textContent = `${Math.max(...progress.map((item) => item.candidateCount || 0)).toLocaleString()} candidate words · ${progress.reduce((sum, item) => sum + (item.prunedPaths || 0), 0).toLocaleString()} duplicate paths pruned · ${elapsed.toFixed(1)}s elapsed`;
+		const remainingSeconds = telemetryTimeLimitMs ? Math.max(0, telemetryTimeLimitMs / 1e3 - elapsed) : 0;
+		const budgetStatus = telemetryTimeLimitMs ? budgetExhausted || remainingSeconds <= 0 ? " · budget exhausted" : complete ? ` · ${Math.ceil(remainingSeconds)}s budget remaining` : ` · ${Math.ceil(remainingSeconds)}s until budget exhausted` : "";
+		analysisFoot.textContent = `${Math.max(...progress.map((item) => item.candidateCount || 0)).toLocaleString()} candidate words · ${progress.reduce((sum, item) => sum + (item.prunedPaths || 0), 0).toLocaleString()} duplicate paths pruned · ${elapsed.toFixed(1)}s elapsed${budgetStatus}`;
 		[...workerLanes.children].forEach((lane, index) => {
 			const item = progress[index];
 			const value = item?.done ? 100 : Math.min(100, (item?.nodes || 0) / (item?.nodeLimit || 1) * 100);
@@ -1346,11 +1555,8 @@
 	});
 	function solveInWorker(source, options, dictionaryKind, showProgress) {
 		return new Promise((resolve, reject) => {
-			const deadlineEpochMs = options.timeLimitMs ? Date.now() + options.timeLimitMs : 0;
-			const workerOptions = {
-				...options,
-				deadlineEpochMs
-			};
+			let deadlineEpochMs = 0;
+			const workerOptions = { ...options };
 			const workerCount = options.workerCount;
 			const workers = [];
 			const shardResults = Array.from({ length: workerCount }, () => []);
@@ -1365,8 +1571,16 @@
 			const completions = [];
 			let settled = false;
 			let hardTimeout = null;
+			let budgetStarted = false;
 			let loadedWordCount = 0;
-			beginTelemetry(workerCount);
+			beginTelemetry(workerCount, options.timeLimitMs);
+			const startBudget = () => {
+				if (budgetStarted || !options.timeLimitMs) return;
+				budgetStarted = true;
+				telemetryStarted = performance.now();
+				deadlineEpochMs = Date.now() + options.timeLimitMs + 2e3;
+				hardTimeout = setTimeout(finishTimedOut, options.timeLimitMs + 2e3);
+			};
 			const terminateAll = () => workers.forEach((worker) => worker.terminate());
 			const mergeResults = () => {
 				return mergeRankedResults(shardResults, options.limit);
@@ -1396,7 +1610,7 @@
 				updateTelemetry(shardProgress.map((entry) => ({
 					...entry,
 					done: true
-				})), mergedResults, true);
+				})), mergedResults, true, true);
 				resolve({
 					outcome: {
 						results: mergedResults,
@@ -1428,6 +1642,7 @@
 						status.textContent = message;
 						if (showProgress) updatePatternProgress(message, percent);
 					} else {
+						startBudget();
 						if (data.engine) shardEngines[shardIndex] = data.engine;
 						shardProgress[shardIndex] = data;
 						const nodes = shardProgress.reduce((sum, entry) => sum + entry.nodes, 0);
@@ -1474,10 +1689,11 @@
 					analysisCancel.hidden = true;
 					const nodes = completions.reduce((sum, entry) => sum + entry.outcome.nodes, 0);
 					const mergedResults = mergeResults();
+					const budgetExhausted = completions.some((entry) => entry.outcome.timeLimited);
 					updateTelemetry(shardProgress.map((entry) => ({
 						...entry,
 						done: true
-					})), mergedResults, true);
+					})), mergedResults, true, budgetExhausted);
 					resolve({
 						outcome: {
 							results: mergedResults,
@@ -1493,7 +1709,7 @@
 				}
 			};
 			for (let shardIndex = 0; shardIndex < workerCount; shardIndex += 1) {
-				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260915-23", { type: "module" });
+				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260917-07", { type: "module" });
 				workers.push(worker);
 				worker.addEventListener("message", ({ data }) => handleMessage(shardIndex, worker, data));
 				worker.addEventListener("error", () => fail(/* @__PURE__ */ new Error("A parallel anagram worker could not start. Reload the page and try again.")));
@@ -1501,19 +1717,20 @@
 				const compactPhraseSpecialist = workerCount > 2 && shardIndex === 1;
 				const specialistCount = workerCount > 2 ? 2 : workerCount > 1 ? 1 : 0;
 				const isSpecialist = shortPhraseSpecialist || compactPhraseSpecialist;
+				const generalShardIndex = shardIndex - specialistCount;
 				worker.postMessage({
 					type: "solve",
 					source,
 					options: {
 						...workerOptions,
 						maxWords: shortPhraseSpecialist ? Math.min(options.maxWords, 3) : compactPhraseSpecialist ? Math.min(options.maxWords, 4) : options.maxWords,
-						shardIndex: isSpecialist ? 0 : shardIndex - specialistCount,
-						shardCount: isSpecialist ? 1 : workerCount - specialistCount
+						shardIndex: isSpecialist ? 0 : generalShardIndex,
+						shardCount: isSpecialist ? 1 : workerCount - specialistCount,
+						deterministicCore: shortPhraseSpecialist || !isSpecialist && generalShardIndex === 0
 					},
 					dictionary: dictionaryKind
 				});
 			}
-			if (options.timeLimitMs) hardTimeout = setTimeout(finishTimedOut, options.timeLimitMs);
 		});
 	}
 	progressCancel.addEventListener("click", () => {
@@ -1622,12 +1839,15 @@
 			tier: available >= 8 && (!memory || memory >= 8) ? "high" : available >= 4 && (!memory || memory >= 4) ? "medium" : "low"
 		};
 	}
+	function selectedTimeBudgetMs(mode = searchMode.value) {
+		if (timeBudget.value !== "auto") return Number(timeBudget.value) * 1e3;
+		return mode === "exhaustive" ? 12e4 : mode === "deep" ? 6e4 : 15e3;
+	}
 	function updateProRecommendation() {
 		const letterCount = normalizeLetters(input.value).length;
 		const { available, memory, tier } = deviceProfile();
 		const hardware = `${available} logical processor${available === 1 ? "" : "s"}${memory ? ` and about ${memory} GB device memory` : ""}`;
-		const baseSeconds = searchMode.value === "exhaustive" ? 60 : searchMode.value === "deep" ? 30 : 15;
-		const seconds = Math.round(baseSeconds * (tier === "high" ? 1 : tier === "medium" ? .85 : .67));
+		const seconds = Math.round(selectedTimeBudgetMs() / 1e3);
 		if (!proMode.checked) {
 			if (letterCount > 30) proRecommendation.textContent = `This ${letterCount}-letter phrase requires Pro mode. This device reports ${hardware}.`;
 			else if (Number(maxWords.value) >= 6) proRecommendation.textContent = `Six-word searches create a much larger search space${Number(minimumLength.value) <= 2 ? ", especially with a 2-letter minimum" : ""}. This search will stop after about ${seconds} seconds and keep its best results.`;
@@ -1648,7 +1868,7 @@
 		const { available, tier } = deviceProfile();
 		const expanded = dictionaryKind === "expanded";
 		const tierFactor = tier === "high" ? 1 : tier === "medium" ? .85 : .67;
-		const baseTimeMs = mode === "exhaustive" ? 6e4 : mode === "deep" ? 3e4 : 15e3;
+		const baseTimeMs = selectedTimeBudgetMs(mode);
 		if (usesProMode && letterCount > 30) {
 			const baseNodes = mode === "exhaustive" ? 15e4 : mode === "deep" ? 75e3 : 25e3;
 			const cap = mode === "exhaustive" ? 8 : mode === "deep" ? 6 : 3;
@@ -1656,7 +1876,7 @@
 			return {
 				workerCount: Math.min(available, cap),
 				nodeLimit: Math.round(baseNodes * tierFactor * dictionaryFactor),
-				timeLimitMs: Math.round(baseTimeMs * tierFactor)
+				timeLimitMs: timeBudget.value === "auto" && letterCount > 30 ? Math.round(baseTimeMs * tierFactor) : baseTimeMs
 			};
 		}
 		return {
@@ -1667,14 +1887,15 @@
 				workerCount: Math.min(available, 4),
 				nodeLimit: expanded ? 5e5 : 3e5
 			} : {
-				workerCount: Math.min(available, 2),
-				nodeLimit: expanded ? 18e4 : 1e5
+				workerCount: 1,
+				nodeLimit: expanded ? 24e4 : 14e4
 			},
-			timeLimitMs: Math.round(baseTimeMs * tierFactor)
+			timeLimitMs: baseTimeMs
 		};
 	}
 	form.addEventListener("submit", async (event) => {
 		event.preventDefault();
+		const requestId = ++searchRequestId;
 		const source = input.value.trim();
 		const letters = normalizeLetters(source);
 		const maximumLetters = proMode.checked ? 60 : 30;
@@ -1710,6 +1931,7 @@
 		if (showsProgressModal) showPatternProgress("Loading the local dictionary…", usesPhrasePattern);
 		resetResultView();
 		results.replaceChildren();
+		currentSource = source;
 		summary.textContent = `${letters.length} letters available`;
 		const started = performance.now();
 		try {
@@ -1729,18 +1951,21 @@
 			}, dictionary.value, showsProgressModal);
 			status.textContent = `Architecting exact phrases from ${wordCount.toLocaleString()} words…`;
 			if (showsProgressModal) updatePatternProgress("Finalizing your exact matches…", 100);
-			currentSource = source;
 			allResults = outcome.results;
 			renderResults();
+			metricProgressLabel.textContent = outcome.timeLimited ? "time budget used" : "search complete";
+			analysisPhase.textContent = outcome.timeLimited ? "Budget reached" : "Complete";
 			const seconds = ((performance.now() - started) / 1e3).toFixed(1);
 			status.textContent = outcome.results.length === 0 && grammarTemplate.value ? `No exact phrases matched the selected grammar template in ${seconds}s. Try another template, Expanded dictionary, or a different source phrase.` : `${outcome.results.length} exact phrase${outcome.results.length === 1 ? "" : "s"} found in ${seconds}s${outcome.timeLimited ? " · time budget reached" : outcome.truncated ? " · ranked search pass" : ""} · ${workerCount} ${engine === "wasm" ? "Rust/WASM" : "JavaScript"} worker${workerCount === 1 ? "" : "s"}.`;
 			if (wasmFailure) console.warn("Rust/WASM fallback:", wasmFailure);
 		} catch (error) {
-			status.textContent = error?.name === "AbortError" ? "Anagram search cancelled." : error instanceof Error ? error.message : "Anagram Architect could not complete the search.";
+			if (requestId === searchRequestId) status.textContent = error?.name === "AbortError" ? "Anagram search cancelled." : error instanceof Error ? error.message : "Anagram Architect could not complete the search.";
 		} finally {
-			submit.disabled = false;
-			analysisCancel.hidden = true;
-			if (showsProgressModal) hidePatternProgress();
+			if (requestId === searchRequestId) {
+				submit.disabled = false;
+				analysisCancel.hidden = true;
+				if (showsProgressModal) hidePatternProgress();
+			}
 		}
 	});
 	function resetAdvancedOptions(announce = false) {
@@ -1749,6 +1974,7 @@
 		grammarControl.open = false;
 		dictionary.value = "standard";
 		searchMode.value = "deep";
+		timeBudget.value = "auto";
 		maxWords.value = "5";
 		minimumLength.value = "2";
 		customGrammarSlots = [];
@@ -1817,6 +2043,7 @@
 	});
 	proMode.addEventListener("change", syncProMode);
 	searchMode.addEventListener("change", updateProRecommendation);
+	timeBudget.addEventListener("change", updateProRecommendation);
 	maxWords.addEventListener("change", updateProRecommendation);
 	minimumLength.addEventListener("change", updateProRecommendation);
 	syncProMode();
