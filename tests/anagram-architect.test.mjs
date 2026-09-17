@@ -186,7 +186,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-14/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-15/);
 });
 
 test("shows phrase validation failures in an accessible modal", async () => {
@@ -217,13 +217,14 @@ test("offers an experimental hardware-aware Pro mode for long phrases", async ()
   assert.match(source, /\{ workerCount: 1, nodeLimit: expanded \? 240000 : 140000 \}/);
   assert.match(source, /deterministicCore: shortPhraseSpecialist/);
   assert.match(source, /time budget reached/);
-  assert.match(source, /hardTimeout = setTimeout\(finishTimedOut, options\.timeLimitMs\)/);
-  assert.match(source, /deadlineEpochMs = options\.timeLimitMs \? Date\.now\(\) \+ options\.timeLimitMs : 0/);
+  assert.match(source, /hardTimeout = setTimeout\(finishTimedOut, options\.timeLimitMs \+ 2000\)/);
+  assert.match(source, /startBudget\(\)/);
+  assert.match(source, /deadlineEpochMs = Date\.now\(\) \+ options\.timeLimitMs \+ 2000/);
   assert.match(source, /resolve\(\{ outcome: \{ results: mergedResults, nodes, truncated: true, timeLimited: true \}/);
   assert.match(source, /return \{ \.\.\.standard, timeLimitMs: baseTimeMs \}/);
   assert.match(source, /Number\(maxWords\.value\) >= 6/);
   assert.match(source, /Six-word searches create a much larger search space/);
-  assert.match(worker, /Date\.now\(\) >= data\.options\.deadlineEpochMs/);
+  assert.match(worker, /deadlineEpochMs: data\.options\.timeLimitMs \? Date\.now\(\) \+ data\.options\.timeLimitMs : 0/);
   assert.match(worker, /Boolean\(step\.timeLimited\)/);
   assert.match(worker, /stepBudget = data\.options\.timeLimitMs \? 100 : 5000/);
   assert.match(worker, /now - lastProgressAt >= 200/);
@@ -234,7 +235,7 @@ test("offers an experimental hardware-aware Pro mode for long phrases", async ()
   assert.match(source, /requestId === searchRequestId/);
   assert.match(worker, /type: "engine", engine: "wasm"/);
   assert.match(worker, /data\.options\.customWords \|\| \[\]/);
-  assert.match(worker, /data\.options\.deadlineEpochMs - Date\.now\(\)/);
+  assert.match(worker, /searchOptions\.deadlineEpochMs - Date\.now\(\)/);
   assert.match(worker, /timeLimitMs: remainingTimeMs/);
 });
 

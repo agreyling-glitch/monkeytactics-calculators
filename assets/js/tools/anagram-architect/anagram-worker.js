@@ -56,12 +56,6 @@ self.addEventListener("message", async ({ data }) => {
     for (const word of data.options.customWords || []) {
       if (!knownWords.has(word)) { knownWords.add(word); words.push(word); }
     }
-    self.postMessage({ type: "progress", phase: "search", nodes: 0, nodeLimit: data.options.nodeLimit, found: 0, wordCount: words.length });
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    if (data.options.deadlineEpochMs && Date.now() >= data.options.deadlineEpochMs) {
-      self.postMessage({ type: "complete", outcome: { results: [], nodes: 0, truncated: true, timeLimited: true }, wordCount: words.length, engine: "javascript", wasmFailure: "" });
-      return;
-    }
     let outcome;
     let engine = "javascript";
     let wasmFailure = "";
@@ -77,9 +71,15 @@ self.addEventListener("message", async ({ data }) => {
       wasmFailure = wasmError instanceof Error ? wasmError.message : String(wasmError);
     }
     if (!wasmReady && data.options.grammarTemplate) throw new Error(`Grammar templates require the Rust/WASM engine. ${wasmFailure}`);
+    const searchOptions = {
+      ...data.options,
+      deadlineEpochMs: data.options.timeLimitMs ? Date.now() + data.options.timeLimitMs : 0
+    };
+    self.postMessage({ type: "progress", phase: "search", nodes: 0, nodeLimit: searchOptions.nodeLimit, found: 0, wordCount: words.length });
+    await new Promise((resolve) => setTimeout(resolve, 0));
     if (wasmReady) {
       self.postMessage({ type: "engine", engine: "wasm" });
-      startWasmSearch(data.source, data.options);
+      startWasmSearch(data.source, searchOptions);
       engine = "wasm";
       let step;
       let lastPartialRevision = -1;
@@ -89,7 +89,7 @@ self.addEventListener("message", async ({ data }) => {
       const stepBudget = data.options.timeLimitMs ? 100 : 5000;
       do {
         step = stepWasmSearch(stepBudget);
-        timeLimited = Boolean(step.timeLimited) || (!step.done && data.options.deadlineEpochMs && Date.now() >= data.options.deadlineEpochMs);
+        timeLimited = Boolean(step.timeLimited) || (!step.done && searchOptions.deadlineEpochMs && Date.now() >= searchOptions.deadlineEpochMs);
         const now = performance.now();
         if (step.done || timeLimited || now - lastProgressAt >= 200) {
           self.postMessage({ type: "progress", phase: "search", nodes: step.nodes, nodeLimit: step.nodeLimit, found: step.found, matchesSeen: step.matchesSeen, candidateCount: step.candidateCount, prunedPaths: step.prunedPaths, done: step.done, engine });
@@ -105,12 +105,12 @@ self.addEventListener("message", async ({ data }) => {
       outcome = { results: step.results || [], nodes: step.nodes, truncated: step.truncated || timeLimited, timeLimited };
     } else {
       self.postMessage({ type: "engine", engine: "javascript" });
-      const remainingTimeMs = data.options.deadlineEpochMs
-        ? Math.max(0, data.options.deadlineEpochMs - Date.now())
+      const remainingTimeMs = searchOptions.deadlineEpochMs
+        ? Math.max(0, searchOptions.deadlineEpochMs - Date.now())
         : 0;
       outcome = remainingTimeMs || !data.options.timeLimitMs
         ? solveAnagrams(data.source, words, {
-            ...data.options,
+            ...searchOptions,
             timeLimitMs: remainingTimeMs,
             onProgress(progress) { self.postMessage({ type: "progress", phase: "search", ...progress, engine }); }
           })

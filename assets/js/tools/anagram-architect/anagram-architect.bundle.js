@@ -1443,11 +1443,8 @@
 	});
 	function solveInWorker(source, options, dictionaryKind, showProgress) {
 		return new Promise((resolve, reject) => {
-			const deadlineEpochMs = options.timeLimitMs ? Date.now() + options.timeLimitMs : 0;
-			const workerOptions = {
-				...options,
-				deadlineEpochMs
-			};
+			let deadlineEpochMs = 0;
+			const workerOptions = { ...options };
 			const workerCount = options.workerCount;
 			const workers = [];
 			const shardResults = Array.from({ length: workerCount }, () => []);
@@ -1462,8 +1459,16 @@
 			const completions = [];
 			let settled = false;
 			let hardTimeout = null;
+			let budgetStarted = false;
 			let loadedWordCount = 0;
 			beginTelemetry(workerCount, options.timeLimitMs);
+			const startBudget = () => {
+				if (budgetStarted || !options.timeLimitMs) return;
+				budgetStarted = true;
+				telemetryStarted = performance.now();
+				deadlineEpochMs = Date.now() + options.timeLimitMs + 2e3;
+				hardTimeout = setTimeout(finishTimedOut, options.timeLimitMs + 2e3);
+			};
 			const terminateAll = () => workers.forEach((worker) => worker.terminate());
 			const mergeResults = () => {
 				return mergeRankedResults(shardResults, options.limit);
@@ -1525,6 +1530,7 @@
 						status.textContent = message;
 						if (showProgress) updatePatternProgress(message, percent);
 					} else {
+						startBudget();
 						if (data.engine) shardEngines[shardIndex] = data.engine;
 						shardProgress[shardIndex] = data;
 						const nodes = shardProgress.reduce((sum, entry) => sum + entry.nodes, 0);
@@ -1591,7 +1597,7 @@
 				}
 			};
 			for (let shardIndex = 0; shardIndex < workerCount; shardIndex += 1) {
-				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260917-05", { type: "module" });
+				const worker = new Worker("/assets/js/tools/anagram-architect/anagram-worker.bundle.js?v=20260917-06", { type: "module" });
 				workers.push(worker);
 				worker.addEventListener("message", ({ data }) => handleMessage(shardIndex, worker, data));
 				worker.addEventListener("error", () => fail(/* @__PURE__ */ new Error("A parallel anagram worker could not start. Reload the page and try again.")));
@@ -1613,7 +1619,6 @@
 					dictionary: dictionaryKind
 				});
 			}
-			if (options.timeLimitMs) hardTimeout = setTimeout(finishTimedOut, options.timeLimitMs);
 		});
 	}
 	progressCancel.addEventListener("click", () => {
