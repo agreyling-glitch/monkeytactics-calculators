@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Animated Anagram Maker — Anagram Architect</title>
+  <meta name="description" content="Create and share a compact animated exact-anagram reveal using Blueprint, Wand, and other locally rendered animation styles.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="MonkeyTactics">
+  <meta name="date" content="2026-09-19">
+  <meta name="theme-color" content="#081426">
+  <link rel="canonical" href="https://monkeytactics.com/tools/anagram-animator">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
+  <link rel="stylesheet" href="../assets/css/tools/anagram-animator.css?v=20260919-04">
+  <script>{const p=new URLSearchParams(location.search);if(p.get("embed")==="1")document.documentElement.classList.add("animator-embed");else if(p.get("focus")==="1")document.documentElement.classList.add("animator-focus");}</script>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Animated Anagram Maker — Anagram Architect">
+  <meta property="og:description" content="Turn an exact before-and-after anagram pair into a compact, shareable animated reveal.">
+  <meta property="og:url" content="https://monkeytactics.com/tools/anagram-animator">
+  <meta property="og:site_name" content="MonkeyTactics">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Anagram Animator","url":"https://monkeytactics.com/tools/anagram-animator","description":"A browser-based exact-anagram animator with compact URL sharing.","applicationCategory":"MultimediaApplication","operatingSystem":"Any","isAccessibleForFree":true,"inLanguage":"en-US"}</script>
+</head>
+<body class="animator-page">
+  <main>
+    <div id="mt-header"></div>
+    <script type="module" src="/assets/wasm/menu/menu.js?v=20260915-menu-manifest-v2"></script>
+    <div class="animator-main">
+      <nav class="breadcrumb animator-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/tools/">Tools</a><span aria-hidden="true">/</span><span aria-current="page">Anagram Animator</span></nav>
+      <header class="animator-hero">
+        <span class="eyebrow">Anagram Architect · Shareable reveal</span>
+        <h1>Animate an exact anagram</h1>
+        <p>Enter a before phrase and its exact anagram, choose a visual style, then copy a lightweight link. The animation is rendered locally from text and parameters—no large video file required.</p>
+      </header>
+      <section class="animator-studio" aria-label="Anagram animation studio">
+        <canvas class="animator-canvas" id="anagram-animator-canvas" width="960" height="540" role="img" aria-label="Animated exact-anagram reveal"></canvas>
+        <form class="animator-form" id="anagram-animator-form">
+          <label>Before<input id="anagram-animator-source" type="text" maxlength="120" autocomplete="off" required></label>
+          <label>After<input id="anagram-animator-result" type="text" maxlength="120" autocomplete="off" required></label>
+          <div class="animator-options">
+            <label>Style<select id="anagram-animator-style"><option value="blueprint">Blueprint</option><option value="wand">Wand</option><option value="fly">Fly</option><option value="shuffle">Shuffle</option><option value="magnetic">Magnetic</option><option value="typewriter">Typewriter</option></select></label>
+            <label>Speed<select id="anagram-animator-speed"><option value="calm">Calm · 8 seconds</option><option value="normal" selected>Normal · 6.5 seconds</option><option value="dramatic">Dramatic · 5.2 seconds</option></select></label>
+            <label class="animator-repeat"><input id="anagram-animator-repeat" type="checkbox" checked> Repeat</label>
+          </div>
+        </form>
+        <p class="animator-status" id="anagram-animator-status" role="status" aria-live="polite"></p>
+        <div class="animator-actions"><button id="anagram-animator-play" type="button">Replay animation</button><button id="anagram-animator-focus" type="button" aria-pressed="false">Focus mode</button><button id="anagram-animator-copy" type="button">Copy animation link</button><button id="anagram-animator-embed" type="button">Copy embed code</button><a href="/tools/anagram-architect">Find an anagram</a></div>
+      </section>
+      <section class="animator-explainer"><h2>A tiny link, not a massive video</h2><p>The shared URL contains only the two phrases and animation choices. Shared links open in a focused 16:9 view that shows only the reveal, while responsive iframe embed mode fits the animation into supporting sites. The recipient’s browser validates the exact letters and draws every frame locally. Nothing is uploaded, and invalid phrase pairs are never animated as exact anagrams.</p><p>Create the before-and-after pair in <a href="/tools/anagram-architect">Anagram Architect</a>, where Pick List recipes can be copied, imported, restored, and rerun.</p></section>
+    </div>
+  </main>
+  <footer><div>© 2026 MonkeyTactics</div><nav aria-label="Footer navigation"><a href="https://blog.monkeytactics.com/">Blog</a><a href="/privacy">Privacy</a><a href="/terms-of-service">Terms</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/sitemap">Sitemap</a></nav></footer>
+  <script src="../assets/js/tools/anagram-animator/anagram-animator.bundle.js?v=20260919-03" defer></script>
+</body>
+</html>

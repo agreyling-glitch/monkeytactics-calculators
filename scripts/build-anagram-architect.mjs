@@ -20,6 +20,16 @@ await build({
   build: {
     emptyOutDir: false,
     minify: false,
+    outDir: resolve(projectRoot, "assets/js/tools/anagram-animator"),
+    lib: { entry: resolve(projectRoot, "assets/js/tools/anagram-animator/anagram-animator.js"), formats: ["iife"], name: "AnagramAnimator", fileName: () => "anagram-animator.bundle.js" }
+  }
+});
+await build({
+  configFile: false,
+  publicDir: false,
+  build: {
+    emptyOutDir: false,
+    minify: false,
     outDir: outputDirectory,
     lib: { entry: resolve(outputDirectory, "anagram-worker.js"), formats: ["es"], fileName: () => "anagram-worker.bundle.js" }
   }

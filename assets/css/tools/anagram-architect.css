@@ -214,6 +214,7 @@
 .anagram-pick-list summary .anagram-pick-kicker { color: #f5b942; font-size: .57rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
 .anagram-pick-meta { position: relative; z-index: 1; }
 .anagram-pick-list summary button { border: 1px solid rgba(251,113,133,.25); border-radius: 7px; background: transparent; color: #fda4af; padding: .32rem .48rem; cursor: pointer; }
+.anagram-pick-list summary .anagram-pick-import { border-color: rgba(45,212,191,.3); color: #99f6e4; }
 .anagram-pick-body { padding: .2rem 1rem 1rem; border-top: 1px solid rgba(148,163,184,.12); }
 .anagram-pick-body > p { color: var(--muted); font-size: .76rem; }
 #anagram-pick-entries { display: grid; gap: .45rem; }
@@ -224,8 +225,90 @@
 .anagram-pick-entry-actions button { border: 1px solid rgba(45,212,191,.2); border-radius: 7px; background: rgba(45,212,191,.07); color: #99f6e4; padding: .35rem .48rem; cursor: pointer; }
 .anagram-pick-more { position: relative; display: inline-flex; }
 .anagram-pick-more > button:first-child { min-width: 2rem; font-size: 1rem; line-height: 1; }
-.anagram-pick-more > button:last-child { position: absolute; z-index: 5; right: 0; top: calc(100% + .35rem); border-color: rgba(251,113,133,.3); background: #172033; color: #fda4af; box-shadow: 0 10px 28px rgba(0,0,0,.35); }
-.anagram-pick-more > button[hidden] { display: none; }
+.anagram-pick-more-menu { position: absolute; z-index: 7; right: 0; top: calc(100% + .35rem); display: grid; width: max-content; min-width: 10.5rem; padding: .35rem; border: 1px solid rgba(148,163,184,.24); border-radius: 9px; background: #172033; box-shadow: 0 10px 28px rgba(0,0,0,.35); }
+.anagram-pick-more-menu.opens-up { top: auto; bottom: calc(100% + .35rem); }
+.anagram-pick-more-menu[hidden] { display: none; }
+.anagram-pick-more-menu button { width: 100%; border: 0; background: transparent; color: #cbd5e1; text-align: left; }
+.anagram-pick-more-menu button:hover { background: rgba(45,212,191,.1); color: #fff; }
+.anagram-pick-more-menu button:last-child { color: #fda4af; }
+.anagram-recipe-modal { width: min(46rem, calc(100vw - 2rem)); max-width: none; max-height: min(84dvh, 50rem); padding: 0; overflow: hidden; border: 1px solid rgba(245,185,66,.4); border-radius: 14px; background: #0f172a; color: #e2e8f0; box-shadow: 0 28px 80px rgba(2,6,23,.8); }
+.anagram-recipe-modal::backdrop { background: rgba(2,6,23,.82); backdrop-filter: blur(5px); }
+.anagram-recipe-card { display: grid; grid-template-rows: auto auto auto minmax(0,1fr); max-height: min(84dvh,50rem); box-sizing: border-box; gap: .7rem; padding: 1rem; }
+.anagram-recipe-card header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.anagram-recipe-card h2 { margin: 0; color: #fde68a; font-size: 1.15rem; }
+.anagram-recipe-card header button { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; padding: 0; border: 1px solid rgba(148,163,184,.25); border-radius: 8px; background: transparent; color: #cbd5e1; font: 400 1.5rem/1 sans-serif; cursor: pointer; }
+.anagram-recipe-card > p { margin: 0; color: #94a3b8; font-size: .8rem; }
+.anagram-recipe-tabs { display: flex; gap: .35rem; border-bottom: 1px solid rgba(148,163,184,.18); }
+.anagram-recipe-tabs button { min-width: 6rem; padding: .55rem .8rem; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #94a3b8; font-weight: 800; cursor: pointer; }
+.anagram-recipe-tabs button[aria-selected="true"] { border-bottom-color: #f5b942; color: #fde68a; }
+.anagram-recipe-overview { min-height: 0; overflow-y: auto; padding-right: .2rem; }
+.anagram-recipe-overview[hidden], .anagram-recipe-card pre[hidden] { display: none; }
+.anagram-recipe-legacy { margin: 0 0 .6rem; padding: .65rem .75rem; border: 1px solid rgba(245,185,66,.3); border-radius: 8px; background: rgba(245,185,66,.08); color: #fde68a; font-size: .78rem; }
+.anagram-recipe-section { border-bottom: 1px solid rgba(148,163,184,.14); }
+.anagram-recipe-section summary { display: flex; align-items: center; gap: .55rem; padding: .72rem .25rem; color: #e2e8f0; cursor: pointer; }
+.anagram-recipe-section-icon { display: grid; width: 1.7rem; height: 1.7rem; place-items: center; border: 1px solid rgba(45,212,191,.28); border-radius: 6px; background: rgba(45,212,191,.08); color: #5eead4; }
+.anagram-recipe-section dl { display: grid; grid-template-columns: minmax(8rem,.72fr) minmax(0,1.6fr); margin: 0; padding: 0 .3rem .8rem 2.55rem; gap: .42rem .8rem; }
+.anagram-recipe-section dt { color: #94a3b8; font-size: .74rem; }
+.anagram-recipe-section dd { min-width: 0; margin: 0; color: #e2e8f0; font-size: .78rem; overflow-wrap: anywhere; }
+.anagram-recipe-card pre { min-height: 0; margin: 0; padding: .8rem; overflow: auto; border: 1px solid rgba(45,212,191,.2); border-radius: 9px; background: #071421; color: #ccfbf1; font: 500 .75rem/1.55 ui-monospace,SFMono-Regular,Consolas,monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 560px) { .anagram-recipe-section dl { grid-template-columns: 1fr; padding-left: 2.55rem; gap: .16rem; } .anagram-recipe-section dd { margin-bottom: .35rem; } }
+.anagram-recipe-import-modal { width: min(42rem,calc(100vw - 2rem)); max-width: none; max-height: min(90dvh,52rem); padding: 0; overflow: hidden; border: 1px solid rgba(45,212,191,.38); border-radius: 16px; background: #0f172a; color: #e2e8f0; box-shadow: 0 28px 80px rgba(2,6,23,.82); }
+.anagram-recipe-import-modal::backdrop { background: rgba(2,6,23,.82); backdrop-filter: blur(5px); }
+.anagram-recipe-import-card { display: grid; max-height: min(90dvh,52rem); box-sizing: border-box; gap: .8rem; padding: 1rem; overflow-y: auto; }
+.anagram-recipe-import-card header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid rgba(45,212,191,.16); padding-bottom: .7rem; }
+.anagram-recipe-import-card header span { display: grid; gap: .08rem; }
+.anagram-recipe-import-card header small { color: #5eead4; font-size: .58rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+.anagram-recipe-import-card h2 { margin: 0; color: #f8fafc; font-size: 1.2rem; }
+.anagram-recipe-import-card header button { display: grid; width: 2.25rem; height: 2.25rem; place-items: center; padding: 0; border: 1px solid rgba(148,163,184,.25); border-radius: 50%; background: transparent; color: #cbd5e1; font: 400 1.5rem/1 sans-serif; cursor: pointer; }
+.anagram-recipe-import-card > p { margin: 0; color: #94a3b8; font-size: .8rem; line-height: 1.5; }
+.anagram-recipe-import-card > label { display: grid; gap: .35rem; color: #cbd5e1; font-size: .76rem; font-weight: 800; }
+.anagram-recipe-import-file { position: relative; justify-items: start; }
+.anagram-recipe-import-file input { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); border: 0; white-space: nowrap; }
+.anagram-recipe-file-control { display: flex; max-width: 100%; align-items: center; gap: .65rem; }
+.anagram-recipe-file-button { display: inline-flex; align-items: center; min-height: 2.35rem; box-sizing: border-box; padding: .55rem .75rem; border: 1px solid rgba(45,212,191,.38); border-radius: 8px; background: rgba(45,212,191,.1); color: #99f6e4; font-weight: 850; cursor: pointer; transition: border-color .16s ease, background .16s ease, color .16s ease; }
+.anagram-recipe-import-file:hover .anagram-recipe-file-button { border-color: rgba(94,234,212,.65); background: rgba(45,212,191,.17); color: #ccfbf1; }
+.anagram-recipe-import-file input:focus-visible + * { outline: none; }
+.anagram-recipe-import-file:has(input:focus-visible) .anagram-recipe-file-button { outline: 2px solid #5eead4; outline-offset: 3px; }
+.anagram-recipe-file-name { min-width: 0; color: #94a3b8; font-size: .74rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.anagram-recipe-import-card textarea { width: 100%; min-height: 11rem; box-sizing: border-box; resize: vertical; padding: .75rem; border: 1px solid rgba(148,163,184,.28); border-radius: 9px; background: #071421; color: #ccfbf1; font: 500 .75rem/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.anagram-recipe-import-preview { display: grid; gap: .25rem; padding: .75rem; border: 1px solid rgba(148,163,184,.2); border-radius: 9px; background: rgba(148,163,184,.05); }
+.anagram-recipe-import-preview strong { color: #e2e8f0; font-size: .82rem; }
+.anagram-recipe-import-preview span { color: #94a3b8; font-size: .74rem; line-height: 1.45; }
+.anagram-recipe-import-preview[data-state="ready"] { border-color: rgba(45,212,191,.35); background: rgba(45,212,191,.07); }
+.anagram-recipe-import-preview[data-state="ready"] strong { color: #99f6e4; }
+.anagram-recipe-import-preview[data-state="error"] { border-color: rgba(251,113,133,.38); background: rgba(251,113,133,.07); }
+.anagram-recipe-import-preview[data-state="error"] strong { color: #fda4af; }
+.anagram-recipe-import-card footer { display: flex; justify-content: flex-end; gap: .55rem; }
+.anagram-recipe-import-card footer button { padding: .58rem .8rem; border: 1px solid rgba(148,163,184,.28); border-radius: 8px; background: transparent; color: #cbd5e1; font-weight: 800; cursor: pointer; }
+.anagram-recipe-import-card footer button:last-child { border-color: rgba(45,212,191,.38); background: rgba(45,212,191,.12); color: #99f6e4; }
+.anagram-recipe-import-card footer button:disabled { opacity: .42; cursor: default; }
+@media (max-width: 620px) { .anagram-pick-list summary { align-items: flex-start; flex-direction: column; } .anagram-pick-meta { width: 100%; flex-wrap: wrap; } .anagram-pick-meta em { margin-right: auto; } }
+.anagram-reveal-modal { width: min(48rem,calc(100vw - 2rem)); max-width: none; max-height: min(94dvh,56rem); padding: 0; overflow: hidden; border: 1px solid rgba(45,212,191,.38); border-radius: 18px; background: #0b1628; color: #e2e8f0; box-shadow: 0 30px 90px rgba(2,6,23,.88); }
+.anagram-reveal-modal::backdrop { background: rgba(2,6,23,.86); backdrop-filter: blur(7px); }
+.anagram-reveal-shell { display: grid; grid-template-columns: minmax(0,1fr); max-height: min(94dvh,56rem); box-sizing: border-box; gap: .85rem; padding: 1rem; overflow-y: auto; }
+.anagram-reveal-shell header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-bottom: .75rem; border-bottom: 1px solid rgba(45,212,191,.18); }
+.anagram-reveal-shell header > span { display: grid; gap: .08rem; }
+.anagram-reveal-shell header em { color: #5eead4; font-size: .58rem; font-style: normal; font-weight: 850; letter-spacing: .14em; }
+.anagram-reveal-shell h2 { margin: 0; color: #f8fafc; font-size: 1.2rem; }
+.anagram-reveal-shell header button { display: grid; width: 2.3rem; height: 2.3rem; place-items: center; padding: 0; border: 1px solid rgba(148,163,184,.25); border-radius: 50%; background: rgba(148,163,184,.06); color: #cbd5e1; font: 400 1.5rem/1 sans-serif; cursor: pointer; }
+.anagram-reveal-canvas { width: min(100%,32rem); max-height: 55dvh; justify-self: center; border: 1px solid rgba(45,212,191,.23); border-radius: 12px; background: #071421; box-shadow: 0 14px 38px rgba(0,0,0,.3); object-fit: contain; }
+.anagram-reveal-controls { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem; }
+.anagram-reveal-controls label { display: grid; gap: .28rem; color: #94a3b8; font-size: .7rem; font-weight: 750; }
+.anagram-reveal-controls select { width: 100%; padding: .6rem .65rem; border: 1px solid rgba(148,163,184,.28); border-radius: 8px; background: #111d31; color: #e2e8f0; }
+.anagram-reveal-motion-note, .anagram-reveal-status { margin: 0; color: #94a3b8; font-size: .72rem; line-height: 1.45; }
+.anagram-reveal-motion-note { padding: .55rem .65rem; border-left: 3px solid #f5b942; background: rgba(245,185,66,.07); color: #fde68a; }
+.anagram-reveal-export-progress { display: grid; grid-template-columns: minmax(0,1fr) 2.7rem; align-items: center; gap: .65rem; }
+.anagram-reveal-export-progress[hidden] { display: none; }
+.anagram-reveal-export-progress > span { height: 9px; overflow: hidden; border-radius: 999px; background: rgba(148,163,184,.17); }
+.anagram-reveal-export-progress i { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#2dd4bf,#f5b942); box-shadow: 0 0 12px rgba(45,212,191,.28); transition: width .1s linear; }
+.anagram-reveal-export-progress strong { color: #99f6e4; font-size: .72rem; text-align: right; }
+.anagram-reveal-actions { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: .45rem; }
+.anagram-reveal-actions button { padding: .58rem .65rem; border: 1px solid rgba(45,212,191,.25); border-radius: 8px; background: rgba(45,212,191,.08); color: #99f6e4; font-size: .72rem; font-weight: 800; cursor: pointer; }
+.anagram-reveal-actions button:first-child, .anagram-reveal-actions button:last-child { background: linear-gradient(135deg,rgba(45,212,191,.22),rgba(245,185,66,.16)); color: #f8fafc; }
+.anagram-reveal-actions button:disabled { cursor: wait; opacity: .58; }
+@media (max-width: 700px) { .anagram-reveal-actions { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .anagram-reveal-controls { grid-template-columns: 1fr; } .anagram-reveal-actions { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .anagram-reveal-modal, .anagram-reveal-shell * { scroll-behavior: auto; } }
 .anagram-pick-permutations { position: relative; grid-column: 1 / -1; display: grid; gap: .5rem; margin-top: .45rem; padding: .7rem; border-radius: 8px; background: rgba(15,23,42,.72); }
 .anagram-pick-permutations[hidden] { display: none; }
 .anagram-pick-permutations > strong { color: #fde68a; }

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { filterAndPageResults, formatAnagramPhrase, isExactAnagram, mergeRankedResults, normalizeLetters, normalizeResultPattern, phraseMatchesPattern, rankPhrasePermutations, rankWordReplacements, resultMatchesSearch, solveAnagrams } from "../assets/js/tools/anagram-architect/anagram-core.mjs";
+import { mapExactAnagramLetters } from "../assets/js/tools/anagram-architect/anagram-share-reveal.js";
 
 test("normalizes phrase punctuation and case", () => {
   assert.equal(normalizeLetters("A damn alien S.O.B."), "adamnalien sob".replace(" ", ""));
@@ -186,7 +187,7 @@ test("the page prevents early native submission and exposes startup failures", a
   const html = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"));
   assert.match(html, /form\.addEventListener\("submit", \(event\) => event\.preventDefault\(\)\)/);
   assert.match(html, /Anagram Architect could not start/);
-  assert.match(html, /anagram-architect\.bundle\.js\?v=20260917-17/);
+  assert.match(html, /anagram-architect\.bundle\.js\?v=20260919-20/);
 });
 
 test("shows phrase validation failures in an accessible modal", async () => {
@@ -264,7 +265,7 @@ test("the result toolbar loads the cache-busted responsive stylesheet", async ()
     readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"),
     readFile(new URL("../assets/css/tools/anagram-architect.css", import.meta.url), "utf8")
   ]);
-  assert.match(html, /anagram-architect\.css\?v=20260917-10/);
+  assert.match(html, /anagram-architect\.css\?v=20260919-20/);
   assert.match(css, /\.anagram-pick-drawer-content > \.anagram-pick-permutations \{[^}]*height: 100%/);
   assert.match(css, /\.anagram-pick-drawer-content > \.anagram-pick-permutations select \{[^}]*height: 100%/);
   assert.match(html, /id="anagram-result-search"/);
@@ -531,6 +532,163 @@ test("offers word steering, vulgar filtering, and a persistent Pick List", async
   assert.doesNotMatch(browser, /button\.disabled = locked\.has\(wordIndex\)/);
 });
 
+test("maps repeated reveal letters deterministically by occurrence", () => {
+  const mapping = mapExactAnagramLetters("A sea", "Aase");
+  assert.deepEqual(mapping.map(({ identity }) => identity), ["a-0", "s-0", "e-0", "a-1"]);
+  assert.deepEqual(mapping.map(({ destination }) => destination?.identity), ["a-0", "s-0", "e-0", "a-1"]);
+  assert.deepEqual(mapping.filter(({ key }) => key === "a").map(({ destination }) => destination.textIndex), [0, 1]);
+});
+
+test("stores reproducible versioned Pick List recipes", async () => {
+  const [html, browser] = await Promise.all([
+    readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8"),
+    readFile(new URL("../assets/js/tools/anagram-architect/anagram-architect.js", import.meta.url), "utf8")
+  ]);
+  assert.match(browser, /RECIPE_SCHEMA_VERSION = 1/);
+  assert.match(browser, /RECIPE_DICTIONARY_VERSIONS/);
+  assert.match(browser, /RECIPE_RANKING_VERSION/);
+  assert.match(browser, /relevantPersonalVocabulary: personalWords\.words\.filter/);
+  assert.match(browser, /grammarTemplateSelection: grammarTemplate\.value/);
+  assert.match(browser, /customGrammarSlots: cloneRecipe\(customGrammarSlots\)/);
+  assert.match(browser, /budgetReached: Boolean\(outcome\.timeLimited\)/);
+  assert.match(browser, /currentSearchRecipe = createSearchRecipe\(source, options, grammarValue, personalWords, requestId\)/);
+  assert.match(browser, /entry\.recipe\?\.discovery\?\.requestId !== requestId/);
+  assert.match(browser, /completeSearchRecipe\(requestId, outcome, durationMs, engine, workerCount\)/);
+  assert.match(browser, /recipe: recipeForResult\(result\)/);
+  assert.match(browser, /currentPhrase: entry\.phrase/);
+  assert.match(browser, /replacements\.push/);
+  for (const action of ["View recipe", "Restore settings", "Run again", "Copy recipe", "Share find"]) assert.match(browser, new RegExp(action));
+  assert.match(browser, /openAnagramReveal/);
+  assert.match(browser, /form\.requestSubmit\(\)/);
+  assert.match(browser, /setRecipeDialogTab\("overview"\)/);
+  assert.match(browser, /button\.textContent = name === "overview" \? "Overview" : "JSON"/);
+  for (const section of ["Phrase", "Tune the search", "Search guidance", "Search run", "Phrase Studio edits", "Versions"]) assert.match(browser, new RegExp(section));
+  assert.match(browser, /Legacy pick: its original search settings were not recorded/);
+  assert.match(html, /reproducible search recipes|versioned discovery recipe/);
+});
+
+test("imports and validates shared Pick List recipes", async () => {
+  const [html, browser, css] = await Promise.all([
+    readFile("tools/anagram-architect.html", "utf8"),
+    readFile("assets/js/tools/anagram-architect/anagram-architect.js", "utf8"),
+    readFile("assets/css/tools/anagram-architect.css", "utf8")
+  ]);
+  assert.match(html, /id="anagram-pick-import"[^>]*>Import recipe/);
+  assert.match(html, /anagram-recipe-file-button">Choose recipe file/);
+  assert.match(html, /id="anagram-recipe-file-name">No file selected/);
+  assert.match(html, /id="anagram-recipe-import-file"[^>]*accept="application\/json,.json"/);
+  assert.match(html, /id="anagram-recipe-import-json"/);
+  assert.match(html, /id="anagram-recipe-import-confirm"[^>]*disabled>Add to Pick List/);
+  assert.match(browser, /function validateImportedRecipe/);
+  assert.match(browser, /value\.schemaVersion !== RECIPE_SCHEMA_VERSION/);
+  assert.match(browser, /!isExactAnagram\(sourcePhrase, resultPhrase\)/);
+  assert.match(browser, /text\.length > 250000/);
+  assert.match(browser, /function importPendingRecipe/);
+  assert.match(browser, /recipeImportFileName\.textContent = file\?\.name \|\| "No file selected"/);
+  assert.match(browser, /pickEntries\.unshift\(entry\)/);
+  assert.match(css, /\.anagram-recipe-import-preview\[data-state="ready"\]/);
+  assert.match(css, /\.anagram-recipe-file-button/);
+  assert.match(html, /Import a copied recipe or JSON file/);
+});
+
+test("dismisses Pick List recipe menus outside the action control", async () => {
+  const [source, css] = await Promise.all([
+    readFile("assets/js/tools/anagram-architect/anagram-architect.js", "utf8"),
+    readFile("assets/css/tools/anagram-architect.css", "utf8")
+  ]);
+  assert.match(source, /function closePickActionMenus/);
+  assert.match(source, /if \(!event\.target\.closest\?\.\("\.anagram-pick-more"\)\) closePickActionMenus\(\)/);
+  assert.match(source, /event\.key === "Escape"/);
+  assert.match(source, /listBounds\.bottom - toggleBounds\.bottom < menuHeight \+ 8/);
+  assert.match(css, /\.anagram-pick-more-menu\.opens-up \{[^}]*bottom: calc\(100% \+ \.35rem\)/);
+  assert.match(css, /\.anagram-recipe-modal \{[^}]*overflow: hidden/);
+  assert.match(css, /\.anagram-recipe-card \{[^}]*grid-template-rows: auto auto auto minmax\(0,1fr\)/);
+  assert.match(css, /\.anagram-recipe-card pre \{[^}]*min-height: 0;[^}]*overflow: auto/);
+});
+
+test("offers a local animated exact-anagram sharing studio", async () => {
+  const [browser, reveal, css] = await Promise.all([
+    readFile("assets/js/tools/anagram-architect/anagram-architect.js", "utf8"),
+    readFile("assets/js/tools/anagram-architect/anagram-share-reveal.js", "utf8"),
+    readFile("assets/css/tools/anagram-architect.css", "utf8")
+  ]);
+  assert.match(browser, /openAnagramReveal/);
+  for (const label of ["Fly", "Blueprint", "Wand", "Shuffle", "Magnetic", "Typewriter", "Calm", "Normal", "Dramatic", "Download WebM", "Download static card", "Copy post text", "Copy animation link", "Share…"]) assert.match(reveal, new RegExp(label));
+  assert.match(reveal, /optionSelect\(\[\["blueprint", "Blueprint"\], \["wand", "Wand"\], \["fly", "Fly"\]/);
+  assert.match(reveal, /Every letter moves\. Nothing appears\. Nothing disappears\./);
+  assert.match(reveal, /canvas\.captureStream\(30\)/);
+  assert.match(reveal, /new MediaRecorder/);
+  assert.match(reveal, /prefers-reduced-motion: reduce/);
+  assert.match(reveal, /REVEAL_SIZE = Object\.freeze\(\[960, 540\]\)/);
+  assert.match(reveal, /LOOP_PAUSE_MS = 1500/);
+  assert.match(reveal, /brandedPngBlob/);
+  assert.match(reveal, /brandedWebmBlob/);
+  assert.doesNotMatch(reveal, /Square · 1:1|Portrait · 4:5|Landscape · 16:9|preview\.textContent = "Preview"/);
+  assert.doesNotMatch(reveal, /pngTextChunk\("Comment"/);
+  assert.match(reveal, /drawBranding/);
+  assert.match(reveal, /drawParticles/);
+  assert.match(reveal, /drawWand/);
+  assert.match(reveal, /drawWandFlash/);
+  assert.match(reveal, /drawBlueprintGrid/);
+  assert.match(reveal, /drawBlueprintGuides/);
+  assert.match(reveal, /drawInspectionSweep/);
+  assert.match(reveal, /drawStaticComparison/);
+  assert.match(reveal, /fillText\("BEFORE"/);
+  assert.match(reveal, /fillText\("AFTER"/);
+  assert.match(reveal, /const postText = \(\) => `\$\{sourcePhrase\} → \$\{resultPhrase\}\\n\\nMade by Anagram Architect`/);
+  assert.match(reveal, /navigator\.share\(\{ title: "Exact anagram reveal", text: postText\(\), url \}\)/);
+  assert.match(reveal, /url\.searchParams\.set\("focus", "1"\)/);
+  assert.doesNotMatch(reveal, /navigator\.canShare\?\.\(\{ files:/);
+  assert.match(reveal, /WebM export progress/);
+  assert.match(reveal, /readEbmlSize/);
+  assert.match(reveal, /webmSimpleTag\("ARTIST", BRAND_NAME\)/);
+  assert.match(reveal, /https:\/\/monkeytactics\.com\/tools\/anagram-architect/);
+  assert.doesNotMatch(reveal, /Show in reveal|Exact-match badge|Recipe summary/);
+  assert.match(css, /\.anagram-reveal-modal/);
+});
+
+test("offers a standalone exact-anagram animator with compact URL recipes", async () => {
+  const [html, browser, css, buildScript, sitemap, headers] = await Promise.all([
+    readFile("tools/anagram-animator.html", "utf8"),
+    readFile("assets/js/tools/anagram-animator/anagram-animator.js", "utf8"),
+    readFile("assets/css/tools/anagram-animator.css", "utf8"),
+    readFile("scripts/build-anagram-architect.mjs", "utf8"),
+    readFile("sitemap-tools.xml", "utf8"),
+    readFile("_headers", "utf8")
+  ]);
+  assert.match(html, /Animate an exact anagram/);
+  assert.match(html, /anagram-animator\.bundle\.js\?v=20260919-03/);
+  assert.match(html, /anagram-animator\.css\?v=20260919-04/);
+  assert.match(html, /id="anagram-animator-embed"[^>]*>Copy embed code/);
+  assert.match(html, /id="anagram-animator-focus"[^>]*>Focus mode/);
+  assert.match(html, /classList\.add\("animator-embed"\)/);
+  assert.match(html, /classList\.add\("animator-focus"\)/);
+  assert.match(browser, /url\.searchParams\.set\("from", values\.source\)/);
+  assert.match(browser, /url\.searchParams\.set\("to", values\.result\)/);
+  assert.match(browser, /source === letters\(resultInput\.value\)/);
+  assert.match(browser, /prefers-reduced-motion: reduce/);
+  assert.match(browser, /renderAnagramAnimationFrame/);
+  assert.match(browser, /url\.searchParams\.set\("embed", "1"\)/);
+  assert.match(browser, /shareUrl\(\{ focus: true \}\)/);
+  assert.match(browser, /event\.key === "Escape"/);
+  assert.match(browser, /<iframe src=/);
+  assert.match(css, /aspect-ratio: 16\/9/);
+  assert.match(css, /html\.animator-embed \.animator-form/);
+  assert.match(css, /html\.animator-focus \.animator-form/);
+  assert.match(buildScript, /anagram-animator\.bundle\.js/);
+  assert.match(sitemap, /https:\/\/monkeytactics\.com\/tools\/anagram-animator/);
+  assert.match(headers, /\/tools\/anagram-animator\*[\s\S]*?! X-Frame-Options[\s\S]*?frame-ancestors \*/);
+});
+
+test("provides a working responsive iframe embed demonstration", async () => {
+  const html = await readFile("tools/anagram-animator-embed-demo.html", "utf8");
+  assert.match(html, /<meta name="robots" content="noindex, nofollow">/);
+  assert.match(html, /<iframe[\s\S]*?anagram-animator\?from=Osama%20Bin%20Laden/);
+  assert.match(html, /embed=1/);
+  assert.match(html, /aspect-ratio: 16\/9/);
+  assert.match(html, /Open the full interactive animator/);
+});
+
 test("groups advanced controls and supports shared Focus Mode", async () => {
   const html = await readFile(new URL("../tools/anagram-architect.html", import.meta.url), "utf8");
   const css = await readFile(new URL("../assets/css/tools/anagram-architect.css", import.meta.url), "utf8");
@@ -571,12 +729,12 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.match(html, /Guided search:<\/strong> enable Pro mode, set Maximum words to 8/);
   assert.match(html, /portrayed, orphaned, hero/);
   assert.match(html, /Add names and specialist vocabulary/);
-  assert.match(html, /Reorder, define, replace, and format anagrams/);
+  assert.match(html, /Reproduce, refine, and share anagram finds/);
   assert.match(html, /compare local WordNet definitions for original and replacement words/);
   assert.match(html, /Why did my search return no results\?/);
   assert.match(html, /Anagram solver FAQ/);
   assert.match(html, /Related word tools/);
-  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-17<\/lastmod>/);
+  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-19<\/lastmod>/);
   assert.match(html, /Standard contains 172,820 words/);
   assert.match(html, /Expanded contains 867,177 Wiktionary-derived words/);
   const structured = html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];
@@ -591,11 +749,18 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.ok(application.featureList.includes("Local WordNet definitions for original and replacement words"));
   assert.ok(application.featureList.includes("Standard 172,820-word and expanded 867,177-word dictionaries"));
   assert.ok(application.featureList.includes("Capitalization and punctuation formatting"));
+  assert.ok(application.featureList.includes("Validated JSON recipe import and export"));
+  assert.ok(application.featureList.includes("Restore and rerun shared search settings"));
+  assert.ok(application.featureList.includes("Focused share links with locally rendered exact-letter animation"));
   assert.ok(data["@graph"].some((entry) => entry["@type"] === "BreadcrumbList"));
   const faq = data["@graph"].find((entry) => entry["@type"] === "FAQPage");
   assert.ok(faq);
   assert.ok(faq.mainEntity.some((entry) => entry.name === "How are anagram results ranked?"));
   assert.match(faq.mainEntity.find((entry) => entry.name === "What can I do with the Pick List phrase editor?")?.acceptedAnswer?.text || "", /WordNet definitions/);
+  assert.match(faq.mainEntity.find((entry) => entry.name === "Can I import an Anagram Architect recipe?")?.acceptedAnswer?.text || "", /validates the schema and exact letter match locally/);
+  assert.match(faq.mainEntity.find((entry) => entry.name === "How do animated anagram links work?")?.acceptedAnswer?.text || "", /focused 16:9 reveal/);
+  assert.match(html, /Can I import and rerun someone else’s recipe\?/);
+  assert.match(html, /It opens in a focused 16:9 view/);
   assert.ok(faq.mainEntity.some((entry) => entry.name === "Can I add names or specialist words to the anagram dictionary?"));
   assert.ok(faq.mainEntity.some((entry) => entry.name === "Why did my anagram search return no results?"));
 });

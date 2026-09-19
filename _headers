@@ -12,6 +12,11 @@
   # It is used by the client-side QR decoder.
   Permissions-Policy: geolocation=(), microphone=(), camera=(self)
 
+# The standalone animator is intentionally embeddable on external sites.
+/tools/anagram-animator*
+  ! X-Frame-Options
+  Content-Security-Policy: frame-ancestors *
+
 # Long-cache the static assets (they're fingerprintable later if needed)
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
