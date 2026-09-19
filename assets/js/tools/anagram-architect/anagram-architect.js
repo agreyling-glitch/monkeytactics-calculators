@@ -1,4 +1,5 @@
 import { filterAndPageResults, formatAnagramPhrase, isExactAnagram, mergeRankedResults, normalizeLetters, rankPhrasePermutations, rankWordReplacements } from "./anagram-core.mjs";
+import { openAnagramReveal } from "./anagram-share-reveal.js";
 
 const form = document.querySelector("#anagram-form");
 const input = document.querySelector("#anagram-input");
@@ -34,8 +35,10 @@ const personalVocabularyCount = document.querySelector("#anagram-personal-vocabu
 const personalVocabularySummary = document.querySelector("#anagram-personal-vocabulary-summary");
 const excludeVulgar = document.querySelector("#anagram-exclude-vulgar");
 const resetAdvanced = document.querySelector("#anagram-reset-advanced");
+const advancedOptions = document.querySelector("#anagram-advanced-options");
 const pickList = document.querySelector("#anagram-pick-list");
 const pickCount = document.querySelector("#anagram-pick-count");
+const pickImport = document.querySelector("#anagram-pick-import");
 const pickClear = document.querySelector("#anagram-pick-clear");
 const pickEmpty = document.querySelector("#anagram-pick-empty");
 const pickEntriesElement = document.querySelector("#anagram-pick-entries");
@@ -64,6 +67,14 @@ const pickDrawerPreview = document.querySelector("#anagram-pick-drawer-preview")
 const pickDrawerContext = document.querySelector("#anagram-pick-drawer-context");
 const pickDrawerTabs = document.querySelector("#anagram-pick-drawer-tabs");
 const pickDrawerContent = document.querySelector("#anagram-pick-drawer-content");
+const recipeImportDialog = document.querySelector("#anagram-recipe-import-modal");
+const recipeImportClose = document.querySelector("#anagram-recipe-import-close");
+const recipeImportCancel = document.querySelector("#anagram-recipe-import-cancel");
+const recipeImportFile = document.querySelector("#anagram-recipe-import-file");
+const recipeImportFileName = document.querySelector("#anagram-recipe-file-name");
+const recipeImportJson = document.querySelector("#anagram-recipe-import-json");
+const recipeImportPreview = document.querySelector("#anagram-recipe-import-preview");
+const recipeImportConfirm = document.querySelector("#anagram-recipe-import-confirm");
 const analysis = document.querySelector("#anagram-analysis");
 const analysisPhase = document.querySelector("#anagram-analysis-phase");
 const analysisProgress = analysis.querySelector('[role="progressbar"]');
@@ -86,6 +97,10 @@ const PAGE_SIZE = 120;
 const PICK_STORAGE_KEY = "monkeytactics.anagram-architect.pick-list.v1";
 const WORKER_HARM_STORAGE_KEY = "monkeytactics.anagram-architect.workers-harmed.v1";
 const PERSONAL_VOCABULARY_STORAGE_KEY = "monkeytactics.anagram-architect.personal-vocabulary.v1";
+const RECIPE_SCHEMA_VERSION = 1;
+const RECIPE_DICTIONARY_VERSIONS = Object.freeze({ standard: "enable-v1", expanded: "wiktionary-v1" });
+const RECIPE_RANKING_VERSION = "language-v1.2+ngrams-v1.3";
+const RECIPE_ENGINE_VERSION = "anagram-architect-wasm-20260917-04";
 const DICTIONARY_LINKS = Object.freeze([
   ["MW", "Merriam-Webster", (word) => `https://www.merriam-webster.com/dictionary/${encodeURIComponent(word)}`],
   ["CO", "Collins", (word) => `https://www.collinsdictionary.com/dictionary/english/${encodeURIComponent(word)}`],
@@ -95,6 +110,7 @@ const DICTIONARY_LINKS = Object.freeze([
   ["Cam", "Cambridge", (word) => `https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(word)}`]
 ]);
 let currentSource = "";
+let currentSearchRecipe = null;
 let searchRequestId = 0;
 let allResults = [];
 let currentPage = 1;
@@ -235,6 +251,238 @@ function savePickList() {
 }
 
 function isPicked(phrase) { return pickEntries.some((entry) => entry.phrase.toLowerCase() === phrase.toLowerCase()); }
+
+function cloneRecipe(value) {
+  return value ? JSON.parse(JSON.stringify(value)) : null;
+}
+
+function splitRecipeWords(value) {
+  return (String(value || "").toLowerCase().match(/[a-z]+/g) || []);
+}
+
+function splitRecipeList(value) {
+  return [...new Set(splitRecipeWords(value))];
+}
+
+function syncRecipeEdits(entry) {
+  if (!entry.recipe) return;
+  entry.recipe.edits = {
+    ...(entry.recipe.edits || {}),
+    currentPhrase: entry.phrase,
+    wordOrder: splitRecipeWords(entry.phrase),
+    lockedPositions: [...lockedPositionSet(entry)],
+    capitalizationAndPunctuation: { ...(entry.formatOptions || {}) }
+  };
+}
+
+function recipeForResult(result) {
+  const recipe = cloneRecipe(currentSearchRecipe) || {
+    schemaVersion: RECIPE_SCHEMA_VERSION,
+    sourcePhrase: currentSource,
+    search: {},
+    versions: { ranking: RECIPE_RANKING_VERSION, engine: RECIPE_ENGINE_VERSION },
+    discovery: {}
+  };
+  recipe.resultPhrase = result.phrase;
+  recipe.originalRank = result.rank;
+  recipe.edits = {
+    originalResultPhrase: result.phrase,
+    currentPhrase: result.phrase,
+    wordOrder: splitRecipeWords(result.phrase),
+    lockedPositions: [],
+    replacements: [],
+    capitalizationAndPunctuation: {}
+  };
+  return recipe;
+}
+
+function recipePayload(entry) {
+  syncRecipeEdits(entry);
+  return entry.recipe || {
+    schemaVersion: 0,
+    sourcePhrase: entry.source,
+    resultPhrase: entry.phrase,
+    originalRank: entry.rank || null,
+    discovery: { legacyPick: true },
+    edits: {
+      originalResultPhrase: entry.phrase,
+      currentPhrase: entry.phrase,
+      wordOrder: splitRecipeWords(entry.phrase),
+      lockedPositions: [...lockedPositionSet(entry)],
+      replacements: [],
+      capitalizationAndPunctuation: { ...(entry.formatOptions || {}) }
+    }
+  };
+}
+
+function recipeJson(entry) {
+  return JSON.stringify(recipePayload(entry), null, 2);
+}
+
+function validateImportedRecipe(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("The recipe must be a JSON object.");
+  if (value.schemaVersion !== RECIPE_SCHEMA_VERSION) throw new Error(`This importer supports recipe schema version ${RECIPE_SCHEMA_VERSION}.`);
+  const sourcePhrase = String(value.sourcePhrase || "").trim();
+  const resultPhrase = String(value.edits?.currentPhrase || value.resultPhrase || "").trim();
+  const sourceLength = normalizeLetters(sourcePhrase).length;
+  if (sourceLength < 2 || sourceLength > 60) throw new Error("The source phrase must contain between 2 and 60 letters.");
+  if (!resultPhrase) throw new Error("The recipe does not contain a result phrase.");
+  if (!isExactAnagram(sourcePhrase, resultPhrase)) throw new Error("The source and result phrases are not exact anagrams.");
+  if (value.search != null && (typeof value.search !== "object" || Array.isArray(value.search))) throw new Error("The search settings are malformed.");
+  if (value.edits != null && (typeof value.edits !== "object" || Array.isArray(value.edits))) throw new Error("The Phrase Studio edits are malformed.");
+  const recipe = cloneRecipe(value);
+  recipe.sourcePhrase = sourcePhrase;
+  recipe.resultPhrase = String(recipe.resultPhrase || resultPhrase).trim();
+  recipe.search ||= {};
+  recipe.discovery ||= {};
+  recipe.versions ||= {};
+  recipe.edits ||= {};
+  recipe.edits.originalResultPhrase ||= recipe.resultPhrase;
+  recipe.edits.currentPhrase = resultPhrase;
+  recipe.edits.wordOrder = splitRecipeWords(resultPhrase);
+  recipe.edits.lockedPositions = Array.isArray(recipe.edits.lockedPositions)
+    ? [...new Set(recipe.edits.lockedPositions.filter((position) => Number.isInteger(position) && position >= 0 && position < recipe.edits.wordOrder.length))]
+    : [];
+  recipe.edits.replacements = Array.isArray(recipe.edits.replacements) ? recipe.edits.replacements : [];
+  recipe.edits.capitalizationAndPunctuation = recipe.edits.capitalizationAndPunctuation && typeof recipe.edits.capitalizationAndPunctuation === "object" && !Array.isArray(recipe.edits.capitalizationAndPunctuation)
+    ? recipe.edits.capitalizationAndPunctuation
+    : {};
+  return recipe;
+}
+
+let pendingImportedRecipe = null;
+
+function showRecipeImportPreview(message, state = "waiting") {
+  recipeImportPreview.dataset.state = state;
+  recipeImportPreview.replaceChildren();
+  const heading = document.createElement("strong");
+  const detail = document.createElement("span");
+  if (state === "ready") {
+    const search = message.search || {};
+    heading.textContent = `${message.sourcePhrase} → ${message.edits.currentPhrase}`;
+    detail.textContent = `${search.dictionary ? titleCase(search.dictionary) : "Unspecified"} dictionary · ${search.searchDepth ? titleCase(search.searchDepth) : "Unspecified"} depth · ${search.maximumWords || "?"} maximum words${message.originalRank ? ` · original rank #${message.originalRank}` : ""}`;
+  } else {
+    heading.textContent = state === "error" ? "Recipe cannot be imported" : "Waiting for a recipe";
+    detail.textContent = String(message);
+  }
+  recipeImportPreview.append(heading, detail);
+}
+
+function parseRecipeImport() {
+  pendingImportedRecipe = null;
+  recipeImportConfirm.disabled = true;
+  const text = recipeImportJson.value.trim();
+  if (!text) {
+    showRecipeImportPreview("The source phrase, result, and search settings will be previewed here.");
+    return;
+  }
+  try {
+    if (text.length > 250000) throw new Error("The recipe is too large to import.");
+    pendingImportedRecipe = validateImportedRecipe(JSON.parse(text));
+    showRecipeImportPreview(pendingImportedRecipe, "ready");
+    recipeImportConfirm.disabled = false;
+  } catch (error) {
+    showRecipeImportPreview(error instanceof SyntaxError ? "The pasted text is not valid JSON." : error.message, "error");
+  }
+}
+
+function openRecipeImporter() {
+  pendingImportedRecipe = null;
+  recipeImportJson.value = "";
+  recipeImportFile.value = "";
+  recipeImportFileName.textContent = "No file selected";
+  recipeImportConfirm.disabled = true;
+  showRecipeImportPreview("The source phrase, result, and search settings will be previewed here.");
+  recipeImportDialog.showModal();
+  recipeImportJson.focus();
+}
+
+function importPendingRecipe() {
+  if (!pendingImportedRecipe) return;
+  const recipe = cloneRecipe(pendingImportedRecipe);
+  const phrase = recipe.edits.currentPhrase;
+  const entry = {
+    phrase,
+    source: recipe.sourcePhrase,
+    rank: Number.isInteger(recipe.originalRank) && recipe.originalRank > 0 ? recipe.originalRank : null,
+    lockedPositions: [...recipe.edits.lockedPositions],
+    formatOptions: { ...recipe.edits.capitalizationAndPunctuation },
+    savedAt: new Date().toISOString(),
+    recipe
+  };
+  pickEntries = pickEntries.filter((candidate) => candidate.phrase.toLowerCase() !== phrase.toLowerCase() || String(candidate.source || "").toLowerCase() !== recipe.sourcePhrase.toLowerCase());
+  pickEntries.unshift(entry);
+  pickEntries = pickEntries.slice(0, 100);
+  savePickList(); renderPickList(); renderResults();
+  pickList.open = true;
+  recipeImportDialog.close();
+  status.textContent = `Imported “${titleCase(phrase)}” and added it to the Pick List.`;
+  pickList.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function createSearchRecipe(source, options, grammarValue, personalWords, requestId) {
+  return {
+    schemaVersion: RECIPE_SCHEMA_VERSION,
+    sourcePhrase: source,
+    search: {
+      dictionary: dictionary.value,
+      searchDepth: searchMode.value,
+      maximumWords: options.maxWords,
+      shortestWordLength: options.minimumLength,
+      proMode: proMode.checked,
+      timeBudget: timeBudget.value,
+      effectiveTimeBudgetMs: options.timeLimitMs,
+      budgetReached: false,
+      phrasePattern: phrasePattern.value.trim(),
+      grammarTemplateSelection: grammarTemplate.value,
+      grammarTemplate: grammarValue,
+      customGrammarSlots: cloneRecipe(customGrammarSlots) || [],
+      requiredWords: splitRecipeList(lockedWords.value),
+      preferredWords: splitRecipeList(preferredWords.value),
+      excludedWords: splitRecipeList(excludedWords.value),
+      excludeVulgar: excludeVulgar.checked,
+      relevantPersonalVocabulary: personalWords.words.filter((word) => personalWordFitsSource(word, source))
+    },
+    discovery: {
+      requestId,
+      inProgress: true,
+      durationMs: null,
+      engine: "pending",
+      workerCount: 0,
+      budgetReached: false,
+      resultCount: null,
+      truncated: false
+    },
+    versions: {
+      dictionary: RECIPE_DICTIONARY_VERSIONS[dictionary.value] || dictionary.value,
+      ranking: RECIPE_RANKING_VERSION,
+      engine: RECIPE_ENGINE_VERSION
+    }
+  };
+}
+
+function completeSearchRecipe(requestId, outcome, durationMs, engine, workerCount) {
+  if (!currentSearchRecipe || currentSearchRecipe.discovery?.requestId !== requestId) return;
+  currentSearchRecipe.search.budgetReached = Boolean(outcome.timeLimited);
+  currentSearchRecipe.discovery = {
+    durationMs: Math.round(durationMs),
+    engine,
+    workerCount,
+    budgetReached: Boolean(outcome.timeLimited),
+    resultCount: outcome.results.length,
+    truncated: Boolean(outcome.truncated)
+  };
+  let updatedPick = false;
+  pickEntries.forEach((entry) => {
+    if (entry.recipe?.discovery?.requestId !== requestId) return;
+    const resultPhrase = entry.recipe.resultPhrase;
+    const originalRank = entry.recipe.originalRank;
+    const edits = entry.recipe.edits;
+    entry.recipe = { ...cloneRecipe(currentSearchRecipe), resultPhrase, originalRank, edits };
+    updatedPick = true;
+  });
+  if (updatedPick) savePickList();
+}
 
 const GRAMMAR_TEMPLATE_LITERALS = {
   "noun-of-noun": ["of"],
@@ -448,6 +696,7 @@ function buildPermutationPanel(entry) {
     locked = new Set(tokens.flatMap(({ originalIndex }, index) => previouslyLocked.has(originalIndex) ? [index] : []));
     entry.phrase = words.join(" ");
     entry.lockedPositions = [...locked].sort((left, right) => left - right);
+    syncRecipeEdits(entry);
     savePickList();
     renderLockControls();
     refreshAlternatives();
@@ -466,6 +715,7 @@ function buildPermutationPanel(entry) {
         if (suppressLockedClick) { suppressLockedClick = false; return; }
         if (locked.has(index)) locked.delete(index); else locked.add(index);
         entry.lockedPositions = [...locked].sort((left, right) => left - right);
+        syncRecipeEdits(entry);
         savePickList(); renderLockControls(); refreshAlternatives();
       });
       button.addEventListener("dragstart", (event) => {
@@ -518,6 +768,7 @@ function buildPermutationPanel(entry) {
     const selectedPhrase = select.value || entry.phrase;
     if (!alternatives.some(({ phrase }) => phrase === selectedPhrase)) return;
     entry.phrase = selectedPhrase;
+    syncRecipeEdits(entry);
     panel.dispatchEvent(new Event("anagramentrychange"));
     savePickList(); renderPickList(); renderResults();
   };
@@ -538,6 +789,7 @@ function buildFormatPanel(entry) {
   const feedback = document.createElement("small"); feedback.className = "anagram-pick-permutation-feedback"; feedback.setAttribute("aria-live", "polite");
   const saveOptions = () => {
     entry.formatOptions = { ...options };
+    syncRecipeEdits(entry);
     savePickList();
     preview.textContent = formatAnagramPhrase(entry.phrase, options);
     panel.dispatchEvent(new CustomEvent("anagramformatchange", { detail: { formattedPhrase: preview.textContent } }));
@@ -590,6 +842,7 @@ function buildWordSwapPanel(entry) {
   const feedback = document.createElement("small"); feedback.className = "anagram-pick-permutation-feedback"; feedback.setAttribute("aria-live", "polite");
   const use = document.createElement("button"); use.type = "button"; use.textContent = "Use replacement"; use.disabled = true;
   let alternatives = [];
+  let selectedOriginalWord = "";
   let definitionRequestId = 0;
   let replacementDefinitionRequestId = 0;
   const showDefinitions = async (word) => {
@@ -642,6 +895,7 @@ function buildWordSwapPanel(entry) {
       const wasSelected = button.getAttribute("aria-pressed") === "true";
       wordButtons.querySelectorAll("button").forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
       if (wasSelected) {
+        selectedOriginalWord = "";
         button.setAttribute("aria-pressed", "false");
         replacement.hidden = true; replacement.value = ""; use.disabled = true;
         replacementDefinitionRequestId += 1; replacementDefinition.hidden = true; replacementDefinition.replaceChildren();
@@ -649,6 +903,7 @@ function buildWordSwapPanel(entry) {
         definitionRequestId += 1; definitionHeading.textContent = "Word definitions"; definitionLookup.hidden = true; delete definitionLookup.dataset.word; definitionContent.textContent = "Select a word to see all of its local definitions.";
         return;
       }
+      selectedOriginalWord = word;
       showDefinitions(word);
       replacementDefinitionRequestId += 1; replacementDefinition.hidden = true; replacementDefinition.replaceChildren();
       replacement.hidden = true; use.disabled = true; preview.textContent = titleCase(entry.phrase); feedback.textContent = `Loading ${dictionary.value} dictionary alternatives for ${word}…`;
@@ -671,7 +926,15 @@ function buildWordSwapPanel(entry) {
   use.addEventListener("click", () => {
     const selected = alternatives.find(({ phrase }) => phrase === replacement.value);
     if (!selected || !isExactAnagram(entry.phrase, selected.phrase)) return;
+    const previousPhrase = entry.phrase;
+    const previousWord = selectedOriginalWord;
     entry.phrase = selected.phrase; panel.dispatchEvent(new Event("anagramentrychange")); savePickList(); renderPickList(); renderResults();
+    if (entry.recipe) {
+      entry.recipe.edits ||= {};
+      entry.recipe.edits.replacements ||= [];
+      entry.recipe.edits.replacements.push({ from: previousWord, to: selected.word, previousPhrase, resultPhrase: selected.phrase });
+      syncRecipeEdits(entry); savePickList();
+    }
   });
   const actions = document.createElement("div"); actions.className = "anagram-pick-permutation-actions"; actions.append(use);
   panel.append(close, heading, hint, wordButtons, definitionPanel, replacement, preview, replacementDefinition, actions, feedback);
@@ -730,6 +993,201 @@ pickDrawerClose.addEventListener("click", closePickDrawer);
 pickDrawerBackdrop.addEventListener("click", (event) => { if (event.target === pickDrawerBackdrop) closePickDrawer(); });
 pickDrawer.addEventListener("keydown", (event) => { if (event.key === "Escape") closePickDrawer(); });
 
+let recipeDialog = null;
+let recipeDialogTitle = null;
+let recipeDialogOverview = null;
+let recipeDialogContent = null;
+let recipeDialogTabs = [];
+let recipeDialogReturnFocus = null;
+
+function recipeList(value) {
+  return Array.isArray(value) && value.length ? value.join(", ") : "None";
+}
+
+function recipeDuration(value) {
+  return Number.isFinite(value) ? `${(value / 1000).toFixed(1)} seconds` : "Not recorded";
+}
+
+function addRecipeOverviewSection(parent, icon, title, rows, open = true) {
+  const section = document.createElement("details"); section.className = "anagram-recipe-section"; section.open = open;
+  const summary = document.createElement("summary");
+  const symbol = document.createElement("span"); symbol.className = "anagram-recipe-section-icon"; symbol.textContent = icon; symbol.setAttribute("aria-hidden", "true");
+  const heading = document.createElement("strong"); heading.textContent = title;
+  summary.append(symbol, heading);
+  const list = document.createElement("dl");
+  rows.forEach(([label, value]) => {
+    const term = document.createElement("dt"); term.textContent = label;
+    const description = document.createElement("dd"); description.textContent = String(value ?? "Not recorded");
+    list.append(term, description);
+  });
+  section.append(summary, list); parent.append(section);
+}
+
+function renderRecipeOverview(recipe) {
+  const search = recipe.search || {};
+  const discovery = recipe.discovery || {};
+  const edits = recipe.edits || {};
+  const versions = recipe.versions || {};
+  const slots = (search.customGrammarSlots || []).map((slot) => slot.kind === "literal" ? `“${slot.word}”` : titleCase(slot.kind));
+  const replacements = (edits.replacements || []).map((replacement) => `${replacement.from || "word"} → ${replacement.to || "replacement"}`);
+  const formatting = Object.entries(edits.capitalizationAndPunctuation || {}).map(([key, value]) => `${titleCase(key)}: ${value || "None"}`);
+  recipeDialogOverview.replaceChildren();
+  if (recipe.schemaVersion === 0) {
+    const legacy = document.createElement("p"); legacy.className = "anagram-recipe-legacy"; legacy.textContent = "Legacy pick: its original search settings were not recorded."; recipeDialogOverview.append(legacy);
+  }
+  addRecipeOverviewSection(recipeDialogOverview, "✦", "Phrase", [
+    ["Source", recipe.sourcePhrase || "Not recorded"],
+    ["Original result", recipe.resultPhrase || edits.originalResultPhrase || "Not recorded"],
+    ["Current phrase", edits.currentPhrase || recipe.resultPhrase || "Not recorded"],
+    ["Original rank", recipe.originalRank ? `#${recipe.originalRank}` : "Not recorded"]
+  ]);
+  addRecipeOverviewSection(recipeDialogOverview, "⚙", "Tune the search", [
+    ["Dictionary", search.dictionary ? titleCase(search.dictionary) : "Not recorded"],
+    ["Search depth", search.searchDepth ? titleCase(search.searchDepth) : "Not recorded"],
+    ["Maximum words", search.maximumWords ?? "Not recorded"],
+    ["Shortest word", search.shortestWordLength ? `${search.shortestWordLength} letters` : "Not recorded"],
+    ["Pro mode", search.proMode == null ? "Not recorded" : search.proMode ? "On" : "Off"],
+    ["Time budget", search.timeBudget === "auto" ? "Auto" : search.timeBudget ? `${search.timeBudget} seconds` : "Not recorded"],
+    ["Effective budget", Number.isFinite(search.effectiveTimeBudgetMs) ? `${search.effectiveTimeBudgetMs / 1000} seconds` : "Not recorded"],
+    ["Budget reached", search.budgetReached == null ? "Not recorded" : search.budgetReached ? "Yes" : "No"]
+  ]);
+  addRecipeOverviewSection(recipeDialogOverview, "⌘", "Search guidance", [
+    ["Phrase pattern", search.phrasePattern || "None"],
+    ["Grammar template", search.grammarTemplateSelection ? titleCase(search.grammarTemplateSelection.replaceAll("-", " ")) : "Free form"],
+    ["Custom grammar slots", recipeList(slots)],
+    ["Required words", recipeList(search.requiredWords)],
+    ["Preferred words", recipeList(search.preferredWords)],
+    ["Excluded words", recipeList(search.excludedWords)],
+    ["Vulgar-word filter", search.excludeVulgar == null ? "Not recorded" : search.excludeVulgar ? "On" : "Off"],
+    ["Relevant personal vocabulary", recipeList(search.relevantPersonalVocabulary)]
+  ], false);
+  addRecipeOverviewSection(recipeDialogOverview, "▶", "Search run", [
+    ["Duration", recipeDuration(discovery.durationMs)],
+    ["Engine", discovery.engine === "wasm" ? "Rust/WebAssembly" : discovery.engine === "pending" ? "Search in progress" : discovery.engine || "Not recorded"],
+    ["Workers", discovery.workerCount || "Not recorded"],
+    ["Results retained", discovery.resultCount ?? "Not recorded"],
+    ["Budget reached", discovery.budgetReached == null ? "Not recorded" : discovery.budgetReached ? "Yes" : "No"],
+    ["Results truncated", discovery.truncated == null ? "Not recorded" : discovery.truncated ? "Yes" : "No"]
+  ], false);
+  addRecipeOverviewSection(recipeDialogOverview, "✎", "Phrase Studio edits", [
+    ["Word order", recipeList(edits.wordOrder)],
+    ["Locked positions", (edits.lockedPositions || []).length ? edits.lockedPositions.map((position) => position + 1).join(", ") : "None"],
+    ["Replacements", recipeList(replacements)],
+    ["Capitalization and punctuation", recipeList(formatting)]
+  ], false);
+  addRecipeOverviewSection(recipeDialogOverview, "◇", "Versions", [
+    ["Recipe schema", recipe.schemaVersion ?? "Not recorded"],
+    ["Dictionary", versions.dictionary || "Not recorded"],
+    ["Ranking", versions.ranking || "Not recorded"],
+    ["Engine", versions.engine || "Not recorded"]
+  ], false);
+}
+
+function setRecipeDialogTab(name) {
+  const showOverview = name === "overview";
+  recipeDialogOverview.hidden = !showOverview;
+  recipeDialogContent.hidden = showOverview;
+  recipeDialogTabs.forEach((button) => {
+    const selected = button.dataset.recipeTab === name;
+    button.setAttribute("aria-selected", String(selected));
+    button.tabIndex = selected ? 0 : -1;
+  });
+}
+
+function ensureRecipeDialog() {
+  if (recipeDialog) return;
+  recipeDialog = document.createElement("dialog"); recipeDialog.className = "anagram-recipe-modal"; recipeDialog.setAttribute("aria-labelledby", "anagram-recipe-title");
+  const card = document.createElement("div"); card.className = "anagram-recipe-card";
+  const header = document.createElement("header");
+  recipeDialogTitle = document.createElement("h2"); recipeDialogTitle.id = "anagram-recipe-title"; recipeDialogTitle.textContent = "Discovery recipe";
+  const close = document.createElement("button"); close.type = "button"; close.textContent = "×"; close.setAttribute("aria-label", "Close recipe"); close.addEventListener("click", () => recipeDialog.close());
+  header.append(recipeDialogTitle, close);
+  const intro = document.createElement("p"); intro.textContent = "This versioned snapshot preserves the search settings and subsequent Phrase Studio edits.";
+  const tabs = document.createElement("div"); tabs.className = "anagram-recipe-tabs"; tabs.setAttribute("role", "tablist"); tabs.setAttribute("aria-label", "Recipe views");
+  recipeDialogTabs = ["overview", "json"].map((name) => {
+    const button = document.createElement("button"); button.type = "button"; button.id = `anagram-recipe-tab-${name}`; button.dataset.recipeTab = name; button.setAttribute("role", "tab"); button.setAttribute("aria-controls", `anagram-recipe-${name}`); button.textContent = name === "overview" ? "Overview" : "JSON";
+    button.addEventListener("click", () => setRecipeDialogTab(name)); tabs.append(button); return button;
+  });
+  tabs.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    event.preventDefault();
+    const selectedIndex = recipeDialogTabs.findIndex((button) => button.getAttribute("aria-selected") === "true");
+    const nextIndex = (selectedIndex + (event.key === "ArrowRight" ? 1 : -1) + recipeDialogTabs.length) % recipeDialogTabs.length;
+    const next = recipeDialogTabs[nextIndex]; setRecipeDialogTab(next.dataset.recipeTab); next.focus();
+  });
+  recipeDialogOverview = document.createElement("div"); recipeDialogOverview.className = "anagram-recipe-overview"; recipeDialogOverview.id = "anagram-recipe-overview"; recipeDialogOverview.setAttribute("role", "tabpanel"); recipeDialogOverview.setAttribute("aria-labelledby", "anagram-recipe-tab-overview");
+  recipeDialogContent = document.createElement("pre"); recipeDialogContent.id = "anagram-recipe-json"; recipeDialogContent.setAttribute("role", "tabpanel"); recipeDialogContent.setAttribute("aria-labelledby", "anagram-recipe-tab-json"); recipeDialogContent.tabIndex = 0;
+  card.append(header, intro, tabs, recipeDialogOverview, recipeDialogContent); recipeDialog.append(card);
+  recipeDialog.addEventListener("click", (event) => { if (event.target === recipeDialog) recipeDialog.close(); });
+  recipeDialog.addEventListener("close", () => { recipeDialogReturnFocus?.focus(); recipeDialogReturnFocus = null; });
+  document.body.append(recipeDialog);
+}
+
+function viewRecipe(entry, trigger) {
+  ensureRecipeDialog();
+  recipeDialogReturnFocus = trigger;
+  recipeDialogTitle.textContent = `Recipe: ${titleCase(entry.phrase)}`;
+  const recipe = recipePayload(entry);
+  renderRecipeOverview(recipe);
+  recipeDialogContent.textContent = JSON.stringify(recipe, null, 2);
+  setRecipeDialogTab("overview");
+  recipeDialog.showModal();
+}
+
+function restoreRecipe(entry, runAgain = false) {
+  const recipe = recipePayload(entry);
+  const search = recipe.search || {};
+  input.value = recipe.sourcePhrase || entry.source || "";
+  dictionary.value = search.dictionary || "standard";
+  searchMode.value = search.searchDepth || "deep";
+  maxWords.value = String(search.maximumWords || 5);
+  minimumLength.value = String(search.shortestWordLength || 2);
+  proMode.checked = Boolean(search.proMode);
+  timeBudget.value = search.timeBudget || "auto";
+  phrasePattern.value = search.phrasePattern || "";
+  grammarTemplate.value = search.grammarTemplateSelection || "";
+  customGrammarSlots = cloneRecipe(search.customGrammarSlots) || [];
+  lockedWords.value = (search.requiredWords || []).join(", ");
+  preferredWords.value = (search.preferredWords || []).join(", ");
+  excludedWords.value = (search.excludedWords || []).join(", ");
+  excludeVulgar.checked = search.excludeVulgar !== false;
+  personalVocabulary.value = (search.relevantPersonalVocabulary || []).join("\n");
+  advancedOptions.open = true;
+  syncTemplateBuilder(); syncProMode(); syncInputClearButtons();
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  status.textContent = runAgain ? "Recipe restored. Starting the search…" : "Recipe settings restored. Review them, then architect anagrams when ready.";
+  input.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (runAgain) queueMicrotask(() => form.requestSubmit()); else input.focus({ preventScroll: true });
+}
+
+async function copyRecipe(entry, trigger) {
+  await navigator.clipboard.writeText(recipeJson(entry));
+  const previous = trigger.textContent; trigger.textContent = "Copied"; setTimeout(() => { trigger.textContent = previous; }, 1200);
+}
+
+function shareFind(entry) {
+  const recipe = recipePayload(entry);
+  const result = formatAnagramPhrase(entry.phrase, entry.formatOptions);
+  openAnagramReveal({ sourcePhrase: recipe.sourcePhrase || entry.source || "", resultPhrase: result, originalRank: recipe.originalRank || entry.rank || null });
+}
+
+function closePickActionMenus(except = null) {
+  document.querySelectorAll(".anagram-pick-more").forEach((wrap) => {
+    if (wrap === except) return;
+    const menu = wrap.querySelector(".anagram-pick-more-menu");
+    const toggle = wrap.querySelector("[aria-expanded]");
+    if (menu) menu.hidden = true;
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
+  });
+}
+
+document.addEventListener("click", (event) => {
+  if (!event.target.closest?.(".anagram-pick-more")) closePickActionMenus();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closePickActionMenus();
+});
+
 function renderPickList() {
   pickCount.textContent = `${pickEntries.length} ${pickEntries.length === 1 ? "pick" : "picks"}`;
   pickClear.disabled = pickEntries.length === 0;
@@ -746,11 +1204,29 @@ function renderPickList() {
     edit.addEventListener("click", () => openPickDrawer(entry, edit, phrase));
     const moreWrap = document.createElement("span"); moreWrap.className = "anagram-pick-more";
     const more = document.createElement("button"); more.type = "button"; more.textContent = "⋯"; more.setAttribute("aria-label", `More actions for ${entry.phrase}`); more.setAttribute("aria-expanded", "false");
+    const menu = document.createElement("span"); menu.className = "anagram-pick-more-menu"; menu.hidden = true;
+    const recipe = document.createElement("button"); recipe.type = "button"; recipe.textContent = "View recipe"; recipe.addEventListener("click", () => viewRecipe(entry, recipe));
+    const restore = document.createElement("button"); restore.type = "button"; restore.textContent = "Restore settings"; restore.addEventListener("click", () => restoreRecipe(entry));
+    const rerun = document.createElement("button"); rerun.type = "button"; rerun.textContent = "Run again"; rerun.addEventListener("click", () => restoreRecipe(entry, true));
+    const copyRecipeButton = document.createElement("button"); copyRecipeButton.type = "button"; copyRecipeButton.textContent = "Copy recipe"; copyRecipeButton.addEventListener("click", () => copyRecipe(entry, copyRecipeButton));
+    const share = document.createElement("button"); share.type = "button"; share.textContent = "Share find"; share.addEventListener("click", () => shareFind(entry));
     const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "Remove"; remove.setAttribute("aria-label", `Remove ${entry.phrase} from the Pick List`);
     remove.addEventListener("click", () => { pickEntries = pickEntries.filter((candidate) => candidate.phrase.toLowerCase() !== entry.phrase.toLowerCase()); savePickList(); renderPickList(); renderResults(); });
-    remove.hidden = true;
-    more.addEventListener("click", () => { const opening = remove.hidden; remove.hidden = !opening; more.setAttribute("aria-expanded", String(opening)); });
-    moreWrap.append(more, remove);
+    menu.append(recipe, restore, rerun, copyRecipeButton, share, remove);
+    more.addEventListener("click", () => {
+      const opening = menu.hidden;
+      closePickActionMenus(moreWrap);
+      menu.hidden = !opening;
+      more.setAttribute("aria-expanded", String(opening));
+      menu.classList.remove("opens-up");
+      if (opening) {
+        const listBounds = pickList.getBoundingClientRect();
+        const toggleBounds = more.getBoundingClientRect();
+        const menuHeight = menu.getBoundingClientRect().height;
+        if (listBounds.bottom - toggleBounds.bottom < menuHeight + 8) menu.classList.add("opens-up");
+      }
+    });
+    moreWrap.append(more, menu);
     actions.append(copy, edit, moreWrap);
     row.append(phrase, context, actions); fragment.append(row);
   });
@@ -759,7 +1235,7 @@ function renderPickList() {
 
 function togglePick(result) {
   if (isPicked(result.phrase)) pickEntries = pickEntries.filter((entry) => entry.phrase.toLowerCase() !== result.phrase.toLowerCase());
-  else pickEntries.unshift({ phrase: result.phrase, source: currentSource, rank: result.rank, lockedPositions: [], savedAt: new Date().toISOString() });
+  else pickEntries.unshift({ phrase: result.phrase, source: currentSource, rank: result.rank, lockedPositions: [], savedAt: new Date().toISOString(), recipe: recipeForResult(result) });
   pickEntries = pickEntries.slice(0, 100); savePickList(); renderPickList(); renderResults();
   if (isPicked(result.phrase)) pickList.open = true;
 }
@@ -1191,6 +1667,7 @@ form.addEventListener("submit", async (event) => {
   resetResultView();
   results.replaceChildren();
   currentSource = source;
+  currentSearchRecipe = null;
   summary.textContent = `${letters.length} letters available`;
   const started = performance.now();
   try {
@@ -1208,6 +1685,7 @@ form.addEventListener("submit", async (event) => {
       limit: 1200,
       ...searchConfiguration(searchMode.value, dictionary.value, letters.length, proMode.checked, Number(maxWords.value), Number(minimumLength.value))
     };
+    currentSearchRecipe = createSearchRecipe(source, options, grammarValue, personalWords, requestId);
     const { outcome, wordCount, engine, wasmFailure, workerCount } = await solveInWorker(source, options, dictionary.value, showsProgressModal);
     status.textContent = `Architecting exact phrases from ${wordCount.toLocaleString()} words…`;
     if (showsProgressModal) updatePatternProgress("Finalizing your exact matches…", 100);
@@ -1215,7 +1693,9 @@ form.addEventListener("submit", async (event) => {
     renderResults();
     metricProgressLabel.textContent = outcome.timeLimited ? "time budget used" : "search complete";
     analysisPhase.textContent = outcome.timeLimited ? "Budget reached" : "Complete";
-    const seconds = ((performance.now() - started) / 1000).toFixed(1);
+    const durationMs = performance.now() - started;
+    const seconds = (durationMs / 1000).toFixed(1);
+    completeSearchRecipe(requestId, outcome, durationMs, engine, workerCount);
     status.textContent = outcome.results.length === 0 && grammarTemplate.value
       ? `No exact phrases matched the selected grammar template in ${seconds}s. Try another template, Expanded dictionary, or a different source phrase.`
       : `${outcome.results.length} exact phrase${outcome.results.length === 1 ? "" : "s"} found in ${seconds}s${outcome.timeLimited ? " · time budget reached" : outcome.truncated ? " · ranked search pass" : ""} · ${workerCount} ${engine === "wasm" ? "Rust/WASM" : "JavaScript"} worker${workerCount === 1 ? "" : "s"}.`;
@@ -1293,6 +1773,27 @@ examples.forEach((button) => button.addEventListener("click", () => {
   input.dispatchEvent(new Event("input", { bubbles: true }));
   input.focus();
 }));
+
+pickImport.addEventListener("click", (event) => { event.preventDefault(); openRecipeImporter(); });
+recipeImportClose.addEventListener("click", () => recipeImportDialog.close());
+recipeImportCancel.addEventListener("click", () => recipeImportDialog.close());
+recipeImportDialog.addEventListener("click", (event) => { if (event.target === recipeImportDialog) recipeImportDialog.close(); });
+recipeImportJson.addEventListener("input", parseRecipeImport);
+recipeImportFile.addEventListener("change", async () => {
+  const file = recipeImportFile.files?.[0];
+  recipeImportFileName.textContent = file?.name || "No file selected";
+  if (!file) return;
+  if (file.size > 250000) {
+    recipeImportJson.value = "";
+    pendingImportedRecipe = null;
+    recipeImportConfirm.disabled = true;
+    showRecipeImportPreview("The selected recipe is too large to import.", "error");
+    return;
+  }
+  recipeImportJson.value = await file.text();
+  parseRecipeImport();
+});
+recipeImportConfirm.addEventListener("click", importPendingRecipe);
 
 pickClear.addEventListener("click", (event) => {
   event.preventDefault();

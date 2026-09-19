@@ -1,0 +1,36 @@
+.animator-page { background: #081426; color: #e2e8f0; }
+.animator-main { width: min(1100px,calc(100% - 2rem)); margin: 0 auto; padding-bottom: 4rem; }
+.animator-breadcrumb { margin: 1rem 0; }
+.animator-hero { display: grid; gap: .55rem; padding: 2.2rem 0 1.4rem; }
+.animator-hero .eyebrow { color: #5eead4; font-size: .72rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+.animator-hero h1 { max-width: 18ch; margin: 0; color: #f8fafc; font-size: clamp(2rem,5vw,3.8rem); line-height: .98; }
+.animator-hero p { max-width: 68ch; margin: .3rem 0 0; color: #aab7ca; line-height: 1.65; }
+.animator-studio { display: grid; gap: 1rem; padding: 1rem; border: 1px solid rgba(45,212,191,.3); border-radius: 18px; background: linear-gradient(145deg,#101d31,#0b1628); box-shadow: 0 24px 65px rgba(0,0,0,.28); }
+.animator-canvas { width: 100%; aspect-ratio: 16/9; border: 1px solid rgba(45,212,191,.24); border-radius: 12px; background: #071421; }
+.animator-form { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.animator-form label { display: grid; gap: .3rem; color: #94a3b8; font-size: .75rem; font-weight: 800; }
+.animator-form input[type="text"], .animator-form select { width: 100%; box-sizing: border-box; padding: .7rem .75rem; border: 1px solid rgba(148,163,184,.3); border-radius: 9px; background: #0b1527; color: #f8fafc; font: inherit; }
+.animator-options { display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: .75rem; }
+.animator-repeat { display: flex !important; grid-auto-flow: column; align-items: center; justify-content: start; padding: .72rem; border: 1px solid rgba(148,163,184,.2); border-radius: 9px; }
+.animator-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.animator-actions button, .animator-actions a { display: inline-flex; align-items: center; padding: .68rem .9rem; border: 1px solid rgba(45,212,191,.32); border-radius: 9px; background: rgba(45,212,191,.09); color: #99f6e4; font-weight: 850; text-decoration: none; cursor: pointer; }
+.animator-actions button:first-child { background: linear-gradient(135deg,#6ee7d1,#f5c342); color: #0a2630; }
+.animator-status { min-height: 1.3em; margin: 0; color: #99f6e4; font-size: .82rem; }
+.animator-status[data-state="error"] { color: #fda4af; }
+.animator-explainer { margin-top: 1.4rem; padding: 1.2rem; border: 1px solid rgba(148,163,184,.15); border-radius: 14px; background: rgba(15,23,42,.55); }
+.animator-explainer h2 { margin: 0 0 .45rem; color: #f8fafc; }
+.animator-explainer p { margin: 0; color: #aab7ca; line-height: 1.6; }
+.animator-explainer p + p { margin-top: .7rem; }
+.animator-explainer a { color: #99f6e4; font-weight: 800; }
+@media (max-width: 700px) { .animator-form, .animator-options { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .animator-canvas { scroll-behavior: auto; } }
+html.animator-embed, html.animator-embed body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #071421; }
+html.animator-embed #mt-header, html.animator-embed .animator-breadcrumb, html.animator-embed .animator-hero, html.animator-embed .animator-form, html.animator-embed .animator-status, html.animator-embed .animator-actions, html.animator-embed .animator-explainer, html.animator-embed footer { display: none !important; }
+html.animator-embed .animator-main { display: grid; width: 100%; height: 100%; margin: 0; padding: 0; place-items: center; }
+html.animator-embed .animator-studio { display: grid; width: 100%; height: 100%; box-sizing: border-box; padding: 0; place-items: center; border: 0; border-radius: 0; background: #071421; box-shadow: none; }
+html.animator-embed .animator-canvas { width: 100%; height: auto; max-height: 100vh; border: 0; border-radius: 0; object-fit: contain; }
+html.animator-focus, html.animator-focus body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #071421; }
+html.animator-focus #mt-header, html.animator-focus .animator-breadcrumb, html.animator-focus .animator-hero, html.animator-focus .animator-form, html.animator-focus .animator-status, html.animator-focus .animator-actions, html.animator-focus .animator-explainer, html.animator-focus footer { display: none !important; }
+html.animator-focus .animator-main { display: grid; width: 100%; height: 100%; margin: 0; padding: 0; place-items: center; }
+html.animator-focus .animator-studio { display: grid; width: 100%; height: 100%; box-sizing: border-box; padding: 0; place-items: center; border: 0; border-radius: 0; background: #071421; box-shadow: none; }
+html.animator-focus .animator-canvas { width: 100%; height: auto; max-height: 100vh; border: 0; border-radius: 0; object-fit: contain; }

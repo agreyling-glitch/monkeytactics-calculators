@@ -97,9 +97,9 @@ test("the runtime menu manifest owns the complete menu hierarchy", () => {
   assert.deepEqual(groups.map(({ id }) => id), ["word-games", "generators", "calculators", "labs", "text-data", "batch-automation"]);
   assert.deepEqual(
     groups.find(({ id }) => id === "word-games").children.map(({ id }) => id),
-    ["word-unscrambler", "anagram-architect", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-solver", "absurdle-solver", "quordle-solver", "octordle-solver", "sedecordle-solver"],
+    ["word-unscrambler", "anagram-architect", "anagram-animator", "words-with-friends-solver", "crossword-solver", "wordiply-solver", "wordle-helper", "antiwordle-solver", "absurdle-solver", "quordle-solver", "octordle-solver", "sedecordle-solver"],
   );
-  assert.equal(leaves.length, 39);
+  assert.equal(leaves.length, 40);
   assert.equal(new Set(leaves.map(({ id }) => id)).size, leaves.length);
 });
 
@@ -163,7 +163,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
   for (const [id, label, count] of [
-    ["word-games", "Word Games", 11],
+    ["word-games", "Word Games", 12],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
     ["labs", "Labs", 1],
@@ -177,7 +177,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 39);
+  assert.equal((html.match(/class="directory-tool"/g) || []).length, 40);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -246,7 +246,7 @@ test("the homepage features twelve designated popular tools", () => {
 test("the homepage collection links every menu category with matching counts", () => {
   const html = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
   const expected = [
-    ["word-games", "Word Games", 11],
+    ["word-games", "Word Games", 12],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
     ["labs", "Labs", 1],

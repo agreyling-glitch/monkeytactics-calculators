@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anagram Animator Embed Demo</title>
+  <meta name="description" content="Demonstration of an embedded Anagram Architect animation.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="../assets/css/shared/style.css?v=20260903-branded-scrollbars">
+  <style>
+    body { background: #081426; color: #e2e8f0; }
+    .embed-demo { width: min(920px,calc(100% - 2rem)); margin: 0 auto; padding: 3rem 0 5rem; }
+    .embed-demo__eyebrow { color: #5eead4; font-size: .72rem; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+    .embed-demo h1 { max-width: 18ch; margin: .45rem 0 .75rem; color: #f8fafc; font-size: clamp(2rem,5vw,3.4rem); line-height: 1; }
+    .embed-demo > p { max-width: 66ch; color: #aab7ca; line-height: 1.65; }
+    .embed-demo__frame { margin-top: 1.5rem; overflow: hidden; border: 1px solid rgba(45,212,191,.35); border-radius: 16px; background: #071421; box-shadow: 0 24px 65px rgba(0,0,0,.34); }
+    .embed-demo__frame iframe { display: block; width: 100%; aspect-ratio: 16/9; border: 0; }
+    .embed-demo__code { margin-top: 1.5rem; padding: 1rem; border: 1px solid rgba(148,163,184,.2); border-radius: 12px; background: #0f1a2d; }
+    .embed-demo__code h2 { margin: 0 0 .65rem; color: #fde68a; font-size: 1rem; }
+    .embed-demo__code pre { margin: 0; overflow-x: auto; color: #cbd5e1; font-size: .78rem; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .embed-demo__fallback { margin-top: .8rem; font-size: .8rem; }
+    .embed-demo__fallback a { color: #99f6e4; }
+  </style>
+</head>
+<body>
+  <div id="mt-header"></div>
+  <script type="module" src="/assets/wasm/menu/menu.js?v=20260915-menu-manifest-v2"></script>
+  <main class="embed-demo">
+    <span class="embed-demo__eyebrow">Anagram Architect · Embed demonstration</span>
+    <h1>An interactive anagram inside a page</h1>
+    <p>This page behaves like a blog post or independent website embedding the lightweight Anagram Animator. The iframe receives only the two phrases and animation settings—there is no uploaded video.</p>
+
+    <div class="embed-demo__frame">
+      <iframe
+        src="/tools/anagram-animator?from=Osama%20Bin%20Laden&amp;to=Old%20Man%20In%20A%20Base&amp;style=blueprint&amp;speed=normal&amp;embed=1"
+        title="Osama Bin Laden rearranging into Old Man In A Base"
+        loading="lazy"
+        referrerpolicy="strict-origin-when-cross-origin">
+      </iframe>
+    </div>
+    <p class="embed-demo__fallback"><a href="/tools/anagram-animator?from=Osama%20Bin%20Laden&amp;to=Old%20Man%20In%20A%20Base&amp;style=blueprint&amp;speed=normal">Open the full interactive animator</a></p>
+
+    <section class="embed-demo__code" aria-labelledby="embed-code-heading">
+      <h2 id="embed-code-heading">Embed code used above</h2>
+      <pre><code>&lt;iframe
+  src="https://monkeytactics.com/tools/anagram-animator?from=Osama%20Bin%20Laden&amp;amp;to=Old%20Man%20In%20A%20Base&amp;amp;style=blueprint&amp;amp;speed=normal&amp;amp;embed=1"
+  title="Osama Bin Laden rearranging into Old Man In A Base"
+  loading="lazy"
+  style="width:100%;aspect-ratio:16/9;border:0"
+  referrerpolicy="strict-origin-when-cross-origin"&gt;
+&lt;/iframe&gt;</code></pre>
+    </section>
+  </main>
+</body>
+</html>
