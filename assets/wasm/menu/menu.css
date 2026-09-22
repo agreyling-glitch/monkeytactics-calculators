@@ -416,6 +416,50 @@ body:has(.mt-mobile-drawer.open) {
   color: #86efac;
 }
 
+.mt-mobile-drawer .mt-applications {
+  margin-bottom: 0.35rem;
+  border: 1px solid rgba(211, 173, 98, 0.25);
+  border-radius: 0.75rem;
+  background: rgba(211, 173, 98, 0.045);
+}
+
+.mt-mobile-drawer .mt-applications summary {
+  padding-inline: 0.75rem;
+}
+
+.mt-mobile-drawer .mt-applications summary span {
+  background: rgba(211, 173, 98, 0.14);
+  color: #e0bd77;
+}
+
+.mt-mobile-drawer .mt-applications > div {
+  gap: 0.15rem;
+  padding: 0 0.45rem 0.55rem;
+}
+
+.mt-mobile-drawer .mt-applications a {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem 0.7rem;
+}
+
+.mt-mobile-drawer .mt-applications a:hover,
+.mt-mobile-drawer .mt-applications a:focus-visible {
+  background: rgba(211, 173, 98, 0.1);
+  color: #f0cf8c;
+}
+
+.mt-mobile-drawer .mt-applications a strong {
+  color: #f8fafc;
+  font-size: 0.88rem;
+}
+
+.mt-mobile-drawer .mt-applications a small {
+  color: #94a3b8;
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
 .mt-mobile-drawer .mt-drawer-subgroup {
   display: grid;
   gap: 0.1rem;

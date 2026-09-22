@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const siteRoot = path.resolve(__dirname, "..");
-const menuAssetVersion = "20260915-menu-manifest-v2";
+const menuAssetVersion = "20260922-applications-v1";
 const integrationMarkup = [
   '<div id="mt-header"></div>',
 ];
@@ -159,6 +159,17 @@ test("the open mobile menu owns the only vertical scroll container", () => {
   assert.match(css, /\.mt-mobile-drawer \{[\s\S]*?overscroll-behavior: contain/);
 });
 
+test("the burger menu promotes standalone applications after the tools directory", () => {
+  const source = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "src", "menu.rs"), "utf8");
+  const css = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "menu.css"), "utf8");
+  assert.match(source, /mt-drawer-all[\s\S]*?class="mt-applications"/);
+  assert.match(source, /https:\/\/qrstudio\.monkeytactics\.com\//);
+  assert.match(source, /Advanced QR design workspace/);
+  assert.match(source, /https:\/\/ironwoodchess\.com\//);
+  assert.match(source, /Private play and Stockfish analysis/);
+  assert.match(css, /\.mt-mobile-drawer \.mt-applications/);
+});
+
 test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
@@ -227,10 +238,14 @@ test("the homepage features twelve designated popular tools", () => {
   assert.match(html, /Rank definitions, synonyms, and WordNet graph relationships/);
   assert.match(html, /Group candidate answers by reusable Grid Positions/);
   assert.match(html, /Import, export, restore, and share complete Pick Lists/);
-  assert.match(html, /home\.css\?v=20260901-featured-spacing-1/);
+  assert.match(html, /home\.css\?v=20260922-featured-apps-1/);
+  assert.match(html, /Featured applications[\s\S]*?<h3>QR Studio<\/h3>[\s\S]*?<h3>Ironwood Chess<\/h3>/);
+  assert.match(html, /href="https:\/\/qrstudio\.monkeytactics\.com\/"/);
+  assert.match(html, /href="https:\/\/ironwoodchess\.com\/"/);
+  assert.match(html, /aria-label="Applications"/);
   assert.match(homeCss, /\.featured-tool > p \{ min-height: 5\.25rem; margin: 0\.6rem 0 0\.75rem;/);
   assert.equal((html.match(/class="capability-list"/g) || []).length, 12);
-  assert.equal((html.match(/<li>/g) || []).length, 48);
+  assert.equal((html.match(/<li>/g) || []).length, 54);
   assert.equal((html.match(/class="featured-tool__new">NEW</g) || []).length, 1);
   assert.equal((html.match(/class="featured-tool__updated">Updated/g) || []).length, 0);
   assert.match(html, /featured-tool--wordle[\s\S]*?featured-tool--antiwordle[\s\S]*?featured-tool--absurdle/);

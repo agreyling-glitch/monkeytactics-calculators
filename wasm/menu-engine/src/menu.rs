@@ -660,6 +660,19 @@ pub fn Header() -> impl IntoView {
                 >"×"</button>
             </div>
             <a class="mt-drawer-all" href="/tools">"View all tools"</a>
+            <details class="mt-applications" open>
+                <summary>"Applications"<span>"2"</span></summary>
+                <div>
+                    <a href="https://qrstudio.monkeytactics.com/">
+                        <strong>"QR Studio"</strong>
+                        <small>"Advanced QR design workspace"</small>
+                    </a>
+                    <a href="https://ironwoodchess.com/">
+                        <strong>"Ironwood Chess"</strong>
+                        <small>"Private play and Stockfish analysis"</small>
+                    </a>
+                </div>
+            </details>
             <Show when=move || !favorite_tools.get().is_empty()>
                 <section class="mt-favorites" aria-label="Favorite tools">
                     <div class="mt-favorites-heading">
