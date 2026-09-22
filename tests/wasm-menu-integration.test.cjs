@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const siteRoot = path.resolve(__dirname, "..");
-const menuAssetVersion = "20260915-menu-manifest-v2";
+const menuAssetVersion = "20260922-applications-v1";
 const integrationMarkup = [
   '<div id="mt-header"></div>',
 ];
@@ -157,6 +157,17 @@ test("the open mobile menu owns the only vertical scroll container", () => {
   assert.match(css, /\.mt-mobile-drawer \{[\s\S]*?box-sizing: border-box/);
   assert.match(css, /\.mt-mobile-drawer \{[\s\S]*?bottom: 0/);
   assert.match(css, /\.mt-mobile-drawer \{[\s\S]*?overscroll-behavior: contain/);
+});
+
+test("the burger menu promotes standalone applications after the tools directory", () => {
+  const source = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "src", "menu.rs"), "utf8");
+  const css = fs.readFileSync(path.join(siteRoot, "wasm", "menu-engine", "menu.css"), "utf8");
+  assert.match(source, /mt-drawer-all[\s\S]*?class="mt-applications"/);
+  assert.match(source, /https:\/\/qrstudio\.monkeytactics\.com\//);
+  assert.match(source, /Advanced QR design workspace/);
+  assert.match(source, /https:\/\/ironwoodchess\.com\//);
+  assert.match(source, /Private play and Stockfish analysis/);
+  assert.match(css, /\.mt-mobile-drawer \.mt-applications/);
 });
 
 test("the All Tools page mirrors the WASM menu hierarchy", () => {
