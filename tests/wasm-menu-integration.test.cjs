@@ -227,10 +227,14 @@ test("the homepage features twelve designated popular tools", () => {
   assert.match(html, /Rank definitions, synonyms, and WordNet graph relationships/);
   assert.match(html, /Group candidate answers by reusable Grid Positions/);
   assert.match(html, /Import, export, restore, and share complete Pick Lists/);
-  assert.match(html, /home\.css\?v=20260901-featured-spacing-1/);
+  assert.match(html, /home\.css\?v=20260922-featured-apps-1/);
+  assert.match(html, /Featured applications[\s\S]*?<h3>QR Studio<\/h3>[\s\S]*?<h3>Ironwood Chess<\/h3>/);
+  assert.match(html, /href="https:\/\/qrstudio\.monkeytactics\.com\/"/);
+  assert.match(html, /href="https:\/\/ironwoodchess\.com\/"/);
+  assert.match(html, /aria-label="Applications"/);
   assert.match(homeCss, /\.featured-tool > p \{ min-height: 5\.25rem; margin: 0\.6rem 0 0\.75rem;/);
   assert.equal((html.match(/class="capability-list"/g) || []).length, 12);
-  assert.equal((html.match(/<li>/g) || []).length, 48);
+  assert.equal((html.match(/<li>/g) || []).length, 54);
   assert.equal((html.match(/class="featured-tool__new">NEW</g) || []).length, 1);
   assert.equal((html.match(/class="featured-tool__updated">Updated/g) || []).length, 0);
   assert.match(html, /featured-tool--wordle[\s\S]*?featured-tool--antiwordle[\s\S]*?featured-tool--absurdle/);

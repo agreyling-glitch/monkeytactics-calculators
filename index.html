@@ -21,7 +21,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260903-branded-scrollbars" />
-  <link rel="stylesheet" href="/assets/css/pages/home.css?v=20260901-featured-spacing-1" />
+  <link rel="stylesheet" href="/assets/css/pages/home.css?v=20260922-featured-apps-1" />
   <script src="/assets/js/shared/ads.js" defer></script>
 
   <script type="application/ld+json">
@@ -72,6 +72,44 @@
         <div><span class="home-principles__mark">01</span><strong>Browser-powered</strong><small>Results are calculated on your device.</small></div>
         <div><span class="home-principles__mark">02</span><strong>Private by design</strong><small>Your inputs stay with you.</small></div>
         <div><span class="home-principles__mark">03</span><strong>No account needed</strong><small>Open a tool and get to work.</small></div>
+      </div>
+    </section>
+
+    <section class="home-section home-apps" aria-labelledby="apps-heading">
+      <header class="home-section__heading">
+        <div>
+          <span class="home-eyebrow">Featured applications</span>
+          <h2 id="apps-heading">Go beyond a single-purpose tool</h2>
+        </div>
+        <p>Two complete browser applications built with the same focus on privacy, capability, and thoughtful engineering.</p>
+      </header>
+
+      <div class="home-apps__grid">
+        <article class="home-app home-app--qr">
+          <div class="home-app__topline"><span>Design studio</span><span>Browser powered</span></div>
+          <div class="home-app__mark" aria-hidden="true">QR</div>
+          <h3>QR Studio</h3>
+          <p>Design polished, customizable QR codes with distinctive modules, finder eyes, frames, templates, and animated exports.</p>
+          <ul>
+            <li>Build and save reusable visual styles</li>
+            <li>Export static and animated designs</li>
+            <li>Keep projects and processing in your browser</li>
+          </ul>
+          <a href="https://qrstudio.monkeytactics.com/">Open QR Studio <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="home-app home-app--chess">
+          <div class="home-app__topline"><span>Chess application</span><span>Stockfish 19</span></div>
+          <div class="home-app__mark" aria-hidden="true">IW</div>
+          <h3>Ironwood Chess</h3>
+          <p>Play, study, and review games with full-NNUE Stockfish analysis running privately on your own device.</p>
+          <ul>
+            <li>Analyze complete games without uploading them</li>
+            <li>Save portable analysis and annotated PGN</li>
+            <li>Use the application directly from a modern browser</li>
+          </ul>
+          <a href="https://ironwoodchess.com/">Explore Ironwood Chess <span aria-hidden="true">→</span></a>
+        </article>
       </div>
     </section>
 
@@ -306,17 +344,25 @@
 
   </main>
 
-  <footer>
+  <footer id="site-footer">
     <div>© 2026 MonkeyTactics</div>
-    <nav aria-label="Footer navigation">
-      <a href="https://blog.monkeytactics.com/">Blog</a>
-      <a href="/privacy">Privacy</a>
-      <a href="/terms-of-service">Terms</a>
-      <a href="/third-party-notices">Third-Party Notices</a>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-      <a href="/sitemap">Sitemap</a>
-    </nav>
+    <div class="home-footer__groups">
+      <nav class="home-footer__group" aria-label="Applications">
+        <strong>Applications</strong>
+        <a href="https://qrstudio.monkeytactics.com/">QR Studio</a>
+        <a href="https://ironwoodchess.com/">Ironwood Chess</a>
+      </nav>
+      <nav class="home-footer__group" aria-label="Footer navigation">
+        <strong>MonkeyTactics</strong>
+        <a href="https://blog.monkeytactics.com/">Blog</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms-of-service">Terms</a>
+        <a href="/third-party-notices">Third-Party Notices</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        <a href="/sitemap">Sitemap</a>
+      </nav>
+    </div>
   </footer>
 </body>
 </html>
