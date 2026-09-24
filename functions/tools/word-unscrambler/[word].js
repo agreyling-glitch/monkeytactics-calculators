@@ -10,7 +10,7 @@ const SITE_URL = "https://monkeytactics.com";
 const TOOL_PATH = "/tools/word-unscrambler";
 const WORD_DATA_PATH = "/assets/data/words";
 const WORD_DATA_VERSION = "wiktionary-v1";
-const PAGE_CACHE_VERSION = "v1";
+const PAGE_CACHE_VERSION = "v2";
 const PAGE_CACHE_TTL_SECONDS = 86400;
 const DICTIONARY_BIT = 3;
 
@@ -156,7 +156,7 @@ function renderPageHTML({ word = "", results = [], valid = false }) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${title}</title>
   <meta name="description" content="${description}">
-  <link rel="canonical" href="${canonical}">
+  ${valid ? `<link rel="canonical" href="${canonical}">` : ""}
 </head>
 <body>
   <main>
@@ -172,7 +172,7 @@ export async function onRequest(context) {
 
   if (!/^[a-z]+$/.test(word)) {
     return new Response(renderPageHTML({ valid: false }), {
-      status: 200,
+      status: 404,
       headers: { "content-type": "text/html; charset=UTF-8" },
     });
   }
@@ -191,8 +191,15 @@ export async function onRequest(context) {
   await initWasm();
   await loadRequiredDictionaryShards(context, word);
 
-  const results = unscramble(word);
   const valid = is_valid_word(word);
+  if (!valid) {
+    return new Response(renderPageHTML({ valid: false }), {
+      status: 404,
+      headers: { "content-type": "text/html; charset=UTF-8" },
+    });
+  }
+
+  const results = unscramble(word);
 
   const response = new Response(renderPageHTML({ word, results, valid }), {
     status: 200,
