@@ -151,10 +151,9 @@ test("every absolute asset reference in authored code resolves", () => {
   }
 });
 
-test("the canonical sitemap index includes tools and generated word maps", () => {
+test("the canonical sitemap index includes tools without retired word maps", () => {
   const sitemap = fs.readFileSync(path.join(siteRoot, "sitemap.xml"), "utf8");
   assert.match(sitemap, /sitemap-tools\.xml/);
-  for (let index = 1; index <= 6; index += 1) {
-    assert.match(sitemap, new RegExp(`sitemap-words-${index}\\.xml`));
-  }
+  assert.doesNotMatch(sitemap, /sitemap-words/);
+  assert.ok(!fs.readdirSync(siteRoot).some((name) => /^sitemap-words-.*\.xml$/.test(name)));
 });
