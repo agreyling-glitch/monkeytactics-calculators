@@ -1,0 +1,363 @@
+.paint-workspace {
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);
+  gap:2rem;
+  align-items:start
+}
+
+.paint-toolbar,.paint-section-title,.paint-room-head,.paint-actions {
+  display:flex;
+  gap:.75rem;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap
+}
+
+.paint-toolbar {
+  justify-content:flex-start
+}
+
+.paint-tool-page button,.paint-tool-page select {
+  font:inherit;
+  padding:.65rem .9rem;
+  border:1px solid #39654c;
+  border-radius:.6rem;
+  background:#12291d;
+  color:#e0f5e7;
+  cursor:pointer
+}
+
+.paint-tool-page button:hover {
+  background:#234b33
+}
+
+.paint-tool-page button:disabled {
+  opacity:.45;
+  cursor:default
+}
+
+.paint-tool-page :focus-visible {
+  outline:3px solid #86efac;
+  outline-offset:3px
+}
+
+.paint-tool-page input {
+  font:inherit;
+  min-width:0
+}
+
+.paint-fields {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:.85rem
+}
+
+.paint-fields .input-group {
+  margin:0
+}
+
+.paint-tool-page label.input-group {
+  display:flex;
+  flex-direction:column;
+  gap:.35rem;
+  font-size:.9rem
+}
+
+.paint-room,.paint-product {
+  min-width:0;
+  border:1px solid #31513e;
+  border-radius:.8rem;
+  padding:1rem;
+  margin:0 0 1rem;
+  background:rgba(15,31,22,.6)
+}
+
+.paint-room legend,.paint-product legend {
+  padding:0 .5rem;
+  color:#a7e8b8;
+  font-weight:700
+}
+
+.paint-room-head {
+  align-items:end;
+  margin-bottom:.75rem
+}
+
+.paint-room-head label {
+  flex:1;
+  margin-bottom:0
+}
+
+.paint-room select {
+  margin-bottom:1rem;
+  width:100%
+}
+
+.paint-hint {
+  font-size:.84rem;
+  color:#a6baac;
+  line-height:1.6
+}
+
+.paint-check {
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin:.75rem 0
+}
+
+.paint-check input {
+  width:1.1rem;
+  height:1.1rem;
+  accent-color:#4ade80
+}
+
+.paint-prices {
+  margin-top:1rem
+}
+
+.paint-prices summary {
+  cursor:pointer;
+  font-size:1.1rem;
+  font-weight:700;
+  margin-bottom:1rem
+}
+
+.paint-prices>label {
+  display:block;
+  margin-bottom:1rem
+}
+
+.paint-summary {
+  position:sticky;
+  top:1rem;
+  border:1px solid #3b674b;
+  border-radius:1rem;
+  padding:1.4rem;
+  background:linear-gradient(145deg,#173522,#101b16)
+}
+
+.paint-total {
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+  margin:1rem 0
+}
+
+.paint-total strong {
+  font-family:Georgia,serif;
+  font-size:clamp(2rem,4vw,3rem);
+  color:#86efac
+}
+
+.paint-total small {
+  color:#c0d3c5
+}
+
+.paint-area-stats {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1rem;
+  margin:1.5rem 0
+}
+
+.paint-area-stats b {
+  display:block
+}
+
+.paint-shopping {
+  border-top:1px solid #375340;
+  padding:.8rem 0
+}
+
+.paint-shopping h4 {
+  display:flex;
+  justify-content:space-between;
+  gap:.5rem;
+  margin:.2rem 0 .6rem
+}
+
+.paint-shopping p {
+  font-size:.85rem;
+  margin:.5rem 0;
+  color:#bfd2c5
+}
+
+.paint-shopping>strong {
+  color:#a7e8b8
+}
+
+.paint-actions button {
+  flex:1
+}
+
+.paint-breakdown {
+  margin-top:2rem
+}
+
+.paint-table-scroll {
+  overflow-x:auto
+}
+
+.paint-breakdown table {
+  width:100%;
+  border-collapse:collapse;
+  white-space:nowrap
+}
+
+.paint-breakdown caption {
+  text-align:left;
+  font-size:.9rem;
+  color:#a6baac;
+  padding-bottom:.7rem
+}
+
+.paint-breakdown td,.paint-breakdown th {
+  padding:.8rem;
+  text-align:right;
+  border-bottom:1px solid #31513e
+}
+
+.paint-breakdown th:first-child {
+  text-align:left;
+  white-space:normal;
+  overflow-wrap:anywhere
+}
+
+.paint-tool-page [hidden] {
+  display:none!important
+}
+
+#calcError {
+  color:#ffcec8;
+  background:#42241e;
+  border:1px solid #c9776b;
+  border-radius:.5rem;
+  padding:1rem;
+  margin:1rem 0
+}
+
+.paint-tool-page #resultsPanel {
+  display:block
+}
+
+.paint-tool-page .input-group input {
+  width:100%;
+  box-sizing:border-box;
+  padding:.65rem;
+  background:#101b16;
+  color:#e0f5e7;
+  border:1px solid #39654c;
+  border-radius:.5rem
+}
+
+.paint-tool-page h3 {
+  margin:1.2rem 0
+}
+
+.paint-toolbar label {
+  display:flex;
+  align-items:center;
+  gap:.6rem
+}
+
+@media(max-width:900px) {
+  .paint-workspace {
+  grid-template-columns:1fr
+}
+
+.paint-summary {
+  position:static
+}
+
+
+}
+
+@media(max-width:480px) {
+  .paint-fields {
+  grid-template-columns:1fr
+}
+
+.paint-room-head {
+  align-items:flex-end
+}
+
+.paint-toolbar label {
+  flex-wrap:wrap
+}
+
+.paint-summary {
+  padding:1rem
+}
+
+
+}
+
+@media print {
+  body.paint-tool-page {
+  background:white!important;
+  color:black!important
+}
+
+.paint-tool-page main {
+  max-width:none!important;
+  padding:0!important
+}
+
+.paint-tool-page .premium-tool-hero,.paint-tool-page #mt-header,.paint-tool-page footer,.paint-tool-page .review-collector,.paint-tool-page .seo-section,.paint-tool-page .faq-section,.paint-tool-page .related-tools-section,.paint-toolbar,.paint-workspace>div,.paint-actions,#saveStatus,.construction-app-title>p,form>.paint-hint {
+  display:none!important
+}
+
+.paint-workspace {
+  display:block
+}
+
+.paint-summary,.paint-shopping,.paint-tool-page .construction-calculator-section {
+  background:white!important;
+  color:black!important;
+  border-color:#999!important;
+  box-shadow:none!important;
+  position:static;
+  padding:.5rem!important
+}
+
+.paint-summary p,.paint-summary strong,.paint-summary small,.paint-summary span,.paint-summary h4,.paint-breakdown caption {
+  color:black!important
+}
+
+.paint-total strong {
+  font-size:2rem
+}
+
+.paint-shopping,.paint-breakdown tr {
+  break-inside:avoid
+}
+
+.paint-breakdown table {
+  white-space:normal
+}
+
+.paint-table-scroll {
+  overflow:visible
+}
+
+.paint-tool-page .tool-widget {
+  margin:0!important
+}
+
+.paint-breakdown {
+  margin-top:1rem
+}
+
+.paint-summary h3:before {
+  content:'Paint Project — '
+}
+
+.paint-breakdown td,.paint-breakdown th {
+  padding:.4rem
+}
+
+
+}
+
+
