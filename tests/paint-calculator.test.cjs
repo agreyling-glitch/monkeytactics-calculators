@@ -49,7 +49,7 @@ test('controller updates estimates, invalid states, units, saved projects and ex
  fire('exampleBtn','click');assert.match(get('roomBreakdown').innerHTML,/Living room/);assert.match(get('resultsPanel').innerHTML,/Primer/);
  fire('paintForm','input',{dataset:{path:'rooms.0.name'},type:'text',value:'<img src=x onerror=alert(1)>'});assert.match(get('roomBreakdown').innerHTML,/&lt;img/);assert.doesNotMatch(get('roomBreakdown').innerHTML,/<img/);
  fire('csvBtn','click');assert.equal(download.download,'paint-project-estimate.csv');fire('printBtn','click');assert.equal(printed,true);
- fire('addRoom','click');assert.match(get('rooms').innerHTML,/Surface 3/);
+ fire('addRoom','click');assert.match(get('rooms').innerHTML,/data-room-index="2"/);
  fire('resetBtn','click');assert.doesNotMatch(get('roomBreakdown').innerHTML,/Living room/);
 });
 test('supply quantities contribute to subtotal and tax without changing paint requirements',()=>{
