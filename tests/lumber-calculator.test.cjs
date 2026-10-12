@@ -1,0 +1,10 @@
+const test=require('node:test'),assert=require('node:assert/strict'),E=require('../assets/js/tools/lumber-board-foot-calculator/lumber-engine.js');
+const p=()=>({units:'imperial',waste:10,tax:8,boards:[{name:'Stud',thickness:2,width:4,actualThickness:1.5,actualWidth:3.5,length:8,quantity:10,pricing:'board',price:6,density:35}]});
+test('whole-board allowance, nominal purchasing volume, actual weight and tax',()=>{const r=E.calculate(p());assert.equal(r.boards,11);assert.equal(r.total,71.28);assert.ok(Math.abs(r.bf-58.66666667)<1e-6);assert.ok(Math.abs(r.weight-112.29166667)<1e-6);});
+test('board foot pricing uses purchasing dimensions',()=>{const q=p();q.boards[0].pricing='bf';q.boards[0].price=3;assert.equal(E.calculate(q).subtotal,176);});
+test('multiple sizes round allowances individually',()=>{const q=p();q.boards[0].quantity=1;q.boards.push({...q.boards[0]});assert.equal(E.calculate(q).boards,4);});
+test('metric conversions preserve board feet, weight and price',()=>{const q=p(),before=E.calculate(q);E.convertUnits(q,'metric');const after=E.calculate(q);for(const k of ['bf','weight','total'])assert.ok(Math.abs(before[k]-after[k])<1e-8);E.convertUnits(q,'imperial');assert.ok(Math.abs(q.boards[0].width-4)<1e-8);});
+test('zero allowance leaves quantities unchanged',()=>{const q=p();q.waste=0;assert.equal(E.calculate(q).boards,10);});
+test('invalid values and fractional board counts rejected',()=>{for(const [k,v] of [['quantity',1.5],['quantity',0],['price',-1],['density',''],['width',Infinity],['pricing','invalid']]){const q=p();q.boards[0][k]=v;assert.throws(()=>E.calculate(q));}});
+test('density affects weight without changing purchasing cost',()=>{const q=p(),a=E.calculate(q);q.boards[0].density=70;const b=E.calculate(q);assert.equal(b.weight,a.weight*2);assert.equal(b.total,a.total);});
+test('limits reject oversized lists and allowances',()=>{const q=p();q.waste=101;assert.throws(()=>E.calculate(q));q.waste=0;q.boards=Array(51).fill(q.boards[0]);assert.throws(()=>E.calculate(q));});

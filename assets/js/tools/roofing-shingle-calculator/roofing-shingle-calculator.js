@@ -1,33 +1,61 @@
-// Roofing shingle calculator
-(function () {
-  "use strict";
-  const KG_PER_LB = 0.45359237;
-
-  document.getElementById("calcBtn").addEventListener("click", function () {
-    const area = Number.parseFloat(document.getElementById("area").value);
-    const pitch = Number.parseFloat(document.getElementById("pitch").value);
-    const error = document.getElementById("calcError");
-    const results = document.getElementById("resultsPanel");
-    const empty = document.getElementById("resultsEmpty");
-    error.style.display = "none";
-    results.style.display = "none";
-    empty.style.display = "flex";
-    if (!Number.isFinite(area) || area <= 0) {
-      error.style.display = "block";
-      return;
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id),key='mt-roof-project-v1';
+  const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+  const fmt=n=>n.toLocaleString(undefined,{maximumFractionDigits:2});
+  const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const section=()=>({name:'Main roof',mode:'footprint',area:1800,deduction:0,pitch:4,waste:10});
+  const supply=(name,mode='manual',coverage=100)=>({name,mode,coverage,allowance:10,quantity:0,price:0,enabled:false});
+  const defaults=()=>({units:'ft',sections:[section()],product:{name:'Asphalt shingles',mode:'square',bundlesPerSquare:3,coverage:100/3,price:0,weight:70},starterLength:0,capLength:0,tax:0,supplies:[supply('Underlayment (rolls)','roof',1000),supply('Starter shingles (packages)','starter',100),supply('Ridge / hip caps (packages)','cap',25),supply('Roofing fasteners (boxes)'),supply('Ice / water membrane (rolls)'),supply('Drip edge / flashing (pieces)'),supply('Sealants / other supplies')]});
+  let project=defaults(),result=null,timer;const expanded=new WeakSet();
+  const field=(label,path,value,min=0,max=1000000,step='any')=>`<label class="input-group">${label}<input type="number" data-path="${path}" value="${escape(value)}" min="${min}" max="${max}" step="${step}" required></label>`;
+  const select=(label,path,value,options)=>`<label class="input-group">${label}<select data-path="${path}">${options.map(([v,l])=>`<option value="${v}" ${value===v?'selected':''}>${l}</option>`).join('')}</select></label>`;
+  function render(){
+    const focus=document.activeElement?.dataset?.path,u=project.units;
+    $('units').value=u;
+    $('sections').innerHTML=project.sections.map((s,i)=>`<details class="roof-room" data-section-index="${i}" ${expanded.has(s)?'open':''}><summary class="roof-room-summary"><span class="roof-room-number" aria-hidden="true">${String(i+1).padStart(2,'0')}</span><span class="roof-room-caption"><strong id="section-name-${i}">${escape(s.name)}</strong><span id="section-area-${i}">Edit section</span></span><span class="roof-room-edit" aria-hidden="true">Edit</span></summary><div class="roof-room-body"><div class="roof-room-head"><label class="input-group">Section name<input data-path="sections.${i}.name" maxlength="100" value="${escape(s.name)}"></label><button type="button" data-remove="${i}" ${project.sections.length===1?'disabled':''} aria-label="Remove ${escape(s.name)}">Remove</button></div>${select('How was this area measured?',`sections.${i}.mode`,s.mode,[['footprint','Horizontal footprint (apply pitch)'],['surface','Measured roof surface (no pitch)']])}<p class="roof-method-note">${s.mode==='footprint'?'Enter the horizontal projection of this roof section, including overhangs. Pitch is applied once.':'Enter the actual sloped roof area. Pitch is not applied. Do not enter the building footprint here.'} Changing the method keeps your entered area; replace it if the measurement basis changes.</p><div class="roof-fields">${field(`${s.mode==='footprint'?'Horizontal':'Measured roof'} area (${u}&sup2;)`,`sections.${i}.area`,s.area,.001,100000000)}${field(`Excluded area (${u}&sup2;)`,`sections.${i}.deduction`,s.deduction,0,100000000)}${s.mode==='footprint'?field('Pitch rise per 12 units of run',`sections.${i}.pitch`,s.pitch,0,36):''}${field('Shingle waste / spare allowance (%)',`sections.${i}.waste`,s.waste,0,100)}</div><p class="roof-hint">Exclusions must use the same measurement basis as the entered area. Add non-overlapping sections once; avoid counting each slope's footprint as the entire building.</p></div></details>`).join('');
+    const p=project.product;
+    $('productFields').innerHTML=`<fieldset class="roof-product"><legend>Field shingles</legend><label class="input-group">Product name / reference<input maxlength="100" data-path="product.name" value="${escape(p.name)}"></label>${select('Bundle coverage method','product.mode',p.mode,[['square','Bundles per roofing square'],['coverage','Coverage printed on bundle']])}<div class="roof-fields">${p.mode==='square'?field('Bundles per square (100 ft&sup2;)','product.bundlesPerSquare',p.bundlesPerSquare,.1,100):field('Coverage per bundle (ft&sup2;)','product.coverage',p.coverage,.001,100000)}${field('Price per bundle (USD)','product.price',p.price,0,100000,.01)}${field('Contents weight per bundle (lb)','product.weight',p.weight,0,10000)}</div></fieldset>`;
+    $('edgeFields').innerHTML=field(`Starter edge length (${u})`,'starterLength',project.starterLength,0,1000000)+field(`Ridge / hip cap length (${u})`,'capLength',project.capLength,0,1000000);
+    $('supplyFields').innerHTML=project.supplies.map((s,i)=>`<fieldset class="roof-product"><legend>${escape(s.name)}</legend><label class="roof-check"><input type="checkbox" data-path="supplies.${i}.enabled" ${s.enabled?'checked':''}> Include this supply</label>${s.enabled?`<div class="roof-fields">${select('Quantity method',`supplies.${i}.mode`,s.mode,[['roof','Net roof area'],['starter','Starter edge length'],['cap','Ridge / hip length'],['manual','Manual quantity']])}${s.mode==='manual'?field('Packages / pieces to buy',`supplies.${i}.quantity`,s.quantity,0,1000000,1):field(`Effective coverage (${s.mode==='roof'?'ft&sup2;':'linear ft'} / package)`,`supplies.${i}.coverage`,s.coverage,.001,1000000)+field('Supply allowance (%)',`supplies.${i}.allowance`,s.allowance,0,100)}${field('Price per package / piece (USD)',`supplies.${i}.price`,s.price,0,100000,.01)}</div>`:''}</fieldset>`).join('');
+    $('taxFields').innerHTML=field('Sales tax on shingles and supplies (%)','tax',project.tax,0,100);
+    $('addSection').disabled=project.sections.length>=50;update();
+    if(focus)$('roofForm').querySelector(`[data-path="${focus}"]`)?.focus();
+  }
+  function update(){
+    clearTimeout(timer);
+    try{
+      result=RoofEngine.calculate(project);$('calcError').hidden=true;
+      const f=project.units==='m'?RoofEngine.SQFT_PER_M2:1,u=project.units==='m'?'m²':'ft²';
+      result.sections.forEach((s,i)=>{$(`section-name-${i}`).textContent=s.name;$(`section-area-${i}`).textContent=`${fmt(s.roof/f)} ${u} roof / ${s.mode==='footprint'?`${s.pitch}:12 pitch`:'measured surface'} / ${s.waste}% allowance`;});
+      const budget=[['Field shingles',result.shingleCost],['Supplies',result.supplyCost],['Sales tax',result.taxCost]];
+      $('resultsPanel').innerHTML=`<div class="roof-total"><span>Estimated materials + tax</span><strong>${money(result.total)}</strong><small>USD &middot; enter your local prices</small></div><dl class="roof-budget">${budget.map(([l,c])=>`<div><dt>${l}</dt><dd>${money(c)}</dd></div>`).join('')}</dl><div class="roof-area-stats"><span>Net roof surface<b>${fmt(result.roof/f)} ${u}</b></span><span>With shingle allowance<b>${fmt(result.target/f)} ${u}</b></span></div><article class="roof-shopping"><h4>${escape(project.product.name)} <span>${money(result.shingleCost)}</span></h4><strong>${fmt(result.bundles)} field-shingle bundles</strong><p>${fmt(result.squares)} roofing squares with allowance (100 ft&sup2; each)</p><p>${fmt(result.supplied/f)} ${u} purchased / ${fmt(result.surplus/f)} ${u} beyond allowance</p><p>${fmt(result.coverage)} ft&sup2; per bundle &middot; ${money(result.bundlePrice)} each</p></article>`+(result.supplies.length?`<article class="roof-shopping"><h4>Supplies <span>${money(result.supplyCost)}</span></h4>${result.supplies.map(s=>`<p>${escape(s.name)}: <strong>${fmt(s.quantity)}</strong> &times; ${money(s.price)} = ${money(s.cost)}</p>`).join('')}</article>`:'')+`<p>Field-shingle contents weight: <strong>${fmt(result.weight)} lb / ${fmt(result.weight*.45359237)} kg</strong></p><p class="roof-hint">Starter and cap packages are separate from field bundles. Weight excludes supplies, pallets, and packaging. Labor, delivery, disposal, and unentered materials are excluded. Zero-priced items contribute no cost.</p>`;
+      $('sectionBreakdown').innerHTML=`<div class="roof-table-scroll"><table><caption>Roof areas in ${u}. Bundle orders combine all sections using the same field-shingle product.</caption><thead><tr><th scope="col">Section</th><th scope="col">Area method</th><th scope="col">Pitch factor</th><th scope="col">Roof area</th><th scope="col">Allowance</th><th scope="col">Order area</th></tr></thead><tbody>${result.sections.map(s=>`<tr><th scope="row">${escape(s.name)}</th><td>${s.mode==='footprint'?'Footprint':'Roof surface'}</td><td>${fmt(s.slope)}</td><td>${fmt(s.roof/f)}</td><td>${s.waste}%</td><td>${fmt(s.target/f)}</td></tr>`).join('')}</tbody><tfoot><tr><th scope="row" colspan="3">Total</th><td>${fmt(result.roof/f)}</td><td>&mdash;</td><td>${fmt(result.target/f)}</td></tr></tfoot></table></div>`;
+      const missingLength=result.supplies.some(s=>s.mode!=='manual'&&s.mode!=='roof'&&s.base===0);
+      $('supplyNotice').hidden=!missingLength;$('supplyNotice').textContent='An enabled length-based supply has zero edge length. Enter the relevant starter or ridge / hip length to include its packages.';
+      $('printBtn').disabled=$('csvBtn').disabled=false;
+      timer=setTimeout(()=>{try{localStorage.setItem(key,JSON.stringify(project));$('saveStatus').textContent='Project saved in this browser.';}catch{$('saveStatus').textContent='Browser saving is unavailable. Export your estimate to keep a copy.';}},400);
+    }catch(e){
+      result=null;$('calcError').hidden=false;$('calcError').textContent=e.message;$('resultsPanel').textContent='Complete the project details to see your estimate.';$('sectionBreakdown').textContent='The breakdown will appear when all project values are valid.';$('supplyNotice').hidden=true;
+      project.sections.forEach((s,i)=>{$(`section-name-${i}`).textContent=s.name||`Section ${i+1}`;$(`section-area-${i}`).textContent='Check project details';});
+      $('printBtn').disabled=$('csvBtn').disabled=true;$('saveStatus').textContent='Invalid or incomplete changes have not been saved.';
     }
-
-    const pitchFactor = Math.sqrt(144 + pitch * pitch) / 12;
-    const roofArea = area * pitchFactor * 1.10;
-    const exactSquares = roofArea / 100;
-    const bundleCount = Math.ceil(exactSquares * 3);
-    const weight = bundleCount * 70;
-    document.getElementById("adjustedArea").textContent = roofArea.toLocaleString(undefined, { maximumFractionDigits: 1 });
-    document.getElementById("squares").textContent = exactSquares.toFixed(2);
-    document.getElementById("bundles").textContent = bundleCount.toLocaleString();
-    document.getElementById("weightLb").textContent = weight.toLocaleString() + " lb";
-    document.getElementById("weightKg").textContent = (weight * KG_PER_LB).toLocaleString(undefined, { maximumFractionDigits: 1 }) + " kg";
-    empty.style.display = "none";
-    results.style.display = "block";
+  }
+  function set(path,value){const a=path.split('.');let target=project;a.slice(0,-1).forEach(k=>target=target[k]);target[a.at(-1)]=value;}
+  $('roofForm').addEventListener('submit',e=>e.preventDefault());
+  $('roofForm').addEventListener('input',e=>{const path=e.target.dataset.path;if(!path)return;set(path,e.target.type==='checkbox'?e.target.checked:e.target.value);if(e.target.tagName==='SELECT'||e.target.type==='checkbox')render();else update();});
+  $('sections').addEventListener('toggle',e=>{const i=e.target.dataset.sectionIndex;if(i===undefined||!e.target.isConnected)return;const s=project.sections[Number(i)];if(s){if(e.target.open)expanded.add(s);else expanded.delete(s);}},true);
+  $('sections').addEventListener('click',e=>{const b=e.target.closest('[data-remove]');if(!b||project.sections.length===1)return;const i=Number(b.dataset.remove);project.sections.splice(i,1);const next=Math.min(i,project.sections.length-1);expanded.add(project.sections[next]);render();$('sections').querySelectorAll('input[data-path$=".name"]')[next].focus();});
+  $('addSection').addEventListener('click',()=>{if(project.sections.length>=50)return;const s={...section(),name:`Section ${project.sections.length+1}`,area:project.units==='m'?100:1000};project.sections.push(s);expanded.add(s);render();const fields=$('sections').querySelectorAll('input[data-path$=".name"]');fields[fields.length-1].focus();});
+  $('units').addEventListener('change',()=>{RoofEngine.convertUnits(project,$('units').value);render();});
+  $('resetBtn').addEventListener('click',()=>{clearTimeout(timer);try{localStorage.removeItem(key);}catch{}project=defaults();expanded.add(project.sections[0]);render();});
+  $('exampleBtn').addEventListener('click',()=>{project=defaults();project.sections=[{...section(),name:'Main roof',area:1600,pitch:6},{...section(),name:'Measured porch roof',mode:'surface',area:200,waste:15}];project.starterLength=180;project.capLength=50;project.product.price=38;project.tax=8;project.supplies[0].enabled=true;project.supplies[0].price=80;project.supplies[1].enabled=true;project.supplies[1].price=50;project.supplies[2].enabled=true;project.supplies[2].price=60;expanded.add(project.sections[0]);render();});
+  $('printBtn').addEventListener('click',()=>{if(result)window.print();});
+  $('csvBtn').addEventListener('click',()=>{
+    if(!result)return;
+    const rows=[['Roofing materials estimate'],['Measurement units',project.units],['Export area unit','square feet'],['Export length unit','feet'],[],['Section','Method','Input ft²','Excluded ft²','Rise per 12 run','Pitch factor','Net roof ft²','Waste %','Order ft²'],...result.sections.map(s=>[s.name,s.mode,s.inputArea,s.deduction,s.pitch??'',s.slope,s.roof,s.waste,s.target]),[],['Shingle product',project.product.name],['Bundle coverage ft²',result.coverage],['Bundles',result.bundles],['Squares with allowance',result.squares],['Purchased ft²',result.supplied],['Surplus ft² beyond allowance',result.surplus],['Bundle price USD',result.bundlePrice],['Bundle contents weight lb',result.bundleWeight],['Starter edge ft',result.starterLength],['Ridge / hip cap ft',result.capLength],[],['Supply','Method','Base area ft² or length ft','Package coverage','Allowance %','Quantity','Unit price USD','Cost USD'],...result.supplies.map(s=>[s.name,s.mode,s.base,s.coverage??'',s.allowance,s.quantity,s.price,s.cost]),[],['Field shingles USD',result.shingleCost],['Supplies USD',result.supplyCost],['Sales tax %',project.tax],['Tax USD',result.taxCost],['Total USD',result.total],['Field-shingle contents weight lb',result.weight],['Excludes labor, delivery, disposal, packaging weight, and supply weight']];
+    const quote=v=>'"'+String(typeof v==='string'&&/^[\s]*[=+@\-]/.test(v)?"'"+v:v).replaceAll('"','""')+'"';const url=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(quote).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='roofing-project-estimate.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
+  try{const saved=JSON.parse(localStorage.getItem(key));if(saved){RoofEngine.calculate(saved);project=saved;}}catch{}
+  expanded.add(project.sections[0]);render();
 })();

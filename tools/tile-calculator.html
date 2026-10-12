@@ -3,11 +3,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tile Calculator — Tiles, Boxes &amp; Weight | MonkeyTactics</title>
-  <meta name="description" content="Calculate tiles and boxes needed with waste allowance, plus total tile weight in pounds and kilograms." />
+  <title>Tile Calculator — Tile Quantities &amp; Project Cost | MonkeyTactics</title>
+  <meta name="description" content="Estimate floor and wall tile, whole boxes, waste, adhesive, grout, and material costs. Plan multiple surfaces with custom products and an exportable shopping list." />
+  <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="Tile Calculator: Quantities &amp; Project Cost" /><meta name="twitter:description" content="Estimate floor and wall tile, whole boxes, waste, adhesive, grout, and material costs. Plan multiple surfaces with custom products and an exportable shopping list." />
   <link rel="canonical" href="https://monkeytactics.com/tools/tile-calculator" />
-  <meta property="og:title" content="Tile Calculator — Tiles, Boxes &amp; Weight" /><meta property="og:description" content="Estimate tile quantity, full boxes, waste allowance, and boxed weight." /><meta property="og:type" content="website" /><meta property="og:url" content="https://monkeytactics.com/tools/tile-calculator" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Tile Calculator","url":"https://monkeytactics.com/tools/tile-calculator","applicationCategory":"ConstructionApplication","operatingSystem":"Any","dateModified":"2026-08-05","isAccessibleForFree":true}</script>
+  <meta property="og:title" content="Tile Calculator — Tile Quantities &amp; Project Cost" /><meta property="og:description" content="Estimate floor and wall tile, whole boxes, waste, adhesive, grout, and material costs. Plan multiple surfaces with custom products and an exportable shopping list." /><meta property="og:type" content="website" /><meta property="og:url" content="https://monkeytactics.com/tools/tile-calculator" />
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Tile Calculator",
+  "url": "https://monkeytactics.com/tools/tile-calculator",
+  "description": "Estimate floor and wall tile, whole boxes, waste, adhesive, grout, and material costs. Plan multiple surfaces with custom products and an exportable shopping list.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "dateModified": "2026-10-11",
+  "isAccessibleForFree": true,
+  "browserRequirements": "Requires JavaScript",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "Multiple floor and wall surfaces",
+    "Custom tile dimensions and carton-label coverage",
+    "Per-surface waste and area deductions",
+    "Separate whole-box orders for floor and wall tile",
+    "Adhesive, grout, supplies, and sales tax",
+    "Local saving, CSV export, and printable shopping lists"
+  ]
+}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://monkeytactics.com/"},{"@type":"ListItem","position":2,"name":"Construction","item":"https://monkeytactics.com/tools/construction"},{"@type":"ListItem","position":3,"name":"Tile Calculator","item":"https://monkeytactics.com/tools/tile-calculator"}]}</script>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" href="/favicon.ico" sizes="any">
@@ -15,27 +40,54 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260903-branded-scrollbars" /><link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-13" /><script src="/assets/js/tools/tile-calculator/tile-calculator.js" defer></script>
+  <link rel="stylesheet" href="/assets/css/shared/style.css?v=20260903-branded-scrollbars" /><link rel="stylesheet" href="/assets/css/shared/premium-tool.css?v=20260807-13" /><link rel="stylesheet" href="/assets/css/tools/tile-calculator.css?v=20261011-1" /><script src="/assets/js/tools/tile-calculator/tile-engine.js?v=20261011-1" defer></script><script src="/assets/js/tools/tile-calculator/tile-calculator.js?v=20261011-1" defer></script>
   <link rel="stylesheet" href="/assets/css/shared/trustpilot-review-collector.css?v=20260731-2">
 </head>
 <body class="construction-calculator-page premium-tool-page construction-premium-page tile-tool-page"><main>
   <div id="mt-header"></div>
     <script type="module" src="/assets/wasm/menu/menu.js?v=20260922-applications-v1"></script>
-  <section class="premium-tool-hero"><nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><a href="/tools/#calculators">Calculators</a><span class="sep">/</span><span>Tile Calculator</span></nav><div class="premium-hero-grid"><div><p class="premium-eyebrow">Plan cuts, boxes, and waste</p><h1>Tile Calculator</h1><p class="premium-hero-copy">Estimate individual tiles, full boxes, waste allowance, and total material weight for floors or walls.</p><div class="premium-hero-pills" aria-label="Tile calculator features"><span>Tile &amp; box counts</span><span>Built-in waste allowance</span></div></div><div class="premium-hero-stat" aria-hidden="true"><span>Lay out the project first</span><strong>Pattern <i>meets</i> precision</strong><small>Cover the area. Allow for every cut.</small></div></div></section>
-  <section class="tool-widget construction-calculator-section" aria-labelledby="calc-heading"><div class="premium-app-title construction-app-title"><div class="premium-section-kicker">01 / Estimate</div><h2 id="calc-heading">Enter area and tile details</h2><p>Choose the tile format, measure the surface, and add the waste allowance your layout needs.</p></div><div class="calc-layout"><div class="inputs-col">
-    <div class="input-row"><div class="input-group"><label for="length">Area length (feet)</label><input id="length" type="number" min="0" step="0.01" placeholder="e.g. 12" /></div><div class="input-group"><label for="width">Area width (feet)</label><input id="width" type="number" min="0" step="0.01" placeholder="e.g. 10" /></div></div>
-    <div class="input-row"><div class="input-group"><label for="tileSize">Tile size</label><select id="tileSize"><option value="6x6">6×6 in — 44/box</option><option value="12x12" selected>12×12 in — 15/box</option><option value="12x24">12×24 in — 8/box</option><option value="24x24">24×24 in — 4/box</option></select></div><div class="input-group"><label for="waste">Waste allowance (%)</label><input id="waste" type="number" min="0" max="100" step="0.1" value="10" /></div></div>
-    <div class="calc-error" id="calcError" role="alert">Enter positive area dimensions and a waste percentage from 0 to 100.</div><button class="btn-calculate" id="calcBtn" type="button">Calculate Tile</button></div><div class="results-col"><div class="results-empty" id="resultsEmpty"><span class="empty-icon" aria-hidden="true">◫</span><strong>Your results will appear here</strong><p>Enter the area and tile details, then click Calculate.</p></div>
-    <div class="results-panel" id="resultsPanel" aria-live="polite"><h3>Results</h3><div class="results-grid">
-      <div class="result-card primary"><div class="result-label">Coverage with waste</div><div class="result-value" id="area">—</div><div class="result-sub">square feet</div></div><div class="result-card"><div class="result-label">Tiles needed</div><div class="result-value" id="tiles">—</div><div class="result-sub">individual tiles</div></div><div class="result-card"><div class="result-label">Boxes needed</div><div class="result-value" id="boxes">—</div><div class="result-sub" id="boxSize">—</div></div>
-    </div><h3 class="weight-heading">Total Weight</h3><div class="results-grid"><div class="result-card"><div class="result-label">Weight per unit</div><div class="result-value" id="unitWeight">—</div><div class="result-sub">per tile</div></div><div class="result-card"><div class="result-label">Total boxed weight</div><div class="result-value" id="weightLb">—</div><div class="result-sub" id="weightKg">—</div></div></div></div></div></div></div>
-  </section><p class="assumption-note">Packaging and ceramic tile weights are representative industry values. Use the quantity and shipping weight on the actual carton for purchasing and load planning.</p>
-  <section class="seo-section" aria-labelledby="how-to-heading"><h2 id="how-to-heading">How to use the Tile Calculator</h2><p>Enter the tiled area’s length and width in feet, choose a tile size, and set a waste percentage. Click <strong>Calculate Tile</strong> to see adjusted coverage, individual tiles, full boxes, and boxed weight.</p><p>A 10% waste allowance is common for straight layouts. Diagonal patterns, complex rooms, or fragile tile may require 15% or more.</p></section>
-  <section class="seo-section" aria-labelledby="formula-heading"><h2 id="formula-heading">How is tile quantity calculated?</h2><p>The calculator increases the floor area by the selected waste percentage, divides by the coverage of one tile, and rounds up to whole tiles and boxes.</p><div class="formula-block" role="img" aria-label="Tile quantity formula">Adjusted area = length × width × (1 + waste ÷ 100)<br />Tiles = round up(adjusted area ÷ tile area)<br />Boxes = round up(tiles ÷ tiles per box)</div><p>Box quantities and weights are representative values for the selected ceramic tile size and should be checked against the actual product carton.</p></section>
-  <section class="faq-section" aria-labelledby="faq-heading"><details open><summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Frequently Asked Questions</h2></summary><div class="faq-content"><ul class="faq-list">
-    <li class="faq-item"><h3>How much extra tile should I buy?</h3><p>Use about 10% extra for a simple straight layout and 15% or more for diagonal patterns, many corners, or future repair stock.</p></li>
-    <li class="faq-item"><h3>Why are boxes rounded up?</h3><p>Tile is usually sold only in full cartons. Rounding up ensures the order contains enough whole tiles after cuts and breakage.</p></li>
-    <li class="faq-item"><h3>Does the calculator include grout spacing?</h3><p>No. Grout joints slightly reduce tile coverage needs, but the waste allowance typically exceeds that difference for project estimating.</p></li>
+  <section class="premium-tool-hero"><nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span class="sep">/</span><a href="/tools/construction">Construction</a><span class="sep">/</span><span>Tile Calculator</span></nav><div class="premium-hero-grid"><div><p class="premium-eyebrow">Plan cuts, boxes, and waste</p><h1>Tile Calculator</h1><p class="premium-hero-copy">How much tile do you need? Plan floors, walls, and backsplashes, compare your carton coverage with tile dimensions, and budget for boxes, adhesive, grout, and supplies.</p><div class="premium-hero-pills" aria-label="Tile calculator features"><span>Multiple surfaces</span><span>Custom tiles &amp; cartons</span><span>Supplies &amp; cost</span></div></div><div class="premium-hero-stat" aria-hidden="true"><span>Lay out the project first</span><strong>Pattern <i>meets</i> precision</strong><small>Cover the area. Allow for every cut.</small></div></div></section>
+  <section class="tool-widget construction-calculator-section" aria-labelledby="calc-heading">
+    <div class="premium-app-title construction-app-title"><div class="premium-section-kicker">01 / Estimate</div><h2 id="calc-heading">Build your tile project</h2><p>Measure surfaces, enter your product details, and turn the estimate into a shopping list.</p></div>
+    <noscript><p>Enable JavaScript to use the interactive calculator. Formulas and the worked example below remain available.</p></noscript>
+    <form id="tileForm" novalidate>
+      <div class="tile-toolbar"><label for="units">Surface units <select id="units"><option value="ft">Feet</option><option value="m">Meters</option></select></label><button type="button" id="exampleBtn">Load bathroom example</button><button type="button" id="resetBtn">Reset project</button></div>
+      <p class="tile-hint">Floor surfaces share one tile product; wall and backsplash surfaces share another. Use separate projects for additional products. Switching units converts existing surface measurements.</p>
+      <div class="tile-workspace"><div>
+        <div class="tile-section-title"><h3>Surfaces to tile</h3><button type="button" id="addSurface">+ Add surface</button></div>
+        <div id="surfaces"></div>
+        <h3>Your tile products</h3>
+        <p class="tile-hint">Use actual carton details when available. Carton coverage and supply coverage always use square feet, even when surface measurements use meters. Tile dimensions can use inches or millimeters.</p>
+        <div id="productFields"></div>
+        <details class="tile-prices" id="supplySection"><summary>Adhesive, grout &amp; other supplies</summary><p class="tile-hint">Enable the items you need. Package coverage varies with product, tile, grout joints, trowel, and substrate: replace example coverage with label guidance for your installation, or enter quantities manually. Supplies use net tiled area with their own allowance, independently of tile cutting waste.</p><div id="supplyFields"></div></details>
+        <h3>Sales tax</h3><div id="taxFields" class="tile-fields"></div>
+      </div><aside class="tile-summary" aria-labelledby="summaryHeading"><div class="premium-section-kicker">02 / Project estimate</div><h3 id="summaryHeading">Your shopping list</h3><div id="calcError" role="alert" hidden></div><div id="resultsPanel" aria-live="polite" aria-atomic="true"></div><p class="tile-hint" id="saveStatus" role="status"></p><div class="tile-actions"><button type="button" id="printBtn">Print / Save PDF</button><button type="button" id="csvBtn">Download CSV</button></div></aside></div>
+    </form>
+    <section class="tile-breakdown" aria-labelledby="breakdownHeading"><h3 id="breakdownHeading">Surface-by-surface breakdown</h3><div id="surfaceBreakdown"></div></section>
+  </section>
+  <nav class="tile-guide-nav" aria-label="Tile planning guide"><a href="#tile-instructions">How to use</a><a href="#tile-formula">Tile formulas</a><a href="#tile-example">Worked example</a><a href="#tile-faq">FAQs</a></nav>
+  <section class="seo-section" id="tile-instructions" aria-labelledby="how-to-heading"><h2 id="how-to-heading">How to calculate tile for floors and walls</h2>
+    <ol><li><strong>Measure each surface.</strong> Enter length and width for floors, or length and height for walls. Add separate rectangles for irregular spaces and deduct untiled areas.</li><li><strong>Assign the tile product.</strong> Choose floor or wall tile for each surface. Enter an allowance for cutting waste and spare stock per surface.</li><li><strong>Check the carton.</strong> Enter tile dimensions, tiles or sheets per box, price, and tile contents weight. If the label gives coverage per box, select that method and enter it directly.</li><li><strong>Budget for installation supplies.</strong> Include adhesive, grout, underlayment, spacers, sealer, trim, or tools. Use package coverage for automatic quantities or enter quantities yourself.</li><li><strong>Review the order.</strong> Check full boxes, extra pieces, coverage, costs, and tax. Export CSV or print the shopping list.</li></ol>
+    <p>The calculator supports up to 50 surfaces. All floor surfaces are combined before rounding floor tile to boxes; all wall surfaces are combined separately. Use another project for a second floor tile or wall tile product. Prices start at zero so you can enter your own USD prices.</p>
+  </section>
+  <section class="seo-section" id="tile-formula" aria-labelledby="formula-heading"><h2 id="formula-heading">Tile quantity, carton coverage, and cost formulas</h2>
+    <div class="formula-block">Net area = length &times; width &minus; excluded area<br>Order area = net area &times; (1 + allowance &divide; 100)<br>Tile area (ft&sup2;) = tile length (in) &times; tile width (in) &divide; 144<br>Calculated carton coverage = tile area &times; pieces per box<br>Boxes = round up(combined order area &divide; carton coverage)<br>Tile cost = full boxes &times; price per box</div>
+    <p>When you enter carton-label coverage, it overrides the coverage calculated from dimensions. Piece estimates then use label coverage divided by pieces per box. For mosaics, enter sheet dimensions and sheets per box. For irregular tiles, use manufacturer carton coverage instead of a rectangular dimension estimate.</p>
+    <p>Grout joints are not added to tile dimensions, and this tool does not simulate cut layouts. Surplus coverage is purchased coverage beyond your entered allowance, while extra pieces are those from rounding the estimated piece count to full boxes. Neither is a guarantee of reusable offcuts.</p>
+    <p>Coverage-based supplies use net area for the chosen surface group, their own allowance, and label coverage per package. Sales tax applies to tile and enabled supplies. Labor, delivery, disposal, and unentered materials are excluded.</p>
+  </section>
+  <section class="seo-section" id="tile-example" aria-labelledby="example-heading"><h2 id="example-heading">Example: tile for a 12 &times; 10 foot floor</h2>
+    <p>A 12-by-10-foot floor has 120 square feet of area. With a 10% allowance, plan for <strong>132 square feet</strong>. A 12-by-12-inch tile covers one square foot; a box containing 15 tiles covers 15 square feet.</p>
+    <div class="formula-block">Boxes = round up(132 &divide; 15) = 9<br>Purchased pieces = 9 &times; 15 = 135 tiles<br>Coverage beyond allowance = 135 &minus; 132 = 3 ft&sup2;</div>
+    <p>At an illustrative $45 per box, the tile subtotal is <strong>$405</strong>, before supplies and tax. Your product's carton coverage, tile size, package count, price, and layout may differ. The calculator uses unrounded values for purchasing.</p>
+  </section>
+  <section class="faq-section" id="tile-faq" aria-labelledby="faq-heading"><details open><summary><span class="faq-info-icon" aria-hidden="true">?</span><h2 id="faq-heading">Tile calculator FAQs</h2></summary><div class="faq-content"><ul class="faq-list">
+    <li class="faq-item"><h3>How much extra tile should I buy?</h3><p>The starting allowance is 10%, an editable planning assumption. Diagonal or patterned layouts, many cuts, fragile material, and spare stock may need a different allowance. Confirm it against your layout and supplier recommendations; the tool does not optimize individual cuts.</p></li>
+    <li class="faq-item"><h3>Can I use custom tile sizes and box coverage?</h3><p>Yes. Enter dimensions in inches or millimeters and pieces per box, or use the carton-label coverage directly. Example sizes populate illustrative counts and weights, which you should replace with actual product data.</p></li>
+    <li class="faq-item"><h3>Can I calculate floor and wall tile together?</h3><p>Yes. Add surfaces and assign each to floor tile or wall tile. These two product groups are ordered separately. Surfaces in the same group share one product and are combined before boxes are rounded up.</p></li>
+    <li class="faq-item"><h3>Does this estimate adhesive and grout?</h3><p>Enable these supplies and enter the coverage of your selected package, a supply allowance, and its price. The calculator rounds up to full packages. You can also enter quantities manually. Coverage depends on installation details; this is not a grout-volume or trowel-selection calculator.</p></li>
+    <li class="faq-item"><h3>Are prices and projects saved?</h3><p>The latest valid project is saved in this browser when local storage is available. Estimates stay on your device. CSV exports and printable summaries include surfaces, orders, supplies, and budget totals. Reset starts a fresh project.</p></li>
+    <li class="faq-item"><h3>What does the weight estimate include?</h3><p>It multiplies ordered tile boxes by your entered tile contents weight per box and shows pounds and kilograms. It excludes carton packaging, pallets, adhesive, grout, and other supplies. Use actual shipping weights for delivery and load planning.</p></li>
   </ul></div></details></section>
   <section class="related-tools-section" aria-labelledby="related-heading"><h2 id="related-heading">Related Construction Tools</h2><div class="related-grid">
     <a href="/tools/concrete-calculator" class="related-card"><strong>🧱 Concrete Calculator</strong><span>Estimate slab volume and concrete bags.</span></a>

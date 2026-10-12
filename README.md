@@ -82,6 +82,14 @@ The Word Unscrambler, Anagram Architect, Words With Friends Solver, Crossword So
 
 The Paint Calculator supports up to 50 rectangular rooms or custom wall-length entries, ceiling surfaces, opening deductions, feet/meters conversion, separate wall paint and ceiling paint, optional primer, editable coats and coverage, touch-up allowance, material sales tax, and itemized supply costs for tape, brushes, rollers, protective coverings, and repairs. Its local purchase planner compares enabled quart, gallon, and five-gallon containers by cost or leftover quantity. The latest valid project is saved in browser storage; room breakdowns and shopping lists can be exported as CSV or printed to PDF. All product prices and liquid weights are editable assumptions.
 
+### Tile project planning
+
+The Tile Calculator supports up to 50 floor or wall surfaces, area deductions, individual waste allowances, feet/meters conversion, and two tile product groups. Custom dimensions (inches or millimeters) or carton-label coverage drive whole-box purchases, piece counts, surplus coverage, cost, and tile contents weight. Optional adhesive, grout, underlayment, and other supplies use editable package coverage or manual quantities, with sales tax on the materials total. Projects save locally and can be exported as CSV or printed. Example carton counts, weights, and coverage are planning assumptions; prices start at zero.
+
+### Roofing project planning
+
+The Roofing Shingle Calculator supports up to 50 roof sections with explicit horizontal-footprint or measured-roof-surface inputs. Pitch applies only to footprints; section allowances combine before bundles are rounded. Product coverage, price, and weight are editable. Starter and ridge/hip caps use entered linear lengths, underlayment uses net roof area, and other supplies can use manual quantities. The budget includes entered supply prices and tax; the field-shingle weight excludes supplies and packaging. Projects save locally and export as CSV or printable shopping lists.
+
 ### Rust/WASM calculators and tools
 
 | Tool | Rust crate | Browser package | Engine responsibilities |
@@ -162,3 +170,7 @@ and dictionary data remain subject to their respective licenses, including the A
 2.0 used by Tesseract.js and the WordNet 3.0 license. See [Third-Party Notices](THIRD_PARTY_NOTICES.md) for sources,
 licensing, attribution, and trademark information.
 
+
+### Lumber shopping-list planner
+
+The lumber board-foot calculator supports multiple stock sizes, separate purchasing and actual dimensions, whole-board waste allowances, per-board or board-foot pricing, tax, editable density for weight, imperial/metric inputs, browser saving, CSV export, and printable orders.

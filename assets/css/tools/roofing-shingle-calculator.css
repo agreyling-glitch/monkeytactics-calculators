@@ -1,0 +1,457 @@
+.roof-workspace {
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(300px,1fr);
+  gap:2rem;
+  align-items:start
+}
+
+.roof-toolbar,.roof-section-title,.roof-room-head,.roof-actions {
+  display:flex;
+  gap:.75rem;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap
+}
+
+.roof-toolbar {
+  justify-content:flex-start
+}
+
+.roofing-tool-page button,.roofing-tool-page select {
+  font:inherit;
+  padding:.65rem .9rem;
+  border:1px solid #39654c;
+  border-radius:.6rem;
+  background:#12291d;
+  color:#e0f5e7;
+  cursor:pointer
+}
+
+.roofing-tool-page button:hover {
+  background:#234b33
+}
+
+.roofing-tool-page button:disabled {
+  opacity:.45;
+  cursor:default
+}
+
+.roofing-tool-page :focus-visible {
+  outline:3px solid #86efac;
+  outline-offset:3px
+}
+
+.roofing-tool-page input {
+  font:inherit;
+  min-width:0
+}
+
+.roof-fields {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:.85rem
+}
+
+.roof-fields .input-group {
+  margin:0
+}
+
+.roofing-tool-page label.input-group {
+  display:flex;
+  flex-direction:column;
+  gap:.35rem;
+  font-size:.9rem
+}
+
+.roof-room,.roof-product {
+  min-width:0;
+  border:1px solid #31513e;
+  border-radius:.8rem;
+  padding:1rem;
+  margin:0 0 1rem;
+  background:rgba(15,31,22,.6)
+}
+
+.roof-room legend,.roof-product legend {
+  padding:0 .5rem;
+  color:#a7e8b8;
+  font-weight:700
+}
+
+.roof-room-head {
+  align-items:end;
+  margin-bottom:.75rem
+}
+
+.roof-room-head label {
+  flex:1;
+  margin-bottom:0
+}
+
+.roof-room select {
+  margin-bottom:1rem;
+  width:100%
+}
+
+.roof-hint {
+  font-size:.84rem;
+  color:#a6baac;
+  line-height:1.6
+}
+
+.roof-check {
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin:.75rem 0
+}
+
+.roof-check input {
+  width:1.1rem;
+  height:1.1rem;
+  accent-color:#4ade80
+}
+
+.roof-prices {
+  margin-top:1rem
+}
+
+.roof-prices summary {
+  cursor:pointer;
+  font-size:1.1rem;
+  font-weight:700;
+  margin-bottom:1rem
+}
+
+.roof-prices>label {
+  display:block;
+  margin-bottom:1rem
+}
+
+.roof-summary {
+  position:sticky;
+  top:1rem;
+  border:1px solid #3b674b;
+  border-radius:1rem;
+  padding:1.4rem;
+  background:linear-gradient(145deg,#173522,#101b16)
+}
+
+.roof-total {
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+  margin:1rem 0
+}
+
+.roof-total strong {
+  font-family:Georgia,serif;
+  font-size:clamp(2rem,4vw,3rem);
+  color:#86efac
+}
+
+.roof-total small {
+  color:#c0d3c5
+}
+
+.roof-area-stats {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1rem;
+  margin:1.5rem 0
+}
+
+.roof-area-stats b {
+  display:block
+}
+
+.roof-shopping {
+  border-top:1px solid #375340;
+  padding:.8rem 0
+}
+
+.roof-shopping h4 {
+  display:flex;
+  justify-content:space-between;
+  gap:.5rem;
+  margin:.2rem 0 .6rem
+}
+
+.roof-shopping p {
+  font-size:.85rem;
+  margin:.5rem 0;
+  color:#bfd2c5
+}
+
+.roof-shopping>strong {
+  color:#a7e8b8
+}
+
+.roof-actions button {
+  flex:1
+}
+
+.roof-breakdown {
+  margin-top:2rem
+}
+
+.roof-table-scroll {
+  overflow-x:auto
+}
+
+.roof-breakdown table {
+  width:100%;
+  border-collapse:collapse;
+  white-space:nowrap
+}
+
+.roof-breakdown caption {
+  text-align:left;
+  font-size:.9rem;
+  color:#a6baac;
+  padding-bottom:.7rem
+}
+
+.roof-breakdown td,.roof-breakdown th {
+  padding:.8rem;
+  text-align:right;
+  border-bottom:1px solid #31513e
+}
+
+.roof-breakdown th:first-child {
+  text-align:left;
+  white-space:normal;
+  overflow-wrap:anywhere
+}
+
+.roofing-tool-page [hidden] {
+  display:none!important
+}
+
+#calcError {
+  color:#ffcec8;
+  background:#42241e;
+  border:1px solid #c9776b;
+  border-radius:.5rem;
+  padding:1rem;
+  margin:1rem 0
+}
+
+.roofing-tool-page #resultsPanel {
+  display:block
+}
+
+.roofing-tool-page .input-group input {
+  width:100%;
+  box-sizing:border-box;
+  padding:.65rem;
+  background:#101b16;
+  color:#e0f5e7;
+  border:1px solid #39654c;
+  border-radius:.5rem
+}
+
+.roofing-tool-page h3 {
+  margin:1.2rem 0
+}
+
+.roof-toolbar label {
+  display:flex;
+  align-items:center;
+  gap:.6rem
+}
+
+@media(max-width:900px) {
+  .roof-workspace {
+  grid-template-columns:1fr
+}
+
+.roof-summary {
+  position:static
+}
+
+
+}
+
+@media(max-width:480px) {
+  .roof-fields {
+  grid-template-columns:1fr
+}
+
+.roof-room-head {
+  align-items:flex-end
+}
+
+.roof-toolbar label {
+  flex-wrap:wrap
+}
+
+.roof-summary {
+  padding:1rem
+}
+
+
+}
+
+@media print {
+  body.roofing-tool-page {
+  background:white!important;
+  color:black!important
+}
+
+.roofing-tool-page main {
+  max-width:none!important;
+  padding:0!important
+}
+
+.roofing-tool-page .premium-tool-hero,.roofing-tool-page #mt-header,.roofing-tool-page footer,.roofing-tool-page .review-collector,.roofing-tool-page .seo-section,.roofing-tool-page .faq-section,.roofing-tool-page .related-tools-section,.roof-toolbar,.roof-workspace>div,.roof-actions,#saveStatus,.construction-app-title>p,form>.roof-hint {
+  display:none!important
+}
+
+.roof-workspace {
+  display:block
+}
+
+.roof-summary,.roof-shopping,.roofing-tool-page .construction-calculator-section {
+  background:white!important;
+  color:black!important;
+  border-color:#999!important;
+  box-shadow:none!important;
+  position:static;
+  padding:.5rem!important
+}
+
+.roof-summary p,.roof-summary strong,.roof-summary small,.roof-summary span,.roof-summary h4,.roof-breakdown caption {
+  color:black!important
+}
+
+.roof-total strong {
+  font-size:2rem
+}
+
+.roof-shopping,.roof-breakdown tr {
+  break-inside:avoid
+}
+
+.roof-breakdown table {
+  white-space:normal
+}
+
+.roof-table-scroll {
+  overflow:visible
+}
+
+.roofing-tool-page .tool-widget {
+  margin:0!important
+}
+
+.roof-breakdown {
+  margin-top:1rem
+}
+
+.roof-summary h3:before {
+  content:'Roofing Project — '
+}
+
+.roof-breakdown td,.roof-breakdown th {
+  padding:.4rem
+}
+
+
+}
+
+
+/* Compact rooms keep completed measurements out of the way. */
+.roof-room {
+  padding: 0;
+  overflow: hidden;
+  transition: border-color .18s ease;
+}
+.roof-room[open] { border-color: #487a58; }
+.roof-room-summary {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+.roof-room-summary::-webkit-details-marker { display: none; }
+.roof-room-summary:hover { background: rgba(74, 222, 128, .05); }
+.roof-room-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2.25rem;
+  height: 2.25rem;
+  border: 1px solid #355c42;
+  border-radius: .65rem;
+  color: #9fd4ac;
+  font-size: .8rem;
+  font-variant-numeric: tabular-nums;
+}
+.roof-room-caption { display: grid; gap: .25rem; flex: 1; min-width: 0; }
+.roof-room-caption strong { color: #e0f5e7; overflow-wrap: anywhere; }
+.roof-room-caption > span { color: #a6baac; font-size: .8rem; }
+.roof-room-edit { color: #9fd4ac; font-size: .8rem; }
+.roof-room[open] .roof-room-edit { visibility: hidden; }
+.roof-room-summary::after {
+  content: '';
+  width: .45rem;
+  height: .45rem;
+  border-right: 2px solid #9fd4ac;
+  border-bottom: 2px solid #9fd4ac;
+  transform: rotate(45deg);
+  margin: 0 .25rem .25rem;
+}
+.roof-room[open] > summary::after { transform: rotate(225deg); margin-top: .4rem; }
+.roof-room-body { padding: 1rem; border-top: 1px solid #31513e; }
+.roof-room-head button { font-size: .85rem; }
+.roof-total { padding-bottom: 1.2rem; margin-bottom: 0; }
+.roof-total > span { font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: #bed1c4; }
+.roof-total > strong { font-variant-numeric: tabular-nums; line-height: 1.15; }
+.roof-budget { margin: 0 0 1.2rem; padding: 1rem 0; border-top: 1px solid #375340; border-bottom: 1px solid #375340; }
+.roof-budget > div { display: flex; justify-content: space-between; gap: 1rem; padding: .35rem 0; font-size: .9rem; }
+.roof-budget dt { color: #bed1c4; }
+.roof-budget dd { margin: 0; color: #e0f5e7; font-variant-numeric: tabular-nums; }
+.roof-budget > div:last-child { margin-top: .45rem; padding-top: .75rem; border-top: 1px dashed #375340; }
+.roof-area-stats { gap: .75rem; }
+.roof-area-stats > span { padding: .8rem; border: 1px solid #31513e; border-radius: .65rem; color: #a6baac; font-size: .8rem; }
+.roof-area-stats b { color: #e0f5e7; font-size: 1.05rem; margin-top: .35rem; }
+@media (prefers-reduced-motion: reduce) { .roof-room { transition: none; } }
+@media (max-width: 480px) {
+  .roof-room-summary { gap: .65rem; padding: .85rem; }
+  .roof-room-body { padding: .85rem; }
+  .roof-room-edit { display: none; }
+}
+@media print {
+  .roof-budget { border-color: #999; }
+  .roof-budget dt, .roof-budget dd, .roof-area-stats b { color: black !important; }
+  .roof-area-stats > span { border-color: #999; }
+}
+.roof-guide-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin: 2rem 0;
+}
+.roof-guide-nav a {
+  padding: .55rem .85rem;
+  border: 1px solid #31513e;
+  border-radius: 999px;
+  color: #b6e8c3;
+  text-decoration: none;
+  font-size: .85rem;
+}
+.roof-guide-nav a:hover { background: rgba(74, 222, 128, .08); }
+.roofing-tool-page .seo-section { scroll-margin-top: 2rem; }
+.roofing-tool-page .seo-section li { margin-bottom: .75rem; line-height: 1.7; }
+.roofing-tool-page .seo-section .formula-block { overflow-wrap: anywhere; }
+@media print { .roof-guide-nav { display: none; } }
+.roof-fields .input-group select { width:100%; margin-bottom:0; box-sizing:border-box; }
+.roof-product > .input-group { margin-bottom:.85rem; }
+.roof-room-body > .input-group { margin-bottom:.85rem; }
+.roofing-tool-page .formula-block { line-height:1.8; }
+.roofing-tool-page .roof-shopping h4 { overflow-wrap:anywhere; }
+@media print { .roof-summary h3:before { content:'Roofing Project - '; } }
+.roof-method-note { border-left:3px solid #7cbf91; padding:.75rem 1rem; background:rgba(74,222,128,.05); color:#c3ddcc; line-height:1.6; font-size:.85rem; }
+@media print { .roof-summary h3:before { content:'Roofing Project - '; } .roof-method-note { color:black; background:white; } }

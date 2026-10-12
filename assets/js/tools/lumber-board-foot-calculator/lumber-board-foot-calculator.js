@@ -1,35 +1,20 @@
-// Lumber board foot calculator
-(function () {
-  "use strict";
-  const KG_PER_LB = 0.45359237;
-  const POUNDS_PER_BOARD_FOOT = 3;
-
-  function positive(id) {
-    const number = Number.parseFloat(document.getElementById(id).value);
-    return Number.isFinite(number) && number > 0 ? number : null;
-  }
-
-  document.getElementById("calcBtn").addEventListener("click", function () {
-    const thickness = positive("thickness");
-    const width = positive("width");
-    const length = positive("length");
-    const error = document.getElementById("calcError");
-    const results = document.getElementById("resultsPanel");
-    const empty = document.getElementById("resultsEmpty");
-    error.style.display = "none";
-    results.style.display = "none";
-    empty.style.display = "flex";
-    if (thickness === null || width === null || length === null) {
-      error.style.display = "block";
-      return;
-    }
-
-    const boardFeet = thickness * width * length / 12;
-    const weight = boardFeet * POUNDS_PER_BOARD_FOOT;
-    document.getElementById("boardFeet").textContent = boardFeet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById("weightLb").textContent = weight.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " lb";
-    document.getElementById("weightKg").textContent = (weight * KG_PER_LB).toLocaleString(undefined, { maximumFractionDigits: 1 }) + " kg";
-    empty.style.display = "none";
-    results.style.display = "block";
-  });
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),key='mt-lumber-project-v1',esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),fmt=(n,d=2)=>n.toLocaleString(undefined,{maximumFractionDigits:d}),money=n=>n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const board=()=>({name:'2 x 4 stock',thickness:2,width:4,actualThickness:1.5,actualWidth:3.5,length:8,quantity:10,pricing:'board',price:0,density:35});
+const defaults=()=>({units:'imperial',waste:10,tax:0,boards:[board()]});let project=defaults(),result;
+try{const saved=JSON.parse(localStorage.getItem(key));if(saved){LumberEngine.calculate(saved);project=saved;}}catch{}
+function field(b,k,label){return `<label class="input-group">${label}<input data-field="${k}" type="number" min="${['price'].includes(k)?0:0.0001}" step="${k==='quantity'?1:'any'}" value="${esc(b[k])}"></label>`;}
+function render(){ $('units').value=project.units;$('waste').value=project.waste;$('tax').value=project.tax;const dim=project.units==='metric'?'mm':'in',len=project.units==='metric'?'m':'ft';$('boards').innerHTML=project.boards.map((b,i)=>`<fieldset class="lumber-product" data-row="${i}"><legend>Board size ${i+1}</legend><div class="lumber-room-head"><label class="input-group">Board / species name<input data-field="name" maxlength="100" value="${esc(b.name)}"></label><button type="button" data-remove="${i}" ${project.boards.length===1?'disabled':''}>Remove</button></div><div class="lumber-fields">${field(b,'thickness',`Purchasing thickness (${dim})`)}${field(b,'width',`Purchasing width (${dim})`)}${field(b,'actualThickness',`Actual thickness (${dim})`)}${field(b,'actualWidth',`Actual width (${dim})`)}${field(b,'length',`Stock length (${len})`)}${field(b,'quantity','Boards needed')}
+<label class="input-group">Price basis<select data-field="pricing"><option value="board" ${b.pricing==='board'?'selected':''}>Per board</option><option value="bf" ${b.pricing==='bf'?'selected':''}>Per board foot</option></select></label>${field(b,'price','Unit price')}${field(b,'density','Density (lb / cubic ft)')}</div><p class="lumber-hint">Use the supplier's purchasing dimensions and measured actual dimensions. Density is an editable assumption for this stock.</p></fieldset>`).join('');$('add').disabled=project.boards.length>=50;update();}
+function update(){try{result=LumberEngine.calculate(project);$('calcError').textContent='';$('resultsPanel').hidden=false;$('resultsPanel').innerHTML=`<div class="lumber-total"><span>Estimated lumber total</span><strong>${money(result.total)}</strong><small>In your entered price currency</small></div><dl class="lumber-budget"><div><dt>Lumber subtotal</dt><dd>${money(result.subtotal)}</dd></div><div><dt>Tax (${fmt(Number(project.tax))}%)</dt><dd>${money(result.taxCost)}</dd></div></dl><div class="lumber-area-stats"><span>Boards to order<b>${fmt(result.boards,0)}</b></span><span>Purchasing board feet<b>${fmt(result.bf)}</b></span><span>Extra whole boards<b>${fmt(result.extra,0)}</b></span><span>Actual volume<b>${fmt(result.volume)} ft&sup3;</b></span></div><p class="lumber-method-note">Estimated stock weight: <strong>${fmt(result.weight,1)} lb / ${fmt(result.weight*.45359237,1)} kg</strong>. Uses actual dimensions and your density inputs.</p><div class="lumber-breakdown lumber-table-scroll"><table><caption>Itemized lumber order</caption><thead><tr><th>Board</th><th>Order</th><th>Board ft</th><th>Cost</th></tr></thead><tbody>${result.rows.map(r=>`<tr><th scope="row">${esc(r.name)}</th><td>${r.order}</td><td>${fmt(r.bf)}</td><td>${money(r.cost)}</td></tr>`).join('')}</tbody></table></div><p class="lumber-hint">Allowance adds whole boards per size. This estimate excludes hardware, delivery, labor, and cut optimization.</p>`;
+$('export').disabled=false;$('print').disabled=false;try{localStorage.setItem(key,JSON.stringify(project));$('saveStatus').textContent='Project saved in this browser.';}catch{$('saveStatus').textContent='Browser storage unavailable. Export CSV to keep a copy.';}
+}catch(e){result=null;$('calcError').textContent=e.message;$('resultsPanel').hidden=true;$('export').disabled=true;$('print').disabled=true;$('saveStatus').textContent='Fix the highlighted estimate before saving or exporting.';}}
+$('boards').addEventListener('input',e=>{const input=e.target,k=input.dataset.field,row=input.closest('[data-row]');if(!k||!row)return;project.boards[Number(row.dataset.row)][k]=input.value;update();});
+$('boards').addEventListener('click',e=>{const button=e.target.closest('[data-remove]');if(button&&project.boards.length>1){project.boards.splice(Number(button.dataset.remove),1);render();}});
+for(const k of ['waste','tax'])$(k).addEventListener('input',()=>{project[k]=$(k).value;update();});
+$('add').onclick=()=>{if(project.boards.length<50){const b=board();b.name='New board size';b.quantity=1;project.boards.push(b);if(project.units==='metric'){const temporary={units:'imperial',boards:[b]};LumberEngine.convertUnits(temporary,'metric');}render();}};
+$('units').onchange=()=>{try{LumberEngine.calculate(project);LumberEngine.convertUnits(project,$('units').value);render();}catch(e){$('units').value=project.units;$('calcError').textContent='Correct the inputs before changing units. '+e.message;}};
+$('reset').onclick=()=>{project=defaults();render();};$('example').onclick=()=>{project=defaults();project.boards[0].price=6;project.tax=8;render();};$('print').onclick=()=>window.print();
+$('export').onclick=()=>{if(!result)return;const rows=[['Lumber shopping list'],['Units',project.units],['Waste percent',project.waste],['Tax percent',project.tax],['Board','Purchasing thickness','Purchasing width','Actual thickness','Actual width','Length','Needed','Order','Price basis','Unit price','Density lb/ft3','Board feet','Actual ft3','Weight lb','Cost'],...result.rows.map((r,i)=>{const b=project.boards[i];return [r.name,b.thickness,b.width,b.actualThickness,b.actualWidth,b.length,r.quantity,r.order,b.pricing,b.price,b.density,r.bf,r.volume,r.weight,r.cost];}),['Subtotal',result.subtotal],['Tax',result.taxCost],['Total',result.total]];const csv=rows.map(row=>row.map(v=>'"'+String(typeof v==='string'&&/^[\s]*[=+@-]/.test(v)?"'"+v:v).replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='lumber-shopping-list.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};render();
 })();
