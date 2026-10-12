@@ -101,7 +101,7 @@ test("the FAQ above related guides uses the full content width", () => {
   assert.match(wordSolverCss, /\.faq-list\s*\{[^}]*width:\s*100%;[^}]*max-width:\s*none;/s);
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
-    assert.match(page, /word-unscrambler\.css\?v=20260913-empty-artwork-45/);
+    assert.match(page, /word-unscrambler\.css\?v=20261012-solvers-5/);
   }
 });
 
@@ -130,9 +130,9 @@ test("dictionary guidance appears before Offline Mode controls", () => {
 });
 
 test("word result popovers use local definitions and move external links behind a spyglass", () => {
-  assert.match(wordSolverScript, /wordLabel\.addEventListener\("mouseenter", openDictionaryPopover\)/);
+  assert.match(wordSolverScript, /createWordPopoverController\(wordLabel, dictionaryLinks, wordLookup, dictionaryPopoverClose, openDictionaryPopover, positionDictionaryPopover\)/);
   assert.doesNotMatch(wordSolverScript, /wordLookup\.addEventListener\("mouseenter", openDictionaryPopover\)/);
-  assert.match(wordSolverCss, /\.word-label:hover \+ \.dictionary-popover/);
+  assert.match(wordSolverCss, /\.dictionary-popover\.is-open:not\(\[hidden\]\)/);
   assert.doesNotMatch(wordSolverCss, /\.word-lookup:hover \.dictionary-popover/);
   assert.match(wordSolverScript, /DefinitionService\.lookup\(word, \{ allowRemote: false \}\)/);
   assert.match(wordSolverScript, /className = "local-definition-lookup"/);
@@ -145,16 +145,16 @@ test("word result popovers use local definitions and move external links behind 
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
-    assert.match(page, /input-rules\.js\?v=20260905-list-search-16/);
-    assert.match(page, /word-unscrambler\.js\?v=20260913-compressed-artwork-43/);
-    assert.match(page, /word-unscrambler\.css\?v=20260913-empty-artwork-45/);
+    assert.match(page, /input-rules\.js\?v=20261012-solvers-1/);
+    assert.match(page, /word-unscrambler\.js\?v=20261012-solvers-11/);
+    assert.match(page, /word-unscrambler\.css\?v=20261012-solvers-5/);
   }
 });
 
 test("definition popovers are roomier while remaining bounded on mobile", () => {
   assert.match(wordSolverCss, /\.dictionary-popover\s*\{[^}]*position:\s*fixed;[^}]*width:\s*min\(30rem, calc\(100vw - 2rem\)\);/s);
   assert.match(wordSolverCss, /\.local-definition-lookup\s*\{[^}]*font-size:\s*\.9rem;/s);
-  assert.match(wordSolverCss, /@media \(max-width: 480px\)[\s\S]*?\.dictionary-popover\s*\{[^}]*width:\s*calc\(100vw - 1rem\);[^}]*max-height:\s*calc\(100dvh - 1rem\);/s);
+  assert.match(wordSolverCss, /@media \(max-width: 600px\)[\s\S]*?\.dictionary-popover\s*\{[^}]*bottom:\s*0;[^}]*max-height:\s*min\(80dvh, 40rem\);/s);
   assert.doesNotMatch(wordSolverScript, /if \(!window\.matchMedia\("\(max-width: 900px\), \(max-height: 600px\)"\)\.matches\)/);
   assert.match(wordSolverScript, /const maxLeft = Math\.max\(viewportPadding, window\.innerWidth - viewportPadding - popoverRect\.width\)/);
   assert.match(wordSolverScript, /const maxTop = Math\.max\(viewportPadding, window\.innerHeight - viewportPadding - popoverRect\.height\)/);
@@ -168,7 +168,9 @@ test("word solvers offer opt-in offline downloads with local definitions", () =>
     assert.match(page, /id="word-tool-offline-progress"/);
   }
   assert.match(wordSolverScript, /navigator\.serviceWorker\.register\("\/crossword-offline-sw\.js", \{ scope: "\/" \}\)/);
-  assert.match(wordSolverScript, /Object\.values\(wordData\.chunks/);
+  assert.match(wordSolverScript, /Dictionary\.offlineAssets\(\)/);
+  assert.match(wordSolverScript, /\.\.\.wordAssets/);
+  assert.match(wordSolverScript, /search-worker\.js\?v=20261012-solvers-3/);
   assert.match(wordSolverScript, /Object\.values\(definitionData\.shards/);
   assert.match(wordSolverScript, /offlineToggle\.setAttribute\("aria-checked", String\(offlineModeEnabled\)\)/);
   assert.match(wordSolverScript, /dictionaryDirectoryButton\.hidden = offlineModeEnabled/);
@@ -213,7 +215,7 @@ test("word solvers support exact-length unrestricted list searches with paginati
     assert.match(page, /\*:2 \/ q\*/);
     assert.match(page, /pattern="\[A-Za-z0-9\?:\/\*\+ -\]\*"/);
   }
-  assert.match(wordSolverScript, /Engine\.crosswordSearch\(options\.pattern \|\| "\*", "", options\)/);
+  assert.match(wordSolverScript, /SearchEngine\.crosswordSearch\(options\.pattern \|\| "\*", "", options\)/);
   assert.match(wordSolverScript, /const proposedValue =/);
   assert.match(wordSolverScript, /sanitizeSmartInput\(proposedValue\)/);
   assert.match(wordSolverScript, /const RESULT_PAGE_SIZE = 250/);
@@ -228,14 +230,17 @@ test("word solvers support exact-length unrestricted list searches with paginati
 });
 
 test("word hover shows rack-aware leaves and a graphical leave value", () => {
-  assert.match(wordSolverScript, /function getRackLeave\(word, rackLetters, dictionaryBit\)/);
-  assert.match(wordSolverScript, /remaining\.indexOf\("\?"\)/);
-  assert.match(wordSolverScript, /label\.textContent = "Rack leave"/);
+  assert.match(wordSolverScript, /async function getRackLeave\(word, rackLetters, dictionaryBit, options = \{\}\)/);
+  assert.match(wordSolverScript, /const play = getPlayAnalysis\(word, rackLetters, options\)/);
+  assert.match(wordSolverScript, /const remaining = \[\.\.\.play\.leave\]/);
+  assert.match(wordSolverScript, /label\.textContent = "Rack leave · estimate"/);
   assert.match(wordSolverScript, /meter\.setAttribute\("role", "progressbar"\)/);
   assert.match(wordSolverScript, /`V:C \$\{leave\.vowels\}:\$\{leave\.consonants\}`/);
-  assert.match(wordSolverScript, /dictionaryLinks\.append\(dictionaryPopoverHeader, createRackLeave\(word, letters, options\.dictionaryBit\)\)/);
+  assert.match(wordSolverScript, /dictionaryLinks\.append\(dictionaryPopoverHeader, dictionarySource\.element, leavePlaceholder\)/);
+  assert.match(wordSolverScript, /const loadRackLeave = async \(\) => \{[\s\S]*?await createRackLeave\(word, letters, options\.dictionaryBit, options\)/);
+  assert.match(wordSolverScript, /const openDictionaryPopover = \(\) => \{[\s\S]*?loadRackLeave\(\)/);
   assert.match(wordSolverScript, /rackLeaveAnagramCountCache/);
-  assert.match(wordSolverScript, /Engine\.unscramble\(leaveRack/);
+  assert.match(wordSolverScript, /await SearchEngine\.unscramble\(leaveRack/);
   assert.match(wordSolverScript, /words"} available/);
   assert.doesNotMatch(wordSolverScript, /item\.append\(top, meta, note, tileRow, leave, flags\)/);
   assert.match(wordSolverCss, /\.rack-leave-meter\s*\{/);
@@ -363,7 +368,8 @@ test("each result group heading includes its total word count", () => {
 test("rack help opens a gold syntax dialog with usable rack and filter examples", () => {
   for (const file of ["word-unscrambler.html", "words-with-friends-solver.html"]) {
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
-    assert.match(page, /id="rack-help-trigger"[^>]*tabindex="-1"[^>]*aria-controls="rack-syntax-dialog"/);
+    assert.match(page, /id="rack-help-trigger"[^>]*type="button"[^>]*aria-controls="rack-syntax-dialog"/);
+    assert.doesNotMatch(page, /id="rack-help-trigger"[^>]*tabindex="-1"/);
     assert.match(page, /id="rack-syntax-dialog"[^>]*aria-labelledby="rack-syntax-title"/);
     assert.match(page, /data-rack-example="\*:2 \/ q\*"/);
     assert.match(page, /data-rack-example="AELPST\? \/ \?A\?E"/);
@@ -399,7 +405,7 @@ test("compact plus and minus clauses populate include and exclude filters", () =
   assert.match(wordSolverScript, /const excludeLetters = inlineExcludeLetters \|\| excludeLettersInput\.value/);
   assert.doesNotMatch(wordSolverScript, /mustIncludeInput\.value = mustInclude/);
   assert.doesNotMatch(wordSolverScript, /excludeLettersInput\.value = excludeLetters/);
-  assert.match(wordSolverScript, /A letter cannot be both required and excluded/);
+  assert.match(wordSolverScript, /cannot be both required and excluded/);
 });
 
 test("dictionary and offline controls sit slightly lower than the tool heading", () => {

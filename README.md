@@ -127,30 +127,43 @@ All seven components run locally in the browser. Their Rust source lives under `
 
 #### Shared word-tool integration
 
-The checked-in bridge initializes the generated module before enabling the form:
+Word Unscrambler and Words With Friends Solver share the following deferred scripts in dependency order. This example assumes the existing solver HTML and styles, including the `play-refill-host` element; it is not a standalone embed. The WASM bridge supplies synchronous scoring and play analysis, while the worker client initializes a separate WASM instance for dictionary indexing and searches. Both must be ready before the form is enabled.
 
 ```html
-<script src="../assets/js/tools/word-unscrambler/wasm-bridge.js" defer></script>
-<script src="../assets/js/tools/word-unscrambler/word-unscrambler.js" defer></script>
+<script src="../assets/js/tools/word-unscrambler/input-rules.js?v=20261012-solvers-1" defer></script>
+<script src="../assets/js/tools/word-unscrambler/history-store.js?v=20261012-solvers-1" defer></script>
+<script src="../assets/js/tools/word-unscrambler/pick-list-store.js?v=20261012-solvers-1" defer></script>
+<script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20261012-solvers-3" defer></script>
+<script src="../assets/js/tools/word-unscrambler/search-worker-client.js?v=20261012-solvers-3" defer></script>
+<script src="../assets/js/tools/word-unscrambler/dictionary-loader.js?v=20261012-solvers-1" defer></script>
+<script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
+<script src="../assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10" defer></script>
+<script src="../assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
+<script src="../assets/js/tools/word-unscrambler/pick-comparison.js?v=20261012-solvers-7" defer></script>
+<script src="../assets/js/tools/word-unscrambler/play-refill.js?v=20261012-solvers-9" defer></script>
+<script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20261012-solvers-11" defer></script>
+<script src="../assets/js/shared/dictionary-offline-controls.js?v=20261012-solvers-11" defer></script>
 ```
 
-The Crossword Solver uses the same bridge with its dedicated interface:
+The worker client loads `search-worker.js` itself; do not add it as a page script. See the [Word Unscrambler architecture](docs/word-unscrambler-architecture.md) for the component contracts, dictionary loading, and asset-version requirements.
+
+The Crossword Solver uses the same bridge directly with its dedicated interface:
 
 ```html
-<script src="../assets/js/tools/word-unscrambler/wasm-bridge.js" defer></script>
-<script src="../assets/js/tools/crossword-solver.js" defer></script>
+<script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20261012-solvers-3" defer></script>
+<script src="../assets/js/tools/crossword-solver.js?v=20261012-solvers-11" defer></script>
 ```
 
 The Wordle Solver also uses the shared bridge and its duplicate-aware WASM search:
 
 ```html
-<script src="../assets/js/tools/word-unscrambler/wasm-bridge.js" defer></script>
+<script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20261012-solvers-3" defer></script>
 <script src="../assets/js/tools/wordle-helper.js" defer></script>
 ```
 
 The Antiwordle and Absurdle solvers reuse that bridge with dedicated browser-side strategy layers. Antiwordle enforces mandatory clue rules and ranks guesses for avoidance; Absurdle partitions every remaining answer by its possible feedback and ranks guesses by the smallest worst-case partition.
 
-Dictionary shards remain lazy-loaded by both interfaces and are passed to `init_engine` as arrays of `word\\tmembership` records. The bridge exposes rack-constrained `unscramble` and pattern-first `crosswordSearch` operations. Crossword clue searches separately load a compressed keyword-and-synonym index and length-based WordNet data shards from `assets/data/crossword-clues/`; clue ranking runs in JavaScript and combines literal relevance, discounted synonym expansion, pattern, length, and dictionary membership. Its browser-local Pick List stores clue context, definitions, match details, grid positions, and notes; saved picks can restore searches or generate compact URLs, formatted clipboard summaries, and QR codes. The WASM module authorizes `monkeytactics.com`, the Cloudflare Pages production and preview hosts under `monkeytactics-calculators.pages.dev`, and the local Wrangler host `127.0.0.1`.
+Dictionary shards remain lazy-loaded. Word Unscrambler and Words With Friends send decompressed shard text to the worker, which splits it into `word\\tmembership` records and calls `init_engine`; their window-side WASM instance does not hold the dictionary index. Crossword, Wordiply, and the Wordle-family solvers use the bridge directly to index records and search on the main thread. The bridge exposes rack-constrained `unscramble` and pattern-first `crosswordSearch` operations. Crossword clue searches separately load a compressed keyword-and-synonym index and length-based WordNet data shards from `assets/data/crossword-clues/`; clue ranking runs in JavaScript and combines literal relevance, discounted synonym expansion, pattern, length, and dictionary membership. Its browser-local Pick List stores clue context, definitions, match details, grid positions, and notes; saved picks can restore searches or generate compact URLs, formatted clipboard summaries, and QR codes. The WASM module authorizes `monkeytactics.com`, the Cloudflare Pages production and preview hosts under `monkeytactics-calculators.pages.dev`, and the local Wrangler host `127.0.0.1`.
 
 #### OCR Utility integration
 

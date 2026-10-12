@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
+import { gunzipSync } from "node:zlib";
 
 import init, {
+  analyze_play,
   analyze_word,
   analyze_wwf_word,
   board_fit_analysis,
   crossword_search,
+  dictionary_membership,
   find_hooks_for_dictionary,
   init_engine,
   score_word,
@@ -84,4 +87,92 @@ test("returns analysis data in the bridge's expected shape", () => {
   assert.equal(analysis.tileDistribution.get(1), 2);
   assert.equal(wwfAnalysis.score, 23);
   assert.equal(wwfAnalysis.tileDistribution.get(2), 1);
+});
+
+test("rack results use zero-value blanks for score ordering and score limits", () => {
+  init_engine(["axe", "tax"]);
+  for (const scoring of ["scrabble", "wwf"]) {
+    const options = { dictionaryBit: 1, sortBy: "score-desc", scoring };
+    assert.deepEqual(unscramble("tae?", "???", options), ["ate", "eat", "tea", "axe", "tax"]);
+    assert.deepEqual(unscramble("tae?", "???", { ...options, minimumScore: 3 }), ["ate", "eat", "tea"]);
+    assert.deepEqual(unscramble("tae?", "???", { ...options, maximumScore: 2 }), ["axe", "tax"]);
+  }
+});
+
+test("play analysis returns the assigned blanks and preserves unplayed tiles", () => {
+  assert.deepEqual(analyze_play("CAT", "CA?", "", "wwf"), {
+    valid: true, score: 5, blankPositions: [2], boardPositions: [], tilesUsed: 3, leave: "", bingo: false
+  });
+  assert.deepEqual(analyze_play("tat", "t?xz", "?a?", "wwf"), {
+    valid: true, score: 2, blankPositions: [2], boardPositions: [1], tilesUsed: 2, leave: "xz", bingo: false
+  });
+  assert.deepEqual(analyze_play("tat", "a?t", "t??", "wwf"), {
+    valid: true, score: 3, blankPositions: [], boardPositions: [0], tilesUsed: 2, leave: "?", bingo: false
+  });
+  assert.equal(analyze_play("cat", "c", "?a?", "wwf").valid, false);
+  assert.equal(analyze_play("cat", "cat", "c*t", "wwf").valid, false);
+});
+
+test("board searches play through fixed letters while retaining independent pattern filters", () => {
+  init_engine(["cat", "act", "tat"]);
+  const options = { dictionaryBit: 1, boardPattern: "?a?", sortBy: "alpha", scoring: "wwf" };
+  assert.deepEqual(unscramble("ct", "", options), ["cat"]);
+  assert.deepEqual(unscramble("ct", "a*", options), []);
+  assert.deepEqual(unscramble("c?", "c*t", { ...options, maximumScore: 5 }), ["cat"]);
+  assert.deepEqual(unscramble("c?", "c*t", { ...options, minimumScore: 6 }), []);
+  assert.deepEqual(unscramble("ct", "", { ...options, wordLength: 2 }), []);
+  assert.deepEqual(unscramble("ct", "", { ...options, boardPattern: "cat" }), []);
+});
+
+test("bingo eligibility counts newly placed tiles, with bonus kept separate", () => {
+  const bingo = analyze_play("stainers", "tainers", "s???????", "wwf");
+  assert.equal(bingo.bingo, true);
+  assert.equal(bingo.tilesUsed, 7);
+  assert.equal(bingo.score, 9);
+  assert.equal(analyze_play("stainer", "tainer", "s??????", "wwf").bingo, false);
+  assert.equal(analyze_play("stainer", "stainer", "", "wwf").bingo, true);
+});
+
+test("board fit counts words excluded by the fixed span and positions", () => {
+  init_engine(["at", "cats", "cast"]);
+  const options = { dictionaryBit: 1, boardPattern: "?a?" };
+  assert.deepEqual(board_fit_analysis("cts", "", options), {
+    candidates: 5, fitting: 1, excluded: 4
+  });
+  assert.deepEqual(board_fit_analysis("cts", "a*", options), {
+    candidates: 5, fitting: 0, excluded: 5
+  });
+});
+
+test("membership distinguishes sources, normalizes case, and merges additional shards", () => {
+  init_engine(["quizzical\t1", "quizzically\t2", "quizzicality\t3"]);
+  assert.equal(dictionary_membership("QUIZZICAL"), 1);
+  assert.equal(dictionary_membership("quizzically"), 2);
+  assert.equal(dictionary_membership("Quizzicality"), 3);
+  assert.equal(dictionary_membership("notawordatall"), 0);
+  assert.equal(dictionary_membership(""), 0);
+  init_engine(["quizzical\t3", "quizzically\t1"]);
+  assert.equal(dictionary_membership("quizzical"), 3);
+  assert.equal(dictionary_membership("quizzically"), 3);
+  init_engine(["quizzical\t1"]);
+  assert.equal(dictionary_membership("quizzical"), 3);
+});
+
+test("real Standard records stay ENABLE-only until the combined shard supplies overlap", () => {
+  const recordsFor = (name) => gunzipSync(fs.readFileSync(new URL(
+    `../assets/data/words/${name}`, import.meta.url,
+  ))).toString("utf8").trim().split(/\r?\n/);
+  const standard = recordsFor("z.enable-v1.txt.gz");
+  const combined = recordsFor("z.wiktionary-v1.txt.gz");
+  const overlap = combined.find((record) => record.endsWith("\t3")).split("\t")[0];
+  const expandedOnly = combined.find((record) => record.endsWith("\t2")).split("\t")[0];
+  const enableOnly = combined.find((record) => record.endsWith("\t1")).split("\t")[0];
+  init_engine(standard);
+  assert.equal(dictionary_membership(overlap), 1);
+  assert.equal(dictionary_membership(expandedOnly), 0);
+  assert.equal(dictionary_membership(enableOnly), 1);
+  init_engine(combined);
+  assert.equal(dictionary_membership(overlap.toUpperCase()), 3);
+  assert.equal(dictionary_membership(expandedOnly), 2);
+  assert.equal(dictionary_membership(enableOnly), 1);
 });

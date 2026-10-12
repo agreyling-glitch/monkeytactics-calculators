@@ -1,0 +1,105 @@
+.play-refill {
+  margin-block: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(57, 218, 194, 0.4);
+  border-radius: 0.8rem;
+  background: rgba(25, 75, 73, 0.22);
+  color: var(--text, #edf5f6);
+}
+
+.play-refill[hidden],
+.play-refill [hidden] {
+  display: none !important;
+}
+
+.play-refill-heading {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.play-refill-status,
+.play-refill-remaining {
+  margin: 0.6rem 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.play-refill-status.is-error {
+  color: #ffcc9b;
+}
+
+.play-refill-controls {
+  display: grid;
+  gap: 0.4rem;
+  margin-block: 0.8rem;
+}
+
+.play-refill-label {
+  font-weight: 650;
+  font-size: 0.85rem;
+}
+
+.play-refill-input {
+  box-sizing: border-box;
+  width: min(100%, 24rem);
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border, #42616d);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  font: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.play-refill-input[aria-invalid="true"] {
+  border-color: #ffcc9b;
+}
+
+.play-refill-hint {
+  margin: 0;
+  color: var(--muted, #b8c5ce);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.play-refill-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.play-refill-button {
+  min-height: 2.75rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgba(57, 218, 194, 0.45);
+  border-radius: 0.5rem;
+  background: rgba(57, 218, 194, 0.1);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.play-refill-button:hover {
+  background: rgba(57, 218, 194, 0.2);
+}
+
+.play-refill-undo {
+  border-color: var(--border, #42616d);
+  background: transparent;
+}
+
+.play-refill :focus-visible {
+  outline: 2px solid var(--accent, #3edbc4);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .play-refill { padding: 0.85rem; }
+  .play-refill-input { width: 100%; }
+  .play-refill-actions > button { flex: 1 1 auto; }
+}

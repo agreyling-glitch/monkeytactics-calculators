@@ -412,8 +412,9 @@
   border-color: rgba(34, 197, 94, 0.55);
 }
 
-.input-group.primary-letter-group input[type="search"]::placeholder {
-  color: transparent;
+.input-group.primary-letter-group input[type="search"]:placeholder-shown::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 .input-group.primary-letter-group input[type="search"]::selection {
@@ -3064,6 +3065,9 @@ details.word-group:not([open]) + .word-group { margin-top: 0.75rem; padding-top:
   display: none;
   width: min(30rem, calc(100vw - 2rem));
   max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - 1.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1rem 1.1rem;
   box-sizing: border-box;
   border: 1px solid rgba(96, 165, 250, 0.45);
@@ -3074,10 +3078,34 @@ details.word-group:not([open]) + .word-group { margin-top: 0.75rem; padding-top:
   text-align: left;
 }
 
-.word-label:hover + .dictionary-popover,
-.dictionary-popover:hover,
-.word-lookup:focus-within .dictionary-popover {
+.dictionary-popover.is-open:not([hidden]) {
   display: block;
+}
+
+.dictionary-popover.is-pinned {
+  border-color: #5eead4;
+}
+
+.dictionary-popover-close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, .4);
+  border-radius: .4rem;
+  background: rgba(15, 23, 42, .8);
+  color: #e2e8f0;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dictionary-popover-close:hover,
+.dictionary-popover-close:focus-visible {
+  border-color: #5eead4;
+  color: #5eead4;
 }
 
 .dictionary-popover-header {
@@ -3096,12 +3124,50 @@ details.word-group:not([open]) + .word-group { margin-top: 0.75rem; padding-top:
 }
 
 .dictionary-popover-title {
+  min-width: 0;
   margin-left: auto;
   color: #fff;
   font-size: 0.9rem;
   font-weight: 800;
   letter-spacing: 0.03em;
   text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.dictionary-source,
+.dictionary-source-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dictionary-source {
+  margin-bottom: 0.65rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.dictionary-source-label {
+  font-weight: 700;
+}
+
+.dictionary-source-badge {
+  padding: 0.16rem 0.45rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-weight: 750;
+}
+
+.dictionary-source-badge--enable {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.dictionary-source-badge--expanded {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.1);
 }
 
 .dictionary-links {
@@ -3146,9 +3212,21 @@ details.word-group:not([open]) + .word-group { margin-top: 0.75rem; padding-top:
 }
 
 .hook-lookup-label {
-  display: block;
+  display: list-item;
+  padding: .3rem 0;
   color: #86efac;
   font-weight: 800;
+  cursor: pointer;
+}
+
+.hook-lookup-retry {
+  padding: .2rem .4rem;
+  border: 1px solid currentColor;
+  border-radius: .3rem;
+  background: transparent;
+  color: #86efac;
+  font: inherit;
+  cursor: pointer;
 }
 
 .hook-lookup-result {
@@ -3893,17 +3971,33 @@ details.word-group:not([open]) + .word-group { margin-top: 0.75rem; padding-top:
   background: #0d1812;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .dictionary-popover {
-    width: calc(100vw - 1rem);
-    max-width: calc(100vw - 1rem);
-    max-height: calc(100dvh - 1rem);
-    padding: .85rem .9rem;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: min(80dvh, 40rem);
+    padding: .85rem .9rem max(.85rem, env(safe-area-inset-bottom));
+    border-radius: 1rem 1rem 0 0;
+    box-shadow: 0 -12px 40px rgba(2, 6, 23, .65);
   }
 
   .dictionary-popover-title,
-  .local-definition-lookup {
+  .local-definition-lookup,
+  .hook-lookup {
     font-size: .85rem;
+  }
+
+  .dictionary-popover-close {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .hook-lookup-label {
+    padding-block: .65rem;
   }
 }
 
@@ -3977,4 +4071,95 @@ details.word-group:not([open]) + .word-group { margin-top: 0.75rem; padding-top:
 
 @media (max-width: 700px) {
   .word-game-guide-grid { grid-template-columns: 1fr; }
+}
+
+/* Shared rack and board search controls for the two tile solvers. */
+.primary-letter-group { margin-bottom: .45rem; }
+.rack-input-hint {
+  margin: .35rem 0 .85rem;
+  color: var(--muted);
+  font-size: .8rem;
+  line-height: 1.5;
+}
+.rack-input-hint strong { color: var(--text); }
+.board-search-options { margin: .9rem 0 1.25rem; }
+.board-mode-toggle {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: .6rem;
+  color: var(--text);
+  font-size: .88rem;
+  cursor: pointer;
+}
+.board-mode-toggle input { width: 1.1rem; height: 1.1rem; margin: 0; accent-color: var(--accent); }
+.board-pattern-fields { max-width: 38rem; margin: .55rem 0 0; padding: .85rem 1rem; border: 1px solid var(--border); border-radius: .65rem; }
+.board-pattern-fields[hidden] { display: none; }
+.board-pattern-fields .rack-input-hint { margin-bottom: 0; }
+.board-pattern-fields input { text-transform: uppercase; letter-spacing: .16em; }
+.board-pattern-fields input::placeholder { text-transform: none; }
+.results-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: .8rem 1.25rem; margin: .8rem 0; }
+.results-toolbar .results-sort { flex: 0 1 20rem; min-width: 0; margin: 0; }
+.results-toolbar .sort-picker-menu { z-index: 45; }
+.quick-length-filters { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; padding-bottom: .05rem; }
+.quick-length-label { margin-right: .25rem; color: var(--muted); font-size: .8rem; }
+.quick-length-filters button,
+.filter-chip,
+.empty-recovery-action {
+  min-height: 2.5rem;
+  padding: .45rem .65rem;
+  border: 1px solid var(--border);
+  border-radius: .55rem;
+  background: rgba(255, 255, 255, .04);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: .8rem;
+  line-height: 1.35;
+}
+.quick-length-filters button:hover,
+.filter-chip:hover,
+.empty-recovery-action:hover { border-color: var(--accent); }
+.quick-length-filters button:focus-visible,
+.filter-chip:focus-visible,
+.empty-recovery-action:focus-visible,
+.board-mode-toggle input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.quick-length-filters button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft, rgba(34, 197, 94, .16)); color: var(--text); }
+.active-filters,
+.empty-recovery { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin: .65rem 0; }
+.active-filters[hidden],
+.empty-recovery[hidden] { display: none; }
+.filter-chip { border-radius: 999px; }
+.dictionary-acceptance-note { margin: .7rem 0 1rem; color: var(--muted); font-size: .75rem; line-height: 1.5; }
+.board-letter { color: var(--accent); text-decoration: underline; text-decoration-style: dotted; text-underline-offset: .2em; }
+.score-breakdown { color: var(--muted); font-size: .75rem; line-height: 1.5; }
+.word-unscrambler-page .reference-dictionary-trigger--labeled {
+  display: flex;
+  width: auto;
+  max-width: 100%;
+  min-height: 2.75rem;
+  height: auto;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  padding: .55rem .7rem;
+  text-align: left;
+}
+.reference-dictionary-trigger--labeled > svg,
+.reference-dictionary-trigger--labeled > .reference-active-symbol { flex: 0 0 auto; }
+.reference-dictionary-label { font-size: .8rem; font-weight: 700; line-height: 1.3; }
+@media (max-width: 600px) {
+  .word-unscrambler-page .premium-tool-hero { margin-top: .8rem; padding: 1rem; border-radius: 1rem; }
+  .word-unscrambler-page .premium-tool-hero .breadcrumb { margin-bottom: .7rem; }
+  .word-unscrambler-page .premium-tool-hero .premium-eyebrow { margin-bottom: .4rem; }
+  .word-unscrambler-page .premium-tool-hero h1 { font-size: 1.9rem; line-height: 1.08; }
+  .word-unscrambler-page .premium-hero-copy { margin-top: .65rem; font-size: .85rem; line-height: 1.45; }
+  .word-unscrambler-page .premium-hero-pills { display: none; }
+  .word-unscrambler-page .reference-word-controls { flex-wrap: wrap; justify-content: flex-start; gap: .6rem; }
+  .word-unscrambler-page .reference-dictionary-trigger--labeled { flex-shrink: 1; }
+  .results-toolbar { align-items: stretch; }
+  .results-toolbar .results-sort { flex-basis: 100%; }
+  .quick-length-filters { gap: .3rem; }
+  .quick-length-filters button { min-height: 2.75rem; }
+  .board-pattern-fields { padding: .75rem; }
 }

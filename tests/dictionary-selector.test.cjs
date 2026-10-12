@@ -25,7 +25,7 @@ test("dictionary selectors use reserved help text instead of floating panels", (
   }
 });
 
-test("every page using the shared dictionary selector loads the fixed version", () => {
+test("every page using the shared dictionary selector loads its current controls version", () => {
   const pages = fs.readdirSync(path.join(siteRoot, "tools"))
     .filter((name) => name.endsWith(".html"))
     .map((name) => path.join(siteRoot, "tools", name))
@@ -34,8 +34,8 @@ test("every page using the shared dictionary selector loads the fixed version", 
   assert.equal(pages.length, 9);
   for (const page of pages) {
     const html = fs.readFileSync(page, "utf8");
-    assert.match(html, /dictionary-selector\.css\?v=20260904-wiktionary-check-14/);
-    assert.match(html, /dictionary-offline-controls\.js\?v=20260904-active-dictionary-icon-10/);
+    assert.match(html, /dictionary-selector\.css\?v=20261012-solvers-5/);
+    assert.match(html, /dictionary-offline-controls\.js\?v=20261012-solvers-11/);
   }
 });
 
@@ -73,7 +73,7 @@ test("shared offline confirmation shows progress only for actual downloads", () 
   assert.doesNotMatch(sharedControls, /ok\.addEventListener\("click", \(\) => \{[\s\S]*?progressWrap\.hidden = false/);
   assert.match(sharedControls, /progressWrap\.hidden = downloaded === 0/);
   assert.match(sharedControls, /if \(downloaded\) message\.textContent = ""/);
-  assert.match(sharedControls, /if \(\(Number\(progress\.dataset\.downloaded\) \|\| 0\) === 0\) \{\s*dialog\.close\(\)/);
+  assert.match(sharedControls, /if \(\(Number\(nativeProgress\?\.dataset\.downloaded\) \|\| 0\) === 0\) \{\s*dialog\.close\(\)/);
 });
 
 test("every remaining word-game utility receives the shared Offline Mode capability", () => {
@@ -89,8 +89,13 @@ test("every remaining word-game utility receives the shared Offline Mode capabil
   assert.doesNotMatch(sharedControls, /Offline Mode \[Future\]/);
   for (const page of newlyOffline) {
     const html = fs.readFileSync(path.join(siteRoot, "tools", page), "utf8");
-    assert.match(html, /dictionary-offline-controls\.js\?v=20260904-active-dictionary-icon-10/);
+    assert.match(html, /dictionary-offline-controls\.js\?v=20261012-solvers-11/);
   }
+});
+
+test("dictionary option buttons and modal close controls have visible keyboard focus", () => {
+  assert.match(sharedCss, /\.reference-dictionary-card \[data-values\]:focus-visible[^}]*outline:3px solid #50e68a/);
+  assert.match(sharedCss, /\.reference-dictionary-card header button:focus-visible/);
 });
 
 test("every dictionary solver explains the word-list choice in its usage guide", () => {

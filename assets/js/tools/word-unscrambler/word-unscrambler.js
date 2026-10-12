@@ -2,6 +2,11 @@
 
 const form = document.querySelector("#unscramble-form");
 const input = document.querySelector("#letters");
+const useBoardLetters = document.querySelector("#use-board-letters");
+const boardPatternInput = document.querySelector("#board-pattern");
+const boardPatternFields = document.querySelector("#board-pattern-fields");
+const activeFilters = document.querySelector("#active-filters");
+const emptyRecovery = document.querySelector("#empty-recovery");
 const dictionaryInputs = form.querySelectorAll('input[name="dictionary"]');
 const wordLengthInput = document.querySelector("#word-length");
 const startsWithInput = document.querySelector("#starts-with");
@@ -27,10 +32,6 @@ const sortOptionButtons = sortPicker.querySelectorAll("[data-sort-value]");
 const resetAllButton = document.querySelector("#reset-all-filters");
 const resetBasicFiltersButton = document.querySelector("#reset-basic-filters");
 const resetAdvancedFiltersButton = document.querySelector("#reset-advanced-filters");
-const resetConfirmBackdrop = document.querySelector("#reset-confirm-backdrop");
-const resetConfirmModal = document.querySelector("#reset-confirm-modal");
-const resetConfirmCancel = document.querySelector("#reset-confirm-cancel");
-const resetConfirmOk = document.querySelector("#reset-confirm-ok");
 const rackTiles = document.querySelector("#rack-tiles");
 const button = document.querySelector("#unscramble-button");
 const buttonLabel = button.querySelector(".button-label");
@@ -72,6 +73,8 @@ const HistoryStore = window.MonkeyTacticsHistory;
 const PickListStore = window.MonkeyTacticsPickList;
 const InputRules = window.MonkeyTacticsWordInputRules;
 const Engine = window.MonkeyTacticsWasm;
+const SearchEngine = window.MonkeyTacticsSearchWorker;
+const Dictionary = window.MonkeyTacticsWordDictionary.create(SearchEngine);
 const DefinitionService = window.MonkeyTacticsWordDefinitions;
 const offlineToggle = document.querySelector("#word-tool-offline-toggle");
 const offlineStatus = document.querySelector("#word-tool-offline-status");
@@ -85,12 +88,9 @@ const IS_WWF = document.body.dataset.wordGame === "wwf";
 const GAME_NAME = IS_WWF ? "Words With Friends Solver" : "Word Unscrambler";
 const analyzeWord = (word) => IS_WWF ? Engine.analyzeWwfWord(word) : Engine.analyzeWord(word);
 
-const MANIFEST_URL =
-  "../assets/data/words/manifest.wiktionary-v1.json?v=wiktionary-v1";
-const CHUNK_BASE_URL = "../assets/data/words/";
 const DEFINITION_MANIFEST_URL = "/assets/data/word-definitions/manifest.wordnet-definitions-v1.json?v=wordnet-3.0-definitions-v1";
 const DEFINITION_BASE_URL = "/assets/data/word-definitions/";
-const OFFLINE_VERSION = "20260904-wiktionary-2";
+const OFFLINE_VERSION = "20261012-solvers-11";
 const OFFLINE_CACHE_PREFIX = "monkeytactics-word-tool-offline-";
 const OFFLINE_TOOL_ID = IS_WWF ? "words-with-friends-solver" : "word-unscrambler";
 const OFFLINE_STORAGE_KEY = `monkeytactics.${OFFLINE_TOOL_ID}.offline-cache`;
@@ -233,11 +233,9 @@ const DICTIONARY_BITS = Object.freeze({
   both: 3
 });
 // Loaded chunks are indexed once and retained for subsequent searches.
-const loadedChunks = new Set();
-const chunkPromises = new Map();
 const dictionaryPopoverPositioners = new WeakMap();
 const rackLeaveAnagramCountCache = new Map();
-let manifest = null;
+let searchRevision = 0;
 let breakdownState = null;
 let historyEntries = HistoryStore.read();
 let historyDropdownIndex = -1;
@@ -247,14 +245,17 @@ let historyModalReturnFocus = null;
 let historySwipeStartY = null;
 let pendingHistorySearch = false;
 let pickListEntries = PickListStore.read();
+let pickComparison = null;
+let playRefill = null;
 let pickListHookCache = new Map();
+let pickListHookRefreshRevision = 0;
 let dictionaryDirectoryDialog = null;
 let dictionaryDirectoryTitle = null;
 let dictionaryDirectoryLinks = null;
 let dictionaryDirectoryReturnFocus = null;
 let offlineCacheName = "";
 try { offlineCacheName = localStorage.getItem(OFFLINE_STORAGE_KEY) || ""; } catch (_error) { /* Storage may be unavailable. */ }
-let offlineModeEnabled = Boolean(offlineCacheName);
+let offlineModeEnabled = offlineCacheName === `${OFFLINE_CACHE_PREFIX}${OFFLINE_TOOL_ID}-${OFFLINE_VERSION}`;
 
 function stableRackSort(letters, rank) {
   return [...letters].map((letter, index) => ({ letter, index }))
@@ -458,8 +459,8 @@ async function readOfflineManifest(cache, url) {
 }
 
 async function buildOfflineUrls(cache) {
-  const [wordData, definitionData] = await Promise.all([
-    readOfflineManifest(cache, MANIFEST_URL),
+  const [wordAssets, definitionData] = await Promise.all([
+    Dictionary.offlineAssets(),
     readOfflineManifest(cache, DEFINITION_MANIFEST_URL)
   ]);
   const loadedAssets = [...document.querySelectorAll("script[src], link[href]")].map((element) => element.src || element.href)
@@ -471,10 +472,10 @@ async function buildOfflineUrls(cache) {
     "/assets/wasm/menu/menu.css?v=20260922-applications-v1",
     "/assets/wasm/menu/menu_bg.wasm?v=20260922-applications-v1",
     "/assets/wasm/menu/tools-manifest.json?v=20260915-anagram-architect",
-    "/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=20260827-wwf-1",
-    "/assets/wasm/word-unscrambler/word_unscrambler_engine_bg.wasm?v=20260827-wwf-1",
-    MANIFEST_URL,
-    ...Object.values(wordData.chunks || {}).map(({ file }) => `${CHUNK_BASE_URL}${file}`),
+    "/assets/js/tools/word-unscrambler/search-worker.js?v=20261012-solvers-3",
+    "/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=20261012-solvers-3",
+    "/assets/wasm/word-unscrambler/word_unscrambler_engine_bg.wasm?v=20261012-solvers-3",
+    ...wordAssets,
     DEFINITION_MANIFEST_URL,
     ...Object.values(definitionData.shards || {}).map(({ file }) => `${DEFINITION_BASE_URL}${file}?v=${definitionData.datasetVersion}`)
   ])];
@@ -482,7 +483,11 @@ async function buildOfflineUrls(cache) {
 
 async function cacheOfflineUrl(cache, url, forceDownload = false) {
   const request = new Request(url, { credentials: "same-origin" });
-  if (!forceDownload) {
+  const asset = new URL(url, location.href);
+  // Never copy an old app shell into a new offline package: its script versions
+  // may differ from the assets collected from the current document.
+  const refreshShell = asset.pathname === location.pathname || (!asset.search && asset.pathname.endsWith(".js"));
+  if (!forceDownload && !refreshShell) {
     if (await cache.match(request)) return false;
     const sharedResponse = await caches.match(request);
     if (sharedResponse) {
@@ -490,7 +495,10 @@ async function cacheOfflineUrl(cache, url, forceDownload = false) {
       return false;
     }
   }
-  const response = await fetch(new Request(url, { cache: "reload", credentials: "same-origin" }));
+  const downloadUrl = new URL(url, location.href);
+  // Bypass stale service-worker fallbacks while refreshing a package shell.
+  if (refreshShell || forceDownload) downloadUrl.searchParams.set("offline-update", OFFLINE_VERSION);
+  const response = await fetch(new Request(downloadUrl.href, { cache: "reload", credentials: "same-origin" }));
   if (!response.ok) throw new Error(`Offline download failed for ${url}.`);
   await cache.put(request, response);
   return true;
@@ -524,7 +532,9 @@ async function enableOfflineMode(forceDownload = false) {
           : `Checking offline data: ${completed} of ${urls.length} files reused.`;
       }
     });
-    await Promise.all(workers);
+    const downloads = await Promise.allSettled(workers);
+    const failed = downloads.find((download) => download.status === "rejected");
+    if (failed) throw failed.reason;
     const cachedPage = await cache.match(location.pathname);
     if (!cachedPage) throw new Error("The offline page could not be verified.");
     const missing = (await Promise.all(urls.map((url) => cache.match(url)))).filter((response) => !response);
@@ -532,11 +542,15 @@ async function enableOfflineMode(forceDownload = false) {
     await cache.put(`/tools/${OFFLINE_TOOL_ID}`, cachedPage.clone());
     await cache.put(`/tools/${OFFLINE_TOOL_ID}.html`, cachedPage.clone());
     localStorage.setItem(OFFLINE_STORAGE_KEY, nextCacheName);
-    for (const name of await caches.keys()) {
-      if (name.startsWith(`${OFFLINE_CACHE_PREFIX}${OFFLINE_TOOL_ID}-`) && name !== nextCacheName) await caches.delete(name);
-    }
     offlineCacheName = nextCacheName;
     offlineModeEnabled = true;
+    try {
+      for (const name of await caches.keys()) {
+        if (name.startsWith(`${OFFLINE_CACHE_PREFIX}${OFFLINE_TOOL_ID}-`) && name !== nextCacheName) await caches.delete(name);
+      }
+    } catch (error) {
+      console.warn("Unable to remove an older Offline Mode cache:", error);
+    }
     try { await navigator.storage?.persist?.(); } catch (_error) { /* Persistence is optional. */ }
     renderOfflineState(downloaded
       ? `Ready offline. ${downloaded} files downloaded and ${urls.length - downloaded} reused; external dictionary links are disabled.`
@@ -628,7 +642,6 @@ function openDictionaryDirectory(word, trigger) {
   dictionaryDirectoryDialog.showModal();
 }
 let pickListHookRefreshQueued = false;
-let resetConfirmReturnFocus = null;
 
 input.style.zIndex = "3";
 input.style.background = "transparent";
@@ -730,9 +743,7 @@ sortOptionButtons.forEach((option) => {
     syncSortPicker();
     closeSortPicker(true);
 
-    if (input.value.trim() && !button.disabled) {
-      form.requestSubmit();
-    }
+    rerunCurrentSearch();
   });
 });
 
@@ -788,6 +799,8 @@ function formatSmartInput(rack, pattern) {
 
 function getCurrentFilters() {
   return {
+    useBoardLetters: useBoardLetters.checked,
+    boardPattern: boardPatternInput.value,
     wordLength: wordLengthInput.value,
     startsWith: startsWithInput.value,
     endsWith: endsWithInput.value,
@@ -822,9 +835,119 @@ function hasAdvancedFilters() {
 function syncSectionFilterResetButtons() {
   resetBasicFiltersButton.hidden = !hasBasicFilters();
   resetAdvancedFiltersButton.hidden = !hasAdvancedFilters();
+  renderActiveFilters();
+}
+
+function rerunCurrentSearch() {
+  syncSectionFilterResetButtons();
+  if (!input.value.trim()) return;
+  if (button.disabled) pendingHistorySearch = true;
+  else form.requestSubmit(button);
+}
+
+function handleDictionaryChange() {
+  const selected = getSelectedDictionary();
+  if (selected === activeDictionarySelection) return;
+  activeDictionarySelection = selected;
+  pickComparison?.close();
+  rackLeaveAnagramCountCache.clear();
+  pickListHookCache.clear();
+  refreshPickListHookCache();
+  if (dictionarySearchQueued) return;
+  dictionarySearchQueued = true;
+  const revision = searchRevision;
+  queueMicrotask(() => {
+    dictionarySearchQueued = false;
+    // Examples and recovery actions can already submit in the same event.
+    if (revision === searchRevision) rerunCurrentSearch();
+  });
+}
+
+function removeInlineConstraint(kind) {
+  if (kind === "length") input.value = input.value.replace(/:\s*\d+/, "");
+  if (kind === "include") input.value = input.value.replace(/\+\s*[a-z]+/i, "");
+  if (kind === "exclude") input.value = input.value.replace(/-\s*[a-z]+/i, "");
+  if (kind === "pattern") input.value = input.value.replace(/\/[^+-]*/, "");
+  renderRackTiles();
+}
+
+function renderActiveFilters() {
+  activeFilters.replaceChildren();
+  const add = (label, clear) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "filter-chip";
+    chip.textContent = `${label} ×`;
+    chip.setAttribute("aria-label", `Remove ${label}`);
+    chip.addEventListener("click", () => { clear(); rerunCurrentSearch(); });
+    activeFilters.append(chip);
+  };
+  const parsed = parseSmartInput(input.value);
+  const length = parsed.inlineLength ?? Number(wordLengthInput.value);
+  if (length && !parsed.unrestricted) add(`Length: ${length}`, () => {
+    removeInlineConstraint("length"); wordLengthInput.value = "0";
+  });
+  const textFilters = [
+    [startsWithInput, "Starts", null], [endsWithInput, "Ends", null],
+    [mustIncludeInput, "Includes", "include"], [excludeLettersInput, "Excludes", "exclude"]
+  ];
+  for (const [control, label, inline] of textFilters) {
+    const value = (inline === "include" ? parsed.inlineMustInclude : inline === "exclude" ? parsed.inlineExcludeLetters : "") || control.value.trim();
+    if (value) add(`${label}: ${value.toUpperCase()}`, () => {
+      control.value = ""; if (inline) removeInlineConstraint(inline);
+    });
+  }
+  if (parsed.pattern) add(`Pattern: ${parsed.pattern.toUpperCase()}`, () => removeInlineConstraint("pattern"));
+  if (useBoardLetters.checked && boardPatternInput.value.trim()) add(`Board: ${boardPatternInput.value.trim().toUpperCase()}`, () => {
+    useBoardLetters.checked = false; boardPatternFields.hidden = true;
+  });
+  if (highValueOnlyInput.checked) add("J, Q, X or Z", () => { highValueOnlyInput.checked = false; });
+  for (const [control, label, defaultValue] of [
+    [minimumVowelsInput, "Min vowels", "0"], [minimumConsonantsInput, "Min consonants", "0"],
+    [minimumScoreInput, "Min score", ""], [maximumScoreInput, "Max score", ""]
+  ]) {
+    if (control.value !== "" && control.value !== defaultValue) add(`${label}: ${control.value}`, () => { control.value = defaultValue; });
+  }
+  const hook = [...hookFilterInputs].find((option) => option.checked)?.value;
+  if (hook) add(`Hooks: ${hook}`, () => { hookFilterInputs[0].checked = true; });
+  activeFilters.hidden = !activeFilters.childElementCount;
+  document.querySelectorAll("[data-quick-length]").forEach((choice) => {
+    choice.setAttribute("aria-pressed", String(Number(choice.dataset.quickLength) === length));
+    choice.disabled = parsed.unrestricted && choice.dataset.quickLength === "0";
+  });
+}
+
+function renderEmptyRecovery(options) {
+  const add = (label, action) => {
+    const recovery = document.createElement("button");
+    recovery.type = "button";
+    recovery.className = "empty-recovery-action";
+    recovery.textContent = label;
+    recovery.addEventListener("click", () => { action(); rerunCurrentSearch(); });
+    emptyRecovery.append(recovery);
+  };
+  if (hasBasicFilters() || hasAdvancedFilters() || (!options.unrestricted && options.wordLength) || options.pattern || options.mustInclude || options.excludeLetters) {
+    add("Clear filters", () => {
+      resetBasicFilters(); resetAdvancedFilters();
+      if (!options.unrestricted) removeInlineConstraint("length");
+      removeInlineConstraint("include"); removeInlineConstraint("exclude"); removeInlineConstraint("pattern");
+    });
+  }
+  if (options.dictionaryBit !== DICTIONARY_BITS.both) add("Try both dictionaries", () => {
+    const choice = [...dictionaryInputs].find((candidate) => candidate.value === "both");
+    choice.checked = true;
+    choice.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  if (options.boardPattern) add("Search rack only", () => {
+    useBoardLetters.checked = false; boardPatternFields.hidden = true;
+  });
+  emptyRecovery.hidden = !emptyRecovery.childElementCount;
 }
 
 function restoreFilters(filters = {}) {
+  useBoardLetters.checked = filters.useBoardLetters === true;
+  boardPatternInput.value = filters.boardPattern ?? "";
+  boardPatternFields.hidden = !useBoardLetters.checked;
   wordLengthInput.value = filters.wordLength ?? "0";
   startsWithInput.value = filters.startsWith ?? "";
   endsWithInput.value = filters.endsWith ?? "";
@@ -855,14 +978,14 @@ function getHistoryEntropy(letters) {
   return Number(clamp(analysis.normalizedEntropy + wildcardBonus, 0, 1).toFixed(2));
 }
 
-function getHistoryLeaveValue(letters, matches) {
+function getHistoryLeaveValue(letters, matches, options = {}) {
   if (matches.length === 0) {
     return null;
   }
 
   const sample = matches.slice(0, 50);
   return Math.round(sample.reduce((sum, word) => (
-    sum + getLeaveQuality(getLeaveLetters(letters, word))
+    sum + getLeaveQuality(getLeaveLetters(letters, word, options))
   ), 0) / sample.length);
 }
 
@@ -1490,7 +1613,7 @@ function saveHistoryEntry(letters, pattern, matches, filters, sortMode) {
     entropy: getHistoryEntropy(analysisLetters),
     leaveValue: parsedHistoryInput.unrestricted
       ? null
-      : getHistoryLeaveValue(analysisLetters, matches),
+      : getHistoryLeaveValue(analysisLetters, matches, { boardPattern: filters.useBoardLetters ? filters.boardPattern : "" }),
     pinned: false
   });
   renderAllHistory();
@@ -1546,6 +1669,8 @@ function clearResults() {
   emptyState.hidden = false;
   matchCount.hidden = true;
   resultsHeading.classList.remove("visually-hidden");
+  emptyRecovery.replaceChildren();
+  emptyRecovery.hidden = true;
 }
 
 function isWordPicked(word) {
@@ -1569,11 +1694,7 @@ function getScrabbleTileValue(letter) {
 
 function getPickListSortKey(entry, mode) {
   const analysis = getPickListAnalysis(entry.word);
-  const totalTileValue = [...entry.word.toLowerCase()].reduce(
-    (sum, letter) => sum + getScrabbleTileValue(letter),
-    0
-  );
-  const density = entry.word.length > 0 ? totalTileValue / entry.word.length : 0;
+  const density = entry.word.length > 0 ? entry.score / entry.word.length : 0;
 
   if (mode === "hook-desc") {
     return [Number(analysis.hasHook), entry.score, entry.word];
@@ -1637,7 +1758,7 @@ function getPickListAnalysis(word) {
 
   return {
     hasHook: pickListHookCache.get(word.toUpperCase()) ?? !word.endsWith("s"),
-    hasHighValueLetters: Boolean(highValueLetters),
+    hasHighValueLetters: highValueLetters.length > 0,
     balanceLabel: vowels === consonants
       ? "Balanced"
       : vowels > consonants
@@ -1650,6 +1771,7 @@ function getPickListAnalysis(word) {
 }
 
 function refreshPickListHookCache() {
+  const revision = ++pickListHookRefreshRevision;
   if (pickListHookRefreshQueued || !pickListEntries.length) {
     return;
   }
@@ -1658,23 +1780,27 @@ function refreshPickListHookCache() {
 
   queueMicrotask(async () => {
     try {
-      await Engine.ready;
-      await loadAllChunks();
-
+      await SearchEngine.ready;
+      const dictionaryBit = DICTIONARY_BITS[getSelectedDictionary()];
+      const entries = [...pickListEntries];
+      await Dictionary.loadRelevant(entries.map((entry) => entry.word[0].toLowerCase()).join(""), dictionaryBit);
       const nextCache = new Map();
-      pickListEntries.forEach((entry) => {
+      await Promise.all(entries.map(async (entry) => {
         nextCache.set(
           entry.word.toUpperCase(),
-          getHookInfo(entry.word.toLowerCase(), DICTIONARY_BITS.both).hasSHook
+          (await getHookInfo(entry.word.toLowerCase(), dictionaryBit)).hasSHook
         );
-      });
+      }));
 
-      pickListHookCache = nextCache;
-      renderPickList();
+      if (revision === pickListHookRefreshRevision) {
+        pickListHookCache = nextCache;
+        renderPickList();
+      }
     } catch (error) {
       console.error("Unable to refresh pick-list hook flags:", error);
     } finally {
       pickListHookRefreshQueued = false;
+      if (revision !== pickListHookRefreshRevision) refreshPickListHookCache();
     }
   });
 }
@@ -1702,46 +1828,40 @@ function createScrabbleTile(letter) {
   return tile;
 }
 
-function renderPickListWord(word) {
+function renderPickListWord(word, entry = {}) {
   const wordRow = document.createElement("div");
   wordRow.className = "pick-list-word-tiles";
 
-  [...word].forEach((letter) => {
-    wordRow.append(createScrabbleTile(letter));
+  [...word].forEach((letter, index) => {
+    const tile = createScrabbleTile(letter);
+    if (entry.blankPositions?.includes(index)) {
+      tile.querySelector(".pick-list-tile-score").textContent = "0";
+      tile.classList.add("wildcard-letter");
+      tile.title = "Blank tile · 0 points";
+    }
+    if (entry.boardPositions?.includes(index)) tile.classList.add("board-letter");
+    wordRow.append(tile);
   });
 
   return wordRow;
 }
 
-function getRackLeave(word, rackLetters, dictionaryBit) {
-  const remaining = [...String(rackLetters).toLowerCase().replace(/[^a-z?]/g, "")];
-  for (const letter of word.toLowerCase()) {
-    let index = remaining.indexOf(letter);
-    if (index < 0) index = remaining.indexOf("?");
-    if (index < 0) return { valid: false, letters: remaining, value: 0, label: "Not from rack", vowels: 0, consonants: 0, anagramCount: 0 };
-    remaining.splice(index, 1);
-  }
+async function getRackLeave(word, rackLetters, dictionaryBit, options = {}) {
+  const play = getPlayAnalysis(word, rackLetters, options);
+  const remaining = [...play.leave];
+  if (!play.valid) return { valid: false, letters: remaining, value: 0, label: "No rack context", vowels: 0, consonants: 0, anagramCount: 0 };
 
   const vowels = remaining.filter((letter) => VOWELS.includes(letter)).length;
   const consonants = remaining.filter((letter) => /[a-z]/.test(letter) && !VOWELS.includes(letter)).length;
-  const counts = remaining.reduce((map, letter) => map.set(letter, (map.get(letter) ?? 0) + 1), new Map());
-  const duplicates = [...counts.values()].reduce((total, count) => total + Math.max(0, count - 1), 0);
-  let value = 50;
-  if (vowels && consonants) value += 12;
-  value -= Math.abs(vowels - consonants) * 7;
-  value -= duplicates * 6;
-  value += remaining.filter((letter) => letter === "?").length * 18;
-  value += remaining.filter((letter) => letter === "s").length * 10;
-  value -= remaining.filter((letter) => HIGH_VALUE_LETTERS.includes(letter)).length * 9;
-  if (remaining.length >= 2 && remaining.length <= 5) value += 5;
-  value = clamp(Math.round(value), 0, 100);
+  const value = getLeaveQuality(remaining);
   const label = value >= 75 ? "Excellent" : value >= 60 ? "Good" : value >= 40 ? "Fair" : "Tough";
   const leaveRack = remaining.join("");
   const anagramKey = `${dictionaryBit}:${[...leaveRack].sort().join("")}`;
   if (!rackLeaveAnagramCountCache.has(anagramKey)) {
+    await Dictionary.loadRelevant(leaveRack, dictionaryBit);
     const availableWords = leaveRack.length < 2
       ? []
-      : Engine.unscramble(leaveRack, "", { dictionaryBit, scoring: IS_WWF ? "wwf" : "scrabble" });
+      : await SearchEngine.unscramble(leaveRack, "", { dictionaryBit, scoring: IS_WWF ? "wwf" : "scrabble" });
     rackLeaveAnagramCountCache.set(anagramKey, availableWords.length);
   }
   return {
@@ -1755,8 +1875,8 @@ function getRackLeave(word, rackLetters, dictionaryBit) {
   };
 }
 
-function createRackLeave(word, rackLetters, dictionaryBit) {
-  const leave = getRackLeave(word, rackLetters, dictionaryBit);
+async function createRackLeave(word, rackLetters, dictionaryBit, options) {
+  const leave = await getRackLeave(word, rackLetters, dictionaryBit, options);
   const container = document.createElement("div");
   const heading = document.createElement("div");
   const label = document.createElement("strong");
@@ -1769,7 +1889,7 @@ function createRackLeave(word, rackLetters, dictionaryBit) {
   const fill = document.createElement("span");
   container.className = `rack-leave${leave.valid ? "" : " is-invalid"}`;
   heading.className = "rack-leave-heading";
-  label.textContent = "Rack leave";
+  label.textContent = "Rack leave · estimate";
   value.textContent = leave.valid ? `${leave.value} · ${leave.label}` : leave.label;
   tiles.className = "rack-leave-tiles";
   if (leave.letters.length) leave.letters.forEach((letter) => tiles.append(createScrabbleTile(letter)));
@@ -1919,6 +2039,7 @@ function renderPickList() {
 
   if (pickListEntries.length === 0) {
     pickListVirtualList.replaceChildren();
+    pickComparison?.sync();
     return;
   }
 
@@ -1930,8 +2051,9 @@ function renderPickList() {
     const topActions = document.createElement("div");
     const meta = document.createElement("span");
     const insert = document.createElement("button");
+    const playButton = document.createElement("button");
     const remove = document.createElement("button");
-    const tileRow = renderPickListWord(entry.word);
+    const tileRow = renderPickListWord(entry.word, entry);
     const wordLabel = document.createElement("strong");
     const wordHeading = document.createElement("span");
     const noteIcon = document.createElement("span");
@@ -1951,13 +2073,20 @@ function renderPickList() {
     noteIcon.hidden = !entry.note.trim();
     flags.className = "pick-list-flags";
     wordLabel.textContent = entry.word;
-    meta.textContent = `${entry.score} pts · ${entry.length} letters · ${analysis.anagramCount.toLocaleString()} anagrams`;
+    meta.textContent = `${entry.score} pts · ${entry.length} letters${entry.scoreKind === "rack" ? " · blanks adjusted" : " · base tile score"}`;
+    if (entry.rack) meta.title = `Saved rack: ${entry.rack}${entry.boardPattern ? ` · Board: ${entry.boardPattern}` : ""}`;
     insert.className = "pick-list-action pick-list-insert";
     insert.type = "button";
     insert.textContent = "Insert";
     insert.title = "Insert into Rack";
     insert.setAttribute("aria-label", `Insert ${entry.word} into rack`);
     insert.addEventListener("click", () => insertPickWordIntoRack(entry.word));
+    playButton.className = "pick-list-action word-play-button";
+    playButton.type = "button";
+    playButton.textContent = "Play";
+    playButton.setAttribute("aria-label", `Play ${entry.word}`);
+    playButton.title = "Play this word using your current rack and board letters";
+    playButton.addEventListener("click", () => playRefill.playCurrent(entry.word));
     remove.className = "pick-list-action";
     remove.type = "button";
     remove.textContent = "Remove";
@@ -1980,26 +2109,30 @@ function renderPickList() {
 
     flags.append(createPickListFlag(analysis.balanceLabel, "pick-list-flag--balance"));
 
-    if (analysis.isBingoFriendly) {
+    if (entry.scoreKind === "rack" ? entry.bingo : analysis.isBingoFriendly) {
       flags.append(createPickListFlag("Bingo-friendly", "pick-list-flag--bingo"));
     }
 
     wordHeading.append(wordLabel, noteIcon);
-    topActions.append(insert, remove);
+    if (pickComparison) topActions.append(pickComparison.createSelectionControl(entry));
+    topActions.append(playButton, insert, remove);
     top.append(wordHeading, topActions);
     item.append(top, meta, note, tileRow, flags);
     fragment.append(item);
   });
 
   pickListVirtualList.replaceChildren(fragment);
-  refreshPickListHookCache();
+  pickComparison?.sync();
 }
 
-function togglePickWord(word, score) {
+function togglePickWord(word, score, letters, options, play) {
   if (isWordPicked(word)) {
     pickListEntries = PickListStore.remove(word);
   } else {
-    pickListEntries = PickListStore.add({ word, score, length: word.length });
+    pickListEntries = PickListStore.add({ word, score, length: word.length,
+      rack: options.unrestricted ? "" : letters, boardPattern: options.boardPattern || "",
+      blankPositions: play.blankPositions, boardPositions: play.boardPositions,
+      bingo: play.bingo, scoreKind: options.unrestricted ? "base" : "rack" });
   }
 
   pickListHookCache.delete(word.toUpperCase());
@@ -2036,10 +2169,16 @@ function getWildcardLetterIndexes(word, letters) {
   return wildcardIndexes;
 }
 
-function appendHighlightedWord(wordLabel, word, letters) {
-  const wildcardIndexes = getWildcardLetterIndexes(word, letters);
+function getPlayAnalysis(word, letters, options = {}) {
+  if (options.unrestricted) return { valid: false, score: getScrabbleScore(word), blankPositions: [], boardPositions: [], tilesUsed: 0, leave: "", bingo: false };
+  return Engine.analyzePlay(word, letters, options.boardPattern || "", IS_WWF ? "wwf" : "scrabble");
+}
 
-  if (wildcardIndexes.size === 0) {
+function appendHighlightedWord(wordLabel, word, letters, play) {
+  const wildcardIndexes = new Set(play.blankPositions);
+  const boardIndexes = new Set(play.boardPositions);
+
+  if (wildcardIndexes.size === 0 && boardIndexes.size === 0) {
     wordLabel.textContent = word.toUpperCase();
     return;
   }
@@ -2051,10 +2190,172 @@ function appendHighlightedWord(wordLabel, word, letters) {
       wildcardLetter.title = "Letter supplied by a wildcard tile";
       wildcardLetter.textContent = word[index].toUpperCase();
       wordLabel.append(wildcardLetter);
+    } else if (boardIndexes.has(index)) {
+      const boardLetter = document.createElement("span");
+      boardLetter.className = "board-letter";
+      boardLetter.title = "Letter already on the board";
+      boardLetter.textContent = word[index].toUpperCase();
+      wordLabel.append(boardLetter);
     } else {
       wordLabel.append(word[index].toUpperCase());
     }
   }
+}
+
+function createDictionarySource(word) {
+  const element = document.createElement("div");
+  const label = document.createElement("span");
+  const result = document.createElement("span");
+  element.className = "dictionary-source";
+  label.className = "dictionary-source-label";
+  label.textContent = "Word lists:";
+  result.className = "dictionary-source-result";
+  result.setAttribute("aria-live", "polite");
+  result.textContent = "Open this word to check its sources.";
+  element.append(label, result);
+  let loading = false;
+  let loaded = false;
+
+  const load = async () => {
+    if (loading || loaded) return;
+    loading = true;
+    result.textContent = "Checking…";
+    try {
+      // A Standard search may only have loaded ENABLE data. The combined shard
+      // supplies complete membership without downloading the whole dictionary.
+      await Dictionary.loadRelevant(word[0], DICTIONARY_BITS.both);
+      const membership = await SearchEngine.dictionaryMembership(word);
+      if (![1, 2, 3].includes(membership)) throw new Error("Word source is unavailable.");
+      result.replaceChildren();
+      for (const [bit, name, source, variant] of [
+        [1, "ENABLE", "ENABLE", "enable"],
+        [2, "Expanded", "Expanded (Wiktionary)", "expanded"]
+      ]) {
+        if (!(membership & bit)) continue;
+        const badge = document.createElement("span");
+        badge.className = `dictionary-source-badge dictionary-source-badge--${variant}`;
+        badge.textContent = name;
+        badge.title = `Included in the ${source} word list`;
+        result.append(badge);
+      }
+      loaded = true;
+    } catch (_error) {
+      result.textContent = "Sources unavailable. Reopen the word to retry.";
+    } finally {
+      loading = false;
+    }
+  };
+  return { element, load };
+}
+
+const dictionaryPopoverState = { active: null, nextId: 0, listening: false };
+
+function createWordPopoverController(trigger, popover, lookup, closeButton, onOpen, position) {
+  let pinned = false;
+  let dismissed = false;
+  let restoringFocus = false;
+  let closeTimer;
+  const state = dictionaryPopoverState;
+  popover.id = `word-details-${++state.nextId}`;
+  popover.hidden = true;
+  popover.tabIndex = -1;
+  trigger.setAttribute("aria-controls", popover.id);
+  trigger.setAttribute("aria-expanded", "false");
+
+  const close = ({ restoreFocus = false } = {}) => {
+    const shouldRestoreFocus = restoreFocus && lookup.contains(document.activeElement);
+    clearTimeout(closeTimer);
+    dismissed = true;
+    pinned = false;
+    popover.hidden = true;
+    popover.classList.remove("is-open", "is-pinned");
+    trigger.setAttribute("aria-expanded", "false");
+    if (state.active === controller) state.active = null;
+    if (shouldRestoreFocus) {
+      restoringFocus = true;
+      trigger.focus({ preventScroll: true });
+      restoringFocus = false;
+    }
+  };
+  const open = ({ pin = false, hover = false } = {}) => {
+    clearTimeout(closeTimer);
+    if (!pin && dismissed) return;
+    if (state.active && state.active !== controller) {
+      if (hover && state.active.isPinned()) return;
+      state.active.close();
+    }
+    state.active = controller;
+    pinned = pinned || pin;
+    popover.hidden = false;
+    popover.classList.add("is-open");
+    popover.classList.toggle("is-pinned", pinned);
+    trigger.setAttribute("aria-expanded", "true");
+    position();
+    onOpen();
+    if (pin) popover.focus({ preventScroll: true });
+  };
+  const controller = { close, lookup, popover, position, isPinned: () => pinned };
+  if (!state.listening) {
+    // One pair of document listeners serves every card, including rerendered results.
+    document.addEventListener("pointerdown", (event) => {
+      if (event.target.closest?.("dialog[open]")) return;
+      if (state.active && !state.active.lookup.contains(event.target)) state.active.close();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || event.defaultPrevented || event.target.closest?.("dialog[open]")) return;
+      if (state.active) {
+        event.preventDefault();
+        state.active.close({ restoreFocus: true });
+      }
+    });
+    window.addEventListener("scroll", () => {
+      if (!state.active) return;
+      if (!state.active.popover.isConnected) state.active.close();
+      else state.active.position();
+    }, true);
+    state.listening = true;
+  }
+  trigger.addEventListener("mouseenter", () => {
+    if (window.matchMedia("(hover: hover)").matches) {
+      dismissed = false;
+      open({ hover: true });
+    }
+  });
+  trigger.addEventListener("click", () => {
+    if (state.active === controller && pinned) close({ restoreFocus: true });
+    else { dismissed = false; open({ pin: true }); }
+  });
+  popover.addEventListener("mouseenter", () => clearTimeout(closeTimer));
+  popover.addEventListener("pointerdown", () => {
+    pinned = true;
+    popover.classList.add("is-pinned");
+  });
+  lookup.addEventListener("mouseleave", () => {
+    closeTimer = setTimeout(() => {
+      if (!pinned && !lookup.contains(document.activeElement)) close();
+    }, 180);
+  });
+  lookup.addEventListener("focusin", (event = {}) => {
+    if (restoringFocus) return;
+    if (!lookup.contains(event.relatedTarget)) dismissed = false;
+    open();
+  });
+  lookup.addEventListener("focusout", (event = {}) => {
+    if (lookup.contains(event.relatedTarget)) return;
+    // A pointer click on summary or other non-input content can temporarily
+    // focus BODY before the click's default action runs. Preserve a pinned
+    // dialog through that transition; outside pointers are handled separately.
+    if (pinned && !event.relatedTarget) return;
+    queueMicrotask(() => {
+      if (document.activeElement?.closest?.("dialog[open]")) return;
+      if (!lookup.contains(document.activeElement)) {
+        close();
+        dismissed = false;
+      }
+    });
+  });
+  closeButton.addEventListener("click", () => close({ restoreFocus: true }));
+  return controller;
 }
 
 function createWordItem(word, letters, options) {
@@ -2065,16 +2366,19 @@ function createWordItem(word, letters, options) {
   const linkMeta = document.createElement("span");
   const score = document.createElement("span");
   const insertButton = document.createElement("button");
+  const playButton = document.createElement("button");
   const pickButton = document.createElement("button");
   const dictionaryLinks = document.createElement("div");
   const dictionaryPopoverHeader = document.createElement("div");
   const dictionaryPopoverActions = document.createElement("div");
   const dictionaryPopoverTitle = document.createElement("span");
+  const dictionaryPopoverClose = document.createElement("button");
   const dictionaryDirectoryButton = document.createElement("button");
   const localDefinition = document.createElement("section");
   const localDefinitionLabel = document.createElement("span");
   const localDefinitionResult = document.createElement("div");
-  const points = getScrabbleScore(word);
+  const play = getPlayAnalysis(word, letters, options);
+  const points = play.score;
   const highValueLetters = getHighValueLetters(word);
 
   item.className = "word-card";
@@ -2083,14 +2387,15 @@ function createWordItem(word, letters, options) {
 
   wordLabel.className = "word-label";
   wordLabel.type = "button";
-  appendHighlightedWord(wordLabel, word, letters);
-  wordLabel.title = `Show definition and hooks for ${word}`;
+  appendHighlightedWord(wordLabel, word, letters, play);
+  wordLabel.title = `Show details for ${word}; click to keep them open`;
   wordLabel.setAttribute("aria-haspopup", "dialog");
 
   linkMeta.className = "word-link-meta";
 
   score.className = "scrabble-score";
   score.textContent = `${points} pts`;
+  score.title = "Tile score with rack blanks worth zero; before board bonuses and cross-words";
   linkMeta.append(score);
 
   pickButton.className = "word-pick-button";
@@ -2099,7 +2404,7 @@ function createWordItem(word, letters, options) {
   pickButton.textContent = isWordPicked(word) ? "Picked" : "Pick";
   pickButton.setAttribute("aria-pressed", String(isWordPicked(word)));
   pickButton.title = `Add ${word} to the pick list`;
-  pickButton.addEventListener("click", () => togglePickWord(word, points));
+  pickButton.addEventListener("click", () => togglePickWord(word, points, letters, options, play));
 
   insertButton.className = "word-insert-button";
   insertButton.type = "button";
@@ -2107,8 +2412,18 @@ function createWordItem(word, letters, options) {
   insertButton.title = "Insert into Rack";
   insertButton.setAttribute("aria-label", `Insert ${word} into rack`);
   insertButton.addEventListener("click", () => insertPickWordIntoRack(word));
+  playButton.className = "word-insert-button word-play-button";
+  playButton.type = "button";
+  playButton.textContent = "Play";
+  playButton.setAttribute("aria-label", `Play ${word.toUpperCase()}`);
+  playButton.title = "Play this word and refill your rack";
+  playButton.disabled = !play.valid || options.unrestricted;
+  if (playButton.disabled) playButton.title = "Use a rack search to play this word";
+  playButton.addEventListener("click", () => playRefill.play(word, {
+    rack: letters, boardPattern: options.boardPattern || "", unrestricted: options.unrestricted
+  }));
 
-  if (word.length === 7) {
+  if (play.bingo) {
     const bingoBadge = document.createElement("span");
     bingoBadge.className = "result-badge result-badge--bingo";
     bingoBadge.textContent = IS_WWF ? "Bingo +35" : "Bingo +50";
@@ -2123,14 +2438,13 @@ function createWordItem(word, letters, options) {
   }
 
   if (options.showHooks) {
-    const hooks = getHookInfo(word, options.dictionaryBit);
     const hookBadge = document.createElement("span");
     hookBadge.className = "result-badge";
-    hookBadge.textContent =
-      `F${hooks.front.length} · B${hooks.back.length}${hooks.hasSHook ? " · S" : ""}`;
-    hookBadge.title =
-      `Front hooks: ${hooks.front.join(", ").toUpperCase() || "none"}; ` +
-      `back hooks: ${hooks.back.join(", ").toUpperCase() || "none"}`;
+    hookBadge.textContent = "Hooks…";
+    getHookInfo(word, options.dictionaryBit).then((hooks) => {
+      hookBadge.textContent = `F${hooks.front.length} · B${hooks.back.length}${hooks.hasSHook ? " · S" : ""}`;
+      hookBadge.title = `Front: ${hooks.front.join(", ").toUpperCase() || "none"}; back: ${hooks.back.join(", ").toUpperCase() || "none"}`;
+    }).catch(() => { hookBadge.textContent = "Hooks unavailable"; });
     linkMeta.append(hookBadge);
   }
 
@@ -2141,6 +2455,10 @@ function createWordItem(word, letters, options) {
   dictionaryPopoverActions.className = "dictionary-popover-actions";
   dictionaryPopoverTitle.className = "dictionary-popover-title";
   dictionaryPopoverTitle.textContent = word.toUpperCase();
+  dictionaryPopoverClose.className = "dictionary-popover-close";
+  dictionaryPopoverClose.type = "button";
+  dictionaryPopoverClose.textContent = "×";
+  dictionaryPopoverClose.setAttribute("aria-label", `Close details for ${word.toUpperCase()}`);
   dictionaryDirectoryButton.className = "dictionary-directory-trigger";
   dictionaryDirectoryButton.type = "button";
   dictionaryDirectoryButton.title = `Show external dictionary lookups for ${word}`;
@@ -2151,9 +2469,27 @@ function createWordItem(word, letters, options) {
   spyglassIcon.setAttribute("aria-hidden", "true");
   dictionaryDirectoryButton.append(spyglassIcon);
   dictionaryDirectoryButton.addEventListener("click", () => openDictionaryDirectory(word, dictionaryDirectoryButton));
-  dictionaryPopoverActions.append(insertButton, pickButton, dictionaryDirectoryButton);
-  dictionaryPopoverHeader.append(dictionaryPopoverActions, dictionaryPopoverTitle);
-  dictionaryLinks.append(dictionaryPopoverHeader, createRackLeave(word, letters, options.dictionaryBit));
+  dictionaryPopoverActions.append(playButton, insertButton, pickButton, dictionaryDirectoryButton);
+  dictionaryPopoverHeader.append(dictionaryPopoverActions, dictionaryPopoverTitle, dictionaryPopoverClose);
+  const dictionarySource = createDictionarySource(word);
+  const leavePlaceholder = document.createElement("div");
+  leavePlaceholder.className = "rack-leave";
+  dictionaryLinks.append(dictionaryPopoverHeader, dictionarySource.element, leavePlaceholder);
+  let leaveLoading = false;
+  let leaveLoaded = false;
+  const loadRackLeave = async () => {
+    if (leaveLoading || leaveLoaded) return;
+    leaveLoading = true;
+    leavePlaceholder.textContent = "Analyzing rack leave…";
+    try {
+      const leave = await createRackLeave(word, letters, options.dictionaryBit, options);
+      leavePlaceholder.replaceWith(leave);
+      leaveLoaded = true;
+      positionDictionaryPopover();
+    } catch (_error) {
+      leavePlaceholder.textContent = "Rack leave unavailable. Reopen the word to retry.";
+    } finally { leaveLoading = false; }
+  };
 
   let localDefinitionLoaded = false;
   let localDefinitionLoading = false;
@@ -2167,8 +2503,8 @@ function createWordItem(word, letters, options) {
   localDefinition.append(localDefinitionLabel, localDefinitionResult);
   dictionaryLinks.append(localDefinition);
 
-  const hookLookup = document.createElement("section");
-  const hookLookupLabel = document.createElement("span");
+  const hookLookup = document.createElement("details");
+  const hookLookupLabel = document.createElement("summary");
   const hookLookupResult = document.createElement("div");
   let hookLookupLoaded = false;
   let hookLookupLoading = false;
@@ -2176,10 +2512,10 @@ function createWordItem(word, letters, options) {
   hookLookup.className = "hook-lookup";
   hookLookup.setAttribute("aria-label", `Available hooks for ${word}`);
   hookLookupLabel.className = "hook-lookup-label";
-  hookLookupLabel.textContent = "Available Hooks:";
+  hookLookupLabel.textContent = "Available hooks";
   hookLookupResult.className = "hook-lookup-result";
   hookLookupResult.setAttribute("aria-live", "polite");
-  hookLookupResult.textContent = "Open this word to load hooks.";
+  hookLookupResult.textContent = "Expand to find letters that extend this word.";
   hookLookup.append(hookLookupLabel, hookLookupResult);
 
   const positionDictionaryPopover = () => {
@@ -2211,8 +2547,8 @@ function createWordItem(word, letters, options) {
     hookLookupResult.textContent = "Loading hooks…";
 
     try {
-      await loadAllChunks();
-      const hooks = getHookInfo(word, options.dictionaryBit);
+      await loadAllChunks(options.dictionaryBit);
+      const hooks = await getHookInfo(word, options.dictionaryBit);
       const formatHookWord = (hookWord) =>
         `${hookWord.toUpperCase()} (+${getScrabbleScore(hookWord)})`;
       const frontHooks = hooks.front.map((letter) => formatHookWord(`${letter}${word}`));
@@ -2237,12 +2573,23 @@ function createWordItem(word, letters, options) {
     } catch (error) {
       console.error(`Unable to load hooks for ${word}:`, error);
       hookLookupResult.className = "hook-lookup-result is-error";
-      hookLookupResult.textContent = "Unable to load hooks. Close this window and try again.";
+      hookLookupResult.textContent = "Unable to load hooks. ";
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "hook-lookup-retry";
+      retry.textContent = "Retry hooks";
+      retry.addEventListener("click", loadHookLookup);
+      hookLookupResult.append(retry);
       positionDictionaryPopover();
     } finally {
       hookLookupLoading = false;
     }
   };
+
+  hookLookup.addEventListener("toggle", () => {
+    if (hookLookup.open) loadHookLookup();
+    positionDictionaryPopover();
+  });
 
   const loadLocalDefinition = async () => {
     if (localDefinitionLoaded || localDefinitionLoading) return;
@@ -2283,12 +2630,12 @@ function createWordItem(word, letters, options) {
 
   const openDictionaryPopover = () => {
     positionDictionaryPopover();
+    dictionarySource.load().then(positionDictionaryPopover);
+    loadRackLeave();
     loadLocalDefinition();
-    loadHookLookup();
   };
 
-  wordLabel.addEventListener("mouseenter", openDictionaryPopover);
-  wordLookup.addEventListener("focusin", openDictionaryPopover);
+  createWordPopoverController(wordLabel, dictionaryLinks, wordLookup, dictionaryPopoverClose, openDictionaryPopover, positionDictionaryPopover);
 
   dictionaryLinks.append(hookLookup);
   wordLookup.append(wordLabel, dictionaryLinks);
@@ -2458,8 +2805,11 @@ function renderMatches(letters, matches, options, requestedPage = 1, focusResult
     resultsHeading.textContent = "No matches found";
     setEmptyState(
       "No words match these options",
-      `Try changing the dictionary, basic or advanced filters, sorting, or “${letters}.”`
+      options.boardPattern
+        ? "Check your board letters and available rack tiles, or remove a filter below."
+        : "Remove an active filter or try a broader dictionary."
     );
+    renderEmptyRecovery(options);
     return;
   }
 
@@ -2725,22 +3075,8 @@ function createTileValueChart(letters) {
   return card;
 }
 
-function getLeaveLetters(letters, word) {
-  const remaining = [...letters];
-
-  for (const letter of word) {
-    let index = remaining.indexOf(letter);
-
-    if (index === -1) {
-      index = remaining.indexOf("?");
-    }
-
-    if (index !== -1) {
-      remaining.splice(index, 1);
-    }
-  }
-
-  return remaining;
+function getLeaveLetters(letters, word, options = {}) {
+  return [...getPlayAnalysis(word, letters, options).leave];
 }
 
 function getLeaveQuality(leave) {
@@ -2777,14 +3113,14 @@ function getLeaveQuality(leave) {
   return Math.round(clamp(score, 0, 100));
 }
 
-function createLeaveValueChart(letters, matches) {
+function createLeaveValueChart(letters, matches, options) {
   const card = createBreakdownCard(
     "Leave Value",
     "A 0–100 heuristic for the tiles kept after each result; balance, flexibility, duplicates, and difficult tiles affect the estimate."
   );
   const leaves = matches.map((word) => ({
     word,
-    value: getLeaveQuality(getLeaveLetters(letters, word))
+    value: getLeaveQuality(getLeaveLetters(letters, word, options))
   }));
   const average = Math.round(
     leaves.reduce((sum, leave) => sum + leave.value, 0) / leaves.length
@@ -2811,35 +3147,15 @@ function createLeaveValueChart(letters, matches) {
   return card;
 }
 
-function createBingoChart(matches) {
-  const card = createBreakdownCard(
-    "Bingo Opportunity",
-    "An opportunity estimate derived from matching 7- and 8-letter words; it is not a tile-bag probability."
-  );
-  const sevenLetterWords = matches.filter((word) => word.length === 7).length;
-  const eightLetterWords = matches.filter((word) => word.length === 8).length;
-  const weightedCount = sevenLetterWords + eightLetterWords * 1.5;
-  const opportunityScore = Math.round(
-    clamp(Math.log2(weightedCount + 1) * 18, 0, 100)
-  );
+function createBingoChart(matches, letters, options) {
+  const card = createBreakdownCard("Bingo Opportunity",
+    "A bingo uses seven tiles from your rack in one play. Fixed board letters do not count toward the seven tiles.");
+  const bingoCount = options.unrestricted ? 0 : matches.filter((word) => getPlayAnalysis(word, letters, options).bingo).length;
   const metrics = document.createElement("div");
-  const gauge = document.createElement("div");
-  const gaugeFill = document.createElement("div");
-  const gaugeLabel = document.createElement("div");
-
   metrics.className = "metric-grid";
-  metrics.append(
-    createMetricTile(String(sevenLetterWords), "7-letter words"),
-    createMetricTile(String(eightLetterWords), "8-letter words"),
-    createMetricTile(String(sevenLetterWords + eightLetterWords), "Bingo-length")
-  );
-  gauge.className = "chart-gauge";
-  gaugeFill.className = "chart-gauge-fill";
-  gaugeFill.style.width = `${opportunityScore}%`;
-  gauge.append(gaugeFill);
-  gaugeLabel.className = "chart-gauge-label";
-  gaugeLabel.textContent = `Opportunity estimate: ${opportunityScore}/100`;
-  card.append(metrics, gauge, gaugeLabel);
+  metrics.append(createMetricTile(String(bingoCount), "Seven-tile plays"),
+    createMetricTile(IS_WWF ? "+35" : "+50", "Bonus per bingo"));
+  card.append(metrics);
   return card;
 }
 
@@ -2947,8 +3263,8 @@ function createWordLengthDistributionChart(matches) {
   );
 }
 
-function createScoreDistributionChart(matches) {
-  const scores = matches.map(getScrabbleScore);
+function createScoreDistributionChart(matches, letters, options) {
+  const scores = matches.map((word) => getPlayAnalysis(word, letters, options).score);
   const minimumScore = scores.reduce((minimum, score) => Math.min(minimum, score), Infinity);
   const maximumScore = scores.reduce((maximum, score) => Math.max(maximum, score), 0);
   const bucketSize = maximumScore <= 30 ? 5 : maximumScore <= 80 ? 10 : 25;
@@ -2982,7 +3298,7 @@ function createScoreDistributionChart(matches) {
   );
 }
 
-function createPremiumPotentialChart(letters, matches) {
+function createPremiumPotentialChart(letters, matches, options) {
   const card = createBreakdownCard(
     "Premium Square Potential",
     "Theoretical multiplier potential only; exact premium hits require board-square positions."
@@ -2990,10 +3306,10 @@ function createPremiumPotentialChart(letters, matches) {
   const highValueCandidates = matches.filter((word) => getHighValueLetters(word)).length;
   const highestTileValue = Math.max(...analyzeWord(letters).tileDistribution.keys());
   const averageWordScore = Math.round(
-    matches.reduce((sum, word) => sum + getScrabbleScore(word), 0) / matches.length
+    matches.reduce((sum, word) => sum + getPlayAnalysis(word, letters, options).score, 0) / matches.length
   );
   const highestWordScore = matches.reduce(
-    (highest, word) => Math.max(highest, getScrabbleScore(word)),
+    (highest, word) => Math.max(highest, getPlayAnalysis(word, letters, options).score),
     0
   );
   const bars = document.createElement("div");
@@ -3026,16 +3342,19 @@ function createPremiumPotentialChart(letters, matches) {
   return card;
 }
 
-function getBoardFitAnalysis(letters, options) {
-  return Engine.boardFitAnalysis(letters, options.pattern, options);
+async function getBoardFitAnalysis(letters, options) {
+  await loadRelevantChunks(letters + (options.boardPattern || "").replace(/\?/g, ""), options.dictionaryBit);
+  return SearchEngine.boardFitAnalysis(letters, options.pattern, options);
 }
 
-function createBoardFitChart(letters, options) {
+async function createBoardFitChart(letters, options) {
   const card = createBreakdownCard(
     "Board Fit Analysis",
-    "Compares rack-buildable words with words fitting the active length, pattern, start, and end constraints."
+    options.boardPattern
+      ? "Compares words using the combined rack and fixed board letters with words fitting the selected board positions and filters."
+      : "Compares rack-buildable words with words fitting the active length, pattern, start, and end constraints."
   );
-  const analysis = getBoardFitAnalysis(letters, options);
+  const analysis = await getBoardFitAnalysis(letters, options);
   const fitPercentage = analysis.candidates > 0
     ? Math.round((analysis.fitting / analysis.candidates) * 100)
     : 0;
@@ -3091,14 +3410,15 @@ function createEntropyChart(letters) {
   return card;
 }
 
-function renderWordBreakdown() {
+async function renderWordBreakdown() {
   breakdownCharts.replaceChildren();
 
   if (!wordBreakdown.open || !breakdownState || breakdownState.matches.length === 0) {
     return;
   }
 
-  const { letters, matches, options } = breakdownState;
+  const currentState = breakdownState;
+  const { letters, matches, options } = currentState;
   const fragment = document.createDocumentFragment();
   const primaryCharts = document.createElement("div");
   const patternCharts = document.createElement("div");
@@ -3118,7 +3438,7 @@ function renderWordBreakdown() {
   distributionCharts.className = "breakdown-grid breakdown-grid--distributions";
   distributionCharts.append(
     createWordLengthDistributionChart(matches),
-    createScoreDistributionChart(matches)
+    createScoreDistributionChart(matches, letters, options)
   );
   estimateSeparator.className = "breakdown-estimate-separator";
   estimateSeparator.setAttribute("role", "note");
@@ -3127,10 +3447,9 @@ function renderWordBreakdown() {
   estimateSeparator.append(estimateDisclaimer);
   estimateCharts.className = "breakdown-grid breakdown-grid--estimates";
   estimateCharts.append(
-    createBoardFitChart(letters, options),
-    createPremiumPotentialChart(letters, matches),
-    createLeaveValueChart(letters, matches),
-    createBingoChart(matches)
+    createPremiumPotentialChart(letters, matches, options),
+    createLeaveValueChart(letters, matches, options),
+    createBingoChart(matches, letters, options)
   );
   fragment.append(
     primaryCharts,
@@ -3140,72 +3459,107 @@ function renderWordBreakdown() {
     estimateCharts
   );
   breakdownCharts.append(fragment);
-}
-
-async function decodeChunk(response) {
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  const isGzip = bytes[0] === 0x1f && bytes[1] === 0x8b;
-
-  // Some hosts transparently decode gzip; only decompress when the magic bytes remain.
-  if (!isGzip) {
-    return new TextDecoder().decode(bytes);
-  }
-
-  if (!("DecompressionStream" in window)) {
-    throw new Error("This browser does not support gzip decompression.");
-  }
-
-  const stream = new Blob([bytes])
-    .stream()
-    .pipeThrough(new DecompressionStream("gzip"));
-
-  return new Response(stream).text();
-}
-
-async function loadChunk(letter) {
-  if (loadedChunks.has(letter)) {
-    return;
-  }
-
-  if (chunkPromises.has(letter)) {
-    return chunkPromises.get(letter);
-  }
-
-  const chunk = manifest?.chunks?.[letter];
-  if (!chunk) {
-    return;
-  }
-
-  const promise = (async () => {
-    const response = await fetch(`${CHUNK_BASE_URL}${chunk.file}`);
-
-    if (!response.ok) {
-      throw new Error(`Dictionary chunk ${letter} failed with status ${response.status}`);
-    }
-
-    const text = await decodeChunk(response);
-    Engine.initEngine(text.split(/\r?\n/).filter(Boolean));
-    loadedChunks.add(letter);
-  })();
-
-  chunkPromises.set(letter, promise);
-
   try {
-    await promise;
-  } finally {
-    chunkPromises.delete(letter);
+    const fit = await createBoardFitChart(letters, options);
+    if (breakdownState === currentState && wordBreakdown.open) estimateCharts.prepend(fit);
+  } catch (_error) { /* Other charts remain useful if the worker becomes unavailable. */ }
+}
+
+function getSearchConflict(letters, options) {
+  const { boardPattern = "", wordLength = 0, mustInclude = "", excludeLetters = "", unrestricted = false } = options;
+  if (boardPattern && wordLength && wordLength !== boardPattern.length) {
+    return {
+      title: "Word length conflicts with the board",
+      message: `Board pattern ${boardPattern.toUpperCase()} has ${boardPattern.length} positions, including existing letters, but Word Length is ${wordLength}.`,
+      action: "board-length", value: boardPattern.length, actionLabel: `Use length ${boardPattern.length}`
+    };
   }
+  const requiredTiles = (boardPattern.match(/\?/g) || []).length;
+  if (boardPattern && requiredTiles > letters.length) {
+    return {
+      title: "The board needs more rack tiles",
+      message: `This board pattern needs ${requiredTiles} new tiles, but your rack contains ${letters.length}. Each ? on the board needs one rack tile.`,
+      action: "edit-rack", actionLabel: "Edit rack"
+    };
+  }
+  if (!boardPattern && !unrestricted && wordLength > letters.length) {
+    return {
+      title: "Word length exceeds your rack",
+      message: `Word Length is ${wordLength}, but your rack has only ${letters.length} tiles. Choose a shorter length or add tiles to your rack.`,
+      action: "any-length", actionLabel: "Use any length"
+    };
+  }
+  const requiredAndExcluded = [...new Set([...mustInclude].filter((letter) => excludeLetters.includes(letter)))];
+  if (requiredAndExcluded.length) {
+    return {
+      title: "Required letters are also excluded",
+      message: `${requiredAndExcluded.join(", ").toUpperCase()} cannot be both required and excluded.`,
+      action: "clear-excluded", actionLabel: "Clear excluded letters"
+    };
+  }
+  const excludedBoardLetters = [...new Set([...boardPattern].filter((letter) => letter !== "?" && excludeLetters.includes(letter)))];
+  if (excludedBoardLetters.length) {
+    return {
+      title: "Excluded letters are already on the board",
+      message: `${excludedBoardLetters.join(", ").toUpperCase()} is fixed in your board pattern, so every matching word must contain it.`,
+      action: "clear-excluded", actionLabel: "Clear excluded letters"
+    };
+  }
+  const maximumLength = boardPattern.length || wordLength || (!unrestricted ? letters.length : 0);
+  const minimumLetters = (options.minimumVowels || 0) + (options.minimumConsonants || 0);
+  if (maximumLength && minimumLetters > maximumLength) {
+    return {
+      title: "Letter minimums exceed the available length",
+      message: `Your minimum vowels and consonants require ${minimumLetters} letters, but this search allows at most ${maximumLength}.`,
+      action: "clear-minimums", actionLabel: "Clear letter minimums"
+    };
+  }
+  return null;
 }
 
-async function loadRelevantChunks(letters) {
-  // Every valid result starts with one of the supplied letters, so these chunks
-  // contain the complete result set without downloading the whole dictionary.
-  const relevantLetters = [...new Set(letters)].sort();
-  await Promise.all(relevantLetters.map(loadChunk));
+function renderSearchConflict(conflict) {
+  resultsHeading.textContent = "Check your search options";
+  setEmptyState(conflict.title, conflict.message);
+  showMessage(conflict.message);
+  const repair = document.createElement("button");
+  repair.type = "button";
+  repair.className = "empty-recovery-action";
+  repair.textContent = conflict.actionLabel;
+  repair.addEventListener("click", () => {
+    if (conflict.action === "edit-rack") {
+      input.focus();
+      return;
+    }
+    if (conflict.action === "board-length") {
+      input.value = input.value.replace(/:\s*\d+/, `:${conflict.value}`);
+      wordLengthInput.value = String(conflict.value);
+    } else if (conflict.action === "any-length") {
+      removeInlineConstraint("length");
+      wordLengthInput.value = "0";
+    } else if (conflict.action === "clear-excluded") {
+      removeInlineConstraint("exclude");
+      excludeLettersInput.value = "";
+    } else if (conflict.action === "clear-minimums") {
+      minimumVowelsInput.value = "0";
+      minimumConsonantsInput.value = "0";
+    }
+    renderRackTiles();
+    rerunCurrentSearch();
+  });
+  emptyRecovery.replaceChildren(repair);
+  emptyRecovery.hidden = false;
 }
 
-async function loadAllChunks() {
-  await Promise.all(Object.keys(manifest.chunks).map(loadChunk));
+function getSelectedDictionary() {
+  return [...dictionaryInputs].find((option) => option.checked)?.value ?? "enable";
+}
+
+function loadRelevantChunks(letters, dictionaryBit = DICTIONARY_BITS[getSelectedDictionary()]) {
+  return Dictionary.loadRelevant(letters, dictionaryBit);
+}
+
+function loadAllChunks(dictionaryBit = DICTIONARY_BITS[getSelectedDictionary()]) {
+  return Dictionary.loadAll(dictionaryBit);
 }
 
 function getHighValueLetters(word) {
@@ -3213,17 +3567,19 @@ function getHighValueLetters(word) {
 }
 
 function getHookInfo(word, dictionaryBit) {
-  return Engine.findHooks(word, dictionaryBit);
+  return SearchEngine.findHooks(word, dictionaryBit);
 }
 
 function findMatches(letters, options, unrestricted) {
   return unrestricted
-    ? Engine.crosswordSearch(options.pattern || "*", "", options)
-    : Engine.unscramble(letters, options.pattern, options);
+    ? SearchEngine.crosswordSearch(options.pattern || "*", "", options)
+    : SearchEngine.unscramble(letters, options.pattern, options);
 }
 
 async function handleSubmit(event) {
   event.preventDefault();
+  const revision = ++searchRevision;
+  const submittedInput = input.value;
   clearMessage();
   clearResults();
 
@@ -3245,21 +3601,23 @@ async function handleSubmit(event) {
     : Number.parseInt(maximumScoreInput.value, 10);
   const hookFilter = [...hookFilterInputs].find((option) => option.checked)?.value ?? "";
   const sortBy = sortResultsInput.value;
+  const boardPattern = useBoardLetters.checked ? boardPatternInput.value.trim().toLowerCase() : "";
   startsWithInput.value = startsWith;
   endsWithInput.value = endsWith;
+
+  // Opening the optional board field does not constrain a search until it has a pattern.
+  if (boardPattern && (unrestricted || !/^[a-z?]{2,30}$/.test(boardPattern) || !/[a-z]/.test(boardPattern) || !boardPattern.includes("?"))) {
+    resultsHeading.textContent = "Check your search options";
+    setEmptyState("Check board letters", "Use letters already on the board and ? for each space to fill, for example ?A?. Enter your tiles in the rack.");
+    showMessage("Board mode needs 2–30 letters or ? positions, including at least one of each. It cannot be combined with an unrestricted * rack.");
+    boardPatternInput.focus();
+    return;
+  }
 
   if (includeClauseCount > 1 || excludeClauseCount > 1 || hasInvalidClauses) {
     resultsHeading.textContent = "Ready when you are";
     setEmptyState("Check inline filters", "Use at most one +letters clause and one -letters clause at the end of the query.");
     showMessage("Use the format rack:length / pattern +required -excluded.");
-    input.focus();
-    return;
-  }
-
-  if ([...mustInclude].some((letter) => excludeLetters.includes(letter))) {
-    resultsHeading.textContent = "Ready when you are";
-    setEmptyState("Conflicting inline filters", "A letter cannot be both required and excluded.");
-    showMessage("Remove letters that appear in both +required and -excluded.");
     input.focus();
     return;
   }
@@ -3425,6 +3783,7 @@ async function handleSubmit(event) {
     startsWith,
     endsWith,
     pattern,
+    boardPattern,
     mustInclude: unrestricted ? `${letters}${mustInclude}` : mustInclude,
     excludeLetters,
     highValueOnly: highValueOnlyInput.checked,
@@ -3440,6 +3799,12 @@ async function handleSubmit(event) {
   };
   const historyFilters = getCurrentFilters();
 
+  const conflict = getSearchConflict(letters, options);
+  if (conflict) {
+    renderSearchConflict(conflict);
+    return;
+  }
+
   results.setAttribute("aria-busy", "true");
   button.disabled = true;
   buttonLabel.textContent = "Loading words…";
@@ -3447,49 +3812,46 @@ async function handleSubmit(event) {
   try {
     if (unrestricted || letters.includes("?")) {
       buttonLabel.textContent = "Loading wildcards…";
-      await loadAllChunks();
+      await loadAllChunks(options.dictionaryBit);
     } else {
-      await loadRelevantChunks(letters);
+      // A fixed first board letter narrows the shard; otherwise either rack or board letters can start a play.
+      await loadRelevantChunks(boardPattern && boardPattern[0] !== "?" ? boardPattern[0] : letters + boardPattern.replace(/\?/g, ""), options.dictionaryBit);
     }
 
     if (options.showHooks) {
       buttonLabel.textContent = "Loading hooks…";
-      await loadAllChunks();
+      await loadAllChunks(options.dictionaryBit);
     }
 
-    const matches = findMatches(letters, options, unrestricted);
+    if (revision !== searchRevision || dictionary !== getSelectedDictionary()) return;
+    buttonLabel.textContent = "Finding words…";
+    const matches = await findMatches(letters, options, unrestricted);
+    if (revision !== searchRevision || dictionary !== getSelectedDictionary()) return;
     renderMatches(letters, matches, options);
-    const slashIndex = input.value.indexOf("/");
-    const historyRack = (slashIndex < 0 ? input.value : input.value.slice(0, slashIndex)).trim();
-    const historyPattern = slashIndex < 0 ? pattern : input.value.slice(slashIndex + 1).trim();
+    const slashIndex = submittedInput.indexOf("/");
+    const historyRack = (slashIndex < 0 ? submittedInput : submittedInput.slice(0, slashIndex)).trim();
+    const historyPattern = slashIndex < 0 ? pattern : submittedInput.slice(slashIndex + 1).trim();
     saveHistoryEntry(historyRack, historyPattern, matches, historyFilters, sortBy);
   } catch (error) {
+    if (revision !== searchRevision || dictionary !== getSelectedDictionary()) return;
     console.error("Unable to load dictionary chunks:", error);
     resultsHeading.textContent = "Dictionary unavailable";
     setEmptyState("Unable to load words", "Please refresh the page and try again.");
     showMessage("The dictionary could not be loaded. Please refresh the page and try again.");
   } finally {
-    results.setAttribute("aria-busy", "false");
-    button.disabled = false;
-    buttonLabel.textContent = "Unscramble";
-    runPendingHistorySearch();
+    if (revision === searchRevision) {
+      results.setAttribute("aria-busy", "false");
+      button.disabled = false;
+      buttonLabel.textContent = "Unscramble";
+      runPendingHistorySearch();
+    }
   }
 }
 
 async function loadManifest() {
   try {
-    await Engine.ready;
-    const response = await fetch(MANIFEST_URL);
-
-    if (!response.ok) {
-      throw new Error(`Dictionary manifest failed with status ${response.status}`);
-    }
-
-    manifest = await response.json();
-
-    if (!manifest?.chunks || manifest.encoding !== "gzip-newline-membership") {
-      throw new TypeError("Dictionary manifest is invalid.");
-    }
+    await Promise.all([Engine.ready, SearchEngine.ready]);
+    await Dictionary.loadManifest(DICTIONARY_BITS[getSelectedDictionary()]);
 
     button.disabled = false;
     buttonLabel.textContent = "Unscramble";
@@ -3513,6 +3875,26 @@ async function loadManifest() {
 form.addEventListener("submit", handleSubmit);
 form.addEventListener("input", syncSectionFilterResetButtons);
 form.addEventListener("change", syncSectionFilterResetButtons);
+useBoardLetters.addEventListener("change", () => {
+  boardPatternFields.hidden = !useBoardLetters.checked;
+  if (useBoardLetters.checked) boardPatternInput.focus();
+});
+document.querySelectorAll("[data-quick-length]").forEach((choice) => {
+  choice.addEventListener("click", () => {
+    const length = Number(choice.dataset.quickLength);
+    const parsed = parseSmartInput(input.value);
+    if (parsed.unrestricted) {
+      if (!length) return;
+      input.value = input.value.replace(/:\s*\d+/, `:${length}`);
+    } else removeInlineConstraint("length");
+    wordLengthInput.value = String(length);
+    renderRackTiles();
+    rerunCurrentSearch();
+  });
+});
+let activeDictionarySelection = getSelectedDictionary();
+let dictionarySearchQueued = false;
+dictionaryInputs.forEach((choice) => choice.addEventListener("change", handleDictionaryChange));
 input.addEventListener("input", () => {
   sanitizeRackInput();
   closeHistoryDropdown();
@@ -3922,79 +4304,97 @@ function resetAdvancedFilters() {
   clearMessage();
 }
 
+function getRackSessionState() {
+  return { input: input.value, filters: getCurrentFilters(), sort: sortResultsInput.value, dictionary: getSelectedDictionary() };
+}
+
+function cancelRackSearch() {
+  searchRevision += 1;
+  pendingHistorySearch = false;
+  button.disabled = false;
+  buttonLabel.textContent = "Unscramble";
+  results.setAttribute("aria-busy", "false");
+  closeHistoryDropdown();
+  clearMessage();
+}
+
+function applyPlayedRack(nextRack, { search = false } = {}) {
+  cancelRackSearch();
+  input.value = nextRack.toUpperCase();
+  // A new turn has no inline pattern for this sort to evaluate.
+  if (sortResultsInput.value === "pattern-strength") {
+    sortResultsInput.value = "length-desc";
+    syncSortPicker();
+  }
+  resetBasicFilters();
+  resetAdvancedFilters();
+  useBoardLetters.checked = false;
+  boardPatternInput.value = "";
+  boardPatternFields.hidden = true;
+  renderRackTiles();
+  syncSectionFilterResetButtons();
+  clearResults();
+  resultsHeading.textContent = "Rack updated";
+  setEmptyState("Ready for your next turn", "Add replacement tiles above or search with the tiles you kept.");
+  if (search && input.value.trim()) form.requestSubmit(button);
+}
+
+function restorePlayedState(snapshot) {
+  cancelRackSearch();
+  input.value = snapshot.input;
+  restoreFilters(snapshot.filters);
+  sortResultsInput.value = snapshot.sort;
+  syncSortPicker();
+  const dictionary = [...dictionaryInputs].find((choice) => choice.value === snapshot.dictionary);
+  if (dictionary && getSelectedDictionary() !== snapshot.dictionary) {
+    dictionaryInputs.forEach((choice) => { choice.checked = choice === dictionary; });
+    // Synchronize the shared selector without scheduling a second search.
+    activeDictionarySelection = snapshot.dictionary;
+    dictionary.dispatchEvent(new Event("change", { bubbles: true }));
+    rackLeaveAnagramCountCache.clear();
+    pickListHookCache.clear();
+    refreshPickListHookCache();
+    pickComparison?.close();
+  }
+  renderRackTiles();
+  syncSectionFilterResetButtons();
+  clearResults();
+  resultsHeading.textContent = "Ready when you are";
+  if (input.value.trim()) form.requestSubmit(button);
+  input.focus({ preventScroll: true });
+}
+
 function resetAll() {
+  playRefill?.reset();
   input.value = "";
   renderRackTiles();
   resetBasicFilters();
   resetAdvancedFilters();
-  historyEntries = HistoryStore.clear();
-  historyPanelFocusIndex = -1;
-  pickListEntries = PickListStore.clear();
-  pickListHookCache.clear();
-  renderAllHistory();
-  renderAllPickList();
+  searchRevision += 1;
+  pendingHistorySearch = false;
+  useBoardLetters.checked = false;
+  boardPatternInput.value = "";
+  boardPatternFields.hidden = true;
+  button.disabled = false;
+  buttonLabel.textContent = "Unscramble";
+  results.setAttribute("aria-busy", "false");
+  closeHistoryDropdown();
+  syncSectionFilterResetButtons();
   clearResults();
   resultsHeading.textContent = "Ready when you are";
+  input.focus({ preventScroll: true });
 }
 
-function openResetConfirmation() {
-  resetConfirmReturnFocus = document.activeElement;
-  resetConfirmBackdrop.hidden = false;
-  resetConfirmCancel.focus({ preventScroll: true });
-}
-
-function closeResetConfirmation({ focusInput = false } = {}) {
-  resetConfirmBackdrop.hidden = true;
-
-  if (focusInput) {
-    input.focus({ preventScroll: true });
-  } else {
-    resetConfirmReturnFocus?.focus?.({ preventScroll: true });
-  }
-
-  resetConfirmReturnFocus = null;
-}
-
-document.addEventListener("keydown", (event) => {
-  if (
-    event.repeat ||
-    event.key.toLowerCase() !== "r" ||
-    !event.ctrlKey ||
-    event.metaKey ||
-    event.altKey ||
-    event.shiftKey
-  ) {
-    return;
-  }
-
-  event.preventDefault();
-  openResetConfirmation();
+resetBasicFiltersButton.addEventListener("click", () => {
+  resetBasicFilters();
+  rerunCurrentSearch();
 });
-resetAllButton.addEventListener("click", openResetConfirmation);
-resetConfirmCancel.addEventListener("click", () => closeResetConfirmation());
-resetConfirmOk.addEventListener("click", () => {
-  resetAll();
-  closeResetConfirmation({ focusInput: true });
+resetAdvancedFiltersButton.addEventListener("click", () => {
+  resetAdvancedFilters();
+  rerunCurrentSearch();
 });
-resetConfirmBackdrop.addEventListener("click", (event) => {
-  if (event.target === resetConfirmBackdrop) {
-    closeResetConfirmation();
-  }
-});
-resetConfirmModal.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    event.preventDefault();
-    closeResetConfirmation();
-  } else if (event.key === "Tab") {
-    event.preventDefault();
-    const focusCancel = event.shiftKey
-      ? document.activeElement !== resetConfirmCancel
-      : document.activeElement === resetConfirmOk;
-    (focusCancel ? resetConfirmCancel : resetConfirmOk).focus();
-  }
-});
-resetBasicFiltersButton.addEventListener("click", resetBasicFilters);
-resetAdvancedFiltersButton.addEventListener("click", resetAdvancedFilters);
+resetAllButton.addEventListener("click", resetAll);
+
 rackSortTrigger.addEventListener("click", () => {
   if (rackSortMenu.hidden) openRackSortMenu();
   else closeRackSortMenu({ restoreFocus: true });
@@ -4043,6 +4443,33 @@ if (solverFocusModePanel) {
     setSolverHeadingExpanded(!solverFocusModePanel.classList.contains("is-focus-mode"));
   }).observe(solverFocusModePanel, { attributes: true, attributeFilter: ["class"] });
 }
+pickComparison = window.MonkeyTacticsPickComparison.create({
+  panel: pickListPanel,
+  getEntries: () => pickListEntries,
+  analyzePlay: getPlayAnalysis,
+  getLeaveQuality,
+  getDictionary: () => {
+    const name = getSelectedDictionary();
+    return { bit: DICTIONARY_BITS[name], label: { enable: "Standard · ENABLE", expanded: "Expanded · Wiktionary", both: "Both · ENABLE + Expanded" }[name] };
+  },
+  loadAll: (bit) => Dictionary.loadAll(bit),
+  findHooks: getHookInfo,
+  loadMembership: async (word) => {
+    await Dictionary.loadRelevant(word[0].toLowerCase(), DICTIONARY_BITS.both);
+    return SearchEngine.dictionaryMembership(word.toLowerCase());
+  },
+  scoringLabel: IS_WWF ? "Words With Friends" : "Scrabble"
+});
+playRefill = window.MonkeyTacticsPlayRefill.create({
+  host: document.querySelector("#play-refill-host"),
+  getState: getRackSessionState,
+  analyzePlay: getPlayAnalysis,
+  parseInput: parseSmartInput,
+  applyRack: applyPlayedRack,
+  restoreState: restorePlayedState,
+  closeDetails: () => dictionaryPopoverState.active?.close(),
+  focusRack: () => input.focus({ preventScroll: true })
+});
 syncSectionFilterResetButtons();
 renderAllHistory();
 renderAllPickList();
@@ -4050,7 +4477,7 @@ renderRackTiles();
 initializeRackSortMenu();
 initializeWordParticles();
 offlineToggle?.addEventListener("click", toggleOfflineMode);
-renderOfflineState();
+renderOfflineState(offlineCacheName && !offlineModeEnabled ? "Offline files have changed. Enable Offline Mode to update the downloaded solver." : "");
 if (offlineModeEnabled && "caches" in window) {
   caches.has(offlineCacheName).then((available) => {
     if (available) return;

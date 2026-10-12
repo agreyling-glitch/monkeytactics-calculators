@@ -92,7 +92,7 @@
   const offlineModeMessage = byId("offline-mode-message");
   const relatedGuides = byId("crossword-related-guides");
   const DICTIONARY_BITS = { enable: 1, expanded: 2, both: 3 };
-  const OFFLINE_VERSION = "20260904-wiktionary-24";
+  const OFFLINE_VERSION = "20261012-solvers-11";
   const OFFLINE_CACHE_PREFIX = "monkeytactics-crossword-offline-";
   const OFFLINE_STORAGE_KEY = "monkeytactics.crossword-solver.offline-cache";
   const DEBUG_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
@@ -230,7 +230,7 @@
     "/crossword-offline-sw.js",
     "/assets/css/shared/style.css?v=20260903-branded-scrollbars",
     "/assets/css/shared/premium-tool.css?v=20260807-2",
-    "/assets/css/tools/crossword-solver.css?v=20260904-controls-right-32",
+    "/assets/css/tools/crossword-solver.css?v=20260905-gold-input-labels-36",
     "/assets/css/shared/focus-mode.css?v=20260829-2",
     "/assets/css/shared/trustpilot-review-collector.css?v=20260731-2",
     "/assets/js/shared/ads.js",
@@ -238,15 +238,15 @@
     "/assets/wasm/menu/menu.css?v=20260922-applications-v1",
     "/assets/wasm/menu/menu_bg.wasm?v=20260922-applications-v1",
     "/assets/wasm/menu/tools-manifest.json?v=20260915-anagram-architect",
-    "/assets/js/tools/word-unscrambler/wasm-bridge.js?v=20260827-crossword-1",
-    "/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=20260827-wwf-1",
-    "/assets/wasm/word-unscrambler/word_unscrambler_engine_bg.wasm?v=20260827-wwf-1",
+    "/assets/js/tools/word-unscrambler/wasm-bridge.js?v=20261012-solvers-3",
+    "/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=20261012-solvers-3",
+    "/assets/wasm/word-unscrambler/word_unscrambler_engine_bg.wasm?v=20261012-solvers-3",
     "/assets/js/vendor/qrcode-1.1.0.min.js",
     "/assets/js/tools/crossword-pick-list-store.js?v=20260901-grid-positions-1",
     "/assets/js/shared/focus-mode.js?v=20260829-2",
     "/assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10",
     "/assets/js/shared/related-guides.js?v=20260903-priority-1",
-    "/assets/js/tools/crossword-solver.js?v=20260904-dictionary-tooltip-33",
+    "/assets/js/tools/crossword-solver.js?v=20261012-solvers-11",
     "/assets/images/trustpilot-review.svg",
     MANIFEST_URL,
     CLUE_MANIFEST_URL
@@ -272,7 +272,7 @@
   let shareReturnFocus = null;
   let offlineCacheName = "";
   try { offlineCacheName = localStorage.getItem(OFFLINE_STORAGE_KEY) || ""; } catch (_error) { /* Storage may be unavailable. */ }
-  let offlineModeEnabled = Boolean(offlineCacheName);
+  let offlineModeEnabled = offlineCacheName === `${OFFLINE_CACHE_PREFIX}${OFFLINE_VERSION}`;
   let pendingOfflinePlan = null;
   let pendingOfflineInventory = null;
   let offlineDialogBusy = false;
@@ -295,11 +295,16 @@
     dictionaryChoiceTrigger.innerHTML = dictionaryChoiceIcon(selected);
   }
 
-  function renderOfflineState() {
+  function renderOfflineState(message = "") {
     if (!offlineToggle || !offlineStatus) return;
     offlineToggle.setAttribute("aria-checked", String(offlineModeEnabled));
     offlineToggle.title = offlineModeEnabled ? "Disable Offline Mode" : "Enable Offline Mode";
     offlineStatus.textContent = `Offline Mode [${offlineModeEnabled ? "Enabled" : "Disabled"}]`;
+    if (!offlineModeEnabled && offlineCacheName) {
+      offlineToggle.title = "Update Offline Mode";
+      offlineStatus.textContent = "Offline Mode [Update required]";
+    }
+    offlineStatus.title = message;
     if (relatedGuides) relatedGuides.hidden = offlineModeEnabled;
     if (offlineModeEnabled) {
       dictionaryMerriamLink.hidden = true;
@@ -308,6 +313,25 @@
       const selectedDictionary = [...dictionaryInputs].find((input) => input.checked)?.value || "both";
       dictionaryMerriamLink.hidden = selectedDictionary === "expanded";
       dictionaryCollinsLink.hidden = selectedDictionary === "enable";
+    }
+  }
+
+  async function verifyStoredOfflineCache() {
+    const savedCacheName = offlineCacheName;
+    if (!savedCacheName) return;
+    try {
+      const available = "caches" in window && await caches.has(savedCacheName);
+      // An enable/disable operation may have completed while storage was checked.
+      if (savedCacheName !== offlineCacheName || available) return;
+      try { localStorage.removeItem(OFFLINE_STORAGE_KEY); } catch (_error) { /* Storage may be unavailable. */ }
+      offlineCacheName = "";
+      offlineModeEnabled = false;
+      renderOfflineState("Offline data is no longer available in browser storage. Enable it again to redownload.");
+    } catch (error) {
+      if (savedCacheName !== offlineCacheName) return;
+      offlineModeEnabled = false;
+      renderOfflineState("Browser storage could not be checked. Enable Offline Mode to retry.");
+      console.warn("Unable to check Offline Mode storage:", error);
     }
   }
 
@@ -346,7 +370,15 @@
     const wordUrls = wordFiles.map(({ file }) => `${CHUNK_BASE_URL}${file}`);
     const clueUrls = clueFiles.map(({ file }) => `${CLUE_BASE_URL}${file}?v=${clueData.datasetVersion}`);
     const definitionUrls = definitionFiles.map(({ file }) => `${DEFINITION_BASE_URL}${file}?v=${definitionData.datasetVersion}`);
-    const urls = [...new Set([...OFFLINE_CORE_URLS, ...wordUrls, ...clueUrls, DEFINITION_MANIFEST_URL, ...definitionUrls])];
+    // The current page is the authority for its static dependencies. Dynamic
+    // imports (including WASM and menu assets) remain explicit in the core list.
+    const coreUrls = new Map(OFFLINE_CORE_URLS.map((url) => [new URL(url, window.location.href).pathname, url]));
+    for (const element of document.querySelectorAll('script[src], link[rel="stylesheet"], link[rel="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]')) {
+      const value = element.getAttribute("src") || element.getAttribute("href");
+      const url = new URL(value, window.location.href);
+      if (url.origin === window.location.origin) coreUrls.set(url.pathname, `${url.pathname}${url.search}`);
+    }
+    const urls = [...new Set([...coreUrls.values(), ...wordUrls, ...clueUrls, DEFINITION_MANIFEST_URL, ...definitionUrls])];
     const dataBytes = [...wordFiles, ...clueFiles, ...definitionFiles].reduce((sum, file) => sum + (Number(file.bytes) || 0), 0);
     const estimatedCoreBytes = 2 * 1024 * 1024;
     const bytesByUrl = new Map([
@@ -359,17 +391,40 @@
     return { urls, bytesByUrl, estimatedUnknownBytes, totalBytes: dataBytes + estimatedCoreBytes };
   }
 
+  function canReuseSharedOfflineUrl(url) {
+    const parsed = new URL(url, window.location.href);
+    // Shells and unversioned executable assets from another release may point
+    // at incompatible imports, even when their cache key is unchanged.
+    if (parsed.pathname.startsWith("/tools/") || /\.html?$/i.test(parsed.pathname)) return false;
+    if (/\.(?:js|css|wasm|webmanifest)$/i.test(parsed.pathname) && !parsed.searchParams.has("v")) return false;
+    return true;
+  }
+
+  async function reusableOfflineResponse(url, cache) {
+    const request = new Request(url, { credentials: "same-origin" });
+    const currentResponse = cache && await cache.match(request);
+    if (currentResponse) return currentResponse;
+    if (!canReuseSharedOfflineUrl(url)) return undefined;
+    return caches.match(request);
+  }
+
   async function cacheOfflineUrl(cache, url, forceDownload = false) {
     const request = new Request(url, { credentials: "same-origin" });
     if (!forceDownload) {
       if (await cache.match(request)) return false;
-      const sharedResponse = await caches.match(request);
+      const sharedResponse = await reusableOfflineResponse(url);
       if (sharedResponse) {
         await cache.put(request, sharedResponse.clone());
         return false;
       }
     }
-    const response = await fetch(new Request(url, { cache: "reload", credentials: "same-origin" }));
+    const downloadUrl = new URL(url, window.location.href);
+    if (forceDownload || !canReuseSharedOfflineUrl(url)) {
+      // An older controlling service worker must not satisfy a shell refresh
+      // with its previous release. Store only the original, canonical key.
+      downloadUrl.searchParams.set("offline-update", OFFLINE_VERSION);
+    }
+    const response = await fetch(new Request(downloadUrl.href, { cache: "reload", credentials: "same-origin" }));
     if (!response.ok) throw new Error(`Offline download failed for ${url}.`);
     await cache.put(request, response);
     return true;
@@ -379,7 +434,9 @@
   const delay = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 
   async function inspectOfflinePlan(plan) {
-    const cached = await Promise.all(plan.urls.map((url) => caches.match(url)));
+    const nextCacheName = `${OFFLINE_CACHE_PREFIX}${OFFLINE_VERSION}`;
+    const currentCache = await caches.has(nextCacheName) ? await caches.open(nextCacheName) : null;
+    const cached = await Promise.all(plan.urls.map((url) => reusableOfflineResponse(url, currentCache)));
     const cachedIndexes = new Set(cached.map((response, index) => response ? index : -1).filter((index) => index >= 0));
     const remainingBytes = plan.urls.reduce((sum, url, index) => cachedIndexes.has(index)
       ? sum
@@ -455,12 +512,18 @@
     let completed = 0;
     let downloaded = 0;
     let cursor = 0;
+    let downloadFailed = false;
     try {
       const workers = Array.from({ length: simulate ? 1 : Math.min(4, urls.length) }, async () => {
-        while (cursor < urls.length) {
+        while (!downloadFailed && cursor < urls.length) {
           const url = urls[cursor++];
           const startedAt = performance.now();
-          if (await cacheOfflineUrl(cache, url, forceDownload)) downloaded += 1;
+          try {
+            if (await cacheOfflineUrl(cache, url, forceDownload)) downloaded += 1;
+          } catch (error) {
+            downloadFailed = true;
+            throw error;
+          }
           completed += 1;
           offlineProgress.value = completed;
           offlineProgressLabel.textContent = `${completed} of ${urls.length}`;
@@ -472,18 +535,36 @@
           }
         }
       });
-      await Promise.all(workers);
-      const page = await cache.match("/tools/crossword-solver.html");
-      if (!page) throw new Error("The offline page could not be verified.");
+      // Wait for in-flight writes before deleting a failed new cache.
+      const outcomes = await Promise.allSettled(workers);
+      const failure = outcomes.find((outcome) => outcome.status === "rejected");
+      if (failure) throw failure.reason;
+      const cachedPage = await cache.match("/tools/crossword-solver.html");
+      if (!cachedPage) throw new Error("The offline page could not be verified.");
       const missing = (await Promise.all(urls.map((url) => cache.match(url)))).filter((response) => !response);
       if (missing.length) throw new Error("The offline download could not be verified.");
+      // Pages redirects .html requests to the clean route. A followed redirect
+      // cannot satisfy a browser navigation with redirect mode "manual" when
+      // served by a service worker, so cache a fresh navigation response.
+      const page = new Response(cachedPage.body, {
+        status: cachedPage.status,
+        statusText: cachedPage.statusText,
+        headers: cachedPage.headers
+      });
+      await cache.put("/tools/crossword-solver.html", page.clone());
       await cache.put("/tools/crossword-solver", page.clone());
       localStorage.setItem(OFFLINE_STORAGE_KEY, nextCacheName);
-      for (const name of await caches.keys()) {
-        if (name.startsWith(OFFLINE_CACHE_PREFIX) && name !== nextCacheName) await caches.delete(name);
-      }
       offlineCacheName = nextCacheName;
       offlineModeEnabled = true;
+      // Activation is complete. Failed cleanup must never discard the newly
+      // verified package or leave storage pointing at a deleted cache.
+      try {
+        for (const name of await caches.keys()) {
+          if (name.startsWith(OFFLINE_CACHE_PREFIX) && name !== nextCacheName) await caches.delete(name);
+        }
+      } catch (error) {
+        console.warn("Unable to remove an older Offline Mode cache:", error);
+      }
       try { await navigator.storage?.persist?.(); } catch (_error) { /* Persistence is optional. */ }
       renderOfflineState();
       offlineModeMessage.textContent = downloaded
@@ -1926,15 +2007,7 @@
   renderDictionaryChoice();
   renderPickList();
   renderOfflineState();
-  if (offlineModeEnabled && "caches" in window) {
-    caches.has(offlineCacheName).then((available) => {
-      if (available) return;
-      try { localStorage.removeItem(OFFLINE_STORAGE_KEY); } catch (_error) { /* Storage may be unavailable. */ }
-      offlineCacheName = "";
-      offlineModeEnabled = false;
-      renderOfflineState("Offline data is no longer available in browser storage. Enable it again to redownload.");
-    });
-  }
+  void verifyStoredOfflineCache();
 
   setBusy(true, "Loading dictionary…");
   Promise.all([Engine.ready, fetch(MANIFEST_URL).then((response) => {

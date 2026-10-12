@@ -1,6 +1,28 @@
 /* @ts-self-types="./word_unscrambler_engine.d.ts" */
 
 /**
+ * Scores one rack play before square multipliers, cross words, or bingo bonus.
+ * Fixed board letters do not consume tiles; blank positions are zero-based.
+ * @param {string} word
+ * @param {string} rack
+ * @param {string} board_pattern
+ * @param {string} scoring
+ * @returns {any}
+ */
+export function analyze_play(word, rack, board_pattern, scoring) {
+    const ptr0 = passStringToWasm0(word, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm0(rack, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len1 = WASM_VECTOR_LEN;
+    const ptr2 = passStringToWasm0(board_pattern, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len2 = WASM_VECTOR_LEN;
+    const ptr3 = passStringToWasm0(scoring, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len3 = WASM_VECTOR_LEN;
+    const ret = wasm.analyze_play(ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+    return takeObject(ret);
+}
+
+/**
  * @param {string} word
  * @returns {any}
  */
@@ -50,6 +72,19 @@ export function crossword_search(pattern, available_letters, options) {
     const len1 = WASM_VECTOR_LEN;
     const ret = wasm.crossword_search(ptr0, len0, ptr1, len1, addHeapObject(options));
     return takeObject(ret);
+}
+
+/**
+ * Returns indexed source membership: 1 = ENABLE, 2 = Expanded, 3 = both.
+ * Callers must load the combined shard first to resolve both sources completely.
+ * @param {string} word
+ * @returns {number}
+ */
+export function dictionary_membership(word) {
+    const ptr0 = passStringToWasm0(word, wasm.__wbindgen_export, wasm.__wbindgen_export2);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.dictionary_membership(ptr0, len0);
+    return ret;
 }
 
 /**

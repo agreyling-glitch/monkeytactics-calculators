@@ -33,13 +33,22 @@
       return null;
     }
 
+    const context = typeof entry.rack === "string" ? {
+      rack: entry.rack.toUpperCase(),
+      boardPattern: typeof entry.boardPattern === "string" ? entry.boardPattern.toUpperCase() : "",
+      blankPositions: Array.isArray(entry.blankPositions) ? entry.blankPositions.filter((position) => Number.isInteger(position) && position >= 0 && position < word.length) : [],
+      boardPositions: Array.isArray(entry.boardPositions) ? entry.boardPositions.filter((position) => Number.isInteger(position) && position >= 0 && position < word.length) : [],
+      bingo: entry.bingo === true,
+      scoreKind: entry.scoreKind === "rack" ? "rack" : "base"
+    } : {};
     return {
       id: typeof entry.id === "string" && entry.id ? entry.id : createId(entry.timestamp),
       timestamp: Number.isFinite(entry.timestamp) ? entry.timestamp : Date.now(),
       word,
       score: Number.isFinite(entry.score) ? Math.max(0, entry.score) : 0,
       length: Number.isFinite(entry.length) ? Math.max(0, entry.length) : word.length,
-      note: typeof entry.note === "string" ? entry.note.slice(0, NOTE_MAX_LENGTH) : ""
+      note: typeof entry.note === "string" ? entry.note.slice(0, NOTE_MAX_LENGTH) : "",
+      ...context
     };
   }
 

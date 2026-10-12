@@ -1,0 +1,173 @@
+.pick-comparison-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.pick-comparison-toolbar[hidden] { display: none; }
+
+.pick-comparison-selection-status {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--muted, #a8b6c8);
+  font-size: 0.78rem;
+}
+
+.pick-comparison-button,
+.pick-comparison-retry {
+  min-height: 2.3rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(45, 212, 191, 0.6);
+  border-radius: 0.6rem;
+  background: #163b3c;
+  color: #e0faf5;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pick-comparison-button--secondary {
+  background: transparent;
+  border-color: #657488;
+}
+
+.pick-comparison-button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.pick-comparison-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.3rem;
+  padding-inline: 0.3rem;
+  color: var(--text, #e2e8f0);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.pick-comparison-choice input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #2dd4bf;
+}
+
+.pick-comparison-button:focus-visible,
+.pick-comparison-retry:focus-visible,
+.pick-comparison-choice input:focus-visible,
+.pick-comparison-scroll:focus-visible {
+  outline: 2px solid #e8c565;
+  outline-offset: 3px;
+}
+
+.pick-comparison-dialog {
+  width: min(72rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 1.2rem;
+  border: 1px solid #3d6f71;
+  border-radius: 1rem;
+  background: #111f30;
+  color: #e2e8f0;
+  box-shadow: 0 1rem 4rem #0009;
+  font-family: inherit;
+}
+
+.pick-comparison-dialog::backdrop { background: #040b17c9; }
+
+.pick-comparison-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pick-comparison-title {
+  margin: 0;
+  color: #f4f6f8;
+  font-size: clamp(1.15rem, 3vw, 1.6rem);
+}
+
+.pick-comparison-note,
+.pick-comparison-footnote {
+  color: #aebed1;
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+.pick-comparison-scroll {
+  overflow-x: auto;
+  border: 1px solid #344a5e;
+  border-radius: 0.6rem;
+  scrollbar-color: #478e89 #15273a;
+}
+
+.pick-comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.pick-comparison-table caption {
+  padding: 0.7rem;
+  color: #a8c5c8;
+  text-align: left;
+  font-size: 0.78rem;
+}
+
+.pick-comparison-table th,
+.pick-comparison-table td {
+  min-width: 10rem;
+  padding: 0.85rem;
+  border-top: 1px solid #344a5e;
+  border-right: 1px solid #344a5e;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.pick-comparison-table tr > :last-child { border-right: 0; }
+.pick-comparison-table thead th { color: #e8c565; background: #183038; }
+.pick-comparison-table tbody tr:nth-child(even) td { background: #15273a; }
+
+.pick-comparison-table tr > th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 8rem;
+  min-width: 8rem;
+  background: #1c3043;
+  color: #dce5ed;
+  box-shadow: 2px 0 4px #0002;
+}
+
+.pick-comparison-hooks { margin: 0 0 0.35rem; }
+.pick-comparison-hooks:last-child { margin-bottom: 0; }
+
+.pick-comparison-source {
+  display: inline-block;
+  margin: 0.15rem 0.35rem 0.15rem 0;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.pick-comparison-source--enable { color: #96edbd; border-color: #428660; background: #19392d; }
+.pick-comparison-source--expanded { color: #f4d789; border-color: #95743f; background: #38301e; }
+.pick-comparison-retry { margin-top: 0.4rem; font-size: 0.75rem; }
+
+@media (max-width: 600px) {
+  .pick-comparison-dialog { width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); padding: 0.8rem; }
+  .pick-comparison-table th, .pick-comparison-table td { min-width: 9rem; padding: 0.65rem; }
+  .pick-comparison-table tr > th:first-child { min-width: 5.5rem; width: 5.5rem; font-size: 0.76rem; }
+}

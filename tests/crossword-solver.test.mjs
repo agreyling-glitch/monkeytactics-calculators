@@ -11,7 +11,7 @@ const offlineWorker = fs.readFileSync(new URL("../crossword-offline-sw.js", impo
 
 test("crossword solver cache-busts the WordNet graph release", () => {
   assert.match(html, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
-  assert.match(html, /crossword-solver\.js\?v=20260904-both-default-39/);
+  assert.match(html, /crossword-solver\.js\?v=20261012-solvers-11/);
   assert.match(html, /crossword-solver\.css\?v=20260905-gold-input-labels-36/);
   assert.match(html, /crossword-pick-list-store\.js\?v=20260901-grid-positions-1/);
 });
@@ -404,7 +404,7 @@ test("opt-in Offline Mode downloads the complete solver and disables Datamuse", 
   assert.match(script, /const nextCacheName = `\$\{OFFLINE_CACHE_PREFIX\}\$\{OFFLINE_VERSION\}`/);
   assert.doesNotMatch(script, /OFFLINE_VERSION\}-\$\{Date\.now\(\)\}/);
   assert.match(script, /if \(await cache\.match\(request\)\) return false/);
-  assert.match(script, /const sharedResponse = await caches\.match\(request\)/);
+  assert.match(script, /const sharedResponse = await reusableOfflineResponse\(url\)/);
   assert.match(script, /Promise\.all\(urls\.map\(\(url\) => cache\.match\(url\)\)\)/);
   assert.match(script, /inspectOfflinePlan\(plan\)/);
   assert.match(offlineWorker, /request\.mode === "navigate"/);

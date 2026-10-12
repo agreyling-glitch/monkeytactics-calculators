@@ -88,6 +88,7 @@
     addTextFilter("endsWith", "Ends With");
     addTextFilter("mustInclude", "Must Include");
     addTextFilter("excludeLetters", "Exclude Letters");
+    if (filters.useBoardLetters === true) addTextFilter("boardPattern", "Board");
     if (filters.highValueOnly === true) {
       active.push("High-Value Letters: J, Q, X, or Z");
     }

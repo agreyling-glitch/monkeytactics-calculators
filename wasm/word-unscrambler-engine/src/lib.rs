@@ -55,6 +55,35 @@ struct SearchOptions {
     hook_filter: String,
     sort_by: String,
     scoring: String,
+    board_pattern: String,
+}
+
+#[derive(Debug, Default, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+struct PlayAnalysis {
+    valid: bool,
+    score: i32,
+    blank_positions: Vec<usize>,
+    board_positions: Vec<usize>,
+    tiles_used: usize,
+    leave: String,
+    bingo: bool,
+}
+
+struct PlayContext<'a> {
+    available: [u8; 26],
+    wildcards: usize,
+    board: &'a str,
+    value_for: fn(u8) -> i32,
+}
+
+#[derive(Clone, Copy)]
+struct PlayMetrics {
+    score: i32,
+    high_value_score: i32,
+    tiles_used: usize,
+    remaining: [u8; 26],
+    remaining_wildcards: usize,
 }
 
 #[derive(Debug, Deserialize)]
@@ -159,6 +188,13 @@ pub fn is_valid_word(word: String) -> bool {
     ENGINE.with(|engine| engine.borrow().has_word(&word, ENABLE | EXPANDED))
 }
 
+/// Returns indexed source membership: 1 = ENABLE, 2 = Expanded, 3 = both.
+/// Callers must load the combined shard first to resolve both sources completely.
+#[wasm_bindgen]
+pub fn dictionary_membership(word: String) -> u8 {
+    ENGINE.with(|engine| engine.borrow().dictionary_membership(&word))
+}
+
 #[wasm_bindgen]
 pub fn find_hooks(word: String) -> JsValue {
     find_hooks_for_dictionary(word, ENABLE | EXPANDED)
@@ -178,6 +214,14 @@ pub fn analyze_word(word: String) -> JsValue {
 #[wasm_bindgen]
 pub fn analyze_wwf_word(word: String) -> JsValue {
     serde_wasm_bindgen::to_value(&analyze_with(&word, wwf_tile_value)).unwrap_or(JsValue::NULL)
+}
+
+/// Scores one rack play before square multipliers, cross words, or bingo bonus.
+/// Fixed board letters do not consume tiles; blank positions are zero-based.
+#[wasm_bindgen]
+pub fn analyze_play(word: String, rack: String, board_pattern: String, scoring: String) -> JsValue {
+    serde_wasm_bindgen::to_value(&analyze_rack_play(&word, &rack, &board_pattern, &scoring))
+        .unwrap_or(JsValue::NULL)
 }
 
 #[wasm_bindgen]
@@ -242,21 +286,38 @@ impl Engine {
     }
 
     fn find_matches(&mut self, rack: &str, pattern: &str, options: &SearchOptions) -> Vec<String> {
-        let (available, wildcards) = rack_counts(rack);
-        let maximum_length = if options.word_length == 0 {
+        let rack = rack.to_ascii_lowercase();
+        let board = options.board_pattern.to_ascii_lowercase();
+        let Some(play_context) = PlayContext::new(&rack, &board, &options.scoring) else {
+            return Vec::new();
+        };
+        // The signature prefilter may include board letters, but the positional
+        // assignment below still requires the rack to fill each empty square.
+        let (available, wildcards) = play_context.signature_pool();
+        let available_length = if board.is_empty() {
             rack.len()
+        } else {
+            board.len()
+        };
+        let maximum_length = if options.word_length == 0 {
+            available_length
         } else {
             options.word_length
         };
         let minimum_length = if options.word_length == 0 {
-            MIN_WORD_LENGTH
+            if board.is_empty() {
+                MIN_WORD_LENGTH
+            } else {
+                board.len()
+            }
         } else {
             options.word_length
         };
         let minimum_pattern_length = pattern.bytes().filter(|byte| *byte != b'*').count();
         let variable_pattern = pattern.contains('*');
 
-        if maximum_length > rack.len()
+        if maximum_length > available_length
+            || (!board.is_empty() && maximum_length != board.len())
             || (!pattern.is_empty()
                 && options.word_length > 0
                 && (options.word_length < minimum_pattern_length
@@ -266,6 +327,7 @@ impl Engine {
         }
 
         let mut matches = Vec::new();
+        let mut play_values = HashMap::new();
         for length in (minimum_length..=maximum_length).rev() {
             if !pattern.is_empty()
                 && (length < minimum_pattern_length
@@ -280,14 +342,18 @@ impl Engine {
                 }
                 for word in &self.signature_map[signature] {
                     let info = &self.metadata[word];
-                    if self.word_matches(word, info, pattern, options) {
+                    let Some(play) = evaluate_play(word, &play_context, |_, _, _| {}) else {
+                        continue;
+                    };
+                    if self.word_matches(word, info, pattern, options, play.score) {
                         matches.push(word.clone());
+                        play_values.insert(word.clone(), play);
                     }
                 }
             }
         }
 
-        self.sort_matches(&mut matches, pattern, options);
+        self.sort_matches(&mut matches, pattern, options, Some(&play_values));
         matches
     }
 
@@ -319,11 +385,17 @@ impl Engine {
             {
                 continue;
             }
-            if self.word_matches(word, info, pattern, options) {
+            if self.word_matches(
+                word,
+                info,
+                pattern,
+                options,
+                score_for(word, &options.scoring),
+            ) {
                 matches.push(word.clone());
             }
         }
-        self.sort_matches(&mut matches, pattern, options);
+        self.sort_matches(&mut matches, pattern, options, None);
         matches
     }
 
@@ -351,6 +423,7 @@ impl Engine {
         info: &WordInfo,
         pattern: &str,
         options: &SearchOptions,
+        word_score: i32,
     ) -> bool {
         let dictionary_bit = normalized_dictionary_bit(options.dictionary_bit);
         if info.membership & dictionary_bit == 0
@@ -366,10 +439,10 @@ impl Engine {
             || word.len() - info.vowels < options.minimum_consonants
             || options
                 .minimum_score
-                .is_some_and(|minimum| score_for(word, &options.scoring) < minimum)
+                .is_some_and(|minimum| word_score < minimum)
             || options
                 .maximum_score
-                .is_some_and(|maximum| score_for(word, &options.scoring) > maximum)
+                .is_some_and(|maximum| word_score > maximum)
             || !contains_required(&info.letter_counts, &options.must_include)
         {
             return false;
@@ -390,9 +463,28 @@ impl Engine {
         }
     }
 
-    fn sort_matches(&mut self, matches: &mut [String], pattern: &str, options: &SearchOptions) {
+    fn sort_matches(
+        &mut self,
+        matches: &mut [String],
+        pattern: &str,
+        options: &SearchOptions,
+        play_values: Option<&HashMap<String, PlayMetrics>>,
+    ) {
         let dictionary_bit = normalized_dictionary_bit(options.dictionary_bit);
-        let score = |word: &str| score_for(word, &options.scoring);
+        let score = |word: &str| {
+            play_values.map_or_else(
+                || score_for(word, &options.scoring),
+                |plays| plays[word].score,
+            )
+        };
+        let high_value_score = |word: &str| {
+            play_values.map_or_else(
+                || high_value_score_for(word, &options.scoring),
+                |plays| plays[word].high_value_score,
+            )
+        };
+        let bingo =
+            |word: &str| play_values.map_or(word.len() == 7, |plays| plays[word].tiles_used == 7);
         let mut hook_sort_values = HashMap::new();
         if options.sort_by.starts_with("hooks-") {
             for word in matches.iter() {
@@ -405,12 +497,12 @@ impl Engine {
                 "score-desc" => score(b).cmp(&score(a)).then_with(longest),
                 "alpha" => a.cmp(b),
                 "length-asc" => a.len().cmp(&b.len()).then_with(|| a.cmp(b)),
-                "high-value" => high_value_score_for(b, &options.scoring)
-                    .cmp(&high_value_score_for(a, &options.scoring))
+                "high-value" => high_value_score(b)
+                    .cmp(&high_value_score(a))
                     .then_with(|| score(b).cmp(&score(a)))
                     .then_with(longest),
-                "bingo" => (b.len() == 7)
-                    .cmp(&(a.len() == 7))
+                "bingo" => bingo(b)
+                    .cmp(&bingo(a))
                     .then_with(|| score(b).cmp(&score(a)))
                     .then_with(longest),
                 "hooks-total" => hook_sort_values[b]
@@ -474,13 +566,31 @@ impl Engine {
             .is_some_and(|info| info.membership & dictionary_bit != 0)
     }
 
+    fn dictionary_membership(&self, word: &str) -> u8 {
+        self.metadata
+            .get(&word.to_ascii_lowercase())
+            .map_or(0, |info| info.membership)
+    }
+
     fn board_fit(&self, rack: &str, pattern: &str, options: &SearchOptions) -> BoardFitAnalysis {
-        let (available, wildcards) = rack_counts(rack);
+        let rack = rack.to_ascii_lowercase();
+        let board = options.board_pattern.to_ascii_lowercase();
+        let Some(play_context) = PlayContext::new(&rack, &board, &options.scoring) else {
+            return BoardFitAnalysis {
+                candidates: 0,
+                fitting: 0,
+                excluded: 0,
+            };
+        };
+        let (available, wildcards) = play_context.signature_pool();
+        // Count combinations before imposing the board span and positions so
+        // longer words appear as excluded, just like an active length filter.
+        let maximum_length = rack.len() + board.bytes().filter(u8::is_ascii_lowercase).count();
         let dictionary_bit = normalized_dictionary_bit(options.dictionary_bit);
         let mut candidates = 0;
         let mut fitting = 0;
 
-        for length in MIN_WORD_LENGTH..=rack.len() {
+        for length in MIN_WORD_LENGTH..=maximum_length {
             for signature in self.signatures_by_length.get(&length).into_iter().flatten() {
                 if !can_build(signature, &available, wildcards) {
                     continue;
@@ -491,6 +601,7 @@ impl Engine {
                     }
                     candidates += 1;
                     if (options.word_length == 0 || word.len() == options.word_length)
+                        && evaluate_play(word, &play_context, |_, _, _| {}).is_some()
                         && (pattern.is_empty() || glob_matches(word.as_bytes(), pattern.as_bytes()))
                         && (options.starts_with.is_empty()
                             || word.starts_with(&options.starts_with))
@@ -506,6 +617,153 @@ impl Engine {
             fitting,
             excluded: candidates - fitting,
         }
+    }
+}
+
+impl<'a> PlayContext<'a> {
+    fn new(rack: &str, board: &'a str, scoring: &str) -> Option<Self> {
+        if !rack
+            .bytes()
+            .all(|byte| byte == b'?' || byte.is_ascii_lowercase())
+            || !board
+                .bytes()
+                .all(|byte| byte == b'?' || byte.is_ascii_lowercase())
+            || (!board.is_empty() && !board.contains('?'))
+            || rack.len() > u8::MAX as usize
+            || board.len() > u8::MAX as usize
+        {
+            return None;
+        }
+        let (available, wildcards) = rack_counts(rack);
+        Some(Self {
+            available,
+            wildcards,
+            board,
+            value_for: if scoring == "wwf" {
+                wwf_tile_value
+            } else {
+                tile_value
+            },
+        })
+    }
+
+    fn signature_pool(&self) -> ([u8; 26], usize) {
+        let mut available = self.available;
+        for byte in self.board.bytes().filter(u8::is_ascii_lowercase) {
+            let count = &mut available[(byte - b'a') as usize];
+            *count = count.saturating_add(1);
+        }
+        (available, self.wildcards)
+    }
+}
+
+// Shared assignment logic keeps search filtering, ranking, saved picks, and tile
+// rendering consistent. Search callers use a no-op visitor and allocate no lists.
+fn evaluate_play(
+    word: &str,
+    context: &PlayContext,
+    mut visit: impl FnMut(usize, bool, bool),
+) -> Option<PlayMetrics> {
+    if word.is_empty()
+        || !word.bytes().all(|byte| byte.is_ascii_lowercase())
+        || (!context.board.is_empty() && word.len() != context.board.len())
+    {
+        return None;
+    }
+    let mut result = PlayMetrics {
+        score: 0,
+        high_value_score: 0,
+        tiles_used: 0,
+        remaining: context.available,
+        remaining_wildcards: context.wildcards,
+    };
+    for (position, letter) in word.bytes().enumerate() {
+        let board_letter = context
+            .board
+            .as_bytes()
+            .get(position)
+            .copied()
+            .unwrap_or(b'?');
+        let on_board = board_letter != b'?';
+        let mut blank = false;
+        if on_board {
+            if board_letter != letter {
+                return None;
+            }
+        } else {
+            result.tiles_used += 1;
+            let available = &mut result.remaining[(letter - b'a') as usize];
+            if *available > 0 {
+                *available -= 1;
+            } else if result.remaining_wildcards > 0 {
+                result.remaining_wildcards -= 1;
+                blank = true;
+            } else {
+                return None;
+            }
+        }
+        if !blank {
+            let value = (context.value_for)(letter);
+            result.score += value;
+            if is_high_value(letter) {
+                result.high_value_score += value;
+            }
+        }
+        visit(position, blank, on_board);
+    }
+    (result.tiles_used > 0).then_some(result)
+}
+
+fn analyze_rack_play(word: &str, rack: &str, board: &str, scoring: &str) -> PlayAnalysis {
+    let word = word.to_ascii_lowercase();
+    let rack = rack.to_ascii_lowercase();
+    let board = board.to_ascii_lowercase();
+    let invalid = || PlayAnalysis {
+        leave: rack.clone(),
+        ..Default::default()
+    };
+    let Some(context) = PlayContext::new(&rack, &board, scoring) else {
+        return invalid();
+    };
+    let mut blank_positions = Vec::new();
+    let mut board_positions = Vec::new();
+    let Some(mut play) = evaluate_play(&word, &context, |position, blank, on_board| {
+        if blank {
+            blank_positions.push(position);
+        }
+        if on_board {
+            board_positions.push(position);
+        }
+    }) else {
+        return invalid();
+    };
+    let leave = rack
+        .bytes()
+        .filter(|letter| {
+            if *letter == b'?' {
+                if play.remaining_wildcards == 0 {
+                    return false;
+                }
+                play.remaining_wildcards -= 1;
+            } else {
+                let count = &mut play.remaining[(*letter - b'a') as usize];
+                if *count == 0 {
+                    return false;
+                }
+                *count -= 1;
+            }
+            true
+        })
+        .map(char::from)
+        .collect();
+    PlayAnalysis {
+        valid: true,
+        score: play.score,
+        blank_positions,
+        board_positions,
+        tiles_used: play.tiles_used,
+        leave,
+        bingo: play.tiles_used == 7,
     }
 }
 
@@ -821,6 +1079,21 @@ mod tests {
     }
 
     #[test]
+    fn reports_dictionary_membership_and_merges_later_sources() {
+        let mut engine = engine();
+        assert_eq!(engine.dictionary_membership("tea"), ENABLE);
+        assert_eq!(engine.dictionary_membership("EATS"), EXPANDED);
+        assert_eq!(engine.dictionary_membership("AtE"), ENABLE | EXPANDED);
+        assert_eq!(engine.dictionary_membership("absent"), 0);
+        assert_eq!(engine.dictionary_membership(""), 0);
+        engine.index_records(vec!["tea\t3".into(), "eats\t1".into()]);
+        assert_eq!(engine.dictionary_membership("TEA"), ENABLE | EXPANDED);
+        assert_eq!(engine.dictionary_membership("eats"), ENABLE | EXPANDED);
+        engine.index_records(vec!["tea\t1".into()]);
+        assert_eq!(engine.dictionary_membership("tea"), ENABLE | EXPANDED);
+    }
+
+    #[test]
     fn searches_crossword_patterns_without_a_rack() {
         let mut engine = engine();
         let options = SearchOptions {
@@ -912,6 +1185,187 @@ mod tests {
         assert_eq!(
             engine.find_matches("abcdefg", "", &options),
             vec!["faced", "badge"]
+        );
+    }
+
+    #[test]
+    fn rack_search_scores_and_filters_blanks_as_zero() {
+        let mut engine = engine();
+        engine.index_records(vec!["axe\t3".into(), "tax\t3".into()]);
+        for scoring in ["", "wwf"] {
+            let mut options = SearchOptions {
+                dictionary_bit: ENABLE,
+                sort_by: "score-desc".into(),
+                scoring: scoring.into(),
+                ..Default::default()
+            };
+            assert_eq!(
+                engine.find_matches("tae?", "???", &options),
+                vec!["ate", "eat", "tea", "axe", "tax"]
+            );
+            options.minimum_score = Some(3);
+            assert_eq!(
+                engine.find_matches("tae?", "???", &options),
+                vec!["ate", "eat", "tea"]
+            );
+            options.minimum_score = None;
+            options.maximum_score = Some(2);
+            assert_eq!(
+                engine.find_matches("tae?", "???", &options),
+                vec!["axe", "tax"]
+            );
+        }
+    }
+
+    #[test]
+    fn board_letters_are_fixed_and_do_not_consume_rack_tiles() {
+        let mut engine = engine();
+        engine.index_records(vec!["cat\t3".into(), "act\t3".into(), "tat\t3".into()]);
+        let mut options = SearchOptions {
+            board_pattern: "?a?".into(),
+            scoring: "wwf".into(),
+            sort_by: "alpha".into(),
+            ..Default::default()
+        };
+        assert_eq!(engine.find_matches("ct", "", &options), vec!["cat"]);
+        assert!(engine.find_matches("ct", "a*", &options).is_empty());
+        assert!(engine.find_matches("c", "", &options).is_empty());
+        options.minimum_score = Some(6);
+        assert_eq!(engine.find_matches("ct", "c*t", &options), vec!["cat"]);
+        assert!(engine.find_matches("c?", "", &options).is_empty());
+        options.minimum_score = None;
+        options.maximum_score = Some(5);
+        assert_eq!(engine.find_matches("c?", "c*t", &options), vec!["cat"]);
+        options.word_length = 2;
+        assert!(engine.find_matches("ct", "", &options).is_empty());
+        options.word_length = 0;
+        for invalid_board in ["cat", "?a*", "?é?", "????"] {
+            options.board_pattern = invalid_board.into();
+            assert!(engine.find_matches("ct", "", &options).is_empty());
+        }
+    }
+
+    #[test]
+    fn play_analysis_tracks_blank_assignment_board_letters_and_leave() {
+        assert_eq!(
+            analyze_rack_play("CAT", "CA?", "", "wwf"),
+            PlayAnalysis {
+                valid: true,
+                score: 5,
+                blank_positions: vec![2],
+                board_positions: vec![],
+                tiles_used: 3,
+                leave: "".into(),
+                bingo: false,
+            }
+        );
+        assert_eq!(
+            analyze_rack_play("TAT", "t?xz", "?A?", "wwf"),
+            PlayAnalysis {
+                valid: true,
+                score: 2,
+                blank_positions: vec![2],
+                board_positions: vec![1],
+                tiles_used: 2,
+                leave: "xz".into(),
+                bingo: false,
+            }
+        );
+        assert_eq!(
+            analyze_rack_play("tat", "a?t", "t??", "wwf"),
+            PlayAnalysis {
+                valid: true,
+                score: 3,
+                blank_positions: vec![],
+                board_positions: vec![0],
+                tiles_used: 2,
+                leave: "?".into(),
+                bingo: false,
+            }
+        );
+        assert_eq!(
+            analyze_rack_play("letter", "l??eer", "", "wwf").blank_positions,
+            vec![2, 3]
+        );
+        for (word, rack, board) in [
+            ("cat", "c", "?a?"),
+            ("act", "ct", "?a?"),
+            ("cat", "cat", "c*t"),
+        ] {
+            let analysis = analyze_rack_play(word, rack, board, "wwf");
+            assert!(!analysis.valid);
+            assert_eq!(analysis.score, 0);
+            assert_eq!(analysis.leave, rack);
+            assert!(analysis.blank_positions.is_empty());
+        }
+    }
+
+    #[test]
+    fn bingo_depends_on_new_tiles_not_final_word_length() {
+        assert!(analyze_rack_play("stainer", "stainer", "", "wwf").bingo);
+        let board_bingo = analyze_rack_play("stainers", "tainers", "s???????", "wwf");
+        assert!(board_bingo.bingo);
+        assert_eq!(board_bingo.tiles_used, 7);
+        assert_eq!(board_bingo.score, 9); // Bonus is applied by the caller.
+        assert!(!analyze_rack_play("stainer", "tainer", "s??????", "wwf").bingo);
+    }
+
+    #[test]
+    fn board_fit_compares_combined_letters_before_positional_and_length_constraints() {
+        let mut engine = Engine::default();
+        engine.index_records(
+            ["at", "cat", "act", "cats", "cast"]
+                .map(str::to_owned)
+                .to_vec(),
+        );
+        let options = SearchOptions {
+            board_pattern: "?a?".into(),
+            ..Default::default()
+        };
+        assert_eq!(
+            engine.board_fit("cts", "", &options),
+            BoardFitAnalysis {
+                candidates: 5,
+                fitting: 1,
+                excluded: 4,
+            }
+        );
+        assert_eq!(
+            engine.board_fit("cts", "a*", &options),
+            BoardFitAnalysis {
+                candidates: 5,
+                fitting: 0,
+                excluded: 5,
+            }
+        );
+        // Both CAT and ACT can use C, a blank and board A in any order; only
+        // CAT has the board A at its required position.
+        assert_eq!(
+            engine.board_fit("c?", "", &options),
+            BoardFitAnalysis {
+                candidates: 3,
+                fitting: 1,
+                excluded: 2,
+            }
+        );
+    }
+
+    #[test]
+    fn crossword_scoring_remains_independent_of_rack_blank_values_and_board_mode() {
+        let mut engine = engine();
+        engine.index_records(vec!["axe\t3".into()]);
+        let options = SearchOptions {
+            minimum_score: Some(10),
+            board_pattern: "this-field-is-unused-in-crosswords".into(),
+            ..Default::default()
+        };
+        assert_eq!(
+            engine.find_crossword_matches("???", "ae?", &options),
+            vec!["axe"]
+        );
+        assert_eq!(
+            engine.find_crossword_matches("???", "", &options),
+            vec!["axe"]
         );
     }
 

@@ -23,7 +23,7 @@ test("dictionary shards distinguish ENABLE, Wiktionary, and shared words", async
   assert.match(chunk, /^cabala\t1$/m);
 });
 
-test("every solver loader uses the Wiktionary manifest", async () => {
+test("every solver dictionary loader supports the Wiktionary manifest", async () => {
   const loaders = [
     "../assets/js/shared/dictionary-offline-controls.js",
     "../assets/js/tools/absurdle-solver.js",
@@ -32,7 +32,7 @@ test("every solver loader uses the Wiktionary manifest", async () => {
     "../assets/js/tools/multi-board-word-solver.js",
     "../assets/js/tools/wordiply-solver.js",
     "../assets/js/tools/wordle-helper.js",
-    "../assets/js/tools/word-unscrambler/word-unscrambler.js"
+    "../assets/js/tools/word-unscrambler/dictionary-loader.js"
   ];
   for (const loader of loaders) {
     assert.match(await readFile(new URL(loader, import.meta.url), "utf8"), /manifest\.wiktionary-v1\.json/);

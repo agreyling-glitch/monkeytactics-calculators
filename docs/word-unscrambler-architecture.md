@@ -2,65 +2,64 @@
 
 ## Overview
 
-The Word Unscrambler is a static browser application with a Rust engine compiled to WebAssembly. HTML and CSS define the interface, JavaScript manages browser concerns, and Rust owns the dictionary indexes and computational search logic.
+Word Unscrambler and Words With Friends Solver share a static browser application with a Rust engine compiled to WebAssembly. HTML and CSS define the interface, JavaScript manages browser concerns, and Rust owns dictionary indexing and search. The WWF page selects its tile values and 35-point bingo bonus through `data-word-game="wwf"`; Word Unscrambler uses Scrabble values and a 50-point bonus.
 
 No word data or search input is sent to a server. The browser downloads static dictionary shards and performs all indexing, matching, filtering, scoring, sorting, hook detection, and word analysis locally.
 
 ## Component Map
 
 ```text
-tools/word-unscrambler.html
+tools/word-unscrambler.html / tools/words-with-friends-solver.html
   |
-  +-- assets/js/tools/word-unscrambler/input-rules.js
-  |     Input normalization and validation limits
+  +-- input-rules.js, history-store.js, pick-list-store.js
+  |     Input limits and local saved work
   |
-  +-- assets/js/tools/word-unscrambler/history-store.js
-  |     localStorage-backed search history
+  +-- wasm-bridge.js -> generated WASM
+  |     Small synchronous scoring and word/play analysis, no dictionary indexing
   |
-  +-- assets/js/tools/word-unscrambler/wasm-bridge.js
-  |     Loads, authorizes, and wraps the generated WASM module
-  |       |
-  |       +-- assets/wasm/word-unscrambler/
-  |             word_unscrambler_engine.js
-  |             word_unscrambler_engine_bg.wasm
+  +-- search-worker-client.js -> search-worker.js -> generated WASM
+  |     Asynchronous request IDs, initialization, dictionary indexing, searches,
+  |     hooks, and board-fit analysis; the worker owns the dictionary index
   |
-  +-- assets/js/tools/word-unscrambler/word-unscrambler.js
-        UI state, dictionary fetching, DOM rendering, and bridge calls
-          |
-          +-- assets/data/words/manifest.wiktionary-v1.json
-          +-- assets/data/words/[a-z].wiktionary-v1.txt.gz
+  +-- dictionary-loader.js
+  |     Selected manifest, bounded shard fetching, gzip decoding, worker initEngine
+  |       +-- assets/data/words/manifest.enable-v1.json
+  |       +-- assets/data/words/[a-z].enable-v1.txt.gz
+  |       +-- assets/data/words/manifest.wiktionary-v1.json
+  |       +-- assets/data/words/[a-z].wiktionary-v1.txt.gz
+  |
+  +-- word-unscrambler.js
+        Form state, result rendering, lazy word details, history, picks, offline mode
 
-Rust source:
-wasm/word-unscrambler-engine/src/lib.rs
+JavaScript modules: assets/js/tools/word-unscrambler/
+Generated WASM: assets/wasm/word-unscrambler/
+Rust source: wasm/word-unscrambler-engine/src/lib.rs
 ```
 
 ## Runtime Initialization
 
-The HTML loads scripts with `defer` in this order:
+Both pages load deferred scripts in dependency order: input rules, History and Pick List stores, WASM bridge, worker client, dictionary loader, shared UI services, then the main solver script.
 
-1. Input rules.
-2. History storage.
-3. WASM bridge.
-4. Main Word Unscrambler UI script.
+`window.MonkeyTacticsWasm` imports and authorizes the generated WASM module for small synchronous operations such as `analyzePlay` and letter scoring. `window.MonkeyTacticsSearchWorker` starts a classic worker whose dynamic import creates a separate authorized WASM instance. This second instance owns all dictionary records and performs indexing, search, hook detection, and board-fit analysis away from the UI thread.
 
-The bridge immediately creates `window.MonkeyTacticsWasm` and starts a dynamic import of the `wasm-pack` JavaScript loader. Its `ready` promise resolves only after:
+The main UI awaits both readiness promises and the selected dictionary manifest before enabling Unscramble. It creates one loader with `MonkeyTacticsWordDictionary.create(SearchEngine)`; decoded shard text is sent to the worker, where it is split into records and indexed. The window instance does not receive dictionary shards.
 
-1. The generated JavaScript module is imported.
-2. The `.wasm` binary is fetched and instantiated.
-3. Rust's `verify_domain` function authorizes `window.location.hostname`.
-
-The main UI waits for `MonkeyTacticsWasm.ready` before fetching the dictionary manifest or enabling the Unscramble button. Every public bridge method also calls `requireEngine`, preventing calls before initialization or after failed authorization.
+The worker client uses increasing request IDs and a pending-promise map. It propagates per-request errors, rejects pending work on fatal startup or worker errors, and uses a 60-second timeout for startup and requests. Worker support is required; there is no main-thread dictionary-search fallback. Search revisions in the UI prevent stale responses from replacing a more recent search or Clear search action.
 
 ### Asset versioning
 
-Cloudflare serves `/assets/*` with a one-year immutable cache policy. `wasm-bridge.js` therefore applies the same explicit version token to both generated assets:
+Cloudflare serves `/assets/*` with a one-year immutable cache policy. The bridge and worker apply the same explicit version token to both generated assets:
 
 ```text
 word_unscrambler_engine.js?v=<version>
 word_unscrambler_engine_bg.wasm?v=<version>
 ```
 
-The script references in `word-unscrambler.html` are versioned as well. When rebuilding or changing the engine, the version in the bridge and HTML must be incremented so browsers do not execute an older WASM binary.
+Keep the bridge, worker, worker-client URL, and offline engine asset URLs on the same engine release token, currently `20261012-solvers-3`, across all ten consuming word-game pages. The page controller, shared dictionary/offline controls, and solver offline packages use `20261012-solvers-11`; the play/refill module uses `20261012-solvers-9`; the comparison module and comparison/play stylesheets use `20261012-solvers-7`; shared dictionary and base solver stylesheets use `20261012-solvers-5`. Offline packages include the worker script, generated WASM, both dictionary datasets, local definitions, and the comparison and play/refill assets.
+
+Offline package upgrades refresh the page shell and unversioned scripts using an `offline-update` query parameter on the network request, while storing responses under the original URLs. This prevents older service workers from substituting stale cached shells during an upgrade. Versioned dictionary and engine assets can be reused. A new package is activated and older packages for that tool are removed only after every required file is verified; a failed download preserves the previous package.
+
+Word Details displays ENABLE and/or Expanded badges using actual dictionary membership. On hover or keyboard focus, `createDictionarySource` loads the combined shard for the word's first letter, then calls the worker's `dictionaryMembership(word)` API. This supplies both membership bits even when the search used only Standard data; it does not infer membership from the selected dictionary. The row loads once per result and can retry after a failed lookup.
 
 ## Host Authorization
 
@@ -71,7 +70,7 @@ Authorization occurs inside the Rust module through `verify_domain(host)`. The c
 - Any subdomain ending in `.monkeytactics-calculators.pages.dev`
 - `127.0.0.1` for local Wrangler development, regardless of port
 
-The browser passes `window.location.hostname`, which does not include the protocol or port. Consequently, `http://127.0.0.1:8788` is checked as `127.0.0.1`.
+The bridge passes `window.location.hostname` and the worker passes `self.location.hostname`; neither includes the protocol or port. Consequently, `http://127.0.0.1:8788` is checked as `127.0.0.1`.
 
 The Pages suffix check requires a leading dot. A lookalike hostname such as `evilmonkeytactics-calculators.pages.dev` is not authorized.
 
@@ -79,7 +78,7 @@ This check prevents the application from enabling its engine on an unapproved ho
 
 ## Dictionary Storage
 
-The Standard dictionary contains 172,820 words sourced from ENABLE. Expanded contains 854,775 normalized ASCII words derived from Wiktionary. Their 867,177-word union is split into 26 gzip-compressed shards based on the first letter of each word.
+The Standard dictionary contains 172,820 words sourced from ENABLE. Expanded contains 854,775 normalized ASCII words derived from Wiktionary. Both the 172,820-word ENABLE dataset and the 867,177-word combined dataset have 26 gzip-compressed shards based on the first letter of each word. Standard selects `manifest.enable-v1.json`; Expanded and Both select `manifest.wiktionary-v1.json` and apply membership filtering in Rust. Loading all Standard shards transfers about 464 KB compressed, compared with about 2.68 MB for the combined shards.
 
 The manifest describes:
 
@@ -112,27 +111,21 @@ Words present in both sources carry membership value `3`, so either individual d
 
 ## Lazy Dictionary Loading
 
-The browser retains the existing first-letter shard strategy to reduce initial transfer and memory usage.
+`dictionary-loader.js` owns manifests, in-flight requests, and loaded-shard state. Cache keys include the source and letter. A previously loaded combined shard also satisfies a Standard request; loading combined data after Standard merges membership bits into existing word records without duplication. Failed requests are removed from the in-flight cache so a later search can retry. A shared queue limits shard fetch/decode/index operations to four at once.
 
-For an ordinary rack without wildcards, every result must begin with one of the rack's letters. JavaScript therefore loads only the unique first-letter shards represented in the rack. For example, `RETAINS` requires the `a`, `e`, `i`, `n`, `r`, `s`, and `t` shards.
+An ordinary rack without blanks needs only the distinct first-letter shards represented in the rack. For example, `RETAINS` loads `a`, `e`, `i`, `n`, `r`, `s`, and `t` from the selected dataset. In board mode, a fixed first board letter can narrow the fetch to that letter; otherwise the UI includes possible rack and board starting letters.
 
-All 26 shards are loaded when:
-
-- The rack contains `?`, because a wildcard may become any first letter.
-- Hook filtering or hook sorting is active, because a front hook may begin with any letter.
-- A user expands Hook Lookup for a result.
-
-Loaded shard names and in-flight promises are cached in JavaScript. This prevents repeated downloads and coalesces concurrent requests for the same shard.
+All selected-dataset shards are loaded for unrestricted word lists, rack blanks, hook filters and sorts, or expanded front/back hook lookup. Saved-pick S-hook flags need only the first-letter shards of the saved words, because appending S preserves the first letter. They do not trigger a complete dictionary download.
 
 ### Decompression
 
-`decodeChunk` reads the response as bytes and checks for the gzip magic bytes `1f 8b`. Some hosts transparently decompress gzip responses, so bytes without that signature are decoded directly. Otherwise, the browser's `DecompressionStream("gzip")` API decompresses the payload.
+The loader inspects response bytes for the gzip magic bytes `1f 8b`. Hosts can transparently decompress `.gz` responses, so data without that signature is decoded directly. Otherwise, `DecompressionStream("gzip")` decompresses it. Decoded text crosses the worker boundary once per shard. Record splitting, Rust metadata creation, and index construction happen inside the worker.
 
-The resulting record array is passed to Rust through `init_engine`. Initialization is additive: each call indexes another shard without discarding previously loaded data.
+Initialization is additive. Loaded indexes live for the page lifetime, and switching dictionaries reuses data already present while each search still enforces its selected membership mask.
 
 ## Rust Engine State
 
-The engine is stored in a thread-local `RefCell<Engine>`. Browser WebAssembly currently invokes it synchronously on the main JavaScript thread, while `RefCell` provides controlled interior mutability for exported functions.
+The engine is stored in a thread-local `RefCell<Engine>`. Each WASM instance owns separate state. Export calls are synchronous within their thread, but the dictionary instance runs in the Web Worker and returns results to the UI through promises. `RefCell` provides controlled interior mutability for exported functions.
 
 `Engine` owns these primary structures:
 
@@ -142,7 +135,7 @@ The engine is stored in a thread-local `RefCell<Engine>`. Browser WebAssembly cu
 | `HashMap<usize, Vec<String>> signatures_by_length` | Limits candidate signatures to the requested word length. |
 | `HashMap<String, WordInfo> metadata` | Stores dictionary membership, score, vowel count, and 26 letter counts for every word. |
 | `Vec<String> enable_words` | Tracks words belonging to ENABLE. |
-| `Vec<String> expanded_words` | Reserved for the future Expanded dictionary. |
+| `Vec<String> expanded_words` | Tracks words belonging to Wiktionary. |
 | `HashMap<(String, u8), HookInfo> hook_maps` | Caches hook results by word and dictionary selection. |
 
 ### Canonical signatures
@@ -176,10 +169,10 @@ Any newly indexed data clears the hook cache because a newly loaded shard can ad
 JavaScript calls:
 
 ```js
-Engine.unscramble(rack, pattern, options)
+await SearchEngine.unscramble(rack, pattern, options)
 ```
 
-The bridge forwards this to Rust's `unscramble` export. `serde-wasm-bindgen` converts the JavaScript options object into `SearchOptions`.
+The worker forwards this to Rust's `unscramble` export. `serde-wasm-bindgen` converts the JavaScript options object into `SearchOptions`.
 
 The options include:
 
@@ -189,11 +182,13 @@ The options include:
 - Required and excluded letters.
 - High-value-letter requirement.
 - Minimum vowel and consonant counts.
-- Minimum and maximum Scrabble score.
+- Minimum and maximum play score.
+- Scoring scheme: `scrabble` or `wwf`.
+- Optional `boardPattern`: fixed board letters and `?` spaces to fill.
 - Hook filter.
 - Sort mode.
 
-The pattern is passed separately and also remains in the JavaScript options object for UI/history use.
+The ordinary rack pattern is passed separately and also remains in the JavaScript options object for UI/history use. It filters words buildable from the rack. `boardPattern` is a distinct option: its literal letters do not consume rack tiles, and each `?` must consume a matching rack tile or a blank. Rack `CT` with board `?A?` can form CAT. A checked board toggle with an empty or whitespace-only field runs a normal rack search and shows no board filter chip. A nonempty board pattern requires fixed letters and at least one space, rejects stars and unrestricted rack searches, and makes word length equal to the board pattern. History stores the toggle and pattern; saved picks store the play context.
 
 ## Search Pipeline
 
@@ -204,7 +199,7 @@ Rust converts the rack into:
 - A fixed `[u8; 26]` count array for known letters.
 - A wildcard count for `?` tiles.
 
-The maximum candidate length is the rack length unless an exact word length is selected. Results shorter than two letters are excluded.
+The maximum candidate length is the rack length unless an exact word length is selected. Board mode instead fixes candidate length to the board pattern and adds its fixed letters to the signature prefilter pool. A positional play check then verifies that only the open spaces consume rack tiles. Results shorter than two letters are excluded.
 
 ### 2. Pattern feasibility
 
@@ -248,9 +243,9 @@ Rust performs the final ordering. Supported modes include:
 
 - Longest or shortest first.
 - Alphabetical.
-- Highest Scrabble score.
+- Highest play score using the selected game values and zero-point rack blanks.
 - High-value-tile priority.
-- Seven-letter bingo priority.
+- Bingo priority for plays using seven rack tiles; board letters do not count as played tiles.
 - Total, S, front, or back hook priority.
 - Pattern-match strength.
 
@@ -260,11 +255,27 @@ All non-alphabetical sorts use deterministic tie breakers, ending with length an
 
 The engine returns an ordered JavaScript array of lowercase words. JavaScript does not reorder or refilter this array; it uses it for DOM rendering, result grouping, history metrics, and charts.
 
-## Scrabble Scoring
+## Play Scoring
 
-`score_word` applies standard English Scrabble tile values in Rust. Scores are also stored in `WordInfo` for dictionary words and reused by search filters and sort modes.
+`score_word` and `score_wwf_word` return base English Scrabble and WWF letter scores. Search uses the selected `scoring` scheme and evaluates actual tile assignment for each rack play. Known rack tiles are used before blanks; blanks contribute zero. Fixed board letters contribute their normal value without consuming rack tiles. Min/max score filters and score sorting use this same adjusted play score.
 
-The UI calls the WASM scoring export for displayed scores and score-based charts. Board multipliers and blank-tile zero scoring are not applied; rack wildcards affect buildability and highlighting, while result words display their base letter score.
+`analyze_play(word, rack, boardPattern, scoring)` exposes the assignment to the UI:
+
+```js
+{
+  valid: true,
+  score: 5,
+  blankPositions: [2],
+  boardPositions: [],
+  tilesUsed: 3,
+  leave: "",
+  bingo: false
+}
+```
+
+The example is WWF CAT from rack `CA?`: C is 4, A is 1, and blank T is 0. Positions are zero-based word offsets. In board mode, `CT` + `?A?` produces CAT with board position `[1]`, two rack tiles used, and score 6.
+
+Displayed result scores, score distributions, saved picks, blank/board highlighting, and rack leave share this analysis. The bingo flag depends on using seven rack tiles, so a board extension can be longer than seven letters and still qualify. The +35 WWF or +50 Scrabble bonus is shown separately. Premium squares, cross-word scores, and pre-existing blank board tiles are not modeled. Unrestricted list searches have no rack assignment and display base letter values.
 
 ## Hook Detection
 
@@ -286,9 +297,21 @@ Each candidate is looked up in the metadata map and checked against the selected
 }
 ```
 
-`find_hooks` searches the union of both dictionaries. The UI uses the additional `find_hooks_for_dictionary` export so badges, filters, sorting, and expanded Hook Lookup respect the user's active dictionary.
+`find_hooks` searches the union of both dictionaries. The worker uses the additional `find_hooks_for_dictionary` export so badges, filters, sorting, and expanded Hook Lookup respect the user's active dictionary.
 
 Hook results are cached by `(word, dictionaryBit)` until more dictionary data is indexed.
+
+## Lazy Word Details
+
+Rendering a result creates a rack-leave placeholder. Hovering, focusing, or opening that result starts `loadRackLeave`, which calls play analysis and only then asks the worker for words buildable from the remaining rack. Results are cached by dictionary and sorted leave. Initial rendering no longer runs a leave-word search for each of the up to 250 visible results. Local definitions load when details open; full hook lookups start only when the user expands Available hooks, with a retry button after failure.
+
+Word Details uses one shared controller state so only one popup stays open. Clicking a word pins its details; Close, Escape, clicking outside, or tabbing away dismisses them. Visibility is explicit rather than tied to CSS hover, so dismissal does not reopen the popup while the trigger still has focus. On small screens, details become a scrolling bottom sheet.
+
+`getSearchConflict` catches incompatible board length, insufficient rack tiles, excluded required/board letters, and impossible letter minimums before loading dictionary shards. The result panel explains the conflict and offers a targeted repair. Shared dictionary controls use keyboard-operable radio buttons; changes refresh active rack searches, coalesce duplicate submissions, and suppress responses for the previous dictionary.
+
+`pick-comparison.js` owns a page-local selection of two to four saved picks and a native dialog with a comparison table. Rack-dependent values use each pick's saved rack and board, while hooks use the current dictionary and membership uses the combined first-letter shard. Legacy and unrestricted picks without rack context do not invent tiles-used or leave values. Comparison work starts only on explicit request. The Pick List hook refresh updates rendering without recursively starting another refresh.
+
+`play-refill.js` uses `analyzePlay` to preserve remaining tiles and unused blanks in rack order. Result-card Play validates the current rack and board against the result's search context to reject stale actions. Pick List Play instead uses the current rack and active board at click time, independently of the pick's saved comparison context; older picks without saved rack data can also be played. Invalid or unrestricted current racks are rejected without changing the input. The controller cancels pending searches and clears board/basic/advanced filters for the new turn. Replacement tiles are limited to the number spent, and completing refill searches the new rack. A single Undo snapshot includes the raw smart input, filters, board toggle/pattern, sort, and dictionary. Restoring it cancels stale work and submits exactly once; History and Pick List are retained. Clear search dismisses the refill/Undo controls.
 
 ## Word Analysis and Charts
 
@@ -316,15 +339,17 @@ The remaining chart code is presentation logic in JavaScript. It aggregates resu
 
 - Reading and validating controls.
 - Parsing the rack/pattern smart input.
-- Loading and decompressing dictionary shards.
-- Waiting for WASM readiness.
+- Requesting the necessary dictionary shards through the dedicated loader.
+- Waiting for both WASM instances and worker requests.
 - Building the Rust options object.
-- Rendering result cards, badges, groups, charts, and messages.
+- Rendering result cards, badges, groups, charts, messages, removable filter chips, and recovery actions.
+- Keeping sort and quick-length controls beside the results.
+- Clearing search state while preserving History and Pick List; browser refresh retains its shortcut.
 - Managing keyboard shortcuts and focus.
 - Saving and restoring local search history.
 - Opening external dictionary links.
 
-This separation keeps the existing UI independent of Rust implementation details. The bridge preserves small, stable JavaScript contracts while computational work remains inside WASM.
+This separation keeps the existing UI independent of Rust implementation details. The bridge and worker client preserve small, stable JavaScript contracts while dictionary computation remains inside WASM in the worker.
 
 ## WASM Exports
 
@@ -335,9 +360,11 @@ This separation keeps the existing UI independent of Rust implementation details
 | `unscramble` | `unscramble` | Search, filter, and sort words. |
 | `crossword_search` | `crosswordSearch` | Search pattern-first without a rack constraint, or optionally enforce an available-letter pool. |
 | `score_word` | `scoreWord` | Return a word's base Scrabble score. |
+| `score_wwf_word` | `scoreWwfWord` | Return a word's base WWF score. |
+| `analyze_play` | `analyzePlay` | Return rack-aware score, blank and board positions, leave, tile use, and bingo eligibility. |
 | `find_hooks` | Direct generated API | Find hooks against the dictionary union. |
 | `find_hooks_for_dictionary` | `findHooks` | Find hooks for the selected dictionary bit. |
-| `analyze_word` | `analyzeWord` | Return letter, score, and entropy metrics. |
+| `analyze_word` / `analyze_wwf_word` | `analyzeWord` / `analyzeWwfWord` | Return letter, score, and entropy metrics for the game. |
 | `board_fit_analysis` | `boardFitAnalysis` | Return buildable versus board-filtered counts. |
 
 ## Build and Generated Artifacts
@@ -361,8 +388,8 @@ Generated browser artifacts under `assets/wasm/word-unscrambler/` are committed 
 After rebuilding:
 
 1. Remove the generated nested `.gitignore` if `wasm-pack` creates one, otherwise it hides the generated package from the repository.
-2. Increment `ASSET_VERSION` in `assets/js/tools/word-unscrambler/wasm-bridge.js`.
-3. Increment the bridge and main-script query versions in `tools/word-unscrambler.html`.
+2. Increment `ASSET_VERSION` in the bridge, worker, and worker client.
+3. Update modified asset query versions in both solver pages and the offline asset list.
 4. Run the Rust and Node test suites.
 5. Commit the updated generated JavaScript and `.wasm` binary with the Rust source.
 
@@ -372,13 +399,16 @@ Rust unit tests in `src/lib.rs` cover:
 
 - Wildcard and pattern matching.
 - Dictionary membership.
-- Score filtering and sorting.
+- Blank-adjusted score filtering and sorting in both games.
+- Board-position assignment, repeated letters, rack leaves, and seven-tile bingo eligibility.
 - Dictionary-specific hooks.
 - Word analysis and scoring.
 - Glob matching.
 - Host authorization and lookalike rejection.
 
 The Node integration test `tests/word-unscrambler-wasm.test.mjs` loads the actual generated `.wasm` binary and verifies the JavaScript-facing serialization contract for authorization, initialization, search results, scoring, hooks, board-fit analysis, entropy, and tile distributions.
+
+Worker-client tests cover request ordering, errors, and timeouts; worker tests exercise indexed searches through the message protocol. Dictionary-loader tests verify selected-source fetching, concurrency, membership upgrades, retries, and offline asset coverage.
 
 Run the relevant suites from the repository root:
 
@@ -392,7 +422,10 @@ node --test tests/*.test.cjs tests/*.test.mjs
 
 The architecture reduces routine work through:
 
-- First-letter shard loading for ordinary racks.
+- The smaller ENABLE dataset for Standard searches.
+- First-letter shard loading for ordinary racks and saved-pick S-hook checks.
+- Worker-owned indexing and searches to keep typing and scrolling responsive.
+- Rack-leave searches deferred until a result is opened.
 - Gzip-compressed static word data.
 - Length-indexed canonical signatures.
 - Fixed-size letter count arrays.
@@ -406,10 +439,10 @@ The worst-case path is intentionally deferred. Wildcard and hook operations may 
 
 ## Operational Constraints
 
-- The engine is synchronous after initialization. Very broad searches execute on the browser's main thread.
+- Engine calls are synchronous within the worker. Large searches can delay later worker requests, while the UI remains responsive; revisions prevent stale rendering.
 - Dictionary indexes live for the page lifetime and grow as more shards are loaded.
 - Hook cache entries are cleared whenever a new shard is indexed.
 - The current data model assumes lowercase ASCII dictionary words.
 - The UI limits rack and pattern size before calling Rust.
-- Browser support requires WebAssembly, dynamic modules, and `DecompressionStream` when the host does not transparently decode gzip.
+- Browser support requires WebAssembly, Web Workers, dynamic modules, and `DecompressionStream` when the host does not transparently decode gzip.
 - Any engine or generated-package update requires an asset-version bump because of immutable caching.

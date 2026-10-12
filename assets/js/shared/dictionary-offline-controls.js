@@ -2,7 +2,7 @@
   "use strict";
   const standardIcon = `<svg class="reference-active-flag" viewBox="0 0 28 18" aria-hidden="true"><rect width="28" height="18" rx="1" fill="#fff"/><path fill="#c83b45" d="M0 0h28v2H0zm0 4h28v2H0zm0 4h28v2H0zm0 4h28v2H0zm0 4h28v2H0z"/><path fill="#27477d" d="M0 0h12v10H0z"/><path fill="#fff" d="m2 2 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zM4 6l.4 1.1h1.2l-1 .7L5 8.9l-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7L9 8.9l-1-.7-1 .7.4-1.1-1-.7h1.2z"/></svg>`;
   const choiceIcon = (name) => name === "Standard" ? standardIcon : `<span class="reference-active-symbol" aria-hidden="true">${name === "Expanded" ? "◎" : "⊕"}</span>`;
-  const GENERIC_OFFLINE_VERSION = "20260904-wiktionary-2";
+  const GENERIC_OFFLINE_VERSION = "20261012-solvers-11";
   const sizeActiveChoiceIcon = (trigger) => {
     const flag = trigger.querySelector(".reference-active-flag");
     if (flag) flag.style.cssText = "width:1.6rem;height:auto;fill:initial;stroke:none";
@@ -24,7 +24,9 @@
 
   async function cacheGenericOfflineUrl(cache, url, forceDownload) {
     const request = new Request(url, { credentials: "same-origin" });
-    if (!forceDownload) {
+    const asset = new URL(url, location.href);
+    const refreshShell = asset.pathname === location.pathname || (!asset.search && asset.pathname.endsWith(".js"));
+    if (!forceDownload && !refreshShell) {
       if (await cache.match(request)) return false;
       const shared = await caches.match(request);
       if (shared) {
@@ -32,7 +34,11 @@
         return false;
       }
     }
-    const response = await fetch(new Request(url, { cache: "reload", credentials: "same-origin" }));
+    // An older service worker may fall back to an old shell even with reload.
+    // This download-only URL is never stored, so that fallback cannot match it.
+    const downloadUrl = new URL(url, location.href);
+    if (refreshShell || forceDownload) downloadUrl.searchParams.set("offline-update", GENERIC_OFFLINE_VERSION);
+    const response = await fetch(new Request(downloadUrl.href, { cache: "reload", credentials: "same-origin" }));
     if (!response.ok) throw new Error(`Offline download failed for ${url}`);
     await cache.put(request, response);
     return true;
@@ -50,8 +56,8 @@
       "/assets/wasm/menu/menu.css?v=20260922-applications-v1",
       "/assets/wasm/menu/menu_bg.wasm?v=20260922-applications-v1",
       "/assets/wasm/menu/tools-manifest.json?v=20260915-anagram-architect",
-      "/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=20260827-wwf-1",
-      "/assets/wasm/word-unscrambler/word_unscrambler_engine_bg.wasm?v=20260827-wwf-1",
+      "/assets/wasm/word-unscrambler/word_unscrambler_engine.js?v=20261012-solvers-3",
+      "/assets/wasm/word-unscrambler/word_unscrambler_engine_bg.wasm?v=20261012-solvers-3",
       WORD_MANIFEST_URL,
       ...Object.values(manifest.chunks || {}).map(({ file }) => `${WORD_CHUNK_BASE_URL}${file}`)
     ])];
@@ -71,6 +77,7 @@
 
     toggle.addEventListener("click", async () => {
       toggle.disabled = true;
+      let createdCache = false;
       try {
         if (enabled) {
           localStorage.removeItem(storageKey);
@@ -81,6 +88,7 @@
         if (!("serviceWorker" in navigator) || !("caches" in window)) throw new Error("Offline Mode is not supported by this browser.");
         await navigator.serviceWorker.register("/crossword-offline-sw.js", { scope: "/" });
         await navigator.serviceWorker.ready;
+        createdCache = !(await caches.has(cacheName));
         const cache = await caches.open(cacheName);
         const urls = await buildGenericOfflineUrls(cache);
         const forceDownload = toggle.dataset.forceDownload === "true";
@@ -100,20 +108,27 @@
             progress.dataset.reused = String(completed - downloaded);
           }
         });
-        await Promise.all(workers);
+        // Let every writer finish before removing an unsuccessful new package.
+        const downloads = await Promise.allSettled(workers);
+        const failed = downloads.find((download) => download.status === "rejected");
+        if (failed) throw failed.reason;
         const page = await cache.match(location.pathname);
         const missing = (await Promise.all(urls.map((url) => cache.match(url)))).filter((response) => !response);
         if (!page || missing.length) throw new Error("The offline package could not be verified.");
         await cache.put(`/tools/${toolId}`, page.clone());
         await cache.put(`/tools/${toolId}.html`, page.clone());
         localStorage.setItem(storageKey, cacheName);
-        for (const name of await caches.keys()) {
-          if (name.startsWith(`${GENERIC_CACHE_PREFIX}${toolId}-`) && name !== cacheName) await caches.delete(name);
-        }
+        createdCache = false;
         enabled = true;
+        try {
+          for (const name of await caches.keys()) {
+            if (name.startsWith(`${GENERIC_CACHE_PREFIX}${toolId}-`) && name !== cacheName) await caches.delete(name);
+          }
+        } catch (error) { console.warn("Unable to remove older offline packages:", error); }
         try { await navigator.storage?.persist?.(); } catch (_error) { /* Persistence is optional. */ }
         render();
       } catch (error) {
+        if (createdCache) await caches.delete(cacheName);
         console.error("Unable to change Offline Mode:", error);
         status.textContent = "Offline Mode could not be changed. Check your connection and available storage.";
       } finally {
@@ -130,7 +145,7 @@
     });
   }
 
-  function attachOfflineConfirmation(toggle, nativeProgress, toolName) {
+  function attachOfflineConfirmation(toggle, nativeProgress, toolName, nativeStatus) {
     const dialog = document.createElement("dialog");
     dialog.className = "reference-offline-modal";
     dialog.innerHTML = `<div class="reference-offline-card"><header><div><span>OFFLINE ACCESS</span><h2>Enable Offline Mode?</h2></div></header><div class="reference-offline-body"><p>Download the complete ${toolName} so word searches and local definitions remain available without an internet connection.</p><dl aria-live="polite"><div><dt>Package</dt><dd>Complete solver · about 7 MB</dd></div><div><dt>Already downloaded</dt><dd>Existing cached files will be reused</dd></div><div><dt>Download required</dt><dd>Only missing or updated files</dd></div></dl><section class="reference-offline-warning"><h3>While Offline Mode is enabled</h3><ul><li>External word-definition lookups are disabled.</li><li>External dictionary links are hidden.</li><li>Related online guides are hidden.</li></ul></section><label class="reference-force-download"><input type="checkbox" role="switch"><span class="reference-force-track" aria-hidden="true"><span></span></span><span><strong>Download files again</strong><small>Ignore saved copies and replace every Offline Mode file with a fresh download.</small></span></label><div class="reference-download-progress" hidden><div><strong>Downloading files</strong><span>Preparing files</span></div><progress value="0" max="1"></progress></div><p class="reference-offline-message" role="status" aria-live="polite"></p></div><footer><button type="button" value="cancel">Cancel</button><button type="button" value="ok">OK</button></footer></div>`;
@@ -144,6 +159,7 @@
     const progressText = progressWrap.querySelector("span");
     const message = dialog.querySelector(".reference-offline-message");
     let approved = false;
+    let pending = false;
     const resetDialog = () => {
       force.checked = false;
       force.disabled = false;
@@ -170,8 +186,10 @@
     cancel.addEventListener("click", () => dialog.close());
     ok.addEventListener("click", () => {
       approved = true;
+      pending = true;
       toggle.dataset.forceDownload = String(force.checked);
       message.textContent = force.checked ? "Preparing download…" : "Checking saved files…";
+      force.disabled = true;
       cancel.disabled = true;
       ok.disabled = true;
       toggle.click();
@@ -189,8 +207,20 @@
         : `${progress.value} of ${progress.max} files reused`;
     }).observe(nativeProgress, { attributes: true, attributeFilter: ["value", "max", "data-downloaded", "data-reused"] });
     new MutationObserver(() => {
-      if (toggle.getAttribute("aria-checked") !== "true" || !dialog.open) return;
-      if ((Number(progress.dataset.downloaded) || 0) === 0) {
+      if (!dialog.open || !pending || toggle.disabled) return;
+      pending = false;
+      force.disabled = false;
+      cancel.disabled = false;
+      if (toggle.getAttribute("aria-checked") !== "true") {
+        const error = nativeStatus?.textContent || "";
+        message.textContent = /could not|failed|unable/i.test(error)
+          ? error
+          : "Offline Mode could not be enabled. Check your connection and available storage, then retry.";
+        ok.disabled = false;
+        ok.textContent = "Retry";
+        return;
+      }
+      if ((Number(nativeProgress?.dataset.downloaded) || 0) === 0) {
         dialog.close();
         return;
       }
@@ -199,7 +229,47 @@
       cancel.disabled = false;
       cancel.textContent = "Close";
       ok.hidden = true;
-    }).observe(toggle, { attributes: true, attributeFilter: ["aria-checked"] });
+    }).observe(toggle, { attributes: true, attributeFilter: ["aria-checked", "disabled"] });
+  }
+
+  function bindDictionaryChoices(dialog, trigger, radios, syncChoice) {
+    const options = [...dialog.querySelectorAll("[data-values]")];
+    const select = (option) => {
+      const radio = radios.find((item) => option.dataset.values.split(",").includes(item.value));
+      if (!radio || radio.checked) return;
+      radio.checked = true;
+      radio.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    options.forEach((option, index) => {
+      option.addEventListener("click", () => {
+        select(option);
+        dialog.close();
+      });
+      option.addEventListener("keydown", (event) => {
+        let next;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % options.length;
+        else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (index - 1 + options.length) % options.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = options.length - 1;
+        else return;
+        event.preventDefault();
+        select(options[next]);
+        options[next].focus();
+      });
+    });
+    radios.forEach((radio) => radio.addEventListener("change", syncChoice));
+    syncChoice();
+    trigger.addEventListener("click", () => {
+      dialog.showModal();
+      trigger.setAttribute("aria-expanded", "true");
+      options.find((option) => option.getAttribute("aria-checked") === "true")?.focus();
+    });
+    dialog.querySelector("header button").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+    dialog.addEventListener("close", () => {
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.focus();
+    });
   }
 
   function buildControls(selector, index) {
@@ -215,40 +285,46 @@
     const trigger = document.createElement("button");
     trigger.type = "button";
     trigger.className = "reference-dictionary-trigger";
+    const showLabel = selector.dataset.visibleLabel === "true";
+    if (showLabel) trigger.classList.add("reference-dictionary-trigger--labeled");
     trigger.innerHTML = choiceIcon("Standard");
     sizeActiveChoiceIcon(trigger);
     const choices = [
-      { values: ["enable", "1"], name: "Standard", detail: "ENABLE · Focused word-game vocabulary with fewer unusual results", icon: "reference-flag" },
-      { values: ["expanded", "2"], name: "Expanded", detail: "Wiktionary · Regional, uncommon, historical, and specialist words", icon: "reference-globe" },
-      { values: ["both", "3"], name: "Both", detail: "ENABLE + Wiktionary · The widest set of matches", icon: "reference-both" }
+      { values: ["enable", "1"], name: "Standard", source: "ENABLE", detail: "ENABLE · Focused word-game vocabulary with fewer unusual results", icon: "reference-flag" },
+      { values: ["expanded", "2"], name: "Expanded", source: "Wiktionary", detail: "Wiktionary · Regional, uncommon, historical, and specialist words", icon: "reference-globe" },
+      { values: ["both", "3"], name: "Both", source: "ENABLE + Wiktionary", detail: "ENABLE + Wiktionary · The widest set of matches", icon: "reference-both" }
     ];
 
     const dialog = document.createElement("dialog");
     dialog.className = "reference-dictionary-modal";
+    dialog.id = `reference-dictionary-dialog-${index}`;
     dialog.setAttribute("aria-labelledby", `reference-dictionary-title-${index}`);
-    dialog.innerHTML = `<div class="reference-dictionary-card"><header><div><span>WORD LIST</span><h2 id="reference-dictionary-title-${index}">Choose A Dictionary</h2></div><button type="button" aria-label="Close dictionary selection">&times;</button></header><fieldset><legend>Dictionary options</legend>${choices.map((choice) => `<label data-values="${choice.values.join(",")}"><span class="${choice.icon}" aria-hidden="true">${choice.icon === "reference-flag" ? `<svg viewBox="0 0 28 18"><rect width="28" height="18" rx="1" fill="#fff"/><path fill="#c83b45" d="M0 0h28v2H0zm0 4h28v2H0zm0 4h28v2H0zm0 4h28v2H0zm0 4h28v2H0z"/><path fill="#27477d" d="M0 0h12v10H0z"/><path fill="#fff" d="m2 2 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zM4 6l.4 1.1h1.2l-1 .7L5 8.9l-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7L9 8.9l-1-.7-1 .7.4-1.1-1-.7h1.2z"/></svg>` : choice.icon === "reference-globe" ? "◎" : "⊕"}</span><span><strong>${choice.name}</strong><small>${choice.detail}</small></span><span class="reference-check" aria-hidden="true">✓</span></label>`).join("")}</fieldset></div>`;
+    trigger.setAttribute("aria-haspopup", "dialog");
+    trigger.setAttribute("aria-controls", dialog.id);
+    trigger.setAttribute("aria-expanded", "false");
+    dialog.innerHTML = `<div class="reference-dictionary-card"><header><div><span>WORD LIST</span><h2 id="reference-dictionary-title-${index}">Choose A Dictionary</h2></div><button type="button" aria-label="Close dictionary selection">&times;</button></header><fieldset role="radiogroup" aria-label="Dictionary options"><legend>Dictionary options</legend>${choices.map((choice) => `<button type="button" role="radio" aria-checked="false" tabindex="-1" data-values="${choice.values.join(",")}"><span class="${choice.icon}" aria-hidden="true">${choice.icon === "reference-flag" ? `<svg viewBox="0 0 28 18"><rect width="28" height="18" rx="1" fill="#fff"/><path fill="#c83b45" d="M0 0h28v2H0zm0 4h28v2H0zm0 4h28v2H0zm0 4h28v2H0zm0 4h28v2H0z"/><path fill="#27477d" d="M0 0h12v10H0z"/><path fill="#fff" d="m2 2 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7.4 1.1-1-.7-1 .7.4-1.1-1-.7h1.2zM4 6l.4 1.1h1.2l-1 .7L5 8.9l-1-.7-1 .7.4-1.1-1-.7h1.2zm4 0 .4 1.1h1.2l-1 .7L9 8.9l-1-.7-1 .7.4-1.1-1-.7h1.2z"/></svg>` : choice.icon === "reference-globe" ? "◎" : "⊕"}</span><span><strong>${choice.name}</strong><small>${choice.detail}</small></span><span class="reference-check" aria-hidden="true">✓</span></button>`).join("")}</fieldset></div>`;
     const syncChoice = () => {
       const selected = radios.find((radio) => radio.checked) || standard;
       const choice = choices.find((item) => item.values.includes(selected.value)) || choices[0];
-      dialog.querySelectorAll("[data-values]").forEach((label) => label.classList.toggle("is-selected", label.dataset.values.split(",").includes(selected.value)));
+      dialog.querySelectorAll("[data-values]").forEach((option) => {
+        const checked = option.dataset.values.split(",").includes(selected.value);
+        option.classList.toggle("is-selected", checked);
+        option.setAttribute("aria-checked", String(checked));
+        option.tabIndex = checked ? 0 : -1;
+      });
       trigger.title = `Dictionary selected: ${choice.name}`;
       trigger.setAttribute("aria-label", `Choose dictionary. Current: ${choice.name}`);
       trigger.innerHTML = choiceIcon(choice.name);
+      if (showLabel) {
+        const label = document.createElement("span");
+        label.className = "reference-dictionary-label";
+        label.textContent = `${choice.name} · ${choice.source}`;
+        trigger.append(label);
+        trigger.setAttribute("aria-label", `Choose dictionary. Current: ${label.textContent}`);
+      }
       sizeActiveChoiceIcon(trigger);
     };
-    dialog.querySelectorAll("[data-values]").forEach((label) => label.addEventListener("click", () => {
-      const radio = radios.find((item) => label.dataset.values.split(",").includes(item.value));
-      if (!radio) return;
-      radio.checked = true;
-      radio.dispatchEvent(new Event("change", { bubbles: true }));
-      dialog.close();
-    }));
-    radios.forEach((radio) => radio.addEventListener("change", syncChoice));
-    syncChoice();
-    trigger.addEventListener("click", () => dialog.showModal());
-    dialog.querySelector("header button").addEventListener("click", () => dialog.close());
-    dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
-    dialog.addEventListener("close", () => trigger.focus());
+    bindDictionaryChoices(dialog, trigger, radios, syncChoice);
     controls.append(trigger);
 
     const existingOffline = selector.parentElement?.querySelector(".word-tool-offline-control");
@@ -265,7 +341,7 @@
       };
       syncLabel();
       if (toggle) new MutationObserver(syncLabel).observe(toggle, { attributes: true, attributeFilter: ["aria-checked"] });
-      if (toggle) attachOfflineConfirmation(toggle, existingOffline.querySelector("progress"), document.title.split("|")[0].trim());
+      if (toggle) attachOfflineConfirmation(toggle, existingOffline.querySelector("progress"), document.title.split("|")[0].trim(), status);
     }
     else {
       const offline = document.createElement("div");
@@ -277,10 +353,10 @@
       const toolId = location.pathname.split("/").filter(Boolean).pop()?.replace(/\.html$/, "") || `word-game-${index}`;
       controls.append(offline);
       attachGenericOfflineCapability(toggle, progress, status, toolId);
-      attachOfflineConfirmation(toggle, progress, document.title.split("|")[0].trim());
+      attachOfflineConfirmation(toggle, progress, document.title.split("|")[0].trim(), status);
     }
     selector.after(controls, dialog);
-    standard.dispatchEvent(new Event("change", { bubbles: true }));
+    initial.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
   document.addEventListener("DOMContentLoaded", () => {

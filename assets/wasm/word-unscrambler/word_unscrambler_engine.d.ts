@@ -1,6 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
+/**
+ * Scores one rack play before square multipliers, cross words, or bingo bonus.
+ * Fixed board letters do not consume tiles; blank positions are zero-based.
+ */
+export function analyze_play(word: string, rack: string, board_pattern: string, scoring: string): any;
+
 export function analyze_word(word: string): any;
 
 export function analyze_wwf_word(word: string): any;
@@ -8,6 +14,12 @@ export function analyze_wwf_word(word: string): any;
 export function board_fit_analysis(rack: string, pattern: string, options: any): any;
 
 export function crossword_search(pattern: string, available_letters: string, options: any): any;
+
+/**
+ * Returns indexed source membership: 1 = ENABLE, 2 = Expanded, 3 = both.
+ * Callers must load the combined shard first to resolve both sources completely.
+ */
+export function dictionary_membership(word: string): number;
 
 export function find_hooks(word: string): any;
 
@@ -35,10 +47,12 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
+    readonly analyze_play: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
     readonly analyze_word: (a: number, b: number) => number;
     readonly analyze_wwf_word: (a: number, b: number) => number;
     readonly board_fit_analysis: (a: number, b: number, c: number, d: number, e: number) => number;
     readonly crossword_search: (a: number, b: number, c: number, d: number, e: number) => number;
+    readonly dictionary_membership: (a: number, b: number) => number;
     readonly find_hooks: (a: number, b: number) => number;
     readonly find_hooks_for_dictionary: (a: number, b: number, c: number) => number;
     readonly init_engine: (a: number, b: number) => void;
