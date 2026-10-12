@@ -174,3 +174,7 @@ licensing, attribution, and trademark information.
 ### Lumber shopping-list planner
 
 The lumber board-foot calculator supports multiple stock sizes, separate purchasing and actual dimensions, whole-board waste allowances, per-board or board-foot pricing, tax, editable density for weight, imperial/metric inputs, browser saving, CSV export, and printable orders.
+
+### Drywall materials planner
+
+Drywall supports four-wall rooms and rectangular walls or ceilings, openings, separate board products, whole-sheet allowances, finishing supplies, costs and tax, weight, metric conversion, browser saving, CSV export, and print. Supply quantities may be entered manually or calculated from user-provided package area coverage.
