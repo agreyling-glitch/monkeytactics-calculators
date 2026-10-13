@@ -5,8 +5,8 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/pwa/word-unscrambler-180.png">
+  <link rel="manifest" href="/word-unscrambler.webmanifest">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Word Unscrambler &amp; Scrabble Finder | MonkeyTactics</title>
@@ -14,7 +14,7 @@
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="MonkeyTactics">
   <meta name="date" content="2026-10-12">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#115e59">
 
   <link rel="canonical" href="https://monkeytactics.com/tools/word-unscrambler">
 
@@ -264,6 +264,8 @@
   <script src="../assets/js/shared/ads.js" defer></script>
   <!-- TrustBox script -->
   <!-- End TrustBox script -->
+  <link rel="stylesheet" href="/assets/css/shared/word-solver-pwa.css?v=20261013-3">
+  <script src="/assets/js/shared/word-solver-pwa.js?v=20261013-1" defer></script>
 </head>
 
 <body class="premium-tool-page word-tool-page word-unscrambler-page">
@@ -284,6 +286,7 @@
           <p class="premium-eyebrow">Private, local word-game analysis</p>
           <h1 id="tool-heading">Word Unscrambler &amp; Scrabble Word Finder</h1>
           <p class="premium-hero-copy">Turn rack letters into playable Scrabble words with tile scores, wildcards, hooks, and 867,000+ unique entries across Standard and Expanded dictionaries. Install the complete word finder for offline use.</p>
+          <div class="solver-app-install"><button type="button" id="solver-install" hidden><img src="/assets/images/pwa/word-unscrambler-192.png" width="40" height="40" alt=""><span>Install Unscrambler</span></button><p id="solver-install-status" role="status">Install from your browser’s app menu. For offline searches, enable Offline Mode in the solver.</p></div>
           <div class="premium-hero-pills" aria-label="Word finder features"><span>ENABLE &amp; EXPANDED</span><span>Local WordNet definitions</span><span>Optional offline mode</span></div>
         </div>
         <div class="premium-hero-stat" aria-hidden="true"><span>Find the advantage</span><strong>Rack <i>meets</i> board</strong><small>Filter the possibilities. Surface the strongest play.</small></div>
@@ -291,7 +294,7 @@
     </section>
 
     <section aria-labelledby="unscrambler-heading">
-      <div class="tool-widget" data-focus-mode data-focus-mode-label="Word Unscrambler">
+      <div class="tool-widget" data-focus-mode data-focus-mode-installed data-focus-mode-label="Word Unscrambler">
         <form id="unscramble-form" novalidate>
           <div class="tool-heading-row">
             <div class="tool-heading-content" id="solver-heading-content">
@@ -345,6 +348,7 @@
             <div class="word-tool-offline-control">
               <button class="word-tool-offline-toggle offline-switch" id="word-tool-offline-toggle" type="button" role="switch" aria-checked="false" aria-label="Offline Mode" aria-describedby="word-tool-offline-status"><span class="offline-switch-track" aria-hidden="true"><span class="offline-switch-thumb"></span></span></button>
               <div class="word-tool-offline-copy"><strong>Offline Mode</strong><span id="word-tool-offline-status" role="status">Download the complete word finder for use without an internet connection (about 7 MB).</span></div>
+              <button type="button" id="word-tool-offline-update" aria-describedby="word-tool-offline-status" hidden>Update offline files</button>
               <progress id="word-tool-offline-progress" value="0" max="1" hidden>0%</progress>
             </div>
             </div>
@@ -1434,12 +1438,12 @@
   <script src="../assets/js/tools/word-unscrambler/wasm-bridge.js?v=20261012-solvers-3" defer></script>
   <script src="../assets/js/tools/word-unscrambler/search-worker-client.js?v=20261012-solvers-3" defer></script>
   <script src="../assets/js/tools/word-unscrambler/dictionary-loader.js?v=20261012-solvers-1" defer></script>
-  <script src="../assets/js/shared/focus-mode.js?v=20260829-2" defer></script>
+  <script src="../assets/js/shared/focus-mode.js?v=20261013-pwa-1" defer></script>
   <script src="../assets/js/shared/word-definitions.js?v=20260903-wordnet-definitions-10" defer></script>
   <script src="../assets/js/shared/related-guides.js?v=20260903-priority-1" defer></script>
   <script src="../assets/js/tools/word-unscrambler/pick-comparison.js?v=20261012-solvers-7" defer></script>
   <script src="../assets/js/tools/word-unscrambler/play-refill.js?v=20261012-solvers-9" defer></script>
-  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20261012-solvers-11" defer></script>
+  <script src="../assets/js/tools/word-unscrambler/word-unscrambler.js?v=20261013-pwa-3" defer></script>
 <script src="../assets/js/shared/dictionary-offline-controls.js?v=20261012-solvers-11" defer></script>
 </body>
 </html>

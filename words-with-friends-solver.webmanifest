@@ -1,0 +1,32 @@
+{
+  "id": "/tools/words-with-friends-solver",
+  "name": "MonkeyTactics WWF Solver",
+  "short_name": "WWF Solver",
+  "description": "WWF Solver with local word searches, scoring, and optional offline dictionaries.",
+  "lang": "en",
+  "start_url": "/tools/words-with-friends-solver",
+  "scope": "/tools/words-with-friends-solver",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6b3fa0",
+  "icons": [
+    {
+      "src": "/assets/images/pwa/words-with-friends-solver-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/pwa/words-with-friends-solver-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/pwa/words-with-friends-solver-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

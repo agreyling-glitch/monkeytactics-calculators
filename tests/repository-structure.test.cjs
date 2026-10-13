@@ -97,7 +97,12 @@ test("every public page declares the complete favicon set", () => {
   for (const page of pages) {
     const html = fs.readFileSync(page, "utf8");
     for (const declaration of requiredDeclarations) {
-      assert.ok(html.includes(declaration), `${path.relative(siteRoot, page)} is missing ${declaration}`);
+      const slug = path.basename(page, ".html");
+      const isSolverApp = ["word-unscrambler", "words-with-friends-solver"].includes(slug);
+      const expected = isSolverApp ? declaration
+        .replace('/apple-touch-icon.png', `/assets/images/pwa/${slug}-180.png`)
+        .replace('/site.webmanifest', `/${slug}.webmanifest`) : declaration;
+      assert.ok(html.includes(expected), `${path.relative(siteRoot, page)} is missing ${expected}`);
     }
   }
 });

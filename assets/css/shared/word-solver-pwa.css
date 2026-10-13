@@ -1,0 +1,36 @@
+.solver-app-install { margin-block: 1rem; }
+.solver-app-install button {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .65rem 1rem;
+  border: 1px solid #99f6e4;
+  border-radius: .65rem;
+  background: #115e59;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.solver-app-install button img {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: .5rem;
+}
+.solver-app-install button:focus-visible { outline: 3px solid #f2c94c; outline-offset: 3px; }
+.solver-app-install button[hidden] { display: none; }
+.solver-app-install p { max-width: 60ch; margin-block: .5rem; font-size: .875rem; line-height: 1.5; }
+#word-tool-offline-update {
+  padding: .45rem .75rem;
+  border: 1px solid #99f6e4;
+  border-radius: .5rem;
+  background: #115e59;
+  color: #fff;
+  font: inherit;
+  font-size: .875rem;
+  cursor: pointer;
+}
+#word-tool-offline-update[hidden] { display: none; }
+#word-tool-offline-update:disabled { opacity: .6; cursor: wait; }
+#word-tool-offline-update:focus-visible { outline: 3px solid #f2c94c; outline-offset: 3px; }

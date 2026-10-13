@@ -90,7 +90,7 @@ const analyzeWord = (word) => IS_WWF ? Engine.analyzeWwfWord(word) : Engine.anal
 
 const DEFINITION_MANIFEST_URL = "/assets/data/word-definitions/manifest.wordnet-definitions-v1.json?v=wordnet-3.0-definitions-v1";
 const DEFINITION_BASE_URL = "/assets/data/word-definitions/";
-const OFFLINE_VERSION = "20261012-solvers-11";
+const OFFLINE_VERSION = "20261013-pwa-3";
 const OFFLINE_CACHE_PREFIX = "monkeytactics-word-tool-offline-";
 const OFFLINE_TOOL_ID = IS_WWF ? "words-with-friends-solver" : "word-unscrambler";
 const OFFLINE_STORAGE_KEY = `monkeytactics.${OFFLINE_TOOL_ID}.offline-cache`;
@@ -439,6 +439,8 @@ function initializeRackSortMenu() {
 
 function renderOfflineState(message = "") {
   if (!offlineToggle || !offlineStatus) return;
+  const updateButton = document.querySelector("#word-tool-offline-update");
+  if (updateButton) updateButton.hidden = !offlineCacheName || offlineModeEnabled;
   offlineToggle.setAttribute("aria-checked", String(offlineModeEnabled));
   offlineToggle.title = offlineModeEnabled ? "Disable Offline Mode" : "Enable Offline Mode";
   offlineStatus.textContent = message || (offlineModeEnabled
@@ -469,6 +471,8 @@ async function buildOfflineUrls(cache) {
     location.pathname,
     "/crossword-offline-sw.js",
     ...loadedAssets,
+    ...[180, 192, 512].map((size) => `/assets/images/pwa/${OFFLINE_TOOL_ID}-${size}.png`),
+    `/assets/images/pwa/${OFFLINE_TOOL_ID}-maskable-512.png`,
     "/assets/wasm/menu/menu.css?v=20260922-applications-v1",
     "/assets/wasm/menu/menu_bg.wasm?v=20260922-applications-v1",
     "/assets/wasm/menu/tools-manifest.json?v=20260915-anagram-architect",
@@ -574,6 +578,8 @@ async function toggleOfflineMode() {
   const forceDownload = offlineToggle.dataset.forceDownload === "true";
   delete offlineToggle.dataset.forceDownload;
   offlineToggle.disabled = true;
+  const updateButton = document.querySelector("#word-tool-offline-update");
+  if (updateButton) updateButton.disabled = true;
   try {
     if (offlineModeEnabled) await disableOfflineMode();
     else await enableOfflineMode(forceDownload);
@@ -582,6 +588,7 @@ async function toggleOfflineMode() {
     offlineStatus.textContent = "Offline Mode could not be changed. Check available storage and try again.";
   } finally {
     offlineToggle.disabled = false;
+    if (updateButton) updateButton.disabled = false;
   }
 }
 
@@ -4477,7 +4484,10 @@ renderRackTiles();
 initializeRackSortMenu();
 initializeWordParticles();
 offlineToggle?.addEventListener("click", toggleOfflineMode);
-renderOfflineState(offlineCacheName && !offlineModeEnabled ? "Offline files have changed. Enable Offline Mode to update the downloaded solver." : "");
+document.querySelector("#word-tool-offline-update")?.addEventListener("click", () => {
+  if (!offlineToggle.disabled && !offlineModeEnabled) offlineToggle.click();
+});
+renderOfflineState(offlineCacheName && !offlineModeEnabled ? "A newer offline package is available. Select Update offline files to download it." : "");
 if (offlineModeEnabled && "caches" in window) {
   caches.has(offlineCacheName).then((available) => {
     if (available) return;

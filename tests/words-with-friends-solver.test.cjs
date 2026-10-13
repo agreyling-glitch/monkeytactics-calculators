@@ -146,7 +146,7 @@ test("word result popovers use local definitions and move external links behind 
     const page = fs.readFileSync(path.join(root, "tools", file), "utf8");
     assert.match(page, /word-definitions\.js\?v=20260903-wordnet-definitions-10/);
     assert.match(page, /input-rules\.js\?v=20261012-solvers-1/);
-    assert.match(page, /word-unscrambler\.js\?v=20261012-solvers-11/);
+    assert.match(page, /word-unscrambler\.js\?v=20261013-pwa-3/);
     assert.match(page, /word-unscrambler\.css\?v=20261012-solvers-5/);
   }
 });

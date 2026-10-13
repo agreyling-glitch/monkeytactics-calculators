@@ -31,6 +31,11 @@
     target.prepend(button);
   });
 
+  // Only opted-in tools start focused in an installed app window.
+  const installedApp = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const appTarget = targets.find((target) => target.hasAttribute("data-focus-mode-installed"));
+  if (installedApp && appTarget) setFocusMode(appTarget, true);
+
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape" || !activeTarget) return;
     event.preventDefault();
