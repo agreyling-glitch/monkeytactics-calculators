@@ -251,14 +251,14 @@ test("clipboard paste accepts Windows Photos HEIC file entries", () => {
   assert.match(decoderHtml, /decodeBlob\(clipboardImage\)/);
 });
 
-test("decoded web links display a safe header-only redirect trace", () => {
+test("decoded web links explain that redirect resolution is disabled", () => {
   assert.match(decoderHtml, /id="redirectTrace" class="redirect-trace" hidden/);
   assert.match(decoderHtml, /id="redirectTraceSummary"/);
   assert.match(decoderHtml, /id="redirectTraceList"/);
   assert.match(decoderHtml, /function renderRedirectTrace\(payload\)/);
   assert.match(decoderHtml, /redirects.*requests.*total/);
-  assert.match(decoderHtml, /show each redirect hop, HTTP status, timing, and final destination/);
-  assert.match(decoderHtml, /does not send the QR image, read page content, or automatically open/);
+  assert.match(decoderHtml, /Automatic redirect and final destination resolution is disabled/);
+  assert.match(decoderHtml, /Decoded website addresses stay in your browser until you choose an action/);
 });
 
 test("URL results use a text-only action table with per-row menus", () => {

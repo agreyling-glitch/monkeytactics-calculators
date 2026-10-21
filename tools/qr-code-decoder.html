@@ -94,7 +94,7 @@
           {
             "@type": "Question",
             "name": "How can I check whether a decoded QR link is safe?",
-            "acceptedAnswer": { "@type": "Answer", "text": "A single decoded web link is sent to the MonkeyTactics privacy proxy only to resolve its final destination for review. Links in multi-code results remain unchecked until you choose an action. The tool never opens links automatically." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Decoded web links are not sent to a redirect resolver. Final destination resolution is disabled. Links in multi-code results remain unchecked until you choose an action. The tool never opens links automatically." }
           }
         ]
       }
@@ -562,7 +562,7 @@
     <section class="qr-decoder-section" aria-labelledby="decoder-heading">
       <div class="tool-widget">
         <div class="premium-app-title decoder-app-title"><div class="premium-section-kicker">01 / Decode</div><h2 id="decoder-heading">Choose how to scan</h2><p>Provide an image containing one or more QR codes or barcodes using the method that fits your situation. The same private decoding pipeline handles every option.</p></div>
-        <p class="privacy-note">Images are processed locally and are never uploaded. A single decoded web link is sent to the MonkeyTactics privacy proxy only to resolve its final destination for review. Links in multi-code results remain unchecked until you choose an action.</p>
+        <p class="privacy-note">Images are processed locally and are never uploaded. Decoded web links are not sent to a redirect resolver. Final destination resolution is disabled. Links in multi-code results remain unchecked until you choose an action.</p>
 
         <fieldset class="scan-mode-fieldset">
           <legend>Code type</legend>
@@ -830,7 +830,7 @@
       <h2 id="supported-content-heading">What QR code content can this decoder read?</h2>
       <p>The decoder identifies common QR payload formats and presents their values as labeled fields while keeping the original decoded text available.</p>
       <ul class="content-types-grid">
-        <li class="content-type-item"><strong>URL</strong><span>Website addresses with private redirect and final-destination review.</span></li>
+        <li class="content-type-item"><strong>URL</strong><span>Website addresses for manual review before opening.</span></li>
         <li class="content-type-item"><strong>Text</strong><span>Notes, identifiers, instructions, serial numbers, and other plain text.</span></li>
         <li class="content-type-item"><strong>Email</strong><span>Mailto and MATMSG recipients, subject lines, CC/BCC values, and message bodies.</span></li>
         <li class="content-type-item"><strong>Phone</strong><span>Telephone numbers stored with the standard <code>tel:</code> format.</span></li>
@@ -948,12 +948,12 @@
     <div class="seo-section">
       <h2>Local QR image scanning with private link resolution</h2>
       <p>This free QR code reader performs decoding locally with Rust/WebAssembly, the browser Barcode Detector when available, and a local ZXing/WebAssembly fallback. Uploaded files, pasted screenshots, and camera frames are not uploaded to MonkeyTactics or stored by this utility.</p>
-      <p>When a scan returns one website address, that decoded link is sent to the MonkeyTactics privacy proxy to show each redirect hop, HTTP status, timing, and final destination for your review. Links in multi-code results remain unchecked until you choose an action. The proxy uses header-only requests; it does not send the QR image, read page content, or automatically open the destination in your browser. You can optionally check a link using VirusTotal before visiting it.</p>
+      <p>Decoded website addresses stay in your browser until you choose an action. Automatic redirect and final destination resolution is disabled. Review the decoded URL before opening it. You can optionally check a link using VirusTotal before visiting it.</p>
     </div>
 
     <div class="seo-section">
       <h2>Is This QR Code Safe?</h2>
-       <p><strong>Safety Notice:</strong> This tool will never open or navigate to a decoded link automatically. A single decoded web link is sent to the MonkeyTactics privacy proxy to resolve its final destination for review; links in multi-code results remain unchecked until you choose an action. Review unfamiliar destinations before choosing to open them.</p>
+       <p><strong>Safety Notice:</strong> This tool will never open or navigate to a decoded link automatically. Final destination resolution is disabled; links in multi-code results remain unchecked until you choose an action. Review unfamiliar destinations before choosing to open them.</p>
     </div>
 
     <section class="faq-section" aria-labelledby="faq-heading">
@@ -998,7 +998,7 @@
             </li>
             <li class="faq-item">
               <h3>How can I check whether a decoded QR link is safe?</h3>
-              <p>Decoded web links are sent to the MonkeyTactics privacy proxy only to resolve their final destination for your review; they are never opened automatically. Select <strong>Check Link Safely</strong> to open the final URL's VirusTotal analysis page. Review unfamiliar destinations before visiting them or entering personal information.</p>
+              <p>Decoded web links are not resolved or opened automatically. Select <strong>Check Link Safely</strong> to open the decoded URL's VirusTotal analysis page. Review unfamiliar destinations before visiting them or entering personal information.</p>
             </li>
             <li class="faq-item">
               <h3>What image formats does the QR decoder support?</h3>
@@ -1127,11 +1127,6 @@
     const wasmReady = initQrDecoder({
       module_or_path: new URL('/assets/wasm/qr-code-decoder/qr_decoder_engine_bg.wasm?v=20260813-2', window.location.href)
     });
-    const isLocalPage = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const qrProxyUrl = isLocalPage
-      ? 'http://127.0.0.1:8787/'
-      : 'https://qr-proxy.monkeytactics.com/';
-
     function currentScanMode() {
       const selected = elements.scanModeInputs.find((input) => input.checked);
       return selected ? selected.value : 'qr';
@@ -2453,47 +2448,18 @@
       elements.redirectTrace.hidden = false;
     }
 
-    async function resolveFinalUrl(url, requestId) {
-      if (requestId === resolveRequestId) {
-        clearRedirectTrace();
-        elements.finalUrlText.textContent = 'Resolving final destination\u2026';
-        elements.finalUrlMenuButton.disabled = true;
+    function resolveFinalUrl(url, requestId) {
+      const message = 'Final destination resolution is disabled. Inspect the decoded URL before opening it.';
+      if (urlToHistoryId[requestId]) {
+        const target = urlToHistoryId[requestId];
+        updateHistoryCode(target.id, target.codeIndex, { destination: message });
+        delete urlToHistoryId[requestId];
       }
-
-      try {
-        const endpoint = new URL(qrProxyUrl);
-        endpoint.searchParams.set('url', url);
-        const response = await fetch(endpoint.toString(), {
-          method: 'GET',
-          mode: 'cors',
-          credentials: 'omit',
-          referrerPolicy: 'no-referrer'
-        });
-        const payload = await response.json();
-
-        if (!response.ok) throw new Error(payload.error || 'HTTP ' + response.status);
-        if (!payload.finalUrl || !isSafeWebUrl(payload.finalUrl)) throw new TypeError('Invalid proxy response');
-        if (urlToHistoryId[requestId]) {
-          const target = urlToHistoryId[requestId];
-          updateHistoryCode(target.id, target.codeIndex, { destination: payload.finalUrl });
-          delete urlToHistoryId[requestId];
-        }
-        if (requestId !== resolveRequestId) return;
-        resolvedText = payload.finalUrl;
-        elements.finalUrlText.textContent = resolvedText;
-        elements.finalUrlMenuButton.disabled = false;
-        renderRedirectTrace(payload);
-      } catch (_) {
-        if (urlToHistoryId[requestId]) {
-          const target = urlToHistoryId[requestId];
-          updateHistoryCode(target.id, target.codeIndex, { destination: 'Final destination could not be resolved.' });
-          delete urlToHistoryId[requestId];
-        }
-        if (requestId !== resolveRequestId) return;
-        resolvedText = '';
-        elements.finalUrlText.textContent = 'Final destination could not be resolved.';
-        elements.finalUrlMenuButton.disabled = true;
-      }
+      if (requestId !== resolveRequestId) return;
+      clearRedirectTrace();
+      resolvedText = '';
+      elements.finalUrlText.textContent = message;
+      elements.finalUrlMenuButton.disabled = true;
     }
 
     function recordDecodedResultForHistory(text, format, sourceImageUrl) {
