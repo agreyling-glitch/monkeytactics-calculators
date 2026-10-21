@@ -13,6 +13,17 @@ const WORD_DATA_VERSION = "wiktionary-v1";
 const PAGE_CACHE_VERSION = "v2";
 const PAGE_CACHE_TTL_SECONDS = 86400;
 const DICTIONARY_BIT = 3;
+const MAX_WORD_LENGTH = 64;
+const NEGATIVE_CACHE_LIMIT = 256;
+const NEGATIVE_CACHE_TTL_MS = 60000;
+const invalidWords = new Map();
+
+function notFound() {
+  return new Response(renderPageHTML({ valid: false }), {
+    status: 404,
+    headers: { "content-type": "text/html; charset=UTF-8", "Cache-Control": "no-cache" },
+  });
+}
 
 let wasmInitialized = false;
 const dictionaryInitializations = new Map();
@@ -168,14 +179,27 @@ function renderPageHTML({ word = "", results = [], valid = false }) {
 }
 
 export async function onRequest(context) {
+  const response = await handleRequest(context);
+  return context.request.method === "HEAD"
+    ? new Response(null, response)
+    : response;
+}
+
+async function handleRequest(context) {
+  if (!["GET", "HEAD"].includes(context.request.method)) {
+    return new Response(null, { status: 405, headers: { Allow: "GET, HEAD" } });
+  }
   const word = normalizeWord(context.params.word);
 
-  if (!/^[a-z]+$/.test(word)) {
-    return new Response(renderPageHTML({ valid: false }), {
-      status: 404,
-      headers: { "content-type": "text/html; charset=UTF-8" },
-    });
+  if (word.length > MAX_WORD_LENGTH || !/^[a-z]{2,}$/.test(word)) {
+    return notFound();
   }
+
+  const invalidUntil = invalidWords.get(word);
+  if (invalidUntil > Date.now()) {
+    return notFound();
+  }
+  invalidWords.delete(word);
 
   const shouldCache = context.request.method === "GET";
   const cache = shouldCache ? caches.default : null;
@@ -189,16 +213,20 @@ export async function onRequest(context) {
   }
 
   await initWasm();
-  await loadRequiredDictionaryShards(context, word);
+  // Shards contain words beginning with their letter. Establish membership
+  // before allowing the candidate's other letters to select expensive work.
+  await loadDictionaryShard(context, word[0]);
 
   const valid = is_valid_word(word);
   if (!valid) {
-    return new Response(renderPageHTML({ valid: false }), {
-      status: 404,
-      headers: { "content-type": "text/html; charset=UTF-8" },
-    });
+    if (invalidWords.size >= NEGATIVE_CACHE_LIMIT) {
+      invalidWords.delete(invalidWords.keys().next().value);
+    }
+    invalidWords.set(word, Date.now() + NEGATIVE_CACHE_TTL_MS);
+    return notFound();
   }
 
+  await loadRequiredDictionaryShards(context, word);
   const results = unscramble(word);
 
   const response = new Response(renderPageHTML({ word, results, valid }), {
