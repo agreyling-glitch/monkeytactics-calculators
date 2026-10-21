@@ -2105,31 +2105,42 @@
   }
 
   function newPhase(values) {
-    const start = values && values.start ? values.start : workStart.value;
-    return Object.assign({
-      id: 'phase-' + (++phaseIdCounter), name: 'Phase ' + (workPhases.length + 1), start: start,
-      end: dateStr(addDays(parseDateInput(start) || today, 6)), buffer: 0, region: 'inherit',
-      color: PHASE_COLORS[workPhases.length % PHASE_COLORS.length], dependencyId: '', dependencyRule: 'none', gap: 1
-    }, values || {});
+    // Shared URLs are untrusted: copy only validated fields and generate IDs locally.
+    const input = values && typeof values === 'object' && !Array.isArray(values) ? values : {};
+    const validDate = value => typeof value === 'string' && parseDateInput(value);
+    const start = validDate(input.start) ? input.start : (validDate(workStart.value) ? workStart.value : dateStr(today));
+    const integer = (value, min, max, fallback) => typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max ? value : fallback;
+    return {
+      id: 'phase-' + (++phaseIdCounter),
+      name: typeof input.name === 'string' ? input.name.slice(0, 60) : 'Phase ' + (workPhases.length + 1),
+      start: start,
+      end: validDate(input.end) ? input.end : dateStr(addDays(parseDateInput(start), 6)),
+      buffer: integer(input.buffer, 0, 90, 0),
+      region: ['inherit', 'none', 'us', 'eu', 'custom'].includes(input.region) ? input.region : 'inherit',
+      color: typeof input.color === 'string' && /^#[0-9a-f]{6}$/i.test(input.color) ? input.color : PHASE_COLORS[workPhases.length % PHASE_COLORS.length],
+      dependencyId: '',
+      dependencyRule: ['none', 'after-end', 'business-gap', 'next-business'].includes(input.dependencyRule) ? input.dependencyRule : 'none',
+      gap: integer(input.gap, 1, 90, 1)
+    };
   }
 
   function renderPhaseEditor() {
     phaseList.innerHTML = workPhases.map(function (phase, index) {
       const dependencies = workPhases.slice(0, index).map(function (candidate) {
-        return '<option value="' + candidate.id + '"' + (phase.dependencyId === candidate.id ? ' selected' : '') + '>' + escapeHTML(candidate.name) + '</option>';
+        return '<option value="' + escapeHTML(candidate.id) + '"' + (phase.dependencyId === candidate.id ? ' selected' : '') + '>' + escapeHTML(candidate.name) + '</option>';
       }).join('');
-      return '<article class="phase-card" data-phase-id="' + phase.id + '" style="--phase-color:' + phase.color + '">' +
-        '<div class="phase-card-head"><strong>Phase ' + (index + 1) + '</strong><button class="phase-remove" type="button" data-remove-phase="' + phase.id + '">Remove</button></div>' +
+      return '<article class="phase-card" data-phase-id="' + escapeHTML(phase.id) + '" style="--phase-color:' + escapeHTML(phase.color) + '">' +
+        '<div class="phase-card-head"><strong>Phase ' + (index + 1) + '</strong><button class="phase-remove" type="button" data-remove-phase="' + escapeHTML(phase.id) + '">Remove</button></div>' +
         '<div class="phase-grid">' +
           '<div class="input-group"><label>Phase name</label><input type="text" data-phase-field="name" value="' + escapeHTML(phase.name) + '" maxlength="60"></div>' +
-          '<div class="input-group"><label>Start date</label><input type="date" data-phase-field="start" value="' + phase.start + '"></div>' +
-          '<div class="input-group"><label>End date</label><input type="date" data-phase-field="end" value="' + phase.end + '"></div>' +
-          '<div class="input-group"><label>Business-day buffer</label><input type="number" min="0" max="90" data-phase-field="buffer" value="' + phase.buffer + '"></div>' +
+          '<div class="input-group"><label>Start date</label><input type="date" data-phase-field="start" value="' + escapeHTML(phase.start) + '"></div>' +
+          '<div class="input-group"><label>End date</label><input type="date" data-phase-field="end" value="' + escapeHTML(phase.end) + '"></div>' +
+          '<div class="input-group"><label>Business-day buffer</label><input type="number" min="0" max="90" data-phase-field="buffer" value="' + escapeHTML(phase.buffer) + '"></div>' +
           '<div class="input-group"><label>Holiday override</label><select data-phase-field="region"><option value="inherit">Use project calendar</option><option value="none">None</option><option value="us">United States</option><option value="eu">European Union</option><option value="custom">Custom list</option></select></div>' +
-          '<div class="input-group"><label>Color</label><input class="phase-color-input" type="color" data-phase-field="color" value="' + phase.color + '"></div>' +
+          '<div class="input-group"><label>Color</label><input class="phase-color-input" type="color" data-phase-field="color" value="' + escapeHTML(phase.color) + '"></div>' +
           '<div class="phase-dependency"><div class="input-group"><label>Depends on</label><select data-phase-field="dependencyId"><option value="">No dependency</option>' + dependencies + '</select></div>' +
           '<div class="input-group"><label>Dependency rule</label><select data-phase-field="dependencyRule"><option value="none">Use entered start date</option><option value="after-end">Start after phase ends</option><option value="business-gap">Start X business days after</option><option value="next-business">Start next business day after</option></select></div>' +
-          '<div class="input-group"><label>Business-day gap</label><input type="number" min="1" max="90" data-phase-field="gap" value="' + phase.gap + '"></div></div>' +
+          '<div class="input-group"><label>Business-day gap</label><input type="number" min="1" max="90" data-phase-field="gap" value="' + escapeHTML(phase.gap) + '"></div></div>' +
         '</div></article>';
     }).join('');
 
@@ -2665,7 +2676,8 @@
         if (Array.isArray(savedPhases) && savedPhases.length <= 20) {
           workPhases = savedPhases.map(function (phase) { return newPhase(phase); });
           workPhases.forEach(function (phase, index) {
-            const oldDependencyIndex = Number(phase.dependencyIndex);
+            const savedPhase = savedPhases[index];
+            const oldDependencyIndex = savedPhase && savedPhase.dependencyIndex;
             phase.dependencyId = Number.isInteger(oldDependencyIndex) && oldDependencyIndex >= 0 && oldDependencyIndex < index ? workPhases[oldDependencyIndex].id : '';
           });
         }
