@@ -734,7 +734,7 @@ test("publishes useful SEO metadata, structured data, and supporting content", a
   assert.match(html, /Why did my search return no results\?/);
   assert.match(html, /Anagram solver FAQ/);
   assert.match(html, /Related word tools/);
-  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-09-19<\/lastmod>/);
+  assert.match(sitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/anagram-architect<\/loc>\s*<lastmod>2026-10-26<\/lastmod>/);
   assert.match(html, /Standard contains 172,820 words/);
   assert.match(html, /Expanded contains 867,177 Wiktionary-derived words/);
   const structured = html.match(/<script type="application\/ld\+json">([^<]+)<\/script>/)?.[1];
