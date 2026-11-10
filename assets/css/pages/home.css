@@ -126,7 +126,7 @@
 
 .home-apps__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.9rem;
 }
 
@@ -167,6 +167,7 @@
 .home-app ul { display: grid; gap: 0.55rem; margin: 0 0 1.4rem; padding: 0; list-style: none; }
 .home-app li { position: relative; padding-left: 1rem; color: #cbd5e1; font-size: 0.78rem; line-height: 1.45; }
 .home-app li::before { content: ""; position: absolute; top: 0.52em; left: 0; width: 0.3rem; height: 0.3rem; border-radius: 50%; background: var(--accent); }
+.home-app--dupeharbor .home-app__mark img { display: block; width: 100%; height: auto; }
 .home-app--chess li::before { background: #d3ad62; }
 .home-app > a { display: inline-flex; align-items: center; gap: 0.55rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(148, 163, 184, 0.13); color: var(--accent); font-size: 0.84rem; font-weight: 750; }
 .home-app--chess > a { color: #e0bd77; }
