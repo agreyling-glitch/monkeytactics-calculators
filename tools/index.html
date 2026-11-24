@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Online Tools, Calculators &amp; Generators | MonkeyTactics</title>
-  <meta name="description" content="Browse every MonkeyTactics generator, calculator, text and data tool, and batch workflow." />
+  <meta name="description" content="Browse MonkeyTactics applications, word games, calculators, generators, and other tools for your browser or Windows PC." />
   <meta name="author" content="MonkeyTactics" />
-  <meta name="date" content="2026-09-02" />
+  <meta name="date" content="2026-11-24" />
 
   <meta property="og:title" content="All Tools — MonkeyTactics" />
-  <meta property="og:description" content="Browse every MonkeyTactics tool in one clear, hierarchical directory." />
+  <meta property="og:description" content="Find MonkeyTactics browser tools and Windows apps by name, category, or task." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://monkeytactics.com/tools/" />
   <link rel="canonical" href="https://monkeytactics.com/tools/" />
@@ -28,45 +28,75 @@
 <body>
   <main>
     <div id="mt-header"></div>
-    <script type="module" src="/assets/wasm/menu/menu.js?v=20260922-applications-v1"></script>
+    <script type="module" src="/assets/wasm/menu/menu.js?v=20261124-applications-v3"></script>
 
     <section class="tools-hero" aria-labelledby="tools-heading">
       <div class="tools-hero__copy">
         <span class="tools-eyebrow">MonkeyTactics tool directory</span>
         <h1 id="tools-heading">All Tools</h1>
-        <p>Find the right tool by following the same categories used in the menu. Everything runs privately in your browser with no sign-up required.</p>
+        <p>Browse tools and applications for your browser or Windows PC. Search by name or by what you want to do.</p>
       </div>
 
       <div class="tools-search-wrap">
         <svg class="tools-search-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
         </svg>
-        <input type="search" id="toolSearch" placeholder="Search all tools…" aria-label="Search all tools" aria-controls="toolsDirectory" autocomplete="off" />
+        <input type="search" id="toolSearch" placeholder="Search tools and apps…" aria-label="Search tools and apps" aria-controls="toolsDirectory" autocomplete="off" />
         <kbd class="tools-search-shortcut" aria-hidden="true">/</kbd>
       </div>
       <p class="tools-search-help">Use ↑ and ↓ to move through results, then Enter to open.</p>
     </section>
 
     <nav class="directory-jump" aria-label="Jump to a tool group">
-      <a href="#word-games"><span>01</span>Word Games <strong>12</strong></a>
-      <a href="#generators"><span>02</span>Generators <strong>2</strong></a>
-      <a href="#calculators"><span>03</span>Calculators <strong>15</strong></a>
-      <a href="#labs"><span>04</span>Labs <strong>1</strong></a>
-      <a href="#text-data"><span>05</span>Text &amp; Data <strong>5</strong></a>
-      <a href="#batch-automation"><span>06</span>Batch &amp; Automation <strong>5</strong></a>
+      <a href="#applications"><span>01</span>Applications <strong>4</strong></a>
+      <a href="#word-games"><span>02</span>Word Games <strong>12</strong></a>
+      <a href="#generators"><span>03</span>Generators <strong>2</strong></a>
+      <a href="#calculators"><span>04</span>Calculators <strong>15</strong></a>
+      <a href="#labs"><span>05</span>Labs <strong>1</strong></a>
+      <a href="#text-data"><span>06</span>Text &amp; Data <strong>5</strong></a>
+      <a href="#batch-automation"><span>07</span>Batch &amp; Automation <strong>5</strong></a>
     </nav>
 
-    <p class="tools-stats" id="toolsStats" aria-live="polite">Showing <strong id="visibleCount">40</strong> menu entries</p>
+    <p class="tools-stats" id="toolsStats" aria-live="polite">Showing <strong id="visibleCount">44</strong> directory entries</p>
 
     <div class="no-results" id="noResults" role="status" aria-live="polite" hidden>
       <span aria-hidden="true">?</span>
-      <div><strong>No matching tools</strong><p>Try another name, category, or task.</p></div>
+      <div><strong>No matching tools or apps</strong><p>Try another name, category, or task.</p></div>
     </div>
 
     <div class="tools-directory" id="toolsDirectory">
-      <section class="directory-group" id="word-games" data-tool-group>
+      <section class="directory-group" id="applications" data-tool-group>
         <header class="directory-group__header">
           <span class="directory-group__number">01</span>
+          <div><h2>Applications <span>4</span></h2><p>Play chess or design QR codes in your browser. Capture screenshots or find duplicate photos and videos on Windows.</p></div>
+        </header>
+        <div class="directory-grid">
+          <a class="directory-tool" data-application href="https://ironwoodchess.com/" data-search="application app chess engine pgn study board game">
+            <span class="directory-tool__icon" aria-hidden="true">IW</span>
+            <span><strong>Ironwood Chess</strong><small>Play chess in your browser and review games with Stockfish.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Analyze a game on your device</li><li>Review moves with Stockfish</li><li>Save annotated PGN files</li></ul></span>
+            <span class="directory-tool__arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="directory-tool" data-application href="https://snipsecure.monkeytactics.com/" data-search="application app screen capture screenshot OCR redaction snip secure">
+            <span class="directory-tool__icon" aria-hidden="true"><img src="/assets/images/snipsecure.png" width="28" height="28" alt=""></span>
+            <span><strong>SnipSecure</strong><small>Capture and search screenshots in an encrypted vault on your Windows PC.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Capture a window, region, or scrolling page</li><li>Search for words inside an image</li><li>Permanently redact private details before export</li></ul></span>
+            <span class="directory-tool__arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="directory-tool" data-application href="https://qrstudio.monkeytactics.com/" data-search="application app qr code designer generator animation templates">
+            <span class="directory-tool__icon" aria-hidden="true">QR</span>
+            <span><strong>QR Studio</strong><small>Design QR codes in your browser and export still or animated versions.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Customize code patterns, corners, and frames</li><li>Save visual styles for reuse</li><li>Export static or animated designs</li></ul></span>
+            <span class="directory-tool__arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="directory-tool" data-application href="https://dupeharbor.monkeytactics.com/" data-search="application app duplicate photo finder video cleanup dupe harbor">
+            <span class="directory-tool__icon" aria-hidden="true"><img src="/assets/images/dupeharbor.png" width="28" height="28" alt=""></span>
+            <span><strong>DupeHarbor</strong><small>Find exact copies of photos and videos on your Windows PC.</small><ul class="directory-tool__capabilities" aria-label="Capabilities"><li>Scan folders and subfolders</li><li>Compare duplicates with photo previews</li><li>Move extra copies to a folder or the Recycle Bin</li></ul></span>
+            <span class="directory-tool__arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="directory-group" id="word-games" data-tool-group>
+        <header class="directory-group__header">
+          <span class="directory-group__number">02</span>
           <div><h2>Word Games <span>12</span></h2><p>Solve word puzzles, find playable words, and narrow letter patterns.</p></div>
         </header>
         <div class="directory-grid">
@@ -87,7 +117,7 @@
 
       <section class="directory-group" id="generators" data-tool-group>
         <header class="directory-group__header">
-          <span class="directory-group__number">02</span>
+          <span class="directory-group__number">03</span>
           <div><h2>Generators <span>2</span></h2><p>Create secure, ready-to-use digital assets.</p></div>
         </header>
         <div class="directory-grid">
@@ -102,7 +132,7 @@
 
       <section class="directory-group directory-group--calculators" id="calculators" data-tool-group>
         <header class="directory-group__header">
-          <span class="directory-group__number">03</span>
+          <span class="directory-group__number">04</span>
           <div><h2>Calculators <span>15</span></h2><p>Calculate finances, health, dates, and construction materials.</p></div>
         </header>
 
@@ -150,7 +180,7 @@
 
       <section class="directory-group" id="labs" data-tool-group>
         <header class="directory-group__header">
-          <span class="directory-group__number">04</span>
+          <span class="directory-group__number">05</span>
           <div><h2>Labs <span>1</span></h2><p>Explore configurable models with disclosed assumptions and browser-local calculations.</p></div>
         </header>
         <div class="directory-grid">
@@ -161,7 +191,7 @@
 
       <section class="directory-group" id="text-data" data-tool-group>
         <header class="directory-group__header">
-          <span class="directory-group__number">05</span>
+          <span class="directory-group__number">06</span>
           <div><h2>Text &amp; Data <span>5</span></h2><p>Convert, decode, count, and extract everyday information.</p></div>
         </header>
         <div class="directory-grid">
@@ -175,7 +205,7 @@
 
       <section class="directory-group" id="batch-automation" data-tool-group>
         <header class="directory-group__header">
-          <span class="directory-group__number">06</span>
+          <span class="directory-group__number">07</span>
           <div><h2>Batch &amp; Automation <span>5</span></h2><p>Jump directly into multi-item and advanced workflows.</p></div>
         </header>
         <div class="directory-grid">

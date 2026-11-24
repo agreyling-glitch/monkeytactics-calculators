@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://monkeytactics.com/</loc>
-    <lastmod>2026-11-10</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://monkeytactics.com/tools/</loc>
-    <lastmod>2026-10-12</lastmod>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://monkeytactics.com/tools/finance</loc>
@@ -193,8 +193,8 @@
     <lastmod>2026-08-05</lastmod>
   </url>
   <url>
-    <loc>https://monkeytactics.com/sitemap/</loc>
-    <lastmod>2026-09-14</lastmod>
+    <loc>https://monkeytactics.com/sitemap</loc>
+    <lastmod>2026-11-24</lastmod>
   </url>
   <url>
     <loc>https://monkeytactics.com/sitemap.xml</loc>

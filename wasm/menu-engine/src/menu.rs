@@ -661,11 +661,15 @@ pub fn Header() -> impl IntoView {
             </div>
             <a class="mt-drawer-all" href="/tools">"View all tools"</a>
             <details class="mt-applications" open>
-                <summary>"Applications"<span>"3"</span></summary>
+                <summary>"Applications"<span>"4"</span></summary>
                 <div>
                     <a href="https://ironwoodchess.com/">
                         <strong>"Ironwood Chess"</strong>
                         <small>"Private play and Stockfish analysis"</small>
+                    </a>
+                    <a href="https://snipsecure.monkeytactics.com/">
+                        <strong>"SnipSecure"</strong>
+                        <small>"Capture, search, and redact screenshots on Windows"</small>
                     </a>
                     <a href="https://qrstudio.monkeytactics.com/">
                         <strong>"QR Studio"</strong>

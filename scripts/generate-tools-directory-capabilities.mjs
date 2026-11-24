@@ -23,7 +23,12 @@ const escapeHtml = (value) => value
 
 const original = await readFile(directoryPath, "utf8");
 let tileIndex = 0;
+let applicationCount = 0;
 let generated = original.replace(/<a class="directory-tool"[^>]*>[\s\S]*?<\/a>/g, (tile) => {
+  if (/^<a\b[^>]*\sdata-application\b/.test(tile)) {
+    applicationCount++;
+    return tile;
+  }
   const tool = leaves[tileIndex++];
   if (!tool) throw new Error("The tools directory contains more tiles than the manifest.");
 
@@ -51,8 +56,8 @@ if (tileIndex !== leaves.length) {
 }
 
 generated = generated.replace(
-  /(<strong id="visibleCount">)\d+(<\/strong> menu entries)/,
-  `$1${leaves.length}$2`,
+  /(<strong id="visibleCount">)\d+(<\/strong> directory entries)/,
+  `$1${leaves.length + applicationCount}$2`,
 );
 
 if (checkOnly) {

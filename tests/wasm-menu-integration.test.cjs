@@ -4,7 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const siteRoot = path.resolve(__dirname, "..");
-const menuAssetVersion = "20260922-applications-v1";
+const menuAssetVersion = "20261124-applications-v3";
 const integrationMarkup = [
   '<div id="mt-header"></div>',
 ];
@@ -110,7 +110,9 @@ test("the All Tools page renders manifest-owned capability disclosures", () => {
   const collectLeaves = (items) => items.forEach((item) => item.children?.length ? collectLeaves(item.children) : leaves.push(item));
   collectLeaves(manifest);
 
-  assert.equal((html.match(/class="directory-tool__capabilities"/g) || []).length, leaves.length);
+  const internalTiles = [...html.matchAll(/<a class="directory-tool" data-tool-id="[^"]+"[\s\S]*?<\/a>/g)].map(([tile]) => tile);
+  assert.equal(internalTiles.length, leaves.length);
+  assert.ok(internalTiles.every((tile) => tile.includes('class="directory-tool__capabilities"')));
   for (const tool of leaves) {
     assert.match(html, new RegExp(`data-tool-id="${tool.id}"[\\s\\S]*?aria-label="Capabilities"`));
     for (const capability of tool.capabilities) assert.ok(html.includes(capability.replaceAll("&", "&amp;")));
@@ -165,6 +167,10 @@ test("the burger menu promotes standalone applications after the tools directory
   assert.match(source, /mt-drawer-all[\s\S]*?class="mt-applications"/);
   assert.match(source, /https:\/\/qrstudio\.monkeytactics\.com\//);
   assert.match(source, /Advanced QR design workspace/);
+  const applications = source.match(/<details class="mt-applications" open>([\s\S]*?)<\/details>/)[1];
+  const appLinks = [...applications.matchAll(/<a href="([^"]+)">/g)].map(([, url]) => url);
+  assert.equal(Number(applications.match(/<summary>"Applications"<span>"(\d+)"/)[1]), appLinks.length);
+  assert.deepEqual(appLinks, ["https://ironwoodchess.com/", "https://snipsecure.monkeytactics.com/", "https://qrstudio.monkeytactics.com/", "https://dupeharbor.monkeytactics.com/"]);
   assert.match(source, /https:\/\/ironwoodchess\.com\//);
   assert.match(source, /Private play and Stockfish analysis/);
   assert.match(css, /\.mt-mobile-drawer \.mt-applications/);
@@ -174,6 +180,7 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
   const html = fs.readFileSync(path.join(siteRoot, "tools", "index.html"), "utf8");
 
   for (const [id, label, count] of [
+    ["applications", "Applications", 4],
     ["word-games", "Word Games", 12],
     ["generators", "Generators", 2],
     ["calculators", "Calculators", 15],
@@ -188,7 +195,14 @@ test("the All Tools page mirrors the WASM menu hierarchy", () => {
     assert.match(html, new RegExp(`<h3>${subgroup}</h3>`));
   }
 
-  assert.equal((html.match(/class="directory-tool"/g) || []).length, 40);
+  const tiles = html.match(/class="directory-tool"/g) || [];
+  assert.equal(tiles.length, 44);
+  assert.equal(Number(html.match(/id="visibleCount">(\d+)/)[1]), tiles.length);
+  const applications = html.match(/<section[^>]+id="applications"[\s\S]*?<\/section>/)[0];
+  const appLinks = [...applications.matchAll(/<a class="directory-tool" data-application href="([^"]+)"/g)].map(([, url]) => url);
+  const homepage = fs.readFileSync(path.join(siteRoot, "index.html"), "utf8");
+  const featuredLinks = [...homepage.matchAll(/<article class="home-app [^"]+">[\s\S]*?<a href="([^"]+)"/g)].map(([, url]) => url);
+  assert.deepEqual(appLinks, featuredLinks);
   assert.doesNotMatch(html, /class="filter-tab/);
 });
 
@@ -238,15 +252,18 @@ test("the homepage features twelve designated popular tools", () => {
   assert.match(html, /Rank definitions, synonyms, and WordNet graph relationships/);
   assert.match(html, /Group candidate answers by reusable Grid Positions/);
   assert.match(html, /Import, export, restore, and share complete Pick Lists/);
-  assert.match(html, /home\.css\?v=20260922-featured-apps-1/);
-  assert.match(html, /Featured applications[\s\S]*?<h3>QR Studio<\/h3>[\s\S]*?<h3>Ironwood Chess<\/h3>/);
+  assert.match(html, /home\.css\?v=20261124-featured-apps-3/);
+  const appCards = [...html.matchAll(/<article class="home-app [^"]+">[\s\S]*?<\/article>/g)].map(([card]) => card);
+  assert.deepEqual(appCards.map((card) => card.match(/<h3>([^<]+)<\/h3>/)[1]), ["Ironwood Chess", "SnipSecure", "QR Studio", "DupeHarbor"]);
+  assert.match(appCards[1], /class="featured-tool__new">NEW<\/span>/);
+  assert.match(appCards[1], /href="https:\/\/snipsecure\.monkeytactics\.com\/"/);
   assert.match(html, /href="https:\/\/qrstudio\.monkeytactics\.com\/"/);
   assert.match(html, /href="https:\/\/ironwoodchess\.com\/"/);
   assert.match(html, /aria-label="Applications"/);
   assert.match(homeCss, /\.featured-tool > p \{ min-height: 5\.25rem; margin: 0\.6rem 0 0\.75rem;/);
   assert.equal((html.match(/class="capability-list"/g) || []).length, 12);
-  assert.equal((html.match(/<li>/g) || []).length, 54);
-  assert.equal((html.match(/class="featured-tool__new">NEW</g) || []).length, 1);
+  assert.equal((html.match(/<li>/g) || []).length, 60);
+  assert.equal((html.match(/class="featured-tool__new">NEW</g) || []).length, 2);
   assert.equal((html.match(/class="featured-tool__updated">Updated/g) || []).length, 0);
   assert.match(html, /featured-tool--wordle[\s\S]*?featured-tool--antiwordle[\s\S]*?featured-tool--absurdle/);
   assert.match(html, /href="\/tools\/antiwordle-solver"/);
@@ -603,7 +620,9 @@ test("the All Tools directory reinforces the compound calculator search intent",
   assert.match(html, /<small>Calculate future savings and investment growth with monthly contributions\.<\/small>/);
   assert.match(manifest, /"description":"Calculate future savings and investment growth with monthly contributions\."/);
   assert.match(manifest, /"compound interest with monthly contributions","investment growth calculator"/);
-  assert.match(toolSitemap, /<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>2026-10-12<\/lastmod>/);
+  const directoryDate = html.match(/<meta name="date" content="(\d{4}-\d{2}-\d{2})"/)[1];
+  const sitemapDate = toolSitemap.match(/<loc>https:\/\/monkeytactics\.com\/tools\/<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/)[1];
+  assert.equal(sitemapDate, directoryDate);
 });
 
 test("the Mortgage Calculator identifies its author and review scope", () => {
